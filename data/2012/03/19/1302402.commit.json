@@ -1,0 +1,82 @@
+{
+  "when": "2012-03-19T08:53:27-04:00", 
+  "message": "installing docs build to the repo", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-2,8 +2,8", 
+          "lines": [
+            "   xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n", 
+            "   xsi:schemaLocation=\"http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd\">\n", 
+            "   <id>docs</id>\n", 
+            "+  <includeBaseDirectory>false</includeBaseDirectory>\n", 
+            "   <formats>\n", 
+            "-    <format>tar.gz</format>\n", 
+            "     <format>zip</format>\n", 
+            "   </formats>\n", 
+            "   <fileSets>\n"
+          ]
+        }, 
+        {
+          "locn": "-12,4 +12,4", 
+          "lines": [
+            "       <outputDirectory>docs</outputDirectory>\n", 
+            "     </fileSet>\n", 
+            "   </fileSets>\n", 
+            "-</assembly>\n", 
+            "\\ No newline at end of file\n", 
+            "+</assembly>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/documentation/src/main/assembly/docs.xml", 
+      "from": "java/modules/documentation/src/main/assembly/docs.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-48,7 +48,7", 
+          "lines": [
+            " \t    <artifactId>maven-site-plugin</artifactId>\n", 
+            " \t    <executions>\n", 
+            " \t      <execution>\n", 
+            "-\t\t<phase>install</phase>\n", 
+            "+\t\t<phase>package</phase>\n", 
+            " \t\t<goals>\n", 
+            " \t\t  <goal>site</goal>\n", 
+            " \t\t</goals>\n"
+          ]
+        }, 
+        {
+          "locn": "-57,15 +57,15", 
+          "lines": [
+            " \t  </plugin>\n", 
+            " \t  <plugin>\n", 
+            " \t    <artifactId>maven-assembly-plugin</artifactId>\n", 
+            "-\t    <executions>\n", 
+            "+\t    <executions>\t     \n", 
+            " \t      <execution>\n", 
+            "-\t\t<phase>install</phase>\n", 
+            "+\t\t<phase>package</phase>\n", 
+            " \t\t<goals>\n", 
+            "-\t\t  <goal>assembly</goal>\n", 
+            "+\t\t  <goal>single</goal>\n", 
+            " \t\t</goals>\n", 
+            " \t      </execution>\n", 
+            " \t    </executions>\n", 
+            "-\t    <configuration>\n", 
+            "+\t    <configuration>\t      \n", 
+            " \t      <descriptors>\n", 
+            " \t\t<descriptor>src/main/assembly/docs.xml</descriptor>\n", 
+            " \t      </descriptors>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/documentation/pom.xml", 
+      "from": "java/modules/documentation/pom.xml"
+    }
+  ], 
+  "id": "1302402"
+}

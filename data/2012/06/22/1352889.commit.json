@@ -1,0 +1,65 @@
+{
+  "when": "2012-06-22T09:42:43-04:00", 
+  "message": "Providig a hook to handle messages with no matching API resources", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-22,6 +22,7", 
+          "lines": [
+            " import org.apache.axis2.Constants;\n", 
+            " import org.apache.http.protocol.HTTP;\n", 
+            " import org.apache.synapse.ManagedLifecycle;\n", 
+            "+import org.apache.synapse.Mediator;\n", 
+            " import org.apache.synapse.MessageContext;\n", 
+            " import org.apache.synapse.core.SynapseEnvironment;\n", 
+            " import org.apache.synapse.core.axis2.Axis2MessageContext;\n"
+          ]
+        }, 
+        {
+          "locn": "-286,8 +287,15", 
+          "lines": [
+            "             }\n", 
+            "         }\n", 
+            " \n", 
+            "-        if (!processed && log.isDebugEnabled()) {\n", 
+            "-            log.debug(\"No matching resource was found for the request: \" + synCtx.getMessageID());\n", 
+            "+        if (!processed) {\n", 
+            "+            if (log.isDebugEnabled()) {\n", 
+            "+                log.debug(\"No matching resource was found for the request: \" + synCtx.getMessageID());\n", 
+            "+            }\n", 
+            "+\n", 
+            "+            Mediator sequence = synCtx.getSequence(RESTConstants.NO_MATCHING_RESOURCE_HANDLER);\n", 
+            "+            if (sequence != null) {\n", 
+            "+                sequence.mediate(synCtx);\n", 
+            "+            }\n", 
+            "         }\n", 
+            "     }\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/rest/API.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/rest/API.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-46,4 +46,6", 
+          "lines": [
+            " \n", 
+            "     public static final String DEFAULT_ENCODING = \"UTF-8\";\n", 
+            " \n", 
+            "+    public static final String NO_MATCHING_RESOURCE_HANDLER = \"NO_MATCHING_RESOURCE_HANDLER\";\n", 
+            "+\n", 
+            " }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/rest/RESTConstants.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/rest/RESTConstants.java"
+    }
+  ], 
+  "id": "1352889"
+}

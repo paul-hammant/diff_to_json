@@ -1,0 +1,28 @@
+{
+  "when": "2012-10-07T13:57:27-04:00", 
+  "message": "Allow the JAXWSStockQuoteService to be built on Java 1.5.", 
+  "who": "veithen", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-35,6 +35,9", 
+          "lines": [
+            "         <javac debug=\"on\" destdir=\"${classes}\" includeantruntime=\"false\">\n", 
+            "             <src path=\"src\"/>\n", 
+            "             <classpath>\n", 
+            "+                <fileset dir=\"../../../../lib\">\n", 
+            "+                    <include name=\"*.jar\"/>\n", 
+            "+                </fileset>\n", 
+            "                 <fileset dir=\"../../lib\">\n", 
+            "                     <include name=\"*.jar\"/>\n", 
+            "                 </fileset>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/samples/services/JAXWSStockQuoteService/build.xml", 
+      "from": "java/modules/samples/services/JAXWSStockQuoteService/build.xml"
+    }
+  ], 
+  "id": "1395351"
+}

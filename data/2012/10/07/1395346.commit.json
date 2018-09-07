@@ -1,0 +1,27 @@
+{
+  "when": "2012-10-07T13:39:33-04:00", 
+  "message": "Fixed formatting.", 
+  "who": "veithen", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-36,7 +36,7", 
+          "lines": [
+            "             <src path=\"src\"/>\n", 
+            "             <classpath>\n", 
+            "                 <fileset dir=\"../../lib\">\n", 
+            "-                   \t<include name=\"*.jar\"/>\n", 
+            "+                    <include name=\"*.jar\"/>\n", 
+            "                 </fileset>\n", 
+            "             </classpath>\n", 
+            "         </javac>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/samples/services/JAXWSStockQuoteService/build.xml", 
+      "from": "java/modules/samples/services/JAXWSStockQuoteService/build.xml"
+    }
+  ], 
+  "id": "1395346"
+}

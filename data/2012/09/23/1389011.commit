@@ -1,0 +1,38 @@
+Index: java/modules/transports/core/vfs/src/test/java/org/apache/synapse/transport/vfs/VFSTestEnvironment.java
+===================================================================
+--- java/modules/transports/core/vfs/src/test/java/org/apache/synapse/transport/vfs/VFSTestEnvironment.java	(revision 1389010)
++++ java/modules/transports/core/vfs/src/test/java/org/apache/synapse/transport/vfs/VFSTestEnvironment.java	(revision 1389011)
+
+Property changes on: java/modules/transports/core/vfs/src/test/java/org/apache/synapse/transport/vfs/VFSTestEnvironment.java
+___________________________________________________________________
+Deleted: svn:mergeinfo
+## -0,0 +0,0 ##
+Index: java/modules/core/src/main/java/org/apache/synapse/eventing/filters/TopicBasedEventFilter.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/eventing/filters/TopicBasedEventFilter.java	(revision 1389010)
++++ java/modules/core/src/main/java/org/apache/synapse/eventing/filters/TopicBasedEventFilter.java	(revision 1389011)
+
+Property changes on: java/modules/core/src/main/java/org/apache/synapse/eventing/filters/TopicBasedEventFilter.java
+___________________________________________________________________
+Deleted: svn:mergeinfo
+## -0,0 +0,0 ##
+Index: java/modules/core/src/main/java/org/apache/synapse/util/resolver/CustomXmlSchemaURIResolver.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/util/resolver/CustomXmlSchemaURIResolver.java	(revision 1389010)
++++ java/modules/core/src/main/java/org/apache/synapse/util/resolver/CustomXmlSchemaURIResolver.java	(revision 1389011)
+
+Property changes on: java/modules/core/src/main/java/org/apache/synapse/util/resolver/CustomXmlSchemaURIResolver.java
+___________________________________________________________________
+Deleted: svn:mergeinfo
+## -0,0 +0,0 ##
+Index: java/repository/conf/synapse-config/synapse.xml
+===================================================================
+--- java/repository/conf/synapse-config/synapse.xml	(revision 1389010)
++++ java/repository/conf/synapse-config/synapse.xml	(revision 1389011)
+
+Property changes on: java/repository/conf/synapse-config/synapse.xml
+___________________________________________________________________
+Deleted: svn:mergeinfo
+## -0,0 +0,0 ##
+-*-*-*-
+Removed empty svn:mergeinfo properties.

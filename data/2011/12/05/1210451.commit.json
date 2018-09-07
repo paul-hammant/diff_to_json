@@ -1,0 +1,75 @@
+{
+  "when": "2011-12-05T08:14:12-05:00", 
+  "message": "Fixing an issue with persisting messages in a message store", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-44,6 +44,7", 
+          "lines": [
+            "         lock.lock();\n", 
+            "         try {\n", 
+            "             if (messageContext != null) {\n", 
+            "+                messageContext.getEnvelope().build();\n", 
+            "                 messageList.put(messageContext.getMessageID(), messageContext);\n", 
+            "                 /** Notify observers */\n", 
+            "                 notifyMessageAddition(messageContext.getMessageID());\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/message/store/InMemoryMessageStore.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/message/store/InMemoryMessageStore.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-148,4 +148,3", 
+          "lines": [
+            "         return view;\n", 
+            "     }\n", 
+            " }\n", 
+            "-\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ScheduledMessageForwardingProcessor.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ScheduledMessageForwardingProcessor.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-132,7 +132,6", 
+          "lines": [
+            "             // otherwise when retrying same header element will add multiple times\n", 
+            "             sc.removeHeaders();\n", 
+            " \n", 
+            "-            axis2Ctx.getAttachmentMap();\n", 
+            "             Iterator itr = axis2Ctx.getEnvelope().getHeader().getChildren();\n", 
+            "             while (itr.hasNext()) {\n", 
+            "                 Object o =itr.next();\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/BlockingMessageSender.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/BlockingMessageSender.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-191,4 +191,5", 
+          "lines": [
+            "         }\n", 
+            "         state = State.DESTROY;\n", 
+            "     }\n", 
+            "+\n", 
+            " }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/message/processors/ScheduledMessageProcessor.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/message/processors/ScheduledMessageProcessor.java"
+    }
+  ], 
+  "id": "1210451"
+}

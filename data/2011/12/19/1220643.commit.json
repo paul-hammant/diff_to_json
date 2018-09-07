@@ -1,0 +1,45 @@
+{
+  "when": "2011-12-19T03:19:19-05:00", 
+  "message": "Fixing xalan duplication issue", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-249,6 +249,7", 
+          "lines": [
+            "                 <exclude>org.slf4j:jcl-over-slf4j:jar</exclude>\r\n", 
+            "                 <exclude>org.slf4j:log4j-over-slf4j:jar</exclude>\r\n", 
+            "                 <exclude>com.oopsconsultancy:xmltask:jar</exclude>\r\n", 
+            "+\t\t<exclude>xalan:xalan:jar</exclude>\r\n", 
+            "             </excludes>\r\n", 
+            "         </dependencySet>\r\n", 
+            "         <dependencySet>\r\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/distribution/src/main/assembly/bin.xml", 
+      "from": "java/modules/distribution/src/main/assembly/bin.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-82,7 +82,7", 
+          "lines": [
+            "                     <artifactId>woden-api</artifactId>\n", 
+            "                 </exclusion>\n", 
+            "                 <exclusion>\n", 
+            "-                    <groupId>org.apache.xalan</groupId>\n", 
+            "+                    <groupId>xalan</groupId>\n", 
+            "                     <artifactId>xalan</artifactId>\n", 
+            "                 </exclusion>\n", 
+            "             </exclusions>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/distribution/pom.xml", 
+      "from": "java/modules/distribution/pom.xml"
+    }
+  ], 
+  "id": "1220643"
+}

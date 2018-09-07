@@ -1,0 +1,32 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/rest/API.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/rest/API.java	(revision 1346305)
++++ java/modules/core/src/main/java/org/apache/synapse/rest/API.java	(revision 1346306)
+@@ -335,6 +335,12 @@
+         for (Resource resource : resources.values()) {
+             resource.init(se);
+         }
++        
++        for (Handler handler : handlers) {
++            if (handler instanceof ManagedLifecycle) {
++                ((ManagedLifecycle) handler).init(se);
++            }
++        }
+     }
+ 
+     public void destroy() {
+@@ -342,6 +348,12 @@
+         for (Resource resource : resources.values()) {
+             resource.destroy();
+         }
++
++        for (Handler handler : handlers) {
++            if (handler instanceof ManagedLifecycle) {
++                ((ManagedLifecycle) handler).destroy();
++            }
++        }
+     }
+ 
+     public VersionStrategy getVersionStrategy() {
+-*-*-*-
+Life cycle support for Synapse API handlers

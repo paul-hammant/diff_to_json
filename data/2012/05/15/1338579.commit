@@ -1,0 +1,36 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/rest/dispatch/URLMappingHelper.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/rest/dispatch/URLMappingHelper.java	(revision 1338578)
++++ java/modules/core/src/main/java/org/apache/synapse/rest/dispatch/URLMappingHelper.java	(revision 1338579)
+@@ -45,6 +45,10 @@
+         if (!"/".equals(url)) {
+             url = RESTUtils.trimTrailingSlashes(url);
+         }
++        int index = url.indexOf('?');
++        if (index != -1) {
++            url = url.substring(0, index);
++        }
+         return exactMatch != null && exactMatch.equals(url);
+     }
+ 
+Index: java/modules/core/src/test/java/org/apache/synapse/rest/URLMappingBasedDispatcherTest.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/rest/URLMappingBasedDispatcherTest.java	(revision 1338578)
++++ java/modules/core/src/test/java/org/apache/synapse/rest/URLMappingBasedDispatcherTest.java	(revision 1338579)
+@@ -142,6 +142,14 @@
+         handler.process(synCtx);
+         assertEquals(PROP_VALUE, synCtx.getProperty(PROP_NAME));
+ 
++        synCtx = getMessageContext(synapseConfig, false, "/test/foo/bar?a=5", "GET");
++        handler.process(synCtx);
++        assertEquals(PROP_VALUE, synCtx.getProperty(PROP_NAME));
++
++        synCtx = getMessageContext(synapseConfig, false, "/test/foo/bar?a=5&name=test", "GET");
++        handler.process(synCtx);
++        assertEquals(PROP_VALUE, synCtx.getProperty(PROP_NAME));
++
+         synCtx = getMessageContext(synapseConfig, false, "/test/foo", "GET");
+         handler.process(synCtx);
+         assertNull(synCtx.getProperty(PROP_NAME));
+-*-*-*-
+Supporting proper exact matches with query parameters

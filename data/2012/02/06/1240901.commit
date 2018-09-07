@@ -1,0 +1,230 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/libraries/util/LibDeployerUtils.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/libraries/util/LibDeployerUtils.java	(revision 1240900)
++++ java/modules/core/src/main/java/org/apache/synapse/libraries/util/LibDeployerUtils.java	(revision 1240901)
+@@ -21,6 +21,8 @@
+ import org.apache.axiom.om.OMAttribute;
+ import org.apache.axiom.om.OMElement;
+ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
++import org.apache.axis2.deployment.DeploymentException;
++import org.apache.axis2.deployment.util.Utils;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.SynapseException;
+@@ -58,7 +60,18 @@
+         //extract
+         String extractPath = LibDeployerUtils.extractSynapseLib(libFilePath);
+         //create synapse lib metadata
+-        SynapseLibrary synapseLib = LibDeployerUtils.populateDependencies(extractPath + LibDeployerConstants.ARTIFACTS_XML);
++        SynapseLibrary synapseLib = LibDeployerUtils.populateDependencies(extractPath +
++                                                                          LibDeployerConstants.ARTIFACTS_XML);
++
++        //create a ClassLoader for loading this synapse lib classes/resources
++        try {
++            ClassLoader libLoader = Utils.getClassLoader(LibDeployerUtils.class.getClassLoader(),
++                                                         extractPath, false);
++            synapseLib.setLibClassLoader(libLoader);
++        } catch (DeploymentException e) {
++            throw new SynapseArtifactDeploymentException("Error setting up lib classpath for Synapse" +
++                                                         " Library  : " + libFilePath, e);
++        }
+         //resolve synapse lib artifacts
+         LibDeployerUtils.searchAndResolveDependencies(extractPath, synapseLib);
+         return synapseLib;
+Index: java/modules/core/src/main/java/org/apache/synapse/libraries/model/Library.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/libraries/model/Library.java	(revision 1240900)
++++ java/modules/core/src/main/java/org/apache/synapse/libraries/model/Library.java	(revision 1240901)
+@@ -68,5 +68,11 @@
+      */
+     public boolean unLoadLibrary();
+ 
++    /**
++     *
++     * @return the Class loader that can be used to load classes/resources under this library
++     */
++    public ClassLoader getLibClassLoader();
+ 
++
+ }
+Index: java/modules/core/src/main/java/org/apache/synapse/libraries/model/SynapseLibrary.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/libraries/model/SynapseLibrary.java	(revision 1240900)
++++ java/modules/core/src/main/java/org/apache/synapse/libraries/model/SynapseLibrary.java	(revision 1240901)
+@@ -44,6 +44,8 @@
+ 
+     private boolean isLoaded = false;
+ 
++    private ClassLoader libClassLoader = null ;
++
+     public SynapseLibrary(String name, String packageName) {
+         this.packageN = packageName;
+         if (packageName != null && !"".equals(packageName)) {
+@@ -144,6 +146,10 @@
+         return true;
+     }
+ 
++    public ClassLoader getLibClassLoader() {
++        return libClassLoader;  //To change body of implemented methods use File | Settings | File Templates.
++    }
++
+     public void clear() {
+         depNameToArtifactIndex.clear();
+         libArtifactDetails.clear();
+@@ -178,4 +184,8 @@
+     public String getDescription() {
+         return description;
+     }
++
++    public void setLibClassLoader(ClassLoader libClassLoader) {
++        this.libClassLoader = libClassLoader;
++    }
+ }
+Index: java/modules/core/src/main/java/org/apache/synapse/libraries/model/ArtifactFile.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/libraries/model/ArtifactFile.java	(revision 1240900)
++++ java/modules/core/src/main/java/org/apache/synapse/libraries/model/ArtifactFile.java	(revision 1240901)
+@@ -27,6 +27,7 @@
+ 
+ import javax.xml.stream.XMLStreamException;
+ import java.io.*;
++import java.util.Properties;
+ 
+ public abstract class ArtifactFile {
+ 
+@@ -38,6 +39,8 @@
+ 
+     public abstract Object build();
+ 
++    protected Properties properties;
++
+     public ArtifactFile(String fileXmlPath){
+         fileName = fileXmlPath;
+         File f = new File(fileXmlPath);
+@@ -63,5 +66,11 @@
+         }
+     }
+ 
++    public OMElement getConfigurationElement(){
++        return configurationElement;
++    }
+ 
++    public void setProperties(Properties properties) {
++        this.properties = properties;
++    }
+ }
+Index: java/modules/core/src/main/java/org/apache/synapse/libraries/model/LibraryArtifact.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/libraries/model/LibraryArtifact.java	(revision 1240900)
++++ java/modules/core/src/main/java/org/apache/synapse/libraries/model/LibraryArtifact.java	(revision 1240901)
+@@ -95,6 +95,7 @@
+         for (String artifactName : subArtifacts.keySet()) {
+             LibraryArtifact artifact = subArtifacts.get(artifactName);
+             if (artifact.isLeafArtifact()) {
++                delegateClassLoading(artifact, library);
+                 //this is where actual artifact is constructed to it's ture form
+                 Object template = artifact.file.build();
+                 if (artifact.file instanceof TemplateArtifactFile) {
+@@ -120,6 +121,12 @@
+         }
+     }
+ 
++    private void delegateClassLoading(LibraryArtifact artifact, SynapseLibrary library) {
++        Properties classLoadingProperties = new Properties();
++        classLoadingProperties.put(SynapseConstants.SYNAPSE_LIB_LOADER, library.getLibClassLoader());
++        artifact.file.setProperties(classLoadingProperties);
++    }
++
+     private String getQualifiedName(String aPackage, String templateName) {
+         return aPackage + "." + templateName;
+     }
+@@ -168,7 +175,7 @@
+             if (element != null) {
+                 String name = element.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
+                 try {
+-                    templateObject = MediatorFactoryFinder.getInstance().getMediator(configurationElement, new Properties());
++                    templateObject = MediatorFactoryFinder.getInstance().getMediator(configurationElement, properties);
+                 } catch (Exception e) {
+                     String msg = "Template configuration : " + name + " cannot be built" +
+                             "for Synapse Library artifact : " + LibraryArtifact.this.name;;
+@@ -185,7 +192,7 @@
+                                                                       "name"));
+                     try {
+                         templateObject = templateFactory.createEndpointTemplate(configurationElement,
+-                                                                                new Properties());
++                                                                                properties);
+                     } catch (Exception e) {
+                         String msg = "Endpoint Template: " + name + "configuration cannot be built " +
+                                      "for Synapse Library artifact : " + LibraryArtifact.this.name;
+@@ -213,7 +220,7 @@
+         }
+ 
+         public boolean resolveWith(LibraryArtifact artifact) {
+-            return markAsResolved == name.equals(artifact.name);
++            return markAsResolved = name.equals(artifact.name);
+         }
+ 
+         public boolean isResolved() {
+Index: java/modules/core/src/main/java/org/apache/synapse/SynapseConstants.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/SynapseConstants.java	(revision 1240900)
++++ java/modules/core/src/main/java/org/apache/synapse/SynapseConstants.java	(revision 1240901)
+@@ -135,6 +135,9 @@
+     public static final String SYNAPSE_XML = "synapse.xml";
+     /** The name of the system property used to specify/override the Synapse properties location */
+     public static final String SYNAPSE_PROPERTIES = "synapse.properties";
++
++    /** the name of the property used for synapse library based class loading */
++    public static final String SYNAPSE_LIB_LOADER = "synapse.lib.classloader";
+     /** conf directory name **/
+     public static final String CONF_DIRECTORY = "conf";
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/ClassMediatorFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/ClassMediatorFactory.java	(revision 1240900)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/ClassMediatorFactory.java	(revision 1240901)
+@@ -23,6 +23,7 @@
+ import org.apache.axiom.om.OMElement;
+ import org.apache.axiom.om.OMNode;
+ import org.apache.synapse.Mediator;
++import org.apache.synapse.SynapseConstants;
+ import org.apache.synapse.SynapseException;
+ import org.apache.synapse.commons.util.PropertyHelper;
+ import org.apache.synapse.mediators.ext.ClassMediator;
+@@ -59,7 +60,13 @@
+         Class clazz = null;
+         Mediator m = null;
+         try {
+-            clazz = getClass().getClassLoader().loadClass(
++            ClassLoader classMediatorLoader = null;
++            if(properties != null){
++                classMediatorLoader = (ClassLoader) properties.get(SynapseConstants.SYNAPSE_LIB_LOADER);
++            }
++            classMediatorLoader = classMediatorLoader != null ? classMediatorLoader :
++                                  getClass().getClassLoader();
++            clazz = classMediatorLoader.loadClass(
+                     name.getAttributeValue());
+             m = (Mediator) clazz.newInstance();
+         } catch (Exception e) {
+Index: java/modules/core/src/main/java/org/apache/synapse/deployers/LibraryArtifactDeployer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/deployers/LibraryArtifactDeployer.java	(revision 1240900)
++++ java/modules/core/src/main/java/org/apache/synapse/deployers/LibraryArtifactDeployer.java	(revision 1240901)
+@@ -18,7 +18,6 @@
+ package org.apache.synapse.deployers;
+ 
+ import org.apache.axiom.om.OMElement;
+-import org.apache.axiom.om.OMException;
+ import org.apache.axis2.deployment.DeploymentException;
+ import org.apache.axis2.deployment.repository.util.DeploymentFileData;
+ import org.apache.commons.io.FilenameUtils;
+@@ -27,7 +26,6 @@
+ import org.apache.synapse.ServerState;
+ import org.apache.synapse.libraries.imports.SynapseImport;
+ import org.apache.synapse.libraries.model.Library;
+-import org.apache.synapse.libraries.model.SynapseLibrary;
+ import org.apache.synapse.libraries.util.LibDeployerUtils;
+ 
+ import java.io.File;
+-*-*-*-
+committing synapse lib changes wrt classloading. enable to load lib based classes on demand

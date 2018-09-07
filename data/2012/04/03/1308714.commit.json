@@ -1,0 +1,46 @@
+{
+  "when": "2012-04-03T02:11:33-04:00", 
+  "message": "Making the MBean names unique so they work in situations where multiple NHTTP listeners are exposed", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-127,7 +127,7", 
+          "lines": [
+            " \n", 
+            "         // register with JMX\n", 
+            "         mbeanSupport\n", 
+            "-            = new TransportMBeanSupport(this, \"nio-http\" + (sslContext == null ? \"\" : \"s\"));\n", 
+            "+            = new TransportMBeanSupport(this, \"nio-\" + transportIn.getName());\n", 
+            "         mbeanSupport.register();\n", 
+            "     }\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOListener.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOListener.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-208,7 +208,7", 
+          "lines": [
+            " \n", 
+            "         // register with JMX\n", 
+            "         mbeanSupport\n", 
+            "-            = new TransportMBeanSupport(this, \"nio-http\" + (sslContext == null ? \"\" : \"s\"));\n", 
+            "+            = new TransportMBeanSupport(this, \"nio-\" + transportOut.getName());\n", 
+            "         mbeanSupport.register();\n", 
+            "         \n", 
+            "         state = BaseConstants.STARTED;\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java"
+    }
+  ], 
+  "id": "1308714"
+}

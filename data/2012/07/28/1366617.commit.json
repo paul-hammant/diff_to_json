@@ -1,0 +1,30 @@
+{
+  "when": "2012-07-28T05:04:06-04:00", 
+  "message": "Some code simplifications using the new OMContainer#removeChildren() method.\n", 
+  "who": "veithen", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-108,10 +108,7", 
+          "lines": [
+            " \n", 
+            "             // if not preservePayload remove all the child elements\n", 
+            "             if (!preservePayload && envelope.getBody() != null) {\n", 
+            "-                for (Iterator itr = envelope.getBody().getChildren(); itr.hasNext();) {\n", 
+            "-                    itr.next();\n", 
+            "-                    itr.remove();\n", 
+            "-                }\n", 
+            "+                envelope.getBody().removeChildren();\n", 
+            "             }\n", 
+            " \n", 
+            "             int msgCount = splitElements.size();\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/eip/splitter/IterateMediator.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/eip/splitter/IterateMediator.java"
+    }
+  ], 
+  "id": "1366617"
+}

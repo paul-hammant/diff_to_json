@@ -1,0 +1,112 @@
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessConstants.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessConstants.java	(revision 1221623)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessConstants.java	(revision 1221624)
+@@ -39,7 +39,7 @@
+     /**
+      * The directory in which log files are created.
+      */
+-    public static String DIRECTORY = "repository/logs";
++    public static String DIRECTORY = "logs";
+ 
+     /**
+      * Gives the format of the date to be appended to the name of the access log file.
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/LoggingNHttpClientConnection.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/LoggingNHttpClientConnection.java	(revision 1221623)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/LoggingNHttpClientConnection.java	(revision 1221624)
+@@ -47,6 +47,7 @@
+     private final Log iolog;
+     private final Log headerlog;
+     private final Log wirelog;
++    private final Log accesslog;
+     private final String id;
+ 
+     public LoggingNHttpClientConnection(
+@@ -59,6 +60,7 @@
+         this.iolog = LogFactory.getLog(session.getClass());
+         this.headerlog = LogFactory.getLog(LoggingUtils.HEADER_LOG_ID);
+         this.wirelog = LogFactory.getLog(LoggingUtils.WIRE_LOG_ID);
++        this.accesslog = LogFactory.getLog(LoggingUtils.ACCESS_LOG_ID);
+         this.id = "http-outgoing-" + COUNT.incrementAndGet();
+         if (this.iolog.isDebugEnabled() || this.wirelog.isDebugEnabled()) {
+             this.session = new LoggingIOSession(session, this.id, this.iolog, this.wirelog);
+@@ -148,6 +150,9 @@
+                     headerlog.debug(id + " >> " + headers[i].toString());
+                 }
+             }
++            if (message != null && accesslog.isInfoEnabled()) {
++                AccessHandler.getAccess().addAccessToQueue(message);
++            }
+             this.writer.write(message);
+         }
+ 
+@@ -179,6 +184,9 @@
+                     headerlog.debug(id + " << " + headers[i].toString());
+                 }
+             }
++            if (message != null && accesslog.isInfoEnabled()) {
++                AccessHandler.getAccess().addAccessToQueue(message);
++            }
+             return message;
+         }
+ 
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/LoggingUtils.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/LoggingUtils.java	(revision 1221623)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/LoggingUtils.java	(revision 1221624)
+@@ -34,7 +34,8 @@
+ class LoggingUtils {
+     
+     public final static String HEADER_LOG_ID = "org.apache.synapse.transport.nhttp.headers"; 
+-    public final static String WIRE_LOG_ID = "org.apache.synapse.transport.nhttp.wire"; 
++    public final static String WIRE_LOG_ID = "org.apache.synapse.transport.nhttp.wire";
++    public final static String ACCESS_LOG_ID = "org.apache.synapse.transport.nhttp.access";
+ 
+     public static NHttpClientHandler decorate(NHttpClientHandler handler) {
+         Log log = LogFactory.getLog(handler.getClass());
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/LoggingNHttpServerConnection.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/LoggingNHttpServerConnection.java	(revision 1221623)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/LoggingNHttpServerConnection.java	(revision 1221624)
+@@ -46,6 +46,7 @@
+     private final Log log;
+     private final Log iolog;
+     private final Log headerlog;
++    private final Log accesslog;
+     private final Log wirelog;
+     private final String id;
+ 
+@@ -59,6 +60,7 @@
+         this.iolog = LogFactory.getLog(session.getClass());
+         this.headerlog = LogFactory.getLog(LoggingUtils.HEADER_LOG_ID);
+         this.wirelog = LogFactory.getLog(LoggingUtils.WIRE_LOG_ID);
++        this.accesslog = LogFactory.getLog(LoggingUtils.ACCESS_LOG_ID);
+         this.id = "http-incoming-" + COUNT.incrementAndGet();
+         if (this.iolog.isDebugEnabled() || this.wirelog.isDebugEnabled()) {
+             this.session = new LoggingIOSession(session, this.id, this.iolog, this.wirelog);
+@@ -148,6 +150,11 @@
+                     headerlog.debug(id + " << " + headers[i].toString());
+                 }
+             }
++
++            if (message != null && accesslog.isInfoEnabled()) {
++                AccessHandler.getAccess().addAccessToQueue(message);
++            }
++
+             this.writer.write(message);
+         }
+ 
+@@ -179,6 +186,10 @@
+                     headerlog.debug(id + " >> " + headers[i].toString());
+                 }
+             }
++            if (message != null && accesslog.isInfoEnabled()) {
++                AccessHandler.getAccess().addAccessToQueue(message);
++            }
++
+             return message;
+         }
+ 
+-*-*-*-
+Patch for SYNAPSE-781, Fixed some test failures and updated the log file location

@@ -1,0 +1,47 @@
+{
+  "when": "2012-09-14T06:07:09-04:00", 
+  "message": "Fixed sample 156: WSS4J seems to require Xalan, so include it in the distribution.", 
+  "who": "veithen", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-188,7 +188,6", 
+          "lines": [
+            "                 <exclude>xerces:xercesImpl:jar</exclude>\r\n", 
+            "                 <exclude>org.apache.xerces:xercesImpl</exclude> <!-- Find the source of this -->\r\n", 
+            "                 <exclude>org.apache.xerces:xml-apis</exclude>\r\n", 
+            "-                <exclude>xalan:xalan:jar</exclude>\r\n", 
+            "                 <exclude>quickfixj:quickfixj-all:jar</exclude>\r\n", 
+            "                 <exclude>org.snmp4j:snmp4j</exclude>\r\n", 
+            "                 <exclude>org.snmp4j:snmp4j-agent</exclude>\r\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/distribution/src/main/assembly/bin.xml", 
+      "from": "java/modules/distribution/src/main/assembly/bin.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-554,10 +554,6", 
+          "lines": [
+            "                         <groupId>org.apache.woden</groupId>\n", 
+            "                         <artifactId>woden-api</artifactId>\n", 
+            "                     </exclusion>\n", 
+            "-                    <exclusion>\n", 
+            "-                        <groupId>xalan</groupId>\n", 
+            "-                        <artifactId>xalan</artifactId>\n", 
+            "-                    </exclusion>\n", 
+            "                 </exclusions>\n", 
+            "                 <type>mar</type>\n", 
+            "             </dependency>\n"
+          ]
+        }
+      ], 
+      "to": "java/pom.xml", 
+      "from": "java/pom.xml"
+    }
+  ], 
+  "id": "1384707"
+}

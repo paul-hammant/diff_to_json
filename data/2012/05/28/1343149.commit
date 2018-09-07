@@ -1,0 +1,14 @@
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java	(revision 1343148)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java	(revision 1343149)
+@@ -109,6 +109,7 @@
+         }
+ 
+         port = port + portOffset;
++        System.setProperty(transportIn.getName() + ".nio.port", String.valueOf(port));
+ 
+         param = transportIn.getParameter(NhttpConstants.BIND_ADDRESS);
+         if (param != null) {
+-*-*-*-
+Making NHTTP ports available via system properties

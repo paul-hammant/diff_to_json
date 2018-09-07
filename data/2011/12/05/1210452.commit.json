@@ -1,0 +1,477 @@
+{
+  "when": "2011-12-05T08:16:19-05:00", 
+  "message": "Fixing a few typos and minor issues with the deployers", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-24,10 +24,8", 
+          "lines": [
+            " import org.apache.commons.logging.LogFactory;\n", 
+            " \n", 
+            " import java.io.File;\n", 
+            "-import java.util.ArrayList;\n", 
+            "-import java.util.HashMap;\n", 
+            "-import java.util.List;\n", 
+            "-import java.util.Map;\n", 
+            "+import java.io.IOException;\n", 
+            "+import java.util.*;\n", 
+            " \n", 
+            " /**\n", 
+            "  * Keeps track of the artifacts deployed with files inside the synapse repository</p>\n"
+          ]
+        }, 
+        {
+          "locn": "-41,6 +39,7", 
+          "lines": [
+            "  * @see org.apache.synapse.config.xml.MultiXMLConfigurationBuilder\n", 
+            "  */\n", 
+            " public final class SynapseArtifactDeploymentStore {\n", 
+            "+\n", 
+            "     /** Keeps track of the deployed artifacts in the synapse environment */\n", 
+            "     private Map<String, String> fileName2ArtifactName = new HashMap<String, String>();\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-48,10 +47,10", 
+          "lines": [
+            "     private Map<String, String> updatingArtifacts = new HashMap<String, String>();\n", 
+            " \n", 
+            "     /** Keeps track of the restored artifacts in the synapse environment in a particular instance */\n", 
+            "-    private List<String> restoredFiles = new ArrayList<String>();\n", 
+            "+    private Set<String> restoredFiles = new HashSet<String>();\n", 
+            " \n", 
+            "     /** Keeps track of the backed up artifacts in the synapse environment in a particular instance */\n", 
+            "-    private List<String> backedUpFiles = new ArrayList<String>();\n", 
+            "+    private Set<String> backedUpFiles = new HashSet<String>();\n", 
+            "    \n", 
+            "     private static final Log log = LogFactory.getLog(SynapseArtifactDeploymentStore.class);\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-228,6 +227,14", 
+          "lines": [
+            "     }\n", 
+            " \n", 
+            "     public static String getNormalizedAbsolutePath(String fileName) {\n", 
+            "-        return FilenameUtils.normalize(new File(fileName).getAbsolutePath());\n", 
+            "+        String path;\n", 
+            "+        File file = new File(fileName);\n", 
+            "+        try {\n", 
+            "+            path = file.getCanonicalPath();\n", 
+            "+        } catch (IOException e) {\n", 
+            "+            log.warn(\"Error while computing the canonical path of file: \" + fileName);\n", 
+            "+            path = file.getAbsolutePath();\n", 
+            "+        }\n", 
+            "+        return FilenameUtils.normalize(path);\n", 
+            "     }\n", 
+            " }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/deployers/SynapseArtifactDeploymentStore.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/deployers/SynapseArtifactDeploymentStore.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-138,7 +138,7", 
+          "lines": [
+            "                         getEndpointTemplate(existingArtifactName);\n", 
+            " \n", 
+            "                 if (existingArtifactName.equals(tm.getName())) {\n", 
+            "-                    getSynapseConfiguration().updateEndpointTemplate(tm.getName(), existingSt);\n", 
+            "+                    getSynapseConfiguration().updateEndpointTemplate(tm.getName(), tm);\n", 
+            "                 } else {\n", 
+            "                     getSynapseConfiguration().addEndpointTemplate(tm.getName(), tm);\n", 
+            "                     getSynapseConfiguration().removeEndpointTemplate(existingSt.getName());\n"
+          ]
+        }, 
+        {
+          "locn": "-171,7 +171,7", 
+          "lines": [
+            "                                 getSequenceTemplate(existingArtifactName);\n", 
+            " \n", 
+            "                         if (existingArtifactName.equals(tm.getName())) {\n", 
+            "-                            getSynapseConfiguration().updateSequenceTemplate(tm.getName(), existingSt);\n", 
+            "+                            getSynapseConfiguration().updateSequenceTemplate(tm.getName(), tm);\n", 
+            "                         } else {\n", 
+            "                             getSynapseConfiguration().addSequenceTemplate(tm.getName(), tm);\n", 
+            "                             getSynapseConfiguration().removeSequenceTemplate(existingSt.getName());\n"
+          ]
+        }, 
+        {
+          "locn": "-206,10 +206,10", 
+          "lines": [
+            "             try {\n", 
+            "                 st = getSynapseConfiguration().getEndpointTemplate(artifactName);\n", 
+            "             } catch (SynapseException e) {\n", 
+            "-                //could not locate an endpoint template for this particular un-delpoyment. This name refers\n", 
+            "-                //probably to a sequence tempalte. Thus if  throws a Synapse exception with following message\n", 
+            "+                //could not locate an endpoint template for this particular un-deployment. This name refers\n", 
+            "+                //probably to a sequence template. Thus if  throws a Synapse exception with following message\n", 
+            "                 //catch n log that and continue this process for undeployment of a sequence template\n", 
+            "-                if (e.getMessage().indexOf(\"Cannot locate an either local or remote enrty for key\") != -1) {\n", 
+            "+                if (e.getMessage().indexOf(\"Cannot locate an either local or remote entry for key\") != -1) {\n", 
+            "                     if (log.isDebugEnabled()) {\n", 
+            "                         log.debug(\"Undeploying template is not of endpoint type. Undeployer will now check \" +\n", 
+            "                                   \"for sequence template for the key: \" + artifactName);\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/deployers/TemplateDeployer.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/deployers/TemplateDeployer.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-151,7 +151,7", 
+          "lines": [
+            "                 = new BufferedReader(new InputStreamReader(servicesURL.openStream()));\n", 
+            "             try {\n", 
+            "                 String className;\n", 
+            "-                while ((className = in.readLine()) != null) {\n", 
+            "+                while ((className = in.readLine()) != null && (!className.trim().equals(\"\"))) {\n", 
+            "                     log.info(\"Loading the \" + providerClassName + \" implementation: \" + className);\n", 
+            "                     try {\n", 
+            "                         Class<? extends T> clazz\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/deployers/ExtensionDeployer.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/deployers/ExtensionDeployer.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-35,8 +35,9", 
+          "lines": [
+            " import java.util.Properties;\n", 
+            " \n", 
+            " public class PriorityExecutorDeployer extends AbstractSynapseArtifactDeployer {\n", 
+            "-    private static Log log = LogFactory.getLog(LocalEntryDeployer.class);\n", 
+            " \n", 
+            "+    private static Log log = LogFactory.getLog(PriorityExecutorDeployer.class);\n", 
+            "+\n", 
+            "     @Override\n", 
+            "     public String deploySynapseArtifact(OMElement artifactConfig,\n", 
+            "                                         String fileName, Properties properties) {\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/deployers/PriorityExecutorDeployer.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/deployers/PriorityExecutorDeployer.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-115,7 +115,8", 
+          "lines": [
+            "                 if (log.isDebugEnabled()) {\n", 
+            "                     log.debug(\"Initialized the ProxyService : \" + proxy.getName());\n", 
+            "                 }\n", 
+            "-                proxy.stop(getSynapseConfiguration());\n", 
+            "+                ProxyService currentProxy = getSynapseConfiguration().getProxyService(existingArtifactName);\n", 
+            "+                currentProxy.stop(getSynapseConfiguration());\n", 
+            "                 getSynapseConfiguration().removeProxyService(existingArtifactName);\n", 
+            "                 if (!existingArtifactName.equals(proxy.getName())) {\n", 
+            "                     log.info(\"ProxyService named \" + existingArtifactName + \" has been Undeployed\");\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/deployers/ProxyServiceDeployer.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/deployers/ProxyServiceDeployer.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-48,22 +48,22", 
+          "lines": [
+            " \n", 
+            "         try {\n", 
+            "             Startup st = StartupFinder.getInstance().getStartup(artifactConfig, properties);\n", 
+            "-                st.setFileName((new File(fileName)).getName());\n", 
+            "-                if (log.isDebugEnabled()) {\n", 
+            "-                    log.debug(\"StartupTask named '\" + st.getName()\n", 
+            "-                            + \"' has been built from the file \" + fileName);\n", 
+            "-                }\n", 
+            "-                st.init(getSynapseEnvironment());\n", 
+            "-                if (log.isDebugEnabled()) {\n", 
+            "-                    log.debug(\"Initialized the StartupTask : \" + st.getName());\n", 
+            "-                }\n", 
+            "-                getSynapseConfiguration().addStartup(st);\n", 
+            "-                if (log.isDebugEnabled()) {\n", 
+            "-                    log.debug(\"StartupTask Deployment from file : \" + fileName + \" : Completed\");\n", 
+            "-                }\n", 
+            "-                log.info(\"StartupTask named '\" + st.getName()\n", 
+            "-                        + \"' has been deployed from file : \" + fileName);\n", 
+            "-                return st.getName();\n", 
+            "+            st.setFileName((new File(fileName)).getName());\n", 
+            "+            if (log.isDebugEnabled()) {\n", 
+            "+                log.debug(\"StartupTask named '\" + st.getName()\n", 
+            "+                        + \"' has been built from the file \" + fileName);\n", 
+            "+            }\n", 
+            "+            st.init(getSynapseEnvironment());\n", 
+            "+            if (log.isDebugEnabled()) {\n", 
+            "+                log.debug(\"Initialized the StartupTask : \" + st.getName());\n", 
+            "+            }\n", 
+            "+            getSynapseConfiguration().addStartup(st);\n", 
+            "+            if (log.isDebugEnabled()) {\n", 
+            "+                log.debug(\"StartupTask Deployment from file : \" + fileName + \" : Completed\");\n", 
+            "+            }\n", 
+            "+            log.info(\"StartupTask named '\" + st.getName()\n", 
+            "+                    + \"' has been deployed from file : \" + fileName);\n", 
+            "+            return st.getName();\n", 
+            "         } catch (Exception e) {\n", 
+            "             handleSynapseArtifactDeploymentError(\n", 
+            "                     \"StartupTask Deployment from the file : \" + fileName + \" : Failed.\", e);\n"
+          ]
+        }, 
+        {
+          "locn": "-87,9 +87,11", 
+          "lines": [
+            "             if (log.isDebugEnabled()) {\n", 
+            "                 log.debug(\"StartupTask: \" + st.getName() + \" has been built from the file: \" + fileName);\n", 
+            "             }\n", 
+            "-            st.init(getSynapseEnvironment());\n", 
+            " \n", 
+            "             Startup existingSt = getSynapseConfiguration().getStartup(existingArtifactName);\n", 
+            "+            existingSt.destroy();\n", 
+            "+\n", 
+            "+            st.init(getSynapseEnvironment());\n", 
+            "             if (existingArtifactName.equals(st.getName())) {\n", 
+            "                 getSynapseConfiguration().updateStartup(st);\n", 
+            "             } else {\n"
+          ]
+        }, 
+        {
+          "locn": "-98,7 +100,6", 
+          "lines": [
+            "                 log.info(\"StartupTask: \" + existingArtifactName + \" has been undeployed\");\n", 
+            "             }\n", 
+            " \n", 
+            "-            existingSt.destroy();\n", 
+            "             log.info(\"StartupTask: \" + st.getName() + \" has been updated from the file: \" + fileName);\n", 
+            "             return st.getName();\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/deployers/TaskDeployer.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/deployers/TaskDeployer.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-29,7 +29,6", 
+          "lines": [
+            " import org.apache.axis2.description.Parameter;\n", 
+            " import org.apache.axis2.util.XMLPrettyPrinter;\n", 
+            " import org.apache.commons.io.FileUtils;\n", 
+            "-import org.apache.commons.io.FilenameUtils;\n", 
+            " import org.apache.commons.logging.Log;\n", 
+            " import org.apache.commons.logging.LogFactory;\n", 
+            " import org.apache.synapse.ServerConfigurationInformation;\n"
+          ]
+        }, 
+        {
+          "locn": "-71,6 +70,15", 
+          "lines": [
+            "         this.cfgCtx = configCtx;\n", 
+            "     }\n", 
+            " \n", 
+            "+    private boolean isHotDeploymentEnabled() {\n", 
+            "+        try {\n", 
+            "+            return getSynapseConfiguration().isAllowHotUpdate();\n", 
+            "+        } catch (DeploymentException e) {\n", 
+            "+            log.warn(\"Error while retrieving the SynapseConfiguration\", e);\n", 
+            "+            return false;\n", 
+            "+        }\n", 
+            "+    }\n", 
+            "+\n", 
+            "     /**\n", 
+            "      * This method is called by the axis2 deployment framework and it performs a synapse artifact\n", 
+            "      * specific yet common across all the artifacts, set of tasks and delegate the actual deployment\n"
+          ]
+        }, 
+        {
+          "locn": "-84,7 +92,15", 
+          "lines": [
+            "      */\n", 
+            "     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {\n", 
+            " \n", 
+            "-        String filename = FilenameUtils.normalize(deploymentFileData.getAbsolutePath());\n", 
+            "+        if (!isHotDeploymentEnabled()) {\n", 
+            "+            if (log.isDebugEnabled()) {\n", 
+            "+                log.debug(\"Hot deployment has been suspended - Ignoring\");\n", 
+            "+            }\n", 
+            "+            return;\n", 
+            "+        }\n", 
+            "+\n", 
+            "+        String filename = SynapseArtifactDeploymentStore.getNormalizedAbsolutePath(\n", 
+            "+                deploymentFileData.getAbsolutePath());\n", 
+            "         if (log.isDebugEnabled()) {\n", 
+            "             log.debug(\"Deployment of the synapse artifact from file : \" + filename + \" : STARTED\");\n", 
+            "         }\n"
+          ]
+        }, 
+        {
+          "locn": "-116,7 +132,7", 
+          "lines": [
+            "         }\n", 
+            "         \n", 
+            "         try {\n", 
+            "-            InputStream in = new FileInputStream(filename);\n", 
+            "+            InputStream in = FileUtils.openInputStream(new File(filename));\n", 
+            "             try {\n", 
+            "                 // construct the xml element from the file, it has to be XML,\n", 
+            "                 // since all synapse artifacts are XML based\n"
+          ]
+        }, 
+        {
+          "locn": "-125,7 +141,7", 
+          "lines": [
+            "                 properties.put(SynapseConstants.RESOLVE_ROOT, getSynapseEnvironment()\n", 
+            "                         .getServerContextInformation()\n", 
+            "                         .getServerConfigurationInformation().getResolveRoot());\n", 
+            "-                String artifatcName = null;\n", 
+            "+                String artifactName = null;\n", 
+            "                 if (deploymentStore.isUpdatingArtifact(filename)) {\n", 
+            " \n", 
+            "                     if (log.isDebugEnabled()) {\n"
+          ]
+        }, 
+        {
+          "locn": "-136,7 +152,7", 
+          "lines": [
+            "                             = deploymentStore.getUpdatingArtifactWithFileName(filename);\n", 
+            "                     deploymentStore.removeUpdatingArtifact(filename);\n", 
+            "                     try {\n", 
+            "-                        artifatcName = updateSynapseArtifact(\n", 
+            "+                        artifactName = updateSynapseArtifact(\n", 
+            "                                 element, filename, existingArtifactName, properties);\n", 
+            "                     } catch (SynapseArtifactDeploymentException sade) {\n", 
+            "                         log.error(\"Update of the Synapse Artifact from file : \"\n"
+          ]
+        }, 
+        {
+          "locn": "-145,12 +161,12", 
+          "lines": [
+            "                                 + backupFile(deploymentFileData.getFile()));\n", 
+            "                         log.info(\"Restoring the existing artifact into the file : \" + filename);\n", 
+            "                         restoreSynapseArtifact(existingArtifactName);\n", 
+            "-                        artifatcName = existingArtifactName;\n", 
+            "+                        artifactName = existingArtifactName;\n", 
+            "                     }\n", 
+            "                 } else {\n", 
+            "                     // new artifact hot-deployment case\n", 
+            "                     try {\n", 
+            "-                        artifatcName = deploySynapseArtifact(element, filename, properties);\n", 
+            "+                        artifactName = deploySynapseArtifact(element, filename, properties);\n", 
+            "                     } catch (SynapseArtifactDeploymentException sade) {\n", 
+            "                         log.error(\"Deployment of the Synapse Artifact from file : \"\n", 
+            "                                 + filename + \" : Failed!\", sade);\n"
+          ]
+        }, 
+        {
+          "locn": "-158,8 +174,8", 
+          "lines": [
+            "                                 + backupFile(deploymentFileData.getFile()));\n", 
+            "                     }\n", 
+            "                 }\n", 
+            "-                if (artifatcName != null) {\n", 
+            "-                    deploymentStore.addArtifact(filename, artifatcName);\n", 
+            "+                if (artifactName != null) {\n", 
+            "+                    deploymentStore.addArtifact(filename, artifactName);\n", 
+            "                 }\n", 
+            "             } finally {\n", 
+            "                 in.close();\n"
+          ]
+        }, 
+        {
+          "locn": "-191,9 +207,16", 
+          "lines": [
+            "      */\n", 
+            "     public void undeploy(String fileName) throws DeploymentException {\n", 
+            " \n", 
+            "-        fileName = FilenameUtils.normalize(fileName);\n", 
+            "+        if (!isHotDeploymentEnabled()) {\n", 
+            "+            if (log.isDebugEnabled()) {\n", 
+            "+                log.debug(\"Hot deployment has been suspended - Ignoring\");\n", 
+            "+            }\n", 
+            "+            return;\n", 
+            "+        }\n", 
+            "+\n", 
+            "+        fileName = SynapseArtifactDeploymentStore.getNormalizedAbsolutePath(fileName);\n", 
+            "         if (log.isDebugEnabled()) {\n", 
+            "-            log.debug(\"UnDeployment of the synapse artifact from file : \"\n", 
+            "+            log.debug(\"Undeployment of the synapse artifact from file : \"\n", 
+            "                     + fileName + \" : STARTED\");\n", 
+            "         }\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-207,7 +230,7", 
+          "lines": [
+            "                 log.debug(\"BackedUp artifact detected with filename : \" + fileName);\n", 
+            "             }\n", 
+            "             // only one undeployment trigger can happen after a backup and hence remove it from\n", 
+            "-            // backedUpFiles at the first hit, allowing the further undeploymentsto take place\n", 
+            "+            // backedUpFiles at the first hit, allowing the further undeployment to take place\n", 
+            "             // as usual\n", 
+            "             deploymentStore.removeBackedUpArtifact(fileName);\n", 
+            "             return;\n"
+          ]
+        }, 
+        {
+          "locn": "-357,7 +380,7", 
+          "lines": [
+            "         SynapseArtifactDeploymentStore deploymentStore =\n", 
+            "                 getSynapseConfiguration().getArtifactDeploymentStore();\n", 
+            "         deploymentStore.addRestoredArtifact(fileName);\n", 
+            "-        OutputStream out = new FileOutputStream(new File(fileName));\n", 
+            "+        OutputStream out = FileUtils.openOutputStream(new File(fileName));\n", 
+            "         XMLPrettyPrinter.prettify(content, out);\n", 
+            "         out.flush();\n", 
+            "         out.close();\n"
+          ]
+        }, 
+        {
+          "locn": "-389,7 +412,7", 
+          "lines": [
+            " \n", 
+            "     private void handleDeploymentError(String msg, Exception e, String fileName)\n", 
+            "             throws DeploymentException {\n", 
+            "-        fileName = FilenameUtils.normalize(fileName);\n", 
+            "+        fileName = SynapseArtifactDeploymentStore.getNormalizedAbsolutePath(fileName);\n", 
+            "         log.error(msg, e);\n", 
+            "         SynapseArtifactDeploymentStore deploymentStore =\n", 
+            "                 getSynapseConfiguration().getArtifactDeploymentStore();\n"
+          ]
+        }, 
+        {
+          "locn": "-404,8 +427,8", 
+          "lines": [
+            "     }\n", 
+            " \n", 
+            "     private String backupFile(File file) throws DeploymentException {\n", 
+            "-        String filePath = FilenameUtils.normalize(file.getAbsolutePath());\n", 
+            "-\n", 
+            "+        String filePath = SynapseArtifactDeploymentStore.getNormalizedAbsolutePath(\n", 
+            "+                file.getAbsolutePath());\n", 
+            "         SynapseArtifactDeploymentStore deploymentStore =\n", 
+            "                 getSynapseConfiguration().getArtifactDeploymentStore();\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/deployers/AbstractSynapseArtifactDeployer.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/deployers/AbstractSynapseArtifactDeployer.java"
+    }
+  ], 
+  "id": "1210452"
+}

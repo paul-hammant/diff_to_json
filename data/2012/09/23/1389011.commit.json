@@ -1,0 +1,28 @@
+{
+  "when": "2012-09-23T06:51:15-04:00", 
+  "message": "Removed empty svn:mergeinfo properties.", 
+  "who": "veithen", 
+  "changes": [
+    {
+      "chunks": [], 
+      "to": "java/repository/conf/synapse-config/synapse.xml", 
+      "from": "java/repository/conf/synapse-config/synapse.xml"
+    }, 
+    {
+      "chunks": [], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/eventing/filters/TopicBasedEventFilter.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/eventing/filters/TopicBasedEventFilter.java"
+    }, 
+    {
+      "chunks": [], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/util/resolver/CustomXmlSchemaURIResolver.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/util/resolver/CustomXmlSchemaURIResolver.java"
+    }, 
+    {
+      "chunks": [], 
+      "to": "java/modules/transports/core/vfs/src/test/java/org/apache/synapse/transport/vfs/VFSTestEnvironment.java", 
+      "from": "java/modules/transports/core/vfs/src/test/java/org/apache/synapse/transport/vfs/VFSTestEnvironment.java"
+    }
+  ], 
+  "id": "1389011"
+}

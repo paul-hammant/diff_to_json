@@ -1,0 +1,1597 @@
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java	(revision 1210885)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java	(revision 1210886)
+@@ -476,6 +476,9 @@
+             response.setHeader(
+                 HTTP.CONTENT_TYPE,
+                 messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
++        } else if ( Boolean.TRUE == noEntityBody) {
++            ((BasicHttpEntity)response.getEntity()).setChunked(false);
++            ((BasicHttpEntity)response.getEntity()).setContentLength(0);
+         }
+         response.setStatusCode(determineHttpStatusCode(msgContext, response));
+ 
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessLogger.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessLogger.java	(nonexistent)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessLogger.java	(revision 1210886)
+@@ -0,0 +1,227 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++package org.apache.synapse.transport.nhttp;
++
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++
++import java.io.BufferedWriter;
++import java.io.File;
++import java.io.FileWriter;
++import java.io.IOException;
++import java.io.PrintWriter;
++import java.text.SimpleDateFormat;
++import java.util.Date;
++
++/**
++ * Class that logs the Http Accesses to the access log files. Code segment borrowed from
++ * Apache Tomcat's org.apache.catalina.valves.AccessLogValve with thanks.
++ */
++public class AccessLogger {
++
++    public final static String ACCESS_LOG_ID = "org.apache.synapse.transport.nhttp.access";
++    private static Log log = LogFactory.getLog(ACCESS_LOG_ID);
++
++    public AccessLogger(final Log log) {
++        super();
++        this.initOpen();
++        AccessLogger.log = log;
++        buffered = true;
++        checkExists = false;
++    }
++
++    /**
++     * A date formatter to format a Date into a date in the given file format
++     */
++    protected SimpleDateFormat fileDateFormatter =
++            new SimpleDateFormat(AccessConstants.FILE_FORMAT);
++
++    /**
++     * The PrintWriter to which we are currently logging, if any.
++     */
++    protected PrintWriter writer;
++
++    /**
++     * The as-of date for the currently open log file, or a zero-length
++     * string if there is no open log file.
++     */
++    private volatile String dateStamp = "";
++
++    /**
++     * Instant when the log daily rotation was last checked.
++     */
++    private volatile long rotationLastChecked = 0L;
++
++    /**
++     * Buffered logging.
++     */
++    private boolean buffered = true;
++
++    /**
++     * Do we check for log file existence? Helpful if an external
++     * agent renames the log file so we can automatically recreate it.
++     */
++    private boolean checkExists = false;
++
++    /**
++     * The current log file we are writing to. Helpful when checkExists
++     * is true.
++     */
++    protected File currentLogFile = null;
++
++    /**
++     * Can the log file be rotated.
++     */
++    protected boolean isRotatable = true;
++
++
++    /**
++     * Log the specified message to the log file, switching files if the date
++     * has changed since the previous log call.
++     *
++     * @param message Message to be logged
++     */
++    public void log(String message) {
++        if (isRotatable) {
++            // Only do a logfile switch check once a second, max.
++            long systemTime = System.currentTimeMillis();
++            if ((systemTime - rotationLastChecked) > 1000) {
++                synchronized (this) {
++                    if ((systemTime - rotationLastChecked) > 1000) {
++                        rotationLastChecked = systemTime;
++
++                        String tsDate;
++                        // Check for a change of date
++                        tsDate = fileDateFormatter.format(new Date(systemTime));
++
++                        // If the date has changed, switch log files
++                        if (!dateStamp.equals(tsDate)) {
++                            close();
++                            dateStamp = tsDate;
++                            open();
++                        }
++                    }
++                }
++            }
++        }
++
++        /* In case something external rotated the file instead */
++        if (checkExists) {
++            synchronized (this) {
++                if (currentLogFile != null && !currentLogFile.exists()) {
++                    try {
++                        close();
++                    } catch (Throwable e) {
++                        handleThrowable(e);
++                        log.info("Access Log file Close failed");
++                    }
++
++                    /* Make sure date is correct */
++                    dateStamp = fileDateFormatter.format(
++                            new Date(System.currentTimeMillis()));
++
++                    open();
++                }
++            }
++        }
++
++        // Log this message
++        synchronized (this) {
++            if (writer != null) {
++                writer.println(message);
++
++                if (!buffered) {
++                    writer.flush();
++                }
++            }
++        }
++    }
++
++    protected synchronized void initOpen() {
++        /* Make sure date is correct */
++        dateStamp = fileDateFormatter.format(
++                new Date(System.currentTimeMillis()));
++        this.open();
++    }
++
++    /**
++     * Open the new log file for the date specified by <code>dateStamp</code>.
++     */
++    protected synchronized void open() {
++        // Create the directory if necessary
++        File dir = new File(AccessConstants.DIRECTORY);
++        if (!dir.exists()) {
++            if (!dir.mkdirs()) {
++                log.error("Access Log Open Directory Failed");
++            }
++        }
++
++        // Open the current log file
++        try {
++            String pathName;
++            // If no rotate - no need for dateStamp in fileName
++            if (isRotatable) {
++                pathName = dir.getAbsolutePath() + File.separator + AccessConstants.PREFIX +
++                           dateStamp + AccessConstants.SUFFIX;
++            } else {
++                pathName = dir.getAbsolutePath() + File.separator + AccessConstants.PREFIX +
++                           AccessConstants.SUFFIX;
++            }
++
++            writer = new PrintWriter(new BufferedWriter(new FileWriter(
++                    pathName, true), 128000), true);
++
++            currentLogFile = new File(pathName);
++        } catch (IOException e) {
++            log.warn("Unable to open the print writer", e);
++            writer = null;
++            currentLogFile = null;
++        }
++    }
++
++    /**
++     * Close the currently open log file (if any)
++     */
++    synchronized void close() {
++        if (writer == null) {
++            return;
++        }
++        writer.flush();
++        writer.close();
++        writer = null;
++        dateStamp = "";
++        currentLogFile = null;
++    }
++
++    /**
++     * Checks whether the supplied Throwable is one that needs to be
++     * re-thrown and swallows all others.
++     *
++     * @param t the Throwable to check
++     */
++    public static void handleThrowable(Throwable t) {
++        if (t instanceof ThreadDeath) {
++            throw (ThreadDeath) t;
++        }
++        if (t instanceof VirtualMachineError) {
++            throw (VirtualMachineError) t;
++        }
++        // All other instances of Throwable will be silently swallowed
++    }
++}
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java	(revision 1210885)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java	(revision 1210886)
+@@ -722,16 +722,25 @@
+                         MessageContext responseMsgCtx = outMsgCtx.getOperationContext().
+                                 getMessageContext(WSDL2Constants.MESSAGE_LABEL_IN);
+                         if (responseMsgCtx == null ||
++                                outMsgCtx.getOptions().isUseSeparateListener() ||
++                                outMsgCtx.getOperationContext().isComplete()) {
++                            if (responseMsgCtx != null &&
++                                    responseMsgCtx.getProperty("synapse.send") == null) {
++                                return;
++                            }
++                        } else if (responseMsgCtx == null ||
+                                 outMsgCtx.getOptions().isUseSeparateListener()) {
+                             // Since we need to notify the SynapseCallback receiver to remove the
+                             // call backs registered  we set a custom property
+-                            if (outMsgCtx.getOperationContext().isComplete()) {
+-                                setHeaders(context, response, outMsgCtx, responseMsgCtx);
+-                                outMsgCtx.setProperty(NhttpConstants.HTTP_202_RECEIVED, "true");
+-                                mr.receive(outMsgCtx);
+-                            }
++                            setHeaders(context, response, outMsgCtx, responseMsgCtx);
++                            outMsgCtx.setProperty(NhttpConstants.HTTP_202_RECEIVED, "true");
++                            mr.receive(outMsgCtx);
+                             return;
+                         }
++
++                        if (responseMsgCtx == null) {
++                            return;
++                        }
+                         setHeaders(context, response, outMsgCtx, responseMsgCtx);
+                         responseMsgCtx.setServerSide(true);
+                         responseMsgCtx.setDoingREST(outMsgCtx.isDoingREST());
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/DefaultHttpGetProcessor.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/DefaultHttpGetProcessor.java	(revision 1210885)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/DefaultHttpGetProcessor.java	(revision 1210886)
+@@ -127,11 +127,15 @@
+         } else if (serviceName != null && parameters.containsKey("wsdl")) {
+             generateWsdl(request, response, msgContext,
+                     conn, os, serviceName, parameters, isRestDispatching);
++            return;
+         } else if (serviceName != null && parameters.containsKey("wsdl2")) {
+             generateWsdl2(request, response, msgContext,
+                     conn, os, serviceName, isRestDispatching);
++            return;
+         } else if (serviceName != null && parameters.containsKey("xsd")) {
+-            generateXsd(response, conn, os, serviceName, parameters);
++            generateXsd(request, response, msgContext, conn, os, serviceName,
++                    parameters, isRestDispatching);
++            return;
+         } else if (serviceName != null && parameters.containsKey("info")) {
+             generateServiceDetailsPage(response, conn, os, serviceName);
+         } else if (uri.startsWith(servicePath) &&
+@@ -144,12 +148,15 @@
+         }
+ 
+         // make sure that the output stream is flushed and closed properly
++        closeOutputStream(os);
++    }
++
++    private void closeOutputStream(OutputStream os) {
+         try {
+             os.flush();
+             os.close();
+         } catch (IOException ignore) {
+         }
+-
+     }
+ 
+     /**
+@@ -186,7 +193,7 @@
+             if (serviceName.startsWith("/")) {
+                 serviceName = serviceName.substring(1);
+             }
+-            if (serviceName.indexOf("?") != -1) {
++            if (serviceName.contains("?")) {
+                 serviceName = serviceName.substring(0, serviceName.indexOf("?"));
+             }
+         } else {
+@@ -277,15 +284,19 @@
+     /**
+      * Generates Schema.
+      *
++     * @param request     HttpRequest
+      * @param response    HttpResponse
++     * @param messageCtx  Current MessageContext
+      * @param conn        NHttpServerConnection
+      * @param os          OutputStream
+      * @param serviceName service name
+      * @param parameters  url parameters
++     * @param isRestDispatching Whether to handle this as REST
+      */
+-    protected void generateXsd(HttpResponse response, NHttpServerConnection conn,
++    protected void generateXsd(HttpRequest request, HttpResponse response,
++                               MessageContext messageCtx, NHttpServerConnection conn,
+                                OutputStream os, String serviceName,
+-                               Map<String, String> parameters) {
++                               Map<String, String> parameters, boolean isRestDispatching) {
+         if (parameters.get("xsd") == null || "".equals(parameters.get("xsd"))) {
+             AxisService service = cfgCtx.getAxisConfiguration()
+                     .getServices().get(serviceName);
+@@ -296,11 +307,15 @@
+                     response.addHeader(CONTENT_TYPE, TEXT_XML);
+                     serverHandler.commitResponseHideExceptions(conn, response);
+                     os.write(baos.toByteArray());
++                    closeOutputStream(os);
+ 
+                 } catch (Exception e) {
+                     handleBrowserException(response, conn, os,
+                             "Error generating ?xsd output for service : " + serviceName, e);
+                 }
++            } else {
++                processGetAndDelete(request, response, messageCtx, conn, os,
++                        serviceName, isRestDispatching);
+             }
+ 
+         } else {
+@@ -330,6 +345,7 @@
+                         response.addHeader(CONTENT_TYPE, TEXT_XML);
+                         serverHandler.commitResponseHideExceptions(conn, response);
+                         os.write(baos.toByteArray());
++                        closeOutputStream(os);
+                     } catch (Exception e) {
+                         handleBrowserException(response, conn, os,
+                                 "Error generating named ?xsd output for service : " + serviceName, e);
+@@ -338,7 +354,11 @@
+                 } else {
+                     // no schema available by that name  - send 404
+                     response.setStatusCode(HttpStatus.SC_NOT_FOUND);
++                    closeOutputStream(os);
+                 }
++            } else {
++                processGetAndDelete(request, response, messageCtx, conn, os,
++                        serviceName, isRestDispatching);
+             }
+         }
+     }
+@@ -373,6 +393,7 @@
+                 response.addHeader(CONTENT_TYPE, TEXT_XML);
+                 serverHandler.commitResponseHideExceptions(conn, response);
+                 os.write(baos.toByteArray());
++                closeOutputStream(os);
+ 
+             } catch (Exception e) {
+                 handleBrowserException(response, conn, os,
+@@ -416,6 +437,7 @@
+                 response.addHeader(CONTENT_TYPE, TEXT_XML);
+                 serverHandler.commitResponseHideExceptions(conn, response);
+                 os.write(baos.toByteArray());
++                closeOutputStream(os);
+ 
+             } catch (Exception e) {
+                 handleBrowserException(response, conn, os,
+@@ -602,7 +624,7 @@
+         Hashtable erroneousServices = cfgCtx.getAxisConfiguration().getFaultyServices();
+         boolean servicesFound = false;
+ 
+-        StringBuffer resultBuf = new StringBuffer();
++        StringBuilder resultBuf = new StringBuilder();
+         resultBuf.append("<html><head><title>Axis2: Services</title></head>" + "<body>");
+ 
+         if ((services != null) && !services.isEmpty()) {
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/util/AccessTimeUtil.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/util/AccessTimeUtil.java	(nonexistent)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/util/AccessTimeUtil.java	(revision 1210886)
+@@ -0,0 +1,181 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++package org.apache.synapse.transport.nhttp.util;
++
++import org.apache.synapse.transport.nhttp.AccessConstants;
++
++import java.text.SimpleDateFormat;
++import java.util.Date;
++import java.util.TimeZone;
++
++/**
++ * Utility methods related to the Access Time
++ */
++public class AccessTimeUtil {
++
++    private static String calculateTimeZoneOffset(long offset) {
++        StringBuilder tz = new StringBuilder();
++        if ((offset < 0)) {
++            tz.append("-");
++            offset = -offset;
++        } else {
++            tz.append("+");
++        }
++
++        long hourOffset = offset / (1000 * 60 * 60);
++        long minuteOffset = (offset / (1000 * 60)) % 60;
++
++        if (hourOffset < 10) {
++            tz.append("0");
++        }
++        tz.append(hourOffset);
++
++        if (minuteOffset < 10) {
++            tz.append("0");
++        }
++        tz.append(minuteOffset);
++
++        return tz.toString();
++    }
++
++    /**
++     * gets the timezone +/-{****}}, offset from GMT,
++     * @return String time zone (eg, +0530, -0600).
++     */
++    public static String getTimeZone() {
++        try {
++            int offset = TimeZone.getDefault().getRawOffset();
++            return calculateTimeZoneOffset(offset);
++        } catch (Exception e) {
++            return "";
++        }
++    }
++
++    /**
++     * AccessDateStruct Class
++     */
++    private static class AccessDateStruct {
++        private Date currentDate = new Date();
++        private String currentDateString = null;
++        private SimpleDateFormat dayFormatter = new SimpleDateFormat("dd");
++        private SimpleDateFormat monthFormatter = new SimpleDateFormat("MM");
++        private SimpleDateFormat yearFormatter = new SimpleDateFormat("yyyy");
++
++        private SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
++
++        public AccessDateStruct() {
++            TimeZone tz = TimeZone.getDefault();
++            dayFormatter.setTimeZone(tz);
++            monthFormatter.setTimeZone(tz);
++            yearFormatter.setTimeZone(tz);
++            timeFormatter.setTimeZone(tz);
++        }
++    }
++
++    /**
++     * The system time when we last updated the Date, that is used for log lines.
++     */
++    private static final ThreadLocal<AccessDateStruct> currentDateStruct =
++            new ThreadLocal<AccessDateStruct>() {
++                @Override
++                protected AccessDateStruct initialValue() {
++                    return new AccessDateStruct();
++                }
++            };
++
++
++    /**
++     * This method returns a Date object that is accurate to within one second.
++     * If a thread calls this method to get a Date and it's been less than 1
++     * second since a new Date was created, this method simply gives out the
++     * same Date again so that the system doesn't spend time creating Date
++     * objects unnecessarily.
++     *
++     * @return Date
++     */
++    public static Date getDate() {
++        // Only create a new Date once per second, max.
++        long systime = System.currentTimeMillis();
++        AccessDateStruct struct = currentDateStruct.get();
++        if ((systime - struct.currentDate.getTime()) > 1000) {
++            struct.currentDate.setTime(systime);
++            struct.currentDateString = null;
++        }
++        return struct.currentDate;
++    }
++
++    private static AccessDateStruct getAccessDateStruct(Date date) {
++        AccessDateStruct struct = currentDateStruct.get();
++        if (struct.currentDateString == null) {
++            StringBuilder current = new StringBuilder(32);
++            current.append('[');
++            current.append(struct.dayFormatter.format(date));
++            current.append('/');
++            current.append(lookup(struct.monthFormatter.format(date)));
++            current.append('/');
++            current.append(struct.yearFormatter.format(date));
++            current.append(':');
++            current.append(struct.timeFormatter.format(date));
++            current.append(' ');
++            current.append(AccessTimeUtil.getTimeZone());
++            current.append(']');
++            struct.currentDateString = current.toString();
++        }
++        return struct;
++    }
++
++    /**
++     * Return the month abbreviation for the specified month, which must
++     * be a two-digit String.
++     *
++     * @param month Month number ("01" .. "12").
++     * @return - the month
++     */
++    private static String lookup(String month) {
++        int index;
++        try {
++            index = Integer.parseInt(month) - 1;
++        } catch (Throwable t) {
++            handleThrowable(t);
++            index = 0;  // Can not happen, in theory
++        }
++        return (AccessConstants.MONTHS[index]);
++    }
++
++    public static String getAccessDate(Date date) {
++         AccessDateStruct struct = getAccessDateStruct(date);
++        return struct.currentDateString;
++    }
++
++    /**
++     * Checks whether the supplied Throwable is one that needs to be
++     * re-thrown and swallows all others.
++     *
++     * @param t the Throwable to check
++     */
++    public static void handleThrowable(Throwable t) {
++        if (t instanceof ThreadDeath) {
++            throw (ThreadDeath) t;
++        }
++        if (t instanceof VirtualMachineError) {
++            throw (VirtualMachineError) t;
++        }
++        // All other instances of Throwable will be silently swallowed
++    }
++}
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessConstants.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessConstants.java	(nonexistent)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessConstants.java	(revision 1210886)
+@@ -0,0 +1,59 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++package org.apache.synapse.transport.nhttp;
++
++/**
++ * Constants used in the Access Class
++ */
++public class AccessConstants {
++
++    /**
++     * Pattern used to log - Default is COMBINED_PATTERN given below.
++     */
++    public static final String COMBINED_PATTERN =
++            "%h %l %u %t \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\"";
++
++    /**
++     * The set of month abbreviations for log messages.
++     */
++    public static final String MONTHS[] =
++            {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
++             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
++
++    /**
++     * The directory in which log files are created.
++     */
++    public static String DIRECTORY = "repository/logs";
++
++    /**
++     * Gives the format of the date to be appended to the name of the access log file.
++     */
++    public static String FILE_FORMAT = "yyyy-MM-dd";
++
++    /**
++     * The prefix that is added to log file file names.
++     */
++    public static String PREFIX = "http_access_";
++
++    /**
++     * The suffix that is added to log file file names.
++     */
++    public static String SUFFIX = ".log";
++
++}
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessHandler.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessHandler.java	(nonexistent)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessHandler.java	(revision 1210886)
+@@ -0,0 +1,40 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++package org.apache.synapse.transport.nhttp;
++
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++
++/**
++ * Handles the Access, providing an Access object.
++ */
++public class AccessHandler {
++
++    public final static String ACCESS_LOG_ID = "org.apache.synapse.transport.nhttp.access";
++
++    private final static Log accessLog = LogFactory.getLog(ACCESS_LOG_ID);
++
++    private static final AccessLogger accessLogger = new AccessLogger(accessLog);
++
++    private static final Access access = new Access(accessLog, accessLogger);
++
++    public static Access getAccess() {
++        return access;
++    }
++}
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Access.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Access.java	(nonexistent)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Access.java	(revision 1210886)
+@@ -0,0 +1,811 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++package org.apache.synapse.transport.nhttp;
++
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.http.Header;
++import org.apache.http.HttpMessage;
++import org.apache.http.HttpRequest;
++import org.apache.http.HttpResponse;
++import org.apache.synapse.transport.nhttp.util.AccessTimeUtil;
++
++import java.net.InetAddress;
++import java.util.ArrayList;
++import java.util.Date;
++import java.util.List;
++import java.util.Timer;
++import java.util.TimerTask;
++import java.util.concurrent.ConcurrentLinkedQueue;
++
++/**
++ * The class to handle the HTTP Access Logs, patterns and the major functionality.
++ * Major Code segment borrowed from Apache Tomcat's
++ * org.apache.catalina.valves.AccessLogValve with thanks.
++ */
++public class Access {
++    private static Log log = LogFactory.getLog(Access.class);
++
++    /**
++     * Array of AccessLogElement, they will be used to make log message.
++     */
++    protected AccessLogElement[] logElements = null;
++
++    protected String pattern = AccessConstants.COMBINED_PATTERN;
++
++    private static AccessLogger accessLogger;
++
++    private static ConcurrentLinkedQueue<HttpRequest> requestQueue;
++    private static ConcurrentLinkedQueue<HttpResponse> responseQueue;
++
++    private static final int LOG_FREQUENCY_IN_SECONDS = 30;
++
++    /**
++     * Constructor of AccessLog. AccessHandler has a static object of Access.
++     *
++     * @param log          - Log passed as a param. Default is Log of the same class.
++     * @param accessLogger - AccessLogger Object
++     */
++    public Access(final Log log, AccessLogger accessLogger) {
++        super();
++        Access.log = log;
++        Access.accessLogger = accessLogger;
++        requestQueue = new ConcurrentLinkedQueue<HttpRequest>();
++        responseQueue = new ConcurrentLinkedQueue<HttpResponse>();
++        logElements = createLogElements();
++        logAccesses();
++    }
++
++    /**
++     * Adds the accesses to the queue.
++     *
++     * @param request - HttpRequest
++     */
++    public void addAccessToQueue(HttpRequest request) {
++        requestQueue.add(request);
++    }
++
++    /**
++     * Adds the accesses to the queue.
++     *
++     * @param response - HttpResponse
++     */
++    public void addAccessToQueue(HttpResponse response) {
++        responseQueue.add(response);
++    }
++
++    /**
++     * logs the request and response accesses.
++     */
++    public void logAccesses() {
++        TimerTask logRequests = new LogRequests();
++        TimerTask logResponses = new LogResponses();
++        Timer requestTimer = new Timer();
++        Timer responseTimer = new Timer();
++        // Retry in 30 seconds
++        long retryIn = 1000 * LOG_FREQUENCY_IN_SECONDS;
++        requestTimer.schedule(logRequests, 0, retryIn);
++        responseTimer.schedule(logResponses, 0, retryIn);
++    }
++
++    private class LogRequests extends TimerTask {
++        public void run() {
++            while (!requestQueue.isEmpty()) {
++                HttpRequest req = requestQueue.poll();
++                log(req, null);
++            }
++        }
++    }
++
++    private class LogResponses extends TimerTask {
++        public void run() {
++            while (!responseQueue.isEmpty()) {
++                HttpResponse res = responseQueue.poll();
++                log(null, res);
++            }
++        }
++    }
++
++    /**
++     * The log method that is called from the NHttpClient and Server connection classes.
++     *
++     * @param request  - HttpRequest
++     * @param response - HttpResponse
++     */
++    public void log(HttpRequest request, HttpResponse response) {
++        Date date = AccessTimeUtil.getDate();
++        StringBuilder result = new StringBuilder(128);
++
++        for (AccessLogElement logElement : logElements) {
++            logElement.addElement(result, date, request, response);
++        }
++        String logString = result.toString();
++        log.debug(logString);      //log to the console
++        accessLogger.log(logString);      //log to the file
++    }
++
++    /**
++     * gets the header values from the given message, with the given name.
++     *
++     * @param message - The message, HttpRequest or HttpResponse
++     * @param name    - The header, which we need to get the value of.
++     * @return - The header value.
++     */
++    protected static String getHeaderValues(HttpMessage message, String name) {
++        int length = 0;
++        Header[] header = new Header[0];
++        StringBuffer headerValue = new StringBuffer();
++        try {
++            header = message.getHeaders(name);
++            length = header.length;
++        } catch (Exception e) {
++            // The header doesn't exist
++        }
++        if (length == 0) {
++            return "-";
++        } else if (length == 1) {
++            return header[0].getValue();
++        } else {
++            headerValue.append(header[0].getValue());
++            for (int i = 1; i < length; i++) {
++                headerValue.append(" - ").append(header[i].getValue());
++            }
++        }
++        return headerValue.toString();
++    }
++
++    public static String getHostElement(HttpMessage message) {
++        return getHeaderValues(message, "Host"); //%h;
++    }
++
++    public static String getLogicalUserNameElement(HttpMessage message) {
++        if (message != null) {  //%l
++            return "-";
++        }
++        return "";
++    }
++
++    public static String getUserNameElement(HttpMessage message) {
++        return getHeaderValues(message, "From");     //%u
++    }
++
++    public static String getCookieElement(HttpMessage message) {
++        return getHeaderValues(message, "Cookie");      // %c
++    }
++
++    public static String getRefererElement(HttpMessage message) {
++        return getHeaderValues(message, "Referer"); //%{Referer}i;           %f
++    }
++
++    public static String getUserAgentElement(HttpMessage message) {
++        return getHeaderValues(message, "User-Agent");           //%{User-Agent} %a
++    }
++
++    public static String getAcceptElement(HttpMessage message) {
++        return getHeaderValues(message, "Accept");
++    }
++
++    public static String getAcceptLanguageElement(HttpMessage message) {
++        return getHeaderValues(message, "Accept-Language");
++    }
++
++    public static String getAcceptEncodingElement(HttpMessage message) {
++        return getHeaderValues(message, "Accept-Encoding");
++    }
++
++    public static String getAcceptCharSetElement(HttpMessage message) {
++        return getHeaderValues(message, "Accept-Charset");
++    }
++
++    public static String getConnectionElement(HttpMessage message) {
++        return getHeaderValues(message, "Connection");       //Keep-Alive
++    }
++
++    public static String getContentTypeElement(HttpMessage message) {
++        return getHeaderValues(message, "Content-Type");
++    }
++
++    public static String getKeepAliveElement(HttpMessage message) {
++        return getHeaderValues(message, "Keep-Alive");
++    }
++
++    public static String getTransferEncodingElement(HttpMessage message) {
++        return getHeaderValues(message, "Transfer-Encoding");
++    }
++
++    public static String getContentEncodingElement(HttpMessage message) {
++        return getHeaderValues(message, "Content-Encoding");
++    }
++
++    public static String getVaryElement(HttpMessage message) {
++        return getHeaderValues(message, "Vary");
++    }
++
++    public static String getServerElement(HttpMessage message) {
++        return getHeaderValues(message, "Server");
++    }
++
++
++    /**
++     * AccessLogElement writes the partial message into the buffer.
++     */
++    protected interface AccessLogElement {
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response);
++    }
++
++    /**
++     * write local IP address - %A
++     */
++    protected static class LocalAddrElement implements AccessLogElement {
++
++        private static final String LOCAL_ADDR_VALUE;
++
++        static {
++            String init;
++            try {
++                init = InetAddress.getLocalHost().getHostAddress();
++            } catch (Throwable e) {
++                AccessTimeUtil.handleThrowable(e);
++                init = "127.0.0.1";
++            }
++            LOCAL_ADDR_VALUE = init;
++        }
++
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            buf.append(LOCAL_ADDR_VALUE);
++        }
++    }
++
++
++    /**
++     * write remote host name - %h
++     */
++    protected static class HostElement implements AccessLogElement {
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            String host = "";
++            try {
++                host = getHostElement(request);
++            } catch (Exception e) {
++                // empty host
++            }
++            buf.append(host);
++        }
++    }
++
++    /**
++     * write remote logical username from identd (always returns '-') - %l
++     */
++    protected static class LogicalUserNameElement implements AccessLogElement {
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            String logicalUserName = "";
++            try {
++                logicalUserName = getLogicalUserNameElement(request);
++            } catch (Exception e) {
++                // empty logicalUserName
++            }
++            buf.append(logicalUserName);
++        }
++    }
++
++
++    /**
++     * write remote user that was authenticated (if any), else '-' - %u
++     */
++    protected static class UserElement implements AccessLogElement {
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            String userElement = "";
++            try {
++                userElement = getUserNameElement(request);
++            } catch (Exception e) {
++                // empty UserName
++            }
++            buf.append(userElement);
++        }
++    }
++
++
++    /**
++     * write date and time, in Common Log Format - %t
++     */
++    protected class DateAndTimeElement implements AccessLogElement {
++
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            String currentDate = "";
++            if (request != null) {
++                currentDate = getHeaderValues(request, "Date");
++            } else if (response != null) {
++                currentDate = getHeaderValues(response, "Date");
++            }
++            buf.append(currentDate);
++        }
++    }
++
++    /**
++     * write first line of the request (method and request URI) - %r
++     */
++    protected static class RequestElement implements AccessLogElement {
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            if (request != null) {
++                String requestLine = request.getRequestLine().toString();
++                buf.append(requestLine);
++            } else {
++                buf.append("- - ");
++            }
++        }
++    }
++
++    /**
++     * write HTTP status code of the response - %s
++     */
++    protected static class HttpStatusCodeElement implements AccessLogElement {
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            if (response != null) {
++                int statusCode = response.getStatusLine().getStatusCode();
++                buf.append(statusCode); //getStatus
++            } else {
++                buf.append('-');
++            }
++        }
++    }
++
++
++    /**
++     * write bytes sent, excluding HTTP headers - %b, %B
++     */
++    protected static class ByteSentElement implements AccessLogElement {
++        private boolean conversion;
++
++        /**
++         * if conversion is true, write '-' instead of 0 - %b
++         *
++         * @param conversion - To be conversed.
++         */
++        public ByteSentElement(boolean conversion) {
++            this.conversion = conversion;
++        }
++
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            // Don't need to flush since trigger for log message is after the
++            // response has been committed
++            try {
++                long length = response.getEntity().getContentLength(); //getBytesWritten(false);
++                if (length <= 0 && conversion) {
++                    buf.append('-');                           //%b
++                } else {
++                    buf.append(length);
++                }
++            } catch (Exception e) {
++                buf.append('-'); //No entity found.
++            }
++        }
++    }
++
++    /**
++     * write request method (GET, POST, etc.) - %m
++     */
++    protected static class MethodElement implements AccessLogElement {
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            if (request != null) {
++                buf.append(request.getRequestLine().getMethod());
++            }
++        }
++    }
++
++    /**
++     * write requested URL path - %U
++     */
++    protected static class RequestURIElement implements AccessLogElement {
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            if (request != null) {
++                buf.append(request.getRequestLine().getUri());
++            } else {
++                buf.append('-');
++            }
++        }
++    }
++
++    /**
++     * write local server name - %v
++     */
++    protected static class LocalServerNameElement implements AccessLogElement {
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            buf.append(getHeaderValues(request, "server"));
++        }
++    }
++
++    /**
++     * write any string
++     */
++    protected static class StringElement implements AccessLogElement {
++        private String str;
++
++        public StringElement(String str) {
++            this.str = str;
++        }
++
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            buf.append(str);
++        }
++    }
++
++    /**
++     * write incoming headers - %{xxx}i
++     */
++    protected static class HeaderElement implements AccessLogElement {
++        private String header;
++
++        public HeaderElement(String header) {
++            this.header = header;
++        }
++
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            try {
++                String value = getHeaderValues(request, header);
++                if (value == null) {
++                    buf.append('-');
++                } else {
++                    buf.append(value);
++                }
++            } catch (Exception e) {
++                buf.append('-'); //Header is null
++            }
++        }
++    }
++
++    /**
++     * write a specific cookie - %{xxx}c
++     */
++    protected static class CookieElement implements AccessLogElement {
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            buf.append(getCookieElement(request));
++        }
++    }
++
++
++    /**
++     * write the referer - %f
++     */
++    protected static class RefererElement implements AccessLogElement {
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            buf.append(getRefererElement(request));
++        }
++    }
++
++
++    /**
++     * write the user agent - %a
++     */
++    protected static class UserAgentElement implements AccessLogElement {
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            buf.append(getUserAgentElement(request));
++        }
++    }
++
++    /**
++     * write the Accept Element - %C
++     */
++    protected static class AcceptElement implements AccessLogElement {
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            buf.append(getAcceptElement(request));
++        }
++    }
++
++    /**
++     * write the Accept Language Element - %L
++     */
++    protected static class AcceptLanguageElement implements AccessLogElement {
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            buf.append(getAcceptLanguageElement(request));
++        }
++    }
++
++    /**
++     * write the Accept Encoding Element - %e
++     */
++    protected static class AcceptEncodingElement implements AccessLogElement {
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            buf.append(getAcceptEncodingElement(request));
++        }
++    }
++
++    /**
++     * write the Accept Character Set Element - %S
++     */
++    protected static class AcceptCharSetElement implements AccessLogElement {
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            buf.append(getAcceptCharSetElement(request));
++        }
++    }
++
++    /**
++     * write the Connection Element - %x
++     */
++    protected static class ConnectionElement implements AccessLogElement {
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            buf.append(getConnectionElement(request));
++        }
++    }
++
++    /**
++     * write the Content Type Element - %T
++     */
++    protected static class ContentTypeElement implements AccessLogElement {
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            buf.append(getContentTypeElement(request));
++        }
++    }
++
++    /**
++     * write the Keep Alive Element - %k
++     */
++    protected static class KeepAliveElement implements AccessLogElement {
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            buf.append(getKeepAliveElement(request));
++        }
++    }
++
++    /**
++     * write the Transfer Encoding Element - %E
++     */
++    protected static class TransferEncodingElement implements AccessLogElement {
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            buf.append(getTransferEncodingElement(request));
++        }
++    }
++
++    /**
++     * write the Content Encoding Element - %n
++     */
++    protected static class ContentEncodingElement implements AccessLogElement {
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            buf.append(getContentEncodingElement(request));
++        }
++    }
++
++    /**
++     * write the Vary Element - %V
++     */
++    protected static class VaryElement implements AccessLogElement {
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            buf.append(getVaryElement(request));
++        }
++    }
++
++    /**
++     * write the Server Element - %Z
++     */
++    protected static class ServerElement implements AccessLogElement {
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            buf.append(getServerElement(request));
++        }
++    }
++
++    /**
++     * write a specific response header - %{xxx}o
++     */
++    protected static class ResponseHeaderElement implements AccessLogElement {
++        private String header;
++
++        public ResponseHeaderElement(String header) {
++            this.header = header;
++        }
++
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            if (null != response) {
++                buf.append(getHeaderValues(response, header));
++            }
++            buf.append("-");
++        }
++    }
++
++    /**
++     * write an attribute in the ServletRequest - %{xxx}r    %R
++     */
++    protected static class RequestAttributeElement implements AccessLogElement {
++
++        public RequestAttributeElement() {
++        }
++
++        public void addElement(StringBuilder buf, Date date, HttpRequest request,
++                               HttpResponse response) {
++            Object value;
++            if (request != null) {
++                value = request.getLastHeader(buf.toString()); //gets the attribute header
++            } else {
++                value = "??";
++            }
++            if (value != null) {
++                if (value instanceof String) {
++                    buf.append((String) value);
++                } else {
++                    buf.append(value.toString());
++                }
++            } else {
++                buf.append('-');
++            }
++        }
++
++    }
++
++
++    /**
++     * parse pattern string and create the array of AccessLogElement
++     *
++     * @return Array of AccessLogElement
++     */
++    protected AccessLogElement[] createLogElements() {
++        List<AccessLogElement> list = new ArrayList<AccessLogElement>();
++        boolean replace = false;
++        StringBuilder buf = new StringBuilder();
++        for (int i = 0; i < pattern.length(); i++) {
++            char ch = pattern.charAt(i);
++            if (replace) {
++                /*
++                 * For code that processes {, the behavior will be ... if I do
++                 * not encounter a closing } - then I ignore the {
++                 */
++                if ('{' == ch) {
++                    StringBuilder name = new StringBuilder();
++                    int j = i + 1;
++                    for (; j < pattern.length() && '}' != pattern.charAt(j); j++) {
++                        name.append(pattern.charAt(j));
++                    }
++                    if (j + 1 < pattern.length()) {
++                        /* the +1 was to account for } which we increment now */
++                        j++;
++                        list.add(createAccessLogElement(name.toString(),
++                                                        pattern.charAt(j)));
++                        i = j; /* Since we walked more than one character */
++                    } else {
++                        // D'oh - end of string - pretend we never did this
++                        // and do processing the "old way"
++                        list.add(createAccessLogElement(ch));
++                    }
++                } else {
++                    list.add(createAccessLogElement(ch));
++                }
++                replace = false;
++            } else if (ch == '%') {
++                replace = true;
++                list.add(new StringElement(buf.toString()));
++                buf = new StringBuilder();
++            } else {
++                buf.append(ch);
++            }
++        }
++        if (buf.length() > 0) {
++            list.add(new StringElement(buf.toString()));
++        }
++        return list.toArray(new AccessLogElement[list.size()]);
++    }
++
++    /**
++     * create an AccessLogElement implementation which needs header string
++     *
++     * @param header  - header of the request/response
++     * @param pattern - pattern character given for the input element
++     * @return AccessLogElement - accessLogElement
++     */
++    private AccessLogElement createAccessLogElement(String header, char pattern) {
++        switch (pattern) {
++            case 'i':
++                return new HeaderElement(header);  //%{xxx}i
++            case 'o':
++                return new ResponseHeaderElement(header);
++            case 'R':
++                return new RequestAttributeElement();
++            default:
++                return new StringElement("???");
++        }
++    }
++
++    /**
++     * create an AccessLogElement implementation
++     *
++     * @param pattern - pattern character given for the input element
++     * @return AccessLogElement acceessLogElement
++     */
++    private AccessLogElement createAccessLogElement(char pattern) {
++        switch (pattern) {
++            case 'A':
++                return new LocalAddrElement();
++            case 'a':
++                return new UserAgentElement();
++            case 'b':
++                return new ByteSentElement(true);     //%b
++            case 'B':
++                return new ByteSentElement(false);
++            case 'c':
++                return new CookieElement();            // %c
++            case 'C':
++                return new AcceptElement();
++            case 'e':
++                return new AcceptEncodingElement();
++            case 'E':
++                return new TransferEncodingElement();
++            case 'f':
++                return new RefererElement();
++            case 'h':
++                return new HostElement();         //%h
++            case 'k':
++                return new KeepAliveElement();
++            case 'l':
++                return new LogicalUserNameElement();     //%l
++            case 'L':
++                return new AcceptLanguageElement();
++            case 'm':
++                return new MethodElement();
++            case 'n':
++                return new ContentEncodingElement();
++            case 'r':
++                return new RequestElement();        //%r
++            case 'S':
++                return new AcceptCharSetElement();
++            case 's':
++                return new HttpStatusCodeElement();       // %s
++            case 'T':
++                return new ContentTypeElement();
++            case 't':
++                return new DateAndTimeElement();       //%t
++            case 'u':
++                return new UserElement();           //%u
++            case 'U':
++                return new RequestURIElement();
++            case 'V':
++                return new VaryElement();
++            case 'v':
++                return new LocalServerNameElement();
++            case 'x':
++                return new ConnectionElement();
++            case 'Z':
++                return new ServerElement();
++            default:
++                return new StringElement("???" + pattern + "???");
++        }
++    }
++}
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientWorker.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientWorker.java	(revision 1210885)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientWorker.java	(revision 1210886)
+@@ -43,6 +43,8 @@
+ import javax.xml.stream.XMLStreamException;
+ import java.io.IOException;
+ import java.io.InputStream;
++import java.net.URI;
++import java.net.URISyntaxException;
+ import java.util.Comparator;
+ import java.util.Map;
+ import java.util.TreeMap;
+@@ -112,6 +114,7 @@
+                 responseMsgCtx.setOperationContext(outMsgCtx.getOperationContext());
+             }
+ 
++            responseMsgCtx.setProperty(MessageContext.IN_MESSAGE_CONTEXT, outMsgCtx);
+             responseMsgCtx.setServerSide(true);
+             responseMsgCtx.setDoingREST(outMsgCtx.isDoingREST());
+             responseMsgCtx.setProperty(MessageContext.TRANSPORT_IN, outMsgCtx
+@@ -130,15 +133,35 @@
+                     }
+                 });
+                 
+-                for (int i=0; i<headers.length; i++) {
++                String servicePrefix = (String)outMsgCtx.getProperty(NhttpConstants.SERVICE_PREFIX);
++                for (int i = 0; i < headers.length; i++) {
+                     Header header = headers[i];
+-                    if ("Location".equals(header.getName())
+-                        && endpointURLPrefix != null
+-                        && outMsgCtx.getProperty(NhttpConstants.SERVICE_PREFIX) != null) {
+-                        
+-                        headerMap.put(header.getName(),
+-                            header.getValue().replaceAll(endpointURLPrefix,
+-                                (String) outMsgCtx.getProperty(NhttpConstants.SERVICE_PREFIX)));
++                    if ("Location".equals(header.getName()) &&
++                            endpointURLPrefix != null && servicePrefix != null) {
++                        // Here, we are changing only the host name and the port of the new URI
++                        // value of the Location header.
++                        // If the new URI is again referring to a resource in the server to which the
++                        // original request is sent, then replace the hostname and port of the URI
++                        // with the hostname and port of synapse.
++                        // We are not changing the request url here, only the hostname and the port.
++                        try {
++                            URI serviceURI = new URI(servicePrefix);
++                            URI endpointURI = new URI(endpointURLPrefix);
++                            URI locationURI = new URI(header.getValue());
++
++                            if(locationURI.getHost().equalsIgnoreCase(endpointURI.getHost())){
++                                URI newURI = new URI(locationURI.getScheme(), locationURI.getUserInfo(),
++                                        serviceURI.getHost(), serviceURI.getPort(), locationURI.getPath(),
++                                        locationURI.getQuery(), locationURI.getFragment());
++                                headerMap.put(header.getName(), newURI.toString());
++                                responseMsgCtx.setProperty(NhttpConstants.SERVICE_PREFIX,
++                                        outMsgCtx.getProperty(NhttpConstants.SERVICE_PREFIX));
++                            } else {
++                                headerMap.put(header.getName(), header.getValue());
++                            }
++                        } catch (URISyntaxException e) {
++                            log.error(e.getMessage(), e);
++                        }
+                     } else {
+                         headerMap.put(header.getName(), header.getValue());
+                     }
+@@ -278,7 +301,6 @@
+ 
+         } catch (AxisFault af) {
+             log.error("Fault creating response SOAP envelope", af);
+-            return;
+         } catch (XMLStreamException e) {
+             log.error("Error creating response SOAP envelope", e);
+         } catch (IOException e) {
+-*-*-*-
+Access logs and a few bug fixes

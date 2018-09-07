@@ -1,0 +1,39 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/ServiceLoadBalanceMembershipHandler.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/core/axis2/ServiceLoadBalanceMembershipHandler.java	(revision 1213667)
++++ java/modules/core/src/main/java/org/apache/synapse/core/axis2/ServiceLoadBalanceMembershipHandler.java	(revision 1213668)
+@@ -96,10 +96,7 @@
+     }
+ 
+     public Member getNextApplicationMember(String host) {
+-        DomainAlgorithmContext domainAlgorithmContext = hostDomainAlgorithmContextMap.get(host);
+-        if(domainAlgorithmContext == null) {
+-            throw new SynapseException("Domain not found for host" + host);
+-        }
++        DomainAlgorithmContext domainAlgorithmContext = getDomainAlgorithmContext(host);
+         String lbDomain = domainAlgorithmContext.getDomain();
+         LoadbalanceAlgorithm algorithm = domainAlgorithmContext.getAlgorithm();
+         GroupManagementAgent groupMgtAgent = clusteringAgent.getGroupManagementAgent(lbDomain);
+@@ -115,6 +112,19 @@
+         return algorithm.getNextApplicationMember(context);
+     }
+ 
++    private DomainAlgorithmContext getDomainAlgorithmContext(String host) {
++        DomainAlgorithmContext domainAlgorithmContext = hostDomainAlgorithmContextMap.get(host);
++        if(domainAlgorithmContext == null) {
++            int indexOfDot;
++            if ((indexOfDot = host.indexOf(".")) != -1) {
++                domainAlgorithmContext = getDomainAlgorithmContext(host.substring(indexOfDot + 1));
++            } else {
++                throw new SynapseException("Domain not found for host" + host);
++            }
++        }
++        return domainAlgorithmContext;
++    }
++
+     public LoadbalanceAlgorithm getLoadbalanceAlgorithm() {
+         return null;
+     }
+-*-*-*-
+Dispatch *.foo.com sort of request hosts to clusters mapped to foo.com
+

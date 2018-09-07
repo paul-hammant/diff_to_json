@@ -1,0 +1,32 @@
+{
+  "when": "2012-07-20T04:24:09-04:00", 
+  "message": "Incorporating fixes of AXIS2-5212.\n", 
+  "who": "sadeep", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-60,12 +60,7", 
+          "lines": [
+            "             if (args[i] == null || paramTypes[i].isAssignableFrom(args[i].getClass())) {\n", 
+            "                 processedArgs[i] = args[i];\n", 
+            "             } else if (SimpleTypeMapper.isSimpleType(paramTypes[i])) {\n", 
+            "-                try {\n", 
+            "-                    // Workaround for https://issues.apache.org/jira/browse/AXIS2-5212\n", 
+            "-                    processedArgs[i] = SimpleTypeMapper.getSimpleTypeObject(paramTypes[i],\n", 
+            "-                            AXIOMUtil.stringToOM(\"<a>\" + args[i].toString() + \"</a>\"));\n", 
+            "-                } catch (XMLStreamException ignored) {\n", 
+            "-                }\n", 
+            "+                processedArgs[i] = SimpleTypeMapper.getSimpleTypeObject(paramTypes[i], args[i].toString());\n", 
+            "             } else {\n", 
+            "                 throw new SynapseException(\"Incompatible argument found in argument \" + i +\n", 
+            "                         \" for '\" + method.getName() + \"' method.\");\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanUtils.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanUtils.java"
+    }
+  ], 
+  "id": "1363672"
+}

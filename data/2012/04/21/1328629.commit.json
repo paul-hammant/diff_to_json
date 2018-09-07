@@ -1,0 +1,85 @@
+{
+  "when": "2012-04-21T06:21:20-04:00", 
+  "message": "Fixed an invalid test case that was making unfounded assumptions about how empty elements are serialized.", 
+  "who": "veithen", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-26,6 +26,7", 
+          "lines": [
+            " import org.apache.commons.io.output.NullOutputStream;\n", 
+            " import org.apache.synapse.config.Entry;\n", 
+            " import org.apache.synapse.registry.Registry;\n", 
+            "+import org.custommonkey.xmlunit.XMLAssert;\n", 
+            " \n", 
+            " import java.io.BufferedWriter;\n", 
+            " import java.io.File;\n"
+          ]
+        }, 
+        {
+          "locn": "-66,15 +67,15", 
+          "lines": [
+            "         prop.setKey(FILE);\n", 
+            " \n", 
+            "         // initial load of file from registry\n", 
+            "-        assertEquals(TEXT_1, reg.getResource(prop, new Properties()).toString());\n", 
+            "+        XMLAssert.assertXMLEqual(TEXT_1, reg.getResource(prop, new Properties()).toString());\n", 
+            " \n", 
+            "         // sleep 1 sec\n", 
+            "         Thread.sleep(1000);\n", 
+            "-        assertEquals(TEXT_1, reg.getResource(prop, new Properties()).toString());\n", 
+            "+        XMLAssert.assertXMLEqual(TEXT_1, reg.getResource(prop, new Properties()).toString());\n", 
+            " \n", 
+            "         // sleep another 1 sec, has expired in cache, but content hasnt changed\n", 
+            "         Thread.sleep(1000);\n", 
+            "-        assertEquals(TEXT_1, reg.getResource(prop, new Properties()).toString());\n", 
+            "+        XMLAssert.assertXMLEqual(TEXT_1, reg.getResource(prop, new Properties()).toString());\n", 
+            " \n", 
+            "         // the renewed cache should be valid for another 1.5 secs\n", 
+            "         // change the file now and change next cache duration\n"
+          ]
+        }, 
+        {
+          "locn": "-82,15 +83,15", 
+          "lines": [
+            "         props.put(\"cachableDuration\", \"100\");\n", 
+            "         reg.init(props);\n", 
+            "         // still cached content should be available and valid\n", 
+            "-        assertEquals(TEXT_1, reg.getResource(prop, new Properties()).toString());\n", 
+            "+        XMLAssert.assertXMLEqual(TEXT_1, reg.getResource(prop, new Properties()).toString());\n", 
+            " \n", 
+            "         // now sleep ~1 sec, still cache should be valid\n", 
+            "         Thread.sleep(800);\n", 
+            "-        assertEquals(TEXT_1, reg.getResource(prop, new Properties()).toString());\n", 
+            "+        XMLAssert.assertXMLEqual(TEXT_1, reg.getResource(prop, new Properties()).toString());\n", 
+            " \n", 
+            "         // sleep another 1 sec.. cache should expire and new content should be loaded\n", 
+            "         Thread.sleep(1000);\n", 
+            "-        assertEquals(TEXT_2, reg.getResource(prop, new Properties()).toString());\n", 
+            "+        XMLAssert.assertXMLEqual(TEXT_2, reg.getResource(prop, new Properties()).toString());\n", 
+            " \n", 
+            "         // change content back to original\n", 
+            "         writeToFile(TEXT_1);\n"
+          ]
+        }, 
+        {
+          "locn": "-98,7 +99,7", 
+          "lines": [
+            "         // sleep for .5 sec, now the new content should be loaded as new expiry time\n", 
+            "         // is .1 sec\n", 
+            "         Thread.sleep(500);\n", 
+            "-        assertEquals(TEXT_1, reg.getResource(prop, new Properties()).toString());\n", 
+            "+        XMLAssert.assertXMLEqual(TEXT_1, reg.getResource(prop, new Properties()).toString());\n", 
+            "     }\n", 
+            "     \n", 
+            "     public void testLargeFile() throws Exception {\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/test/java/org/apache/synapse/registry/url/SimpleURLRegistryTest.java", 
+      "from": "java/modules/core/src/test/java/org/apache/synapse/registry/url/SimpleURLRegistryTest.java"
+    }
+  ], 
+  "id": "1328629"
+}

@@ -1,0 +1,70 @@
+{
+  "when": "2011-12-22T00:15:38-05:00", 
+  "message": "added recipient list config", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-61,6 +61,7", 
+          "lines": [
+            "                         <li><a href=\"#LBEndpointConfig\">Load Balance Endpoint</a></li>\n", 
+            "                         <li><a href=\"#DLBEndpointConfig\">Dynamic Load Balance Endpoint</a></li>\n", 
+            "                         <li><a href=\"#FOEndpointConfig\">Fail-Over Endpoint</a></li>\n", 
+            "+                        <li><a href=\"#RecipientListEndpointConfig\">Recipient List Endpoint\"</a></li>\n", 
+            "                     </ul>\n", 
+            "                 </li>\n", 
+            "                 <li><a href=\"#ProxyServiceConfig\">Proxy Service Configuration</a></li>\n"
+          ]
+        }, 
+        {
+          "locn": "-649,7 +650,7", 
+          "lines": [
+            "             </p>\n", 
+            "             <div class=\"xmlConf\">&lt;endpoint [name=\"string\"] [key=\"string\"]&gt;\n", 
+            "     <a href=\"#AddressEndpointConfig\">address-endpoint</a> | <a href=\"#DefaultEndpointConfig\">default-endpoint</a> | <a href=\"#WSDLEndpointConfig\">wsdl-endpoint</a> |\n", 
+            "-    <a href=\"#LBEndpointConfig\">load-balanced-endpoint</a> | <a href=\"#FOEndpointConfig\">fail-over-endpoint</a> | <a href=\"#recipient-list-endpoint\">recipient-list-endpoint</a>\n", 
+            "+    <a href=\"#LBEndpointConfig\">load-balanced-endpoint</a> | <a href=\"#FOEndpointConfig\">fail-over-endpoint</a> | <a href=\"#RecipientListEndpointConfig\">recipient-list-endpoint</a>\n", 
+            " &lt;/endpoint&gt;</div>\n", 
+            "             <p>\n", 
+            "                 Note how the endpoint definitions always start with an 'endpoint' element. The\n"
+          ]
+        }, 
+        {
+          "locn": "-932,6 +933,26", 
+          "lines": [
+            " &lt;/failover&gt;</div>\n", 
+            " \n", 
+            "             </subsection>\n", 
+            "+            <subsection name=\"Recipient List Endpoint\" id=\"RecipientListEndpointConfig\">\n", 
+            "+                <p>\n", 
+            "+                    A recipient list endpoint can be used to send a single message to a list of\n", 
+            "+                    recipients (child endpoints). This is used to implement the well-known\n", 
+            "+                    integration pattern named 'recipient list'. The same functionality can\n", 
+            "+                    be achieved using the 'clone' mediator, but the recipient list provides\n", 
+            "+                    a more natural and intuitive way of implementing such a scenario. Configuration\n", 
+            "+                    of the recipient list endpoint takes the following general form.\n", 
+            "+                </p>\n", 
+            "+                <div class=\"xmlConf\">&lt;recipientList name=\"string\"&gt;\n", 
+            "+    &lt;endpoint&gt;+\n", 
+            "+    &lt;member hostName=\"host\" [httpPort=\"port\"] [httpsPort=\"port2\"]&gt;+\n", 
+            "+&lt;/recipientList&gt;</div>\n", 
+            "+                <p>\n", 
+            "+                    A recipient list can be named by setting the 'name' attribute on the 'recipientList'\n", 
+            "+                    element. Similar to a load balance endpoint, the recipient list endpoint also\n", 
+            "+                    wraps a set of endpoint definitions or a set of member definitions. At runtime\n", 
+            "+                    messages will be sent to all the child endpoints or members.\n", 
+            "+                </p>\n", 
+            "+            </subsection>\n", 
+            "         </section>\n", 
+            "         <section name=\"Proxy Service Configuration\" id=\"ProxyServiceConfig\">\n", 
+            "             <p>\n"
+          ]
+        }
+      ], 
+      "to": "scratch/hiranya/website/src/site/xdoc/userguide/config.xml", 
+      "from": "scratch/hiranya/website/src/site/xdoc/userguide/config.xml"
+    }
+  ], 
+  "id": "1222039"
+}

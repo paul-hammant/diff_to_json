@@ -1,0 +1,27 @@
+{
+  "when": "2012-04-12T14:39:39-04:00", 
+  "message": "Updated Axiom version.", 
+  "who": "veithen", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-1107,7 +1107,7", 
+          "lines": [
+            "         <!-- Axis2 and its dependencies -->\n", 
+            "         <axis2.version>1.7.0-SNAPSHOT</axis2.version>\n", 
+            "         <axis2.transport.version>1.7.0-SNAPSHOT</axis2.transport.version>\n", 
+            "-        <axiom.version>1.2.13-SNAPSHOT</axiom.version>\n", 
+            "+        <axiom.version>1.2.14-SNAPSHOT</axiom.version>\n", 
+            "         <xml_schema.version>1.4.3</xml_schema.version>\n", 
+            "         <wsdl4j.version>1.6.2</wsdl4j.version>\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/pom.xml", 
+      "from": "java/pom.xml"
+    }
+  ], 
+  "id": "1325434"
+}

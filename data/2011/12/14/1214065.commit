@@ -1,0 +1,15 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/deployers/ProxyServiceDeployer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/deployers/ProxyServiceDeployer.java	(revision 1214064)
++++ java/modules/core/src/main/java/org/apache/synapse/deployers/ProxyServiceDeployer.java	(revision 1214065)
+@@ -133,7 +133,7 @@
+                 }
+                 log.info("ProxyService named '" + proxy.getName()
+                         + "' has been " + (existingArtifactName.equals(proxy.getName()) ?
+-                            "update" : "deployed") + " from file : " + fileName);
++                            "updated" : "deployed") + " from file : " + fileName);
+                 return proxy.getName();
+             } else {
+                 handleSynapseArtifactDeploymentError("ProxyService Update Failed. The artifact " +
+-*-*-*-
+committing patch for https://issues.apache.org/jira/browse/SYNAPSE-828

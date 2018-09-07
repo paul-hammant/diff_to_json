@@ -1,0 +1,37 @@
+Index: java/modules/distribution/src/main/assembly/bin.xml
+===================================================================
+--- java/modules/distribution/src/main/assembly/bin.xml	(revision 1220726)
++++ java/modules/distribution/src/main/assembly/bin.xml	(revision 1220727)
+@@ -242,6 +242,8 @@
+                 <exclude>javax.servlet:servlet-api:jar</exclude>
+                 <exclude>xml-apis:xml-apis:jar</exclude>
+                 <exclude>xerces:xercesImpl:jar</exclude>
++		<exclude>org.apache.xerces:xercesImpl</exclude>
++		<exclude>org.apache.xerces:xml-apis</exclude>
+                 <exclude>junit:junit:jar</exclude>
+                 <exclude>org.apache.mina:mina-core:jar</exclude>
+                 <exclude>org.slf4j:slf4j-api:jar</exclude>
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1220726)
++++ java/pom.xml	(revision 1220727)
+@@ -828,7 +828,7 @@
+         <axis2.transport.version>1.7.0-SNAPSHOT</axis2.transport.version>
+         <axiom.version>1.2.13-SNAPSHOT</axiom.version>
+         <xml_schema.version>1.4.3</xml_schema.version>
+-        <xml_apis.version>1.3.04</xml_apis.version>
++        <xml_apis.version>2.0.2</xml_apis.version>
+         <wsdl4j.version>1.6.2</wsdl4j.version>
+ 
+         <commons.logging.version>1.1.1</commons.logging.version>
+@@ -843,7 +843,7 @@
+         <bcprov.jdk15.version>140</bcprov.jdk15.version>
+ 
+         <xalan.version>2.7.1</xalan.version>
+-        <xerces.version>2.8.1</xerces.version>
++        <xerces.version>2.9.1</xerces.version>
+         <js.version>1.6R5</js.version>
+ 
+         <!-- startup, quartz -->
+-*-*-*-
+Upgrading XML APIs version - SYNAPSE-410 - Removed some redundant libs

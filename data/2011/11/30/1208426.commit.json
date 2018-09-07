@@ -1,0 +1,28 @@
+{
+  "when": "2011-11-30T08:46:04-05:00", 
+  "message": "applying the patchfor SYNAPSE-804", 
+  "who": "charith", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-78,7 +78,8", 
+          "lines": [
+            " \n", 
+            "                 }\n", 
+            " \n", 
+            "-\n", 
+            "+                // Ensure that the message is fully read\n", 
+            "+                synCtx.getEnvelope().buildWithAttachments();\n", 
+            "                 messageStore.offer(synCtx);\n", 
+            " \n", 
+            "                 // with the nio transport, this causes the listener not to write a 202\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/store/MessageStoreMediator.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/store/MessageStoreMediator.java"
+    }
+  ], 
+  "id": "1208426"
+}

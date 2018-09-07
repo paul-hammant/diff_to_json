@@ -1,0 +1,182 @@
+Index: java/modules/commons/src/test/java/org/apache/synapse/util/TemporaryDataTest.java
+===================================================================
+--- java/modules/commons/src/test/java/org/apache/synapse/util/TemporaryDataTest.java	(revision 1231895)
++++ java/modules/commons/src/test/java/org/apache/synapse/util/TemporaryDataTest.java	(revision 1231896)
+@@ -27,8 +27,8 @@
+ import java.util.Arrays;
+ import java.util.Random;
+ 
++import org.apache.axiom.util.blob.OverflowBlob;
+ import org.apache.commons.io.IOUtils;
+-import org.apache.synapse.commons.util.TemporaryData;
+ 
+ import junit.framework.TestCase;
+ 
+@@ -38,7 +38,7 @@
+     private void doTestRandomReadWrite(int size) throws IOException {
+         byte[] data = new byte[size];
+         random.nextBytes(data);
+-        TemporaryData tmp = new TemporaryData(16, 1024, "test", ".dat");
++        OverflowBlob tmp = new OverflowBlob(16, 1024, "test", ".dat");
+         try {
+             OutputStream out = tmp.getOutputStream();
+             // Write the test data in chunks with random size
+@@ -89,7 +89,7 @@
+         byte[] sourceData2 = new byte[2000];
+         random.nextBytes(sourceData1);
+         random.nextBytes(sourceData2);
+-        TemporaryData tmp = new TemporaryData(16, 512, "test", ".dat");
++        OverflowBlob tmp = new OverflowBlob(16, 512, "test", ".dat");
+         OutputStream out = tmp.getOutputStream();
+         out.write(sourceData1);
+         out.write(sourceData2);
+@@ -109,9 +109,9 @@
+     private void testReadFrom(int size) throws IOException {
+         byte[] data = new byte[size];
+         random.nextBytes(data);
+-        TemporaryData tmp = new TemporaryData(16, 1024, "test", ".dat");
++        OverflowBlob tmp = new OverflowBlob(16, 1024, "test", ".dat");
+         try {
+-            tmp.readFrom(new ByteArrayInputStream(data));
++            tmp.readFrom(new ByteArrayInputStream(data), -1);
+             InputStream in = tmp.getInputStream();
+             try {
+                 assertTrue(Arrays.equals(data, IOUtils.toByteArray(in)));
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java	(revision 1231895)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java	(revision 1231896)
+@@ -19,6 +19,7 @@
+ package org.apache.synapse.transport.nhttp;
+ 
+ import org.apache.axiom.om.OMOutputFormat;
++import org.apache.axiom.util.blob.OverflowBlob;
+ import org.apache.axis2.AxisFault;
+ import org.apache.axis2.Constants;
+ import org.apache.axis2.addressing.AddressingConstants;
+@@ -36,7 +37,6 @@
+ import org.apache.axis2.transport.base.ManagementSupport;
+ import org.apache.axis2.transport.base.MetricsCollector;
+ import org.apache.axis2.transport.base.TransportMBeanSupport;
+-import org.apache.axis2.util.JavaUtils;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+ import org.apache.http.*;
+@@ -61,7 +61,6 @@
+ import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
+ import org.apache.synapse.transport.nhttp.util.NhttpUtil;
+ import org.apache.synapse.transport.nhttp.util.NhttpMetricsCollector;
+-import org.apache.synapse.commons.util.TemporaryData;
+ 
+ import javax.net.ssl.SSLContext;
+ import java.io.IOException;
+@@ -624,7 +623,7 @@
+     private void setStreamAsTempData(BasicHttpEntity entity, MessageFormatter messageFormatter,
+                                      MessageContext msgContext, OMOutputFormat format)
+             throws IOException {
+-        TemporaryData serialized = new TemporaryData(256, 4096, "http-nio_", ".dat");
++        OverflowBlob serialized = new OverflowBlob(256, 4096, "http-nio_", ".dat");
+         OutputStream out = serialized.getOutputStream();
+         try {
+             messageFormatter.writeTo(msgContext, format, out, true);
+@@ -643,8 +642,8 @@
+      */
+     private void writeMessageFromTempData(OutputStream out, MessageContext msgContext)
+             throws IOException {
+-        TemporaryData serialized =
+-                (TemporaryData) msgContext.getProperty(NhttpConstants.SERIALIZED_BYTES);
++        OverflowBlob serialized =
++                (OverflowBlob) msgContext.getProperty(NhttpConstants.SERIALIZED_BYTES);
+         try {
+             serialized.writeTo(out);
+         } finally {
+@@ -653,7 +652,7 @@
+     }
+ 
+     /**
+-     * Determine the HttpStatusCodedepending on the message type processed <br>
++     * Determine the HttpStatusCode depending on the message type processed <br>
+      * (normal response versus fault response) as well as Axis2 message context properties set
+      * via Synapse configuration or MessageBuilders.
+      * 
+Index: java/modules/core/src/main/java/org/apache/synapse/rest/Resource.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/rest/Resource.java	(revision 1231895)
++++ java/modules/core/src/main/java/org/apache/synapse/rest/Resource.java	(revision 1231896)
+@@ -375,9 +375,9 @@
+     }
+ 
+     private String getSupportedMethods() {
+-        String value = "";
++        StringBuilder value = new StringBuilder("");
+         if (methods.isEmpty()) {
+-            value = RESTConstants.REST_ALL_SUPPORTED_METHODS;
++            value.append(RESTConstants.REST_ALL_SUPPORTED_METHODS);
+         } else {
+             for (String method : methods) {
+                 if (RESTConstants.METHOD_OPTIONS.equals(method)) {
+@@ -385,12 +385,12 @@
+                 }
+ 
+                 if (value.length() > 0) {
+-                    value += ", ";
++                    value.append(", ");
+                 }
+-                value += method;
++                value.append(method);
+             }
+         }
+-        return value;
++        return value.toString();
+     }
+ 
+     public void init(SynapseEnvironment se) {
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/GetPropertyFunction.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/GetPropertyFunction.java	(revision 1231895)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/GetPropertyFunction.java	(revision 1231896)
+@@ -39,7 +39,6 @@
+ import org.jaxen.function.StringFunction;
+ 
+ import javax.activation.DataHandler;
+-import java.io.BufferedInputStream;
+ import java.io.BufferedReader;
+ import java.io.IOException;
+ import java.io.InputStreamReader;
+@@ -330,12 +329,12 @@
+                             try {
+                                 InputStreamReader streamReader = new InputStreamReader(dh.getInputStream());
+                                 BufferedReader stringReader = new BufferedReader(streamReader);
+-                                String omTextString = NULL_STRING;
++                                StringBuilder omTextString = new StringBuilder(NULL_STRING);
+                                 String tempStr;
+                                 while ((tempStr = stringReader.readLine()) != null) {
+-                                    omTextString = omTextString + tempStr;
++                                    omTextString.append(tempStr);
+                                 }
+-                                return omTextString;
++                                return omTextString.toString();
+                             } catch (IOException e) {
+                                 return NULL_STRING;
+                             }
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/rest/ResourceSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/rest/ResourceSerializer.java	(revision 1231895)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/rest/ResourceSerializer.java	(revision 1231896)
+@@ -38,11 +38,11 @@
+         OMElement resourceElt = fac.createOMElement("resource", SynapseConstants.SYNAPSE_OMNAMESPACE);
+         String[] methods = resource.getMethods();
+         if (methods.length > 0) {
+-            String value = "";
++            StringBuilder value = new StringBuilder("");
+             for (String method : methods) {
+-                value += method + " ";
++                value.append(method).append(" ");
+             }
+-            resourceElt.addAttribute("methods", value.trim(), null);
++            resourceElt.addAttribute("methods", value.toString().trim(), null);
+         }
+ 
+         if (resource.getContentType() != null) {
+-*-*-*-
+Getting rid of all uses of the deprecated TemporaryData class

@@ -1,0 +1,103 @@
+{
+  "when": "2012-06-12T02:23:38-04:00", 
+  "message": "Preventing the fault mediator from changing its status at runtime", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-110,26 +110,23", 
+          "lines": [
+            "             default : {\n", 
+            "                 // if this is a POX or REST message then make a POX fault\n", 
+            "                 if (synCtx.isDoingPOX() || synCtx.isDoingGET()) {\n", 
+            "-                    \n", 
+            "+\n", 
+            "                     makePOXFault(synCtx, synLog);\n", 
+            " \n", 
+            "                 } else {\n", 
+            "-                    \n", 
+            "+\n", 
+            "                     // determine from current message's SOAP envelope namespace\n", 
+            "                     SOAPEnvelope envelop = synCtx.getEnvelope();\n", 
+            "                     if (envelop != null) {\n", 
+            "-                        \n", 
+            "+\n", 
+            "                         if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(\n", 
+            "                             envelop.getNamespace().getNamespaceURI())) {\n", 
+            "-\n", 
+            "-                            soapVersion = SOAP12;\n", 
+            "                             makeSOAPFault(synCtx, SOAP12, synLog);\n", 
+            " \n", 
+            "                         } else {\n", 
+            "-                            soapVersion = SOAP11;\n", 
+            "                             makeSOAPFault(synCtx, SOAP11, synLog);\n", 
+            "                         }\n", 
+            "-                        \n", 
+            "+\n", 
+            "                     } else {\n", 
+            "                         // default to SOAP 11\n", 
+            "                         makeSOAPFault(synCtx, SOAP11, synLog);\n"
+          ]
+        }, 
+        {
+          "locn": "-245,8 +242,8", 
+          "lines": [
+            "         }\n", 
+            " \n", 
+            "         // populate it\n", 
+            "-        setFaultCode(synCtx, factory, fault);\n", 
+            "-        setFaultResaon(synCtx, factory, fault);\n", 
+            "+        setFaultCode(synCtx, factory, fault, soapVersion);\n", 
+            "+        setFaultReason(synCtx, factory, fault, soapVersion);\n", 
+            "         setFaultNode(factory, fault);\n", 
+            "         setFaultRole(factory, fault);\n", 
+            "         setFaultDetail(synCtx, factory, fault);\n"
+          ]
+        }, 
+        {
+          "locn": "-305,7 +302,7", 
+          "lines": [
+            "         synLog.traceOrDebug(\"End : Fault mediator\");\n", 
+            "     }\n", 
+            " \n", 
+            "-    private void setFaultCode(MessageContext synCtx, SOAPFactory factory, SOAPFault fault) {\n", 
+            "+    private void setFaultCode(MessageContext synCtx, SOAPFactory factory, SOAPFault fault, int soapVersion) {\n", 
+            " \n", 
+            "         QName fault_code = null;\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-319,7 +316,7", 
+          "lines": [
+            "         }\n", 
+            " \n", 
+            "         SOAPFaultCode code = factory.createSOAPFaultCode();\n", 
+            "-        switch(soapVersion) {\n", 
+            "+        switch (soapVersion) {\n", 
+            "             case SOAP11:\n", 
+            "                 code.setText(fault_code);\n", 
+            "                 break;\n"
+          ]
+        }, 
+        {
+          "locn": "-331,7 +328,7", 
+          "lines": [
+            "         fault.setCode(code);\n", 
+            "     }\n", 
+            " \n", 
+            "-    private void setFaultResaon(MessageContext synCtx, SOAPFactory factory, SOAPFault fault) {\n", 
+            "+    private void setFaultReason(MessageContext synCtx, SOAPFactory factory, SOAPFault fault, int soapVersion) {\n", 
+            "         String reasonString = null;\n", 
+            " \n", 
+            "         if (faultReasonValue == null && faultReasonExpr == null) {\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/transform/FaultMediator.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/transform/FaultMediator.java"
+    }
+  ], 
+  "id": "1349134"
+}

@@ -1,0 +1,121 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/MessageForwardingProcessorView.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/MessageForwardingProcessorView.java	(revision 1213628)
++++ java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/MessageForwardingProcessorView.java	(revision 1213629)
+@@ -199,11 +199,10 @@
+                 Endpoint ep = messageContext.getEndpoint(targetEp);
+ 
+                 if (ep instanceof AddressEndpoint) {
+-                    AddressEndpoint addEp = (AddressEndpoint) ep;
+-                    String addressUrl = addEp.getDefinition().getAddress();
+ 
+                     try {
+-                        MessageContext outCtx = sender.send(messageContext, addressUrl);
++                        MessageContext outCtx = sender.send(
++                                ((AddressEndpoint) ep).getDefinition(), messageContext);
+                         // If no Exception Occurred We remove the Message
+                         if (delete) {
+                             messageStore.poll();
+Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ForwardingJob.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ForwardingJob.java	(revision 1213628)
++++ java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ForwardingJob.java	(revision 1213629)
+@@ -123,11 +123,10 @@
+                     Endpoint ep = messageContext.getEndpoint(targetEp);
+ 
+                     if (ep instanceof AddressEndpoint) {
+-                        AddressEndpoint addEp = (AddressEndpoint) ep;
+-                        String addressUrl = addEp.getDefinition().getAddress();
+ 
+                         try {
+-                            MessageContext outCtx = sender.send(messageContext, addressUrl);
++                            MessageContext outCtx = sender.send(
++                                    ((AddressEndpoint) ep).getDefinition(), messageContext);
+ 
+                             if (outCtx != null && "true".equals(outCtx.
+                                     getProperty(ForwardingProcessorConstants.BLOCKING_SENDER_ERROR))) {
+Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/BlockingMessageSender.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/BlockingMessageSender.java	(revision 1213628)
++++ java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/BlockingMessageSender.java	(revision 1213629)
+@@ -42,6 +42,7 @@
+ import org.apache.synapse.SynapseConstants;
+ import org.apache.synapse.SynapseException;
+ import org.apache.synapse.core.axis2.Axis2MessageContext;
++import org.apache.synapse.endpoints.EndpointDefinition;
+ import org.apache.synapse.util.MessageHelper;
+ 
+ 
+@@ -77,10 +78,20 @@
+         }
+     }
+ 
+-    public MessageContext send(MessageContext messageIn , String serviceUrl) throws Exception {
++    /**
++     * Send the message to a given AddressEndpoint in a blocking manner
++     * @param endpoint EndpointDefinition for the given address endpoint
++     * @param messageIn Synapse Message Context to be sent
++     * @return  OutPut message Context
++     * @throws Exception
++     */
++    public MessageContext send(EndpointDefinition endpoint, MessageContext messageIn)
++            throws Exception {
+ 
++        String serviceUrl = endpoint.getAddress();
++
+         if(log.isDebugEnabled()) {
+-            log.debug("Start Sending the Message ");
++            log.debug("Start Sending the Message : " + messageIn.getMessageID());
+         }
+ 
+         try {
+@@ -106,26 +117,22 @@
+ 
+             }
+ 
+-           //After setting all the options we need to find the MEP of the Message
+-           org.apache.axis2.context.MessageContext axis2Ctx =
+-                   ((Axis2MessageContext)messageOut).getAxis2MessageContext();
++            //After setting all the options we need to find the MEP of the Message
++            org.apache.axis2.context.MessageContext axis2Ctx =
++                    ((Axis2MessageContext) messageOut).getAxis2MessageContext();
+ 
+-           boolean outOnlyMessage = "true".equals(messageIn.getProperty(
+-                SynapseConstants.OUT_ONLY)) || WSDL2Constants.MEP_URI_IN_ONLY.equals(
+-                axis2Ctx.getOperationContext()
+-                        .getAxisOperation().getMessageExchangePattern());
++            boolean outOnlyMessage = "true".equals(messageIn.getProperty(
++                    SynapseConstants.OUT_ONLY)) || WSDL2Constants.MEP_URI_IN_ONLY.equals(
++                    axis2Ctx.getOperationContext()
++                            .getAxisOperation().getMessageExchangePattern());
+ 
+             // Here We consider all other Messages that evaluates to outOnlyMessage == false
+             // follows out in mep.
+-            if(log.isDebugEnabled()) {
++            if (log.isDebugEnabled()) {
+                 log.debug("Invoking service Url " + serviceUrl + " with Message" +
+                         messageIn.getMessageID());
+             }
+ 
+-
+-
+-
+-
+             options.setProperty(
+                     AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.TRUE);
+ 
+@@ -141,6 +148,12 @@
+                 }
+             }
+ 
++            if (endpoint.isUseMTOM()) {
++                options.setProperty(Constants.Configuration.ENABLE_MTOM, Constants.VALUE_TRUE);
++            } else if (endpoint.isUseSwa()) {
++                options.setProperty(Constants.Configuration.ENABLE_SWA, Constants.VALUE_TRUE);
++            }
++
+             sc.setOptions(options);
+             OMElement result = null;
+             try {
+-*-*-*-
+Fix SYNAPSE-805

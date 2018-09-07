@@ -1,0 +1,17 @@
+Index: java/modules/core/src/test/resources/synapse-libraries/SynapseTestLibrary.zip
+===================================================================
+Cannot display: file marked as a binary type.
+svn:mime-type = application/octet-stream
+Index: java/modules/core/src/test/resources/synapse-libraries/SynapseTestLibrary.zip
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/SynapseTestLibrary.zip	(revision 1327898)
++++ java/modules/core/src/test/resources/synapse-libraries/SynapseTestLibrary.zip	(nonexistent)
+
+Property changes on: java/modules/core/src/test/resources/synapse-libraries/SynapseTestLibrary.zip
+___________________________________________________________________
+Deleted: svn:mime-type
+## -1 +0,0 ##
+-application/octet-stream
+\ No newline at end of property
+-*-*-*-
+removing library resource file

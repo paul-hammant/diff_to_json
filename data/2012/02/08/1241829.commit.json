@@ -1,0 +1,67 @@
+{
+  "when": "2012-02-08T04:15:58-05:00", 
+  "message": "Fixing a compilation error", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-101,13 +101,13", 
+          "lines": [
+            " \n", 
+            "                 if (pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN) {\n", 
+            " \n", 
+            "-                    if (pc.getIdentifer().equals(\"Ron\") && pc.getPassword().equals(\"noR\")) {\n", 
+            "+                    if (pc.getIdentifier().equals(\"Ron\") && pc.getPassword().equals(\"noR\")) {\n", 
+            " \n", 
+            "                         return;\n", 
+            " \n", 
+            "                     }\n", 
+            " \n", 
+            "-                    if (pc.getIdentifer().equals(\"joe\") && pc.getPassword().equals(\"eoj\")) {\n", 
+            "+                    if (pc.getIdentifier().equals(\"joe\") && pc.getPassword().equals(\"eoj\")) {\n", 
+            " \n", 
+            "                         return;\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-141,23 +141,23", 
+          "lines": [
+            " \n", 
+            "                     pc.setKey(key);\n", 
+            " \n", 
+            "-                } else if (pc.getIdentifer().equals(\"alice\")) {\n", 
+            "+                } else if (pc.getIdentifier().equals(\"alice\")) {\n", 
+            " \n", 
+            "                     pc.setPassword(\"password\");\n", 
+            " \n", 
+            "-                } else if (pc.getIdentifer().equals(\"bob\")) {\n", 
+            "+                } else if (pc.getIdentifier().equals(\"bob\")) {\n", 
+            " \n", 
+            "                     pc.setPassword(\"password\");\n", 
+            " \n", 
+            "-                } else if (pc.getIdentifer().equals(\"Ron\")) {\n", 
+            "+                } else if (pc.getIdentifier().equals(\"Ron\")) {\n", 
+            " \n", 
+            "                     pc.setPassword(\"noR\");\n", 
+            " \n", 
+            "-                } else if (pc.getIdentifer().equals(\"joe\")) {\n", 
+            "+                } else if (pc.getIdentifier().equals(\"joe\")) {\n", 
+            " \n", 
+            "                     pc.setPassword(\"eoj\");\n", 
+            " \n", 
+            "-                } else if (pc.getIdentifer().equals(\"ip\")) {\n", 
+            "+                } else if (pc.getIdentifier().equals(\"ip\")) {\n", 
+            " \n", 
+            "                     pc.setPassword(\"password\");\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/samples/src/main/java/samples/userguide/PWCallback.java", 
+      "from": "java/modules/samples/src/main/java/samples/userguide/PWCallback.java"
+    }
+  ], 
+  "id": "1241829"
+}

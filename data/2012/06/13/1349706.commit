@@ -1,0 +1,408 @@
+Index: java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_def.xml
+===================================================================
+--- java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_def.xml	(revision 1349705)
++++ java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_def.xml	(revision 1349706)
+@@ -114,14 +114,10 @@
+     <!--any operation -->
+     <!--Note : You can ovrride this for a particular service by adding the same element with your requirement-->
+     <messageReceivers>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
+                          class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+                          class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-only"
+-                         class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-out"
+-                         class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+     </messageReceivers>
+ 
+     <!-- ================================================= -->
+Index: java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_clustering.xml
+===================================================================
+--- java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_clustering.xml	(revision 1349705)
++++ java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_clustering.xml	(revision 1349706)
+@@ -114,14 +114,10 @@
+     <!--any operation -->
+     <!--Note : You can ovrride this for a particular service by adding the same element with your requirement-->
+     <messageReceivers>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
+                          class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+                          class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-only"
+-                         class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-out"
+-                         class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+     </messageReceivers>
+ 
+     <!-- ================================================= -->
+Index: java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_fix.xml
+===================================================================
+--- java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_fix.xml	(revision 1349705)
++++ java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_fix.xml	(revision 1349706)
+@@ -114,14 +114,10 @@
+     <!--any operation -->
+     <!--Note : You can ovrride this for a particular service by adding the same element with your requirement-->
+     <messageReceivers>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
+                          class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
+-                         class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-only"
+-                         class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-out"
+-                         class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
++                         class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/> 
+     </messageReceivers>
+ 
+     <!-- ================================================= -->
+Index: java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_tcp.xml
+===================================================================
+--- java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_tcp.xml	(revision 1349705)
++++ java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_tcp.xml	(revision 1349706)
+@@ -114,14 +114,10 @@
+     <!--any operation -->
+     <!--Note : You can ovrride this for a particular service by adding the same element with your requirement-->
+     <messageReceivers>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
++        <messageReceiver mep="http://www.w3.org/ns/in-only"
+                          class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+                          class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-only"
+-                         class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-out"
+-                         class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+     </messageReceivers>
+ 
+     <!-- ================================================= -->
+Index: java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_udp.xml
+===================================================================
+--- java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_udp.xml	(revision 1349705)
++++ java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_udp.xml	(revision 1349706)
+@@ -114,14 +114,10 @@
+     <!--any operation -->
+     <!--Note : You can ovrride this for a particular service by adding the same element with your requirement-->
+     <messageReceivers>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
+                          class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+                          class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-only"
+-                         class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-out"
+-                         class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+     </messageReceivers>
+ 
+     <!-- ================================================= -->
+Index: java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_jms.xml
+===================================================================
+--- java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_jms.xml	(revision 1349705)
++++ java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_jms.xml	(revision 1349706)
+@@ -114,14 +114,10 @@
+     <!--any operation -->
+     <!--Note : You can ovrride this for a particular service by adding the same element with your requirement-->
+     <messageReceivers>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
+                          class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+                          class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-only"
+-                         class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-out"
+-                         class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+     </messageReceivers>
+ 
+     <!-- ================================================= -->
+Index: java/modules/integration/src/test/resources/axis2Xml/axis2Client/axis2_def.xml
+===================================================================
+--- java/modules/integration/src/test/resources/axis2Xml/axis2Client/axis2_def.xml	(revision 1349705)
++++ java/modules/integration/src/test/resources/axis2Xml/axis2Client/axis2_def.xml	(revision 1349706)
+@@ -97,14 +97,10 @@
+     <!--any operation -->
+     <!--Note : You can ovrride this for a particular service by adding the same element with your requirement-->
+     <messageReceivers>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
+                          class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+                          class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-only"
+-                         class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-out"
+-                         class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+     </messageReceivers>
+ 
+     <!-- ================================================= -->
+Index: java/modules/integration/src/test/resources/axis2Xml/axis2Client/axis2_tcp.xml
+===================================================================
+--- java/modules/integration/src/test/resources/axis2Xml/axis2Client/axis2_tcp.xml	(revision 1349705)
++++ java/modules/integration/src/test/resources/axis2Xml/axis2Client/axis2_tcp.xml	(revision 1349706)
+@@ -97,14 +97,10 @@
+     <!--any operation -->
+     <!--Note : You can ovrride this for a particular service by adding the same element with your requirement-->
+     <messageReceivers>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
+                          class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+                          class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-only"
+-                         class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-out"
+-                         class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+     </messageReceivers>
+ 
+     <!-- ================================================= -->
+Index: java/modules/integration/src/test/resources/axis2Xml/axis2Client/axis2_udp.xml
+===================================================================
+--- java/modules/integration/src/test/resources/axis2Xml/axis2Client/axis2_udp.xml	(revision 1349705)
++++ java/modules/integration/src/test/resources/axis2Xml/axis2Client/axis2_udp.xml	(revision 1349706)
+@@ -97,14 +97,10 @@
+     <!--any operation -->
+     <!--Note : You can ovrride this for a particular service by adding the same element with your requirement-->
+     <messageReceivers>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
+                          class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+                          class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-only"
+-                         class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-out"
+-                         class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+     </messageReceivers>
+ 
+     <!-- ================================================= -->
+Index: java/modules/integration/src/test/resources/axis2Xml/axis2Client/axis2_jms.xml
+===================================================================
+--- java/modules/integration/src/test/resources/axis2Xml/axis2Client/axis2_jms.xml	(revision 1349705)
++++ java/modules/integration/src/test/resources/axis2Xml/axis2Client/axis2_jms.xml	(revision 1349706)
+@@ -97,14 +97,10 @@
+     <!--any operation -->
+     <!--Note : You can ovrride this for a particular service by adding the same element with your requirement-->
+     <messageReceivers>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
+                          class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+                          class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-only"
+-                         class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-out"
+-                         class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+     </messageReceivers>
+ 
+     <!-- ================================================= -->
+Index: java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_def.xml
+===================================================================
+--- java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_def.xml	(revision 1349705)
++++ java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_def.xml	(revision 1349706)
+@@ -102,14 +102,10 @@
+     <!--any operation -->
+     <!--Note : You can ovrride this for a particular service by adding the same element with your requirement-->
+     <messageReceivers>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
+                          class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+                          class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-only"
+-                         class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-out"
+-                         class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+     </messageReceivers>
+ 
+     <!-- ================================================= -->
+Index: java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_clustering.xml
+===================================================================
+--- java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_clustering.xml	(revision 1349705)
++++ java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_clustering.xml	(revision 1349706)
+@@ -102,14 +102,10 @@
+     <!--any operation -->
+     <!--Note : You can ovrride this for a particular service by adding the same element with your requirement-->
+     <messageReceivers>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
+                          class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+                          class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-only"
+-                         class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-out"
+-                         class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+     </messageReceivers>
+ 
+     <!-- ================================================= -->
+Index: java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_jms.xml
+===================================================================
+--- java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_jms.xml	(revision 1349705)
++++ java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_jms.xml	(revision 1349706)
+@@ -102,14 +102,10 @@
+     <!--any operation -->
+     <!--Note : You can ovrride this for a particular service by adding the same element with your requirement-->
+     <messageReceivers>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
+                          class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+                          class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-only"
+-                         class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-out"
+-                         class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+     </messageReceivers>
+ 
+     <!-- ================================================= -->
+Index: java/modules/packaging/package-archetype/src/main/resources/archetype-resources/repository/conf/axis2.xml
+===================================================================
+--- java/modules/packaging/package-archetype/src/main/resources/archetype-resources/repository/conf/axis2.xml	(revision 1349705)
++++ java/modules/packaging/package-archetype/src/main/resources/archetype-resources/repository/conf/axis2.xml	(revision 1349706)
+@@ -98,14 +98,10 @@
+     <!--any operation -->
+     <!--Note : You can ovrride this for a particular service by adding the same element with your requirement-->
+     <messageReceivers>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
+                          class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+                          class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-only"
+-                         class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-out"
+-                         class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+     </messageReceivers>
+ 
+     <!-- ================================================= -->
+Index: java/modules/samples/services/LoadbalanceFailoverService/conf/service1/services.xml
+===================================================================
+--- java/modules/samples/services/LoadbalanceFailoverService/conf/service1/services.xml	(revision 1349705)
++++ java/modules/samples/services/LoadbalanceFailoverService/conf/service1/services.xml	(revision 1349706)
+@@ -20,9 +20,9 @@
+ <serviceGroup>
+ <service name="LBService1">
+ 	<messageReceivers>
+-		<messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
++		<messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
+ 				class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver" />
+-		<messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
++		<messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+ 				class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver" />
+ 		</messageReceivers>
+ 		<parameter locked="false" name="ServiceClass">samples.services.LBService1</parameter>
+Index: java/modules/samples/services/LoadbalanceFailoverService/conf/service2/services.xml
+===================================================================
+--- java/modules/samples/services/LoadbalanceFailoverService/conf/service2/services.xml	(revision 1349705)
++++ java/modules/samples/services/LoadbalanceFailoverService/conf/service2/services.xml	(revision 1349706)
+@@ -20,9 +20,9 @@
+ <serviceGroup>
+ <service name="LBService2" scope="transportsession">
+ 	<messageReceivers>
+-		<messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
++		<messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
+ 				class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver" />
+-		<messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
++		<messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+ 				class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver" />
+ 		</messageReceivers>
+ 		<parameter locked="false" name="ServiceClass">samples.services.LBService2</parameter>
+Index: java/modules/samples/services/FastStockQuoteService/conf/services.xml
+===================================================================
+--- java/modules/samples/services/FastStockQuoteService/conf/services.xml	(revision 1349705)
++++ java/modules/samples/services/FastStockQuoteService/conf/services.xml	(revision 1349706)
+@@ -20,9 +20,9 @@
+ <serviceGroup>
+ <service name="FastStockQuoteService">
+ 	<messageReceivers>
+-		<messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only" 
++		<messageReceiver mep="http://www.w3.org/ns/wsdl/in-only" 
+ 				class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver" />
+-		<messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out" 
++		<messageReceiver mep="http://www.w3.org/ns/wsdl/in-out" 
+ 				class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver" />
+ 		</messageReceivers>
+ 		<parameter locked="false" name="ServiceClass">samples.services.FastStockQuoteService</parameter>
+Index: java/repository/conf/axis2.xml
+===================================================================
+--- java/repository/conf/axis2.xml	(revision 1349705)
++++ java/repository/conf/axis2.xml	(revision 1349706)
+@@ -117,14 +117,10 @@
+     <!--any operation -->
+     <!--Note : You can ovrride this for a particular service by adding the same element with your requirement-->
+     <messageReceivers>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
+                          class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+                          class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-only"
+-                         class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-out"
+-                         class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+     </messageReceivers>
+ 
+     <!-- ================================================= -->
+Index: java/repository/conf/sample/resources/misc/server/axis2.xml
+===================================================================
+--- java/repository/conf/sample/resources/misc/server/axis2.xml	(revision 1349705)
++++ java/repository/conf/sample/resources/misc/server/axis2.xml	(revision 1349706)
+@@ -102,14 +102,10 @@
+     <!--any operation -->
+     <!--Note : You can ovrride this for a particular service by adding the same element with your requirement-->
+     <messageReceivers>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
+                          class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+                          class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-only"
+-                         class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-out"
+-                         class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+     </messageReceivers>
+ 
+     <!-- ================================================= -->
+Index: java/repository/conf/sample/resources/misc/client/axis2.xml
+===================================================================
+--- java/repository/conf/sample/resources/misc/client/axis2.xml	(revision 1349705)
++++ java/repository/conf/sample/resources/misc/client/axis2.xml	(revision 1349706)
+@@ -97,14 +97,10 @@
+     <!--any operation -->
+     <!--Note : You can ovrride this for a particular service by adding the same element with your requirement-->
+     <messageReceivers>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
+                          class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+                          class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-only"
+-                         class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
+-        <messageReceiver mep="http://www.w3.org/2006/01/wsdl/in-out"
+-                         class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
+     </messageReceivers>
+ 
+     <!-- ================================================= -->
+-*-*-*-
+Fixing SYNAPSE-879, Committing patch from Sagara

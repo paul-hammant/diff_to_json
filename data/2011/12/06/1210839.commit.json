@@ -1,0 +1,50 @@
+{
+  "when": "2011-12-06T05:04:36-05:00", 
+  "message": "Fixing a startup error", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-92,13 +92,6", 
+          "lines": [
+            "      */\n", 
+            "     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {\n", 
+            " \n", 
+            "-        if (!isHotDeploymentEnabled()) {\n", 
+            "-            if (log.isDebugEnabled()) {\n", 
+            "-                log.debug(\"Hot deployment has been suspended - Ignoring\");\n", 
+            "-            }\n", 
+            "-            return;\n", 
+            "-        }\n", 
+            "-\n", 
+            "         String filename = SynapseArtifactDeploymentStore.getNormalizedAbsolutePath(\n", 
+            "                 deploymentFileData.getAbsolutePath());\n", 
+            "         if (log.isDebugEnabled()) {\n"
+          ]
+        }, 
+        {
+          "locn": "-115,6 +108,13", 
+          "lines": [
+            "             return;\n", 
+            "         }\n", 
+            " \n", 
+            "+        if (!isHotDeploymentEnabled()) {\n", 
+            "+            if (log.isDebugEnabled()) {\n", 
+            "+                log.debug(\"Hot deployment has been suspended - Ignoring\");\n", 
+            "+            }\n", 
+            "+            return;\n", 
+            "+        }\n", 
+            "+\n", 
+            "         SynapseArtifactDeploymentStore deploymentStore =\n", 
+            "                 getSynapseConfiguration().getArtifactDeploymentStore();\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/deployers/AbstractSynapseArtifactDeployer.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/deployers/AbstractSynapseArtifactDeployer.java"
+    }
+  ], 
+  "id": "1210839"
+}

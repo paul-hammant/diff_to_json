@@ -1,0 +1,15 @@
+Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java
+===================================================================
+--- java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java	(revision 1378456)
++++ java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java	(revision 1378457)
+@@ -270,7 +270,7 @@
+             } else {
+                 
+                 log.warn("Couldn't get the lock for the file : "
+-                        + responseFile.getName() + ", retry : " + tryNum
++                        + VFSUtils.maskURLPassword(responseFile.getName().getURI()) + ", retry : " + tryNum
+                         + " scheduled after : " + vfsOutInfo.getReconnectTimeout());
+                 try {
+                     Thread.sleep(vfsOutInfo.getReconnectTimeout());
+-*-*-*-
+Masked the password in the file URL in log.

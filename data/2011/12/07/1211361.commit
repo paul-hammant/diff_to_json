@@ -1,0 +1,429 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/transform/PayloadFactoryMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/transform/PayloadFactoryMediator.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/transform/PayloadFactoryMediator.java	(revision 1211361)
+@@ -0,0 +1,155 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.mediators.transform;
++
++import org.apache.axiom.om.OMElement;
++import org.apache.axiom.om.util.AXIOMUtil;
++import org.apache.axiom.soap.SOAPBody;
++import org.apache.synapse.MessageContext;
++import org.apache.synapse.mediators.AbstractMediator;
++import org.apache.synapse.util.xpath.SynapseXPath;
++
++import javax.xml.stream.XMLStreamException;
++import java.util.ArrayList;
++import java.util.Iterator;
++import java.util.List;
++import java.util.regex.Matcher;
++import java.util.regex.Pattern;
++
++/**
++ * Payload-factory mediator creates a new SOAP payload for the message, replacing the existing one.
++ * <pre>printf()</pre> style formatting is used to configure the transformation performed by the
++ * mediator.<p/>
++ * Each argument in the mediator configuration could be a static value or an XPath expression.
++ * When an expression is used, argument value is fetched at runtime by evaluating the provided XPath
++ * expression against the existing SOAP message/message context.
++ */
++public class PayloadFactoryMediator extends AbstractMediator {
++
++    private String format;
++    private List<Argument> argumentList = new ArrayList<Argument>();
++
++    private Pattern pattern = Pattern.compile("\\$(\\d)+");
++
++    public boolean mediate(MessageContext synCtx) {
++
++        SOAPBody soapBody = synCtx.getEnvelope().getBody();
++
++        StringBuffer result = new StringBuffer();
++        transformPayload(result, synCtx);
++
++        OMElement resultElement;
++        try {
++            resultElement = AXIOMUtil.stringToOM(result.toString());
++        } catch (XMLStreamException e) {
++            handleException("Unable to create a valid XML payload. Invalid format/arguments are " +
++                    "provided in the payloadFactory mediator configuration", synCtx);
++            return false;
++        }
++
++        // replace the existing payload with the new payload
++        for (Iterator itr = soapBody.getChildElements(); itr.hasNext();) {
++            OMElement child = (OMElement) itr.next();
++            child.detach();
++        }
++
++        for (Iterator itr = resultElement.getChildElements(); itr.hasNext();) {
++            OMElement child = (OMElement) itr.next();
++            soapBody.addChild(child);
++        }
++
++        return true;
++    }
++
++    private void transformPayload(StringBuffer result, MessageContext synCtx) {
++        Object[] argValues = getArgValues(synCtx);
++        Matcher matcher = pattern.matcher("<dummy>" + format + "</dummy>");
++        while (matcher.find()) {
++            String matchSeq = matcher.group();
++            int argIndex = Integer.parseInt(matchSeq.substring(1));
++            matcher.appendReplacement(result, argValues[argIndex - 1].toString());
++        }
++        matcher.appendTail(result);
++    }
++
++    private Object[] getArgValues(MessageContext synCtx) {
++
++        Object[] argValues = new Object[argumentList.size()];
++        for (int i = 0; i < argumentList.size(); ++i) {
++            Argument arg = argumentList.get(i);
++            if (arg.getValue() != null) {
++                argValues[i] = arg.getValue();
++            } else if (arg.getExpression() != null) {
++                String value = arg.getExpression().stringValueOf(synCtx);
++                if (value != null) {
++                    argValues[i] = value;
++                } else {
++                    argValues[i] = "";
++                }
++            } else {
++                handleException("Unexpected argument type detected in the payloadFactory " +
++                        "mediator configuration", synCtx);
++            }
++        }
++        return argValues;
++    }
++
++    public String getFormat() {
++        return format;
++    }
++
++    public void setFormat(String format) {
++        this.format = format;
++    }
++
++    public void addArgument(Argument arg) {
++        argumentList.add(arg);
++    }
++
++    public List<Argument> getArgumentList() {
++        return argumentList;
++    }
++
++    /**
++     * Represents an argument provided in the payload factory mediator configuration.
++     */
++    public static class Argument {
++
++        private String value;
++        private SynapseXPath expression;
++
++        public String getValue() {
++            return value;
++        }
++
++        public void setValue(String value) {
++            this.value = value;
++        }
++
++        public SynapseXPath getExpression() {
++            return expression;
++        }
++
++        public void setExpression(SynapseXPath expression) {
++            this.expression = expression;
++        }
++    }
++
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java	(revision 1211360)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java	(revision 1211361)
+@@ -68,7 +68,8 @@
+         TemplateMediatorSerializer.class,
+         InvokeMediatorSerializer.class,
+         MessageStoreMediatorSerializer.class,
+-        URLRewriteMediatorSerializer.class
++        URLRewriteMediatorSerializer.class,
++        PayloadFactoryMediatorSerializer.class
+     };
+ 
+     private final static MediatorSerializerFinder instance = new MediatorSerializerFinder();
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/PayloadFactoryMediatorFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/PayloadFactoryMediatorFactory.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/PayloadFactoryMediatorFactory.java	(revision 1211361)
+@@ -0,0 +1,132 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.config.xml;
++
++import org.apache.axiom.om.*;
++import org.apache.synapse.Mediator;
++import org.apache.synapse.mediators.transform.PayloadFactoryMediator;
++import org.jaxen.JaxenException;
++
++import javax.xml.namespace.QName;
++import java.util.ArrayList;
++import java.util.Iterator;
++import java.util.List;
++import java.util.Properties;
++
++/**
++ * Creates a payloadFactory mediator from the provided XML configuration
++ * <p/>
++ * <pre>
++ * &lt;payloadFactory&gt;
++ *   &lt;format&gt;&quot;xmlstring&quot;&lt;/format&gt;
++ *   &lt;args&gt;
++ *     &lt;arg (value=&quot;literal&quot; | expression=&quot;xpath&quot;)/&gt;*
++ *   &lt;/args&gt;
++ * &lt;/payloadFactory&gt;
++ * </pre>
++ */
++public class PayloadFactoryMediatorFactory extends AbstractMediatorFactory {
++
++    private static final QName PAYLOAD_FACTORY_Q
++            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "payloadFactory");
++
++    private static final QName FORMAT_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "format");
++    private static final QName ARGS_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "args");
++
++    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
++
++        PayloadFactoryMediator payloadFactoryMediator = new PayloadFactoryMediator();
++
++        OMElement formatElem = elem.getFirstChildWithName(FORMAT_Q);
++
++        if (formatElem != null) {
++            OMElement copy = formatElem.getFirstElement().cloneOMElement();
++            removeIndentations(copy);
++            payloadFactoryMediator.setFormat(copy.toString());
++        } else {
++            handleException("format element of payloadFactoryMediator is required");
++        }
++
++        OMElement argumentsElem = elem.getFirstChildWithName(ARGS_Q);
++
++        if (argumentsElem != null) {
++
++            Iterator itr = argumentsElem.getChildElements();
++
++            while (itr.hasNext()) {
++                OMElement argElem = (OMElement) itr.next();
++                PayloadFactoryMediator.Argument arg = new PayloadFactoryMediator.Argument();
++                String value;
++
++                if ((value = argElem.getAttributeValue(ATT_VALUE)) != null) {
++                    arg.setValue(value);
++                } else if ((value = argElem.getAttributeValue(ATT_EXPRN)) != null) {
++
++                    if (value.trim().length() == 0) {
++                        handleException("Value of 'expression' attribute is required");
++                    } else {
++                        try {
++                            arg.setExpression(SynapseXPathFactory.getSynapseXPath(argElem, ATT_EXPRN));
++                        } catch (JaxenException e) {
++                            handleException("Invalid XPath expression is provided for " +
++                                    "'expression' attribute: " + value, e);
++                        }
++                    }
++
++                } else {
++                    handleException("Unsupported arg type. 'value' or 'expression' attribute is " +
++                            "required");
++                }
++
++                payloadFactoryMediator.addArgument(arg);
++            }
++        }
++
++        return payloadFactoryMediator;
++    }
++
++    public QName getTagQName() {
++        return PAYLOAD_FACTORY_Q;
++    }
++
++    private void removeIndentations(OMElement element) {
++        List<OMText> removables = new ArrayList<OMText>();
++        removeIndentations(element, removables);
++        for (OMText node : removables) {
++            node.detach();
++        }
++    }
++
++    private void removeIndentations(OMElement element, List<OMText> removables) {
++        Iterator children = element.getChildren();
++        while (children.hasNext()) {
++            Object next = children.next();
++            if (next instanceof OMText) {
++                OMText text = (OMText) next;
++                if (text.getText().trim().equals("")) {
++                    removables.add(text);
++                }
++            } else if (next instanceof OMElement) {
++                removeIndentations((OMElement) next, removables);
++            }
++        }
++    }
++
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/PayloadFactoryMediatorSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/PayloadFactoryMediatorSerializer.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/PayloadFactoryMediatorSerializer.java	(revision 1211361)
+@@ -0,0 +1,97 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.config.xml;
++
++import org.apache.axiom.om.OMElement;
++import org.apache.axiom.om.util.AXIOMUtil;
++import org.apache.synapse.Mediator;
++import org.apache.synapse.mediators.transform.PayloadFactoryMediator;
++
++import javax.xml.stream.XMLStreamException;
++import java.util.List;
++
++/**
++ * Serializer for {@link PayloadFactoryMediator} instances.
++ *
++ * @see PayloadFactoryMediatorFactory
++ */
++public class PayloadFactoryMediatorSerializer extends AbstractMediatorSerializer {
++
++    private static final String PAYLOAD_FACTORY = "payloadFactory";
++    private static final String FORMAT = "format";
++    private static final String ARGS = "args";
++    private static final String ARG = "arg";
++    private static final String VALUE = "value";
++    private static final String EXPRESSION = "expression";
++
++
++    public OMElement serializeSpecificMediator(Mediator m) {
++
++        if (!(m instanceof PayloadFactoryMediator)) {
++            handleException("Unsupported mediator was passed in for serialization: " + m.getType());
++            return null;
++        }
++
++        PayloadFactoryMediator mediator = (PayloadFactoryMediator) m;
++
++        OMElement payloadFactoryElem = fac.createOMElement(PAYLOAD_FACTORY, synNS);
++        saveTracingState(payloadFactoryElem, mediator);
++
++        if (mediator.getFormat() != null) {
++
++            try {
++                OMElement formatElem = fac.createOMElement(FORMAT, synNS);
++                formatElem.addChild(AXIOMUtil.stringToOM(mediator.getFormat()));
++                payloadFactoryElem.addChild(formatElem);
++            } catch (XMLStreamException e) {
++                handleException("Error while serializing payloadFactory mediator", e);
++            }
++        } else {
++            handleException("Invalid payloadFactory mediator, format is required");
++        }
++
++        List<PayloadFactoryMediator.Argument> argList = mediator.getArgumentList();
++
++        if (argList != null && argList.size() > 0) {
++
++            OMElement argumentsElem = fac.createOMElement(ARGS, synNS);
++
++            for (PayloadFactoryMediator.Argument arg : argList) {
++
++                OMElement argElem = fac.createOMElement(ARG, synNS);
++
++                if (arg.getValue() != null) {
++                    argElem.addAttribute(fac.createOMAttribute(VALUE, nullNS, arg.getValue()));
++                } else if (arg.getExpression() != null) {
++                    SynapseXPathSerializer.serializeXPath(arg.getExpression(), argElem, EXPRESSION);
++                }
++                argumentsElem.addChild(argElem);
++            }
++            payloadFactoryElem.addChild(argumentsElem);
++        }
++
++        return payloadFactoryElem;
++    }
++
++    public String getMediatorClassName() {
++        return PayloadFactoryMediator.class.getName();
++    }
++
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java	(revision 1211360)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java	(revision 1211361)
+@@ -82,7 +82,8 @@
+         EnrichMediatorFactory.class,
+         MessageStoreMediatorFactory.class,
+         TemplateMediatorFactory.class,
+-        InvokeMediatorFactory.class
++        InvokeMediatorFactory.class,
++        PayloadFactoryMediatorFactory.class
+     };
+ 
+     private final static MediatorFactoryFinder instance  = new MediatorFactoryFinder();
+-*-*-*-
+Adding payload factory mediator. SYNAPSE-821. Thanks Sadeep for the patch

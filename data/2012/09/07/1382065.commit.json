@@ -1,0 +1,30 @@
+{
+  "when": "2012-09-07T11:23:59-04:00", 
+  "message": "Code refractoring to use new API.\n", 
+  "who": "sadeep", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-81,10 +81,7", 
+          "lines": [
+            "         }\n", 
+            " \n", 
+            "         // replace the existing payload with the new payload\n", 
+            "-        for (Iterator itr = soapBody.getChildElements(); itr.hasNext();) {\n", 
+            "-            itr.next();\n", 
+            "-            itr.remove();\n", 
+            "-        }\n", 
+            "+        soapBody.removeChildren();\n", 
+            " \n", 
+            "         for (Iterator itr = resultElement.getChildElements(); itr.hasNext();) {\n", 
+            "             OMElement child = (OMElement) itr.next();\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/transform/PayloadFactoryMediator.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/transform/PayloadFactoryMediator.java"
+    }
+  ], 
+  "id": "1382065"
+}

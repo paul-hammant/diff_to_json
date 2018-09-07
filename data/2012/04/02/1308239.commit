@@ -1,0 +1,36 @@
+Index: java/src/site/resources/presentations/ApacheCon Synapse Tute.pdf
+===================================================================
+Cannot display: file marked as a binary type.
+svn:mime-type = application/octet-stream
+Index: java/src/site/resources/presentations/ApacheCon Synapse Tute.pdf
+===================================================================
+--- java/src/site/resources/presentations/ApacheCon Synapse Tute.pdf	(revision 1308238)
++++ java/src/site/resources/presentations/ApacheCon Synapse Tute.pdf	(nonexistent)
+
+Property changes on: java/src/site/resources/presentations/ApacheCon Synapse Tute.pdf
+___________________________________________________________________
+Deleted: svn:mime-type
+## -1 +0,0 ##
+-application/octet-stream
+\ No newline at end of property
+Index: java/src/site/resources/presentations/ApacheConUS2007SynapseTutorial.pdf
+===================================================================
+Cannot display: file marked as a binary type.
+svn:mime-type = application/octet-stream
+Index: java/src/site/resources/presentations/ApacheConUS2007SynapseTutorial.pdf
+===================================================================
+--- java/src/site/resources/presentations/ApacheConUS2007SynapseTutorial.pdf	(revision 1308238)
++++ java/src/site/resources/presentations/ApacheConUS2007SynapseTutorial.pdf	(nonexistent)
+
+Property changes on: java/src/site/resources/presentations/ApacheConUS2007SynapseTutorial.pdf
+___________________________________________________________________
+Deleted: svn:mime-type
+## -1 +0,0 ##
+-application/octet-stream
+\ No newline at end of property
+Index: java/src/site/resources/presentations/makingsoagroovyfremantle.pdf
+===================================================================
+--- java/src/site/resources/presentations/makingsoagroovyfremantle.pdf	(revision 1308238)
++++ java/src/site/resources/presentations/makingsoagroovyfremantle.pdf	(nonexistent)
+@@ -1,22178 +0,0 @@
+-%PDF-1.4

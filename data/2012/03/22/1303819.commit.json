@@ -1,0 +1,61 @@
+{
+  "when": "2012-03-22T10:57:08-04:00", 
+  "message": "committing patch for API versioning deployment", 
+  "who": "uswick", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-317,7 +317,7", 
+          "lines": [
+            "     public void addAPI(String name, API api) {\n", 
+            "         if (!apiTable.containsKey(name)) {\n", 
+            "             for (API existingAPI : apiTable.values()) {\n", 
+            "-                if (existingAPI.getContext().equals(api.getContext())) {\n", 
+            "+                if (api.getVersion().equals(existingAPI.getVersion()) && existingAPI.getContext().equals(api.getContext())) {\n", 
+            "                     handleException(\"URL context: \" + api.getContext() + \" is already registered\" +\n", 
+            "                             \" with the API: \" + existingAPI.getName());\n", 
+            "                 }\n"
+          ]
+        }, 
+        {
+          "locn": "-333,7 +333,7", 
+          "lines": [
+            "             handleException(\"No API exists by the name: \" + name);\n", 
+            "         } else {\n", 
+            "             for (API existingAPI : apiTable.values()) {\n", 
+            "-                if (existingAPI.getContext().equals(api.getContext()) && !name.equals(api.getName())) {\n", 
+            "+                if (api.getVersion().equals(existingAPI.getVersion()) && existingAPI.getContext().equals(api.getContext()) && !name.equals(api.getName())) {\n", 
+            "                     handleException(\"URL context: \" + api.getContext() + \" is already registered\" +\n", 
+            "                             \" with the API: \" + existingAPI.getName());\n", 
+            "                 }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfiguration.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfiguration.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-66,6 +66,10", 
+          "lines": [
+            "         return name;\n", 
+            "     }\n", 
+            " \n", 
+            "+    public String getVersion(){\n", 
+            "+        return versionStrategy.getVersion();\n", 
+            "+    }\n", 
+            "+\n", 
+            "     public String getContext() {\n", 
+            "         return context;\n", 
+            "     }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/rest/API.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/rest/API.java"
+    }
+  ], 
+  "id": "1303819"
+}

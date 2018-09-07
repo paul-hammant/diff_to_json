@@ -1,0 +1,219 @@
+{
+  "when": "2011-12-24T07:09:47-05:00", 
+  "message": "Adding the throttle mediator test - Made some changes to match a few changes done in wso2 throttle core", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-24,7 +24,6", 
+          "lines": [
+            " import org.apache.axiom.om.OMElement;\n", 
+            " import org.apache.axiom.om.impl.builder.StAXOMBuilder;\n", 
+            " import org.apache.axiom.soap.SOAPEnvelope;\n", 
+            "-import org.apache.neethi.PolicyEngine;\n", 
+            " import org.apache.synapse.MessageContext;\n", 
+            " import org.apache.synapse.SynapseException;\n", 
+            " import org.apache.synapse.config.Entry;\n"
+          ]
+        }, 
+        {
+          "locn": "-52,7 +51,6", 
+          "lines": [
+            "     private static final String POLICY = \" <wsp:Policy xmlns:wsp=\\\"http://schemas.xmlsoap.org/ws/2004/09/policy\\\"\\n\" +\n", 
+            "             \"                xmlns:throttle=\\\"http://www.wso2.org/products/wso2commons/throttle\\\">\\n\" +\n", 
+            "             \"        <throttle:ThrottleAssertion>\\n\" +\n", 
+            "-            \"            <throttle:MaximumConcurrentAccess>10</throttle:MaximumConcurrentAccess>\\n\" +\n", 
+            "             \"            <wsp:All>\\n\" +\n", 
+            "             \"                <throttle:ID throttle:type=\\\"IP\\\">other</throttle:ID>\\n\" +\n", 
+            "             \"                <wsp:ExactlyOne>\\n\" +\n"
+          ]
+        }, 
+        {
+          "locn": "-61,7 +59,6", 
+          "lines": [
+            "             \"                        <throttle:UnitTime>800000</throttle:UnitTime>\\n\" +\n", 
+            "             \"                        <throttle:ProhibitTimePeriod wsp:Optional=\\\"true\\\">10</throttle:ProhibitTimePeriod>\\n\" +\n", 
+            "             \"                    </wsp:All>\\n\" +\n", 
+            "-            \"                    <throttle:IsAllow>true</throttle:IsAllow>\\n\" +\n", 
+            "             \"                </wsp:ExactlyOne>\\n\" +\n", 
+            "             \"            </wsp:All>\\n\" +\n", 
+            "             \"            <wsp:All>\\n\" +\n"
+          ]
+        }, 
+        {
+          "locn": "-72,7 +69,6", 
+          "lines": [
+            "             \"                        <throttle:UnitTime>800000</throttle:UnitTime>\\n\" +\n", 
+            "             \"                        <throttle:ProhibitTimePeriod wsp:Optional=\\\"true\\\">10000</throttle:ProhibitTimePeriod>\\n\" +\n", 
+            "             \"                    </wsp:All>\\n\" +\n", 
+            "-            \"                    <throttle:IsAllow>true</throttle:IsAllow>\\n\" +\n", 
+            "             \"                </wsp:ExactlyOne>\\n\" +\n", 
+            "             \"            </wsp:All>\\n\" +\n", 
+            "             \"            <wsp:All>\\n\" +\n"
+          ]
+        }, 
+        {
+          "locn": "-83,7 +79,6", 
+          "lines": [
+            "             \"                        <throttle:UnitTime>600000</throttle:UnitTime>\\n\" +\n", 
+            "             \"                        <throttle:ProhibitTimePeriod wsp:Optional=\\\"true\\\"></throttle:ProhibitTimePeriod>\\n\" +\n", 
+            "             \"                    </wsp:All>\\n\" +\n", 
+            "-            \"                    <throttle:IsAllow>true</throttle:IsAllow>\\n\" +\n", 
+            "             \"                </wsp:ExactlyOne>\\n\" +\n", 
+            "             \"            </wsp:All>\\n\" +\n", 
+            "             \"            <wsp:All>\\n\" +\n"
+          ]
+        }, 
+        {
+          "locn": "-94,7 +89,6", 
+          "lines": [
+            "             \"                        <throttle:UnitTime>500000</throttle:UnitTime>\\n\" +\n", 
+            "             \"                        <throttle:ProhibitTimePeriod wsp:Optional=\\\"true\\\"></throttle:ProhibitTimePeriod>\\n\" +\n", 
+            "             \"                    </wsp:All>\\n\" +\n", 
+            "-            \"                    <throttle:IsAllow>true</throttle:IsAllow>\\n\" +\n", 
+            "             \"                </wsp:ExactlyOne>\\n\" +\n", 
+            "             \"            </wsp:All>\\n\" +\n", 
+            "             \"        </throttle:ThrottleAssertion>\\n\" +\n"
+          ]
+        }, 
+        {
+          "locn": "-194,7 +188,7", 
+          "lines": [
+            " \n", 
+            "     public void testMediate() throws Exception {\n", 
+            "         ByteArrayInputStream in = new ByteArrayInputStream(POLICY.getBytes());\n", 
+            "-        StAXOMBuilder builde = new StAXOMBuilder(in);\n", 
+            "+        StAXOMBuilder builder = new StAXOMBuilder(in);\n", 
+            "         ThrottleTestMediator throttleMediator = new ThrottleTestMediator();\n", 
+            "         throttleMediator.setPolicyKey(\"throttlepolicy\");\n", 
+            "         MessageContext synCtx = createLightweightSynapseMessageContext(\"<empty/>\");\n"
+          ]
+        }, 
+        {
+          "locn": "-203,7 +197,7", 
+          "lines": [
+            "         Entry prop = new Entry();\n", 
+            "         prop.setKey(\"throttlepolicy\");\n", 
+            "         prop.setType(Entry.INLINE_XML);\n", 
+            "-        prop.setValue(builde.getDocumentElement());\n", 
+            "+        prop.setValue(builder.getDocumentElement());\n", 
+            "         synCfg.addEntry(\"throttlepolicy\", prop);\n", 
+            "         synCtx.setConfiguration(synCfg);\n", 
+            "         for (int i = 0; i < 6; i++) {\n"
+          ]
+        }, 
+        {
+          "locn": "-228,7 +222,7", 
+          "lines": [
+            "     }\n", 
+            " \n", 
+            "     public void testMediateWithInLineXML() throws Exception {\n", 
+            "-        ByteArrayInputStream in = new ByteArrayInputStream(NEW_POLICY.getBytes());\n", 
+            "+        ByteArrayInputStream in = new ByteArrayInputStream(POLICY.getBytes());\n", 
+            "         StAXOMBuilder build = new StAXOMBuilder(in);\n", 
+            "         ThrottleTestMediator throttleMediator = new ThrottleTestMediator();\n", 
+            "         throttleMediator.setInLinePolicy(build.getDocumentElement());\n"
+          ]
+        }, 
+        {
+          "locn": "-268,7 +262,7", 
+          "lines": [
+            " \n", 
+            "             init(synCtx);\n", 
+            "             try {\n", 
+            "-                return canAcess(synCtx);\n", 
+            "+                return canAccess(synCtx);\n", 
+            "             }\n", 
+            "             catch (\n", 
+            "                     ThrottleException e) {\n"
+          ]
+        }, 
+        {
+          "locn": "-277,7 +271,7", 
+          "lines": [
+            " \n", 
+            "         }\n", 
+            " \n", 
+            "-        protected boolean canAcess(MessageContext synContext)\n", 
+            "+        protected boolean canAccess(MessageContext synContext)\n", 
+            "                 throws SynapseException, ThrottleException {\n", 
+            " \n", 
+            "             if (throttle == null) {\n"
+          ]
+        }, 
+        {
+          "locn": "-289,20 +283,20", 
+          "lines": [
+            "             if (remoteIP == null) {\n", 
+            "                 throw new ThrottleException(\"IP address of the caller can not find - \" +\n", 
+            "                         \"Currently only support caller-IP base access control\" +\n", 
+            "-                        \"- Thottling will not happen \");\n", 
+            "+                        \"- Throttling will not happen \");\n", 
+            " \n", 
+            "             } else {\n", 
+            "                 ThrottleContext throttleContext\n", 
+            "                         = throttle.getThrottleContext(ThrottleConstants.IP_BASED_THROTTLE_KEY);\n", 
+            "                 if (throttleContext == null) {\n", 
+            "-                    throw new ThrottleException(\"Can not find a configuartion for \" +\n", 
+            "+                    throw new ThrottleException(\"Can not find a configuration for \" +\n", 
+            "                             \"IP Based Throttle\");\n", 
+            " \n", 
+            "                 }\n", 
+            "-                AccessRateController accessControler;\n", 
+            "+                AccessRateController accessController;\n", 
+            "                 try {\n", 
+            "-                    accessControler = new AccessRateController();\n", 
+            "-                    boolean canAccess = accessControler.canAccess(\n", 
+            "+                    accessController = new AccessRateController();\n", 
+            "+                    boolean canAccess = accessController.canAccess(\n", 
+            "                             throttleContext, remoteIP, ThrottleConstants.IP_BASE).isAccessAllowed();\n", 
+            "                     if (!canAccess) {\n", 
+            "                         throw new SynapseException(\"Access has currently been denied by\" +\n"
+          ]
+        }, 
+        {
+          "locn": "-356,8 +350,7", 
+          "lines": [
+            "         protected void createThrottleMetaData(OMElement policyOmElement) {\n", 
+            " \n", 
+            "             try {\n", 
+            "-                throttle = ThrottleFactory.createMediatorThrottle(\n", 
+            "-                        PolicyEngine.getPolicy(policyOmElement));\n", 
+            "+                throttle = ThrottleFactory.createMediatorThrottle(policyOmElement);\n", 
+            "             }\n", 
+            "             catch (ThrottleException e) {\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/extensions/src/test/java/org/apache/synapse/mediators/throttle/ThrottleMediatorTest.java", 
+      "from": "java/modules/extensions/src/test/java/org/apache/synapse/mediators/throttle/ThrottleMediatorTest.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-44,11 +44,11", 
+          "lines": [
+            "                 <groupId>org.apache.maven.plugins</groupId>\n", 
+            "                 <artifactId>maven-surefire-plugin</artifactId>\n", 
+            "                 <version>2.2</version>\n", 
+            "-                <configuration>\n", 
+            "+                <!--configuration>\n", 
+            "                     <excludes>\n", 
+            "                         <exclude>org/apache/synapse/mediators/throttle/ThrottleMediatorTest.java</exclude>\n", 
+            "                     </excludes>                    \n", 
+            "-                </configuration>\n", 
+            "+                </configuration-->\n", 
+            "             </plugin>\n", 
+            " \n", 
+            "             <plugin>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/extensions/pom.xml", 
+      "from": "java/modules/extensions/pom.xml"
+    }
+  ], 
+  "id": "1222964"
+}

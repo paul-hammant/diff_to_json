@@ -1,0 +1,258 @@
+{
+  "when": "2012-01-16T05:24:24-05:00", 
+  "message": "Getting rid of all uses of the deprecated TemporaryData class", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-27,8 +27,8", 
+          "lines": [
+            " import java.util.Arrays;\n", 
+            " import java.util.Random;\n", 
+            " \n", 
+            "+import org.apache.axiom.util.blob.OverflowBlob;\n", 
+            " import org.apache.commons.io.IOUtils;\n", 
+            "-import org.apache.synapse.commons.util.TemporaryData;\n", 
+            " \n", 
+            " import junit.framework.TestCase;\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-38,7 +38,7", 
+          "lines": [
+            "     private void doTestRandomReadWrite(int size) throws IOException {\n", 
+            "         byte[] data = new byte[size];\n", 
+            "         random.nextBytes(data);\n", 
+            "-        TemporaryData tmp = new TemporaryData(16, 1024, \"test\", \".dat\");\n", 
+            "+        OverflowBlob tmp = new OverflowBlob(16, 1024, \"test\", \".dat\");\n", 
+            "         try {\n", 
+            "             OutputStream out = tmp.getOutputStream();\n", 
+            "             // Write the test data in chunks with random size\n"
+          ]
+        }, 
+        {
+          "locn": "-89,7 +89,7", 
+          "lines": [
+            "         byte[] sourceData2 = new byte[2000];\n", 
+            "         random.nextBytes(sourceData1);\n", 
+            "         random.nextBytes(sourceData2);\n", 
+            "-        TemporaryData tmp = new TemporaryData(16, 512, \"test\", \".dat\");\n", 
+            "+        OverflowBlob tmp = new OverflowBlob(16, 512, \"test\", \".dat\");\n", 
+            "         OutputStream out = tmp.getOutputStream();\n", 
+            "         out.write(sourceData1);\n", 
+            "         out.write(sourceData2);\n"
+          ]
+        }, 
+        {
+          "locn": "-109,9 +109,9", 
+          "lines": [
+            "     private void testReadFrom(int size) throws IOException {\n", 
+            "         byte[] data = new byte[size];\n", 
+            "         random.nextBytes(data);\n", 
+            "-        TemporaryData tmp = new TemporaryData(16, 1024, \"test\", \".dat\");\n", 
+            "+        OverflowBlob tmp = new OverflowBlob(16, 1024, \"test\", \".dat\");\n", 
+            "         try {\n", 
+            "-            tmp.readFrom(new ByteArrayInputStream(data));\n", 
+            "+            tmp.readFrom(new ByteArrayInputStream(data), -1);\n", 
+            "             InputStream in = tmp.getInputStream();\n", 
+            "             try {\n", 
+            "                 assertTrue(Arrays.equals(data, IOUtils.toByteArray(in)));\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/commons/src/test/java/org/apache/synapse/util/TemporaryDataTest.java", 
+      "from": "java/modules/commons/src/test/java/org/apache/synapse/util/TemporaryDataTest.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-19,6 +19,7", 
+          "lines": [
+            " package org.apache.synapse.transport.nhttp;\n", 
+            " \n", 
+            " import org.apache.axiom.om.OMOutputFormat;\n", 
+            "+import org.apache.axiom.util.blob.OverflowBlob;\n", 
+            " import org.apache.axis2.AxisFault;\n", 
+            " import org.apache.axis2.Constants;\n", 
+            " import org.apache.axis2.addressing.AddressingConstants;\n"
+          ]
+        }, 
+        {
+          "locn": "-36,7 +37,6", 
+          "lines": [
+            " import org.apache.axis2.transport.base.ManagementSupport;\n", 
+            " import org.apache.axis2.transport.base.MetricsCollector;\n", 
+            " import org.apache.axis2.transport.base.TransportMBeanSupport;\n", 
+            "-import org.apache.axis2.util.JavaUtils;\n", 
+            " import org.apache.commons.logging.Log;\n", 
+            " import org.apache.commons.logging.LogFactory;\n", 
+            " import org.apache.http.*;\n"
+          ]
+        }, 
+        {
+          "locn": "-61,7 +61,6", 
+          "lines": [
+            " import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;\n", 
+            " import org.apache.synapse.transport.nhttp.util.NhttpUtil;\n", 
+            " import org.apache.synapse.transport.nhttp.util.NhttpMetricsCollector;\n", 
+            "-import org.apache.synapse.commons.util.TemporaryData;\n", 
+            " \n", 
+            " import javax.net.ssl.SSLContext;\n", 
+            " import java.io.IOException;\n"
+          ]
+        }, 
+        {
+          "locn": "-624,7 +623,7", 
+          "lines": [
+            "     private void setStreamAsTempData(BasicHttpEntity entity, MessageFormatter messageFormatter,\n", 
+            "                                      MessageContext msgContext, OMOutputFormat format)\n", 
+            "             throws IOException {\n", 
+            "-        TemporaryData serialized = new TemporaryData(256, 4096, \"http-nio_\", \".dat\");\n", 
+            "+        OverflowBlob serialized = new OverflowBlob(256, 4096, \"http-nio_\", \".dat\");\n", 
+            "         OutputStream out = serialized.getOutputStream();\n", 
+            "         try {\n", 
+            "             messageFormatter.writeTo(msgContext, format, out, true);\n"
+          ]
+        }, 
+        {
+          "locn": "-643,8 +642,8", 
+          "lines": [
+            "      */\n", 
+            "     private void writeMessageFromTempData(OutputStream out, MessageContext msgContext)\n", 
+            "             throws IOException {\n", 
+            "-        TemporaryData serialized =\n", 
+            "-                (TemporaryData) msgContext.getProperty(NhttpConstants.SERIALIZED_BYTES);\n", 
+            "+        OverflowBlob serialized =\n", 
+            "+                (OverflowBlob) msgContext.getProperty(NhttpConstants.SERIALIZED_BYTES);\n", 
+            "         try {\n", 
+            "             serialized.writeTo(out);\n", 
+            "         } finally {\n"
+          ]
+        }, 
+        {
+          "locn": "-653,7 +652,7", 
+          "lines": [
+            "     }\n", 
+            " \n", 
+            "     /**\n", 
+            "-     * Determine the HttpStatusCodedepending on the message type processed <br>\n", 
+            "+     * Determine the HttpStatusCode depending on the message type processed <br>\n", 
+            "      * (normal response versus fault response) as well as Axis2 message context properties set\n", 
+            "      * via Synapse configuration or MessageBuilders.\n", 
+            "      * \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-38,11 +38,11", 
+          "lines": [
+            "         OMElement resourceElt = fac.createOMElement(\"resource\", SynapseConstants.SYNAPSE_OMNAMESPACE);\n", 
+            "         String[] methods = resource.getMethods();\n", 
+            "         if (methods.length > 0) {\n", 
+            "-            String value = \"\";\n", 
+            "+            StringBuilder value = new StringBuilder(\"\");\n", 
+            "             for (String method : methods) {\n", 
+            "-                value += method + \" \";\n", 
+            "+                value.append(method).append(\" \");\n", 
+            "             }\n", 
+            "-            resourceElt.addAttribute(\"methods\", value.trim(), null);\n", 
+            "+            resourceElt.addAttribute(\"methods\", value.toString().trim(), null);\n", 
+            "         }\n", 
+            " \n", 
+            "         if (resource.getContentType() != null) {\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/rest/ResourceSerializer.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/rest/ResourceSerializer.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-375,9 +375,9", 
+          "lines": [
+            "     }\n", 
+            " \n", 
+            "     private String getSupportedMethods() {\n", 
+            "-        String value = \"\";\n", 
+            "+        StringBuilder value = new StringBuilder(\"\");\n", 
+            "         if (methods.isEmpty()) {\n", 
+            "-            value = RESTConstants.REST_ALL_SUPPORTED_METHODS;\n", 
+            "+            value.append(RESTConstants.REST_ALL_SUPPORTED_METHODS);\n", 
+            "         } else {\n", 
+            "             for (String method : methods) {\n", 
+            "                 if (RESTConstants.METHOD_OPTIONS.equals(method)) {\n"
+          ]
+        }, 
+        {
+          "locn": "-385,12 +385,12", 
+          "lines": [
+            "                 }\n", 
+            " \n", 
+            "                 if (value.length() > 0) {\n", 
+            "-                    value += \", \";\n", 
+            "+                    value.append(\", \");\n", 
+            "                 }\n", 
+            "-                value += method;\n", 
+            "+                value.append(method);\n", 
+            "             }\n", 
+            "         }\n", 
+            "-        return value;\n", 
+            "+        return value.toString();\n", 
+            "     }\n", 
+            " \n", 
+            "     public void init(SynapseEnvironment se) {\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/rest/Resource.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/rest/Resource.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-39,7 +39,6", 
+          "lines": [
+            " import org.jaxen.function.StringFunction;\n", 
+            " \n", 
+            " import javax.activation.DataHandler;\n", 
+            "-import java.io.BufferedInputStream;\n", 
+            " import java.io.BufferedReader;\n", 
+            " import java.io.IOException;\n", 
+            " import java.io.InputStreamReader;\n"
+          ]
+        }, 
+        {
+          "locn": "-330,12 +329,12", 
+          "lines": [
+            "                             try {\n", 
+            "                                 InputStreamReader streamReader = new InputStreamReader(dh.getInputStream());\n", 
+            "                                 BufferedReader stringReader = new BufferedReader(streamReader);\n", 
+            "-                                String omTextString = NULL_STRING;\n", 
+            "+                                StringBuilder omTextString = new StringBuilder(NULL_STRING);\n", 
+            "                                 String tempStr;\n", 
+            "                                 while ((tempStr = stringReader.readLine()) != null) {\n", 
+            "-                                    omTextString = omTextString + tempStr;\n", 
+            "+                                    omTextString.append(tempStr);\n", 
+            "                                 }\n", 
+            "-                                return omTextString;\n", 
+            "+                                return omTextString.toString();\n", 
+            "                             } catch (IOException e) {\n", 
+            "                                 return NULL_STRING;\n", 
+            "                             }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/GetPropertyFunction.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/GetPropertyFunction.java"
+    }
+  ], 
+  "id": "1231896"
+}

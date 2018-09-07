@@ -1,0 +1,273 @@
+Index: java/modules/distribution/src/main/conf/providers.xml
+===================================================================
+--- java/modules/distribution/src/main/conf/providers.xml	(revision 1213627)
++++ java/modules/distribution/src/main/conf/providers.xml	(revision 1213628)
+@@ -15,28 +15,28 @@
+     limitations under the License.
+ -->
+ <providers>
+-    <default-provider class-name="org.apache.commons.vfs.provider.url.UrlFileProvider">
++    <default-provider class-name="org.apache.commons.vfs2.provider.url.UrlFileProvider">
+     </default-provider>
+-    <provider class-name="org.apache.commons.vfs.provider.local.DefaultLocalFileProvider">
++    <provider class-name="org.apache.commons.vfs2.provider.local.DefaultLocalFileProvider">
+         <scheme name="file"/>
+     </provider>
+-    <provider class-name="org.apache.commons.vfs.provider.zip.ZipFileProvider">
++    <provider class-name="org.apache.commons.vfs2.provider.zip.ZipFileProvider">
+         <scheme name="zip"/>
+     </provider>
+-    <provider class-name="org.apache.commons.vfs.provider.tar.TarFileProvider">
++    <provider class-name="org.apache.commons.vfs2.provider.tar.TarFileProvider">
+         <scheme name="tar"/>
+-        <if-available class-name="org.apache.commons.vfs.provider.tar.TarInputStream"/>
++        <if-available class-name="org.apache.commons.vfs2.provider.tar.TarInputStream"/>
+     </provider>
+ 
+-    <provider class-name="org.apache.commons.vfs.provider.bzip2.Bzip2FileProvider">
++    <provider class-name="org.apache.commons.vfs2.provider.bzip2.Bzip2FileProvider">
+         <scheme name="bz2"/>
+-        <if-available class-name="org.apache.commons.vfs.provider.bzip2.CBZip2InputStream"/>
++        <if-available class-name="org.apache.commons.vfs2.provider.bzip2.CBZip2InputStream"/>
+     </provider>
+-    <provider class-name="org.apache.commons.vfs.provider.gzip.GzipFileProvider">
++    <provider class-name="org.apache.commons.vfs2.provider.gzip.GzipFileProvider">
+         <scheme name="gz"/>
+     </provider>
+ 
+-    <provider class-name="org.apache.commons.vfs.provider.jar.JarFileProvider">
++    <provider class-name="org.apache.commons.vfs2.provider.jar.JarFileProvider">
+         <scheme name="jar"/>
+         <scheme name="sar"/>
+         <scheme name="ear"/>
+@@ -44,63 +44,63 @@
+         <scheme name="ejb3"/>
+         <scheme name="war"/>
+     </provider>
+-    <provider class-name="org.apache.commons.vfs.provider.temp.TemporaryFileProvider">
++    <provider class-name="org.apache.commons.vfs2.provider.temp.TemporaryFileProvider">
+         <scheme name="tmp"/>
+     </provider>
+-    <provider class-name="org.apache.commons.vfs.provider.ftp.FtpFileProvider">
++    <provider class-name="org.apache.commons.vfs2.provider.ftp.FtpFileProvider">
+         <scheme name="ftp"/>
+         <if-available class-name="org.apache.commons.net.ftp.FTPFile"/>
+     </provider>
+-    <provider class-name="org.apache.commons.vfs.provider.http.HttpFileProvider">
++    <provider class-name="org.apache.commons.vfs2.provider.http.HttpFileProvider">
+         <scheme name="http"/>
+         <if-available class-name="org.apache.commons.httpclient.HttpClient"/>
+     </provider>
+-    <provider class-name="org.apache.commons.vfs.provider.https.HttpsFileProvider">
++    <provider class-name="org.apache.commons.vfs2.provider.https.HttpsFileProvider">
+         <scheme name="https"/>
+         <if-available class-name="org.apache.commons.httpclient.HttpClient"/>
+     </provider>
+-    <provider class-name="org.apache.commons.vfs.provider.sftp.SftpFileProvider">
++    <provider class-name="org.apache.commons.vfs2.provider.sftp.SftpFileProvider">
+         <scheme name="sftp"/>
+         <if-available class-name="javax.crypto.Cipher"/>
+         <if-available class-name="com.jcraft.jsch.JSch"/>
+     </provider>
+-    <provider class-name="org.apache.commons.vfs.provider.res.ResourceFileProvider">
++    <provider class-name="org.apache.commons.vfs2.provider.res.ResourceFileProvider">
+         <scheme name="res"/>
+     </provider>
+-        <provider class-name="org.apache.commons.vfs.provider.webdav.WebdavFileProvider">
++        <provider class-name="org.apache.commons.vfs2.provider.webdav.WebdavFileProvider">
+         <scheme name="webdav"/>
+         <if-available class-name="org.apache.commons.httpclient.HttpClient"/>
+         <if-available class-name="org.apache.jackrabbit.webdav.client.methods.DavMethod"/>
+     </provider>
+     <!--
+-    <provider class-name="org.apache.commons.vfs.provider.svn.SvnFileProvider">
++    <provider class-name="org.apache.commons.vfs2.provider.svn.SvnFileProvider">
+         <scheme name="svnhttps"/>
+     </provider>
+     -->
+     <!--
+-        <provider class-name="org.apache.commons.vfs.provider.tar.TgzFileProvider">
++        <provider class-name="org.apache.commons.vfs2.provider.tar.TgzFileProvider">
+             <scheme name="tgz"/>
+             <if-available scheme="gz"/>
+             <if-available scheme="tar"/>
+         </provider>
+-        <provider class-name="org.apache.commons.vfs.provider.tar.Tbz2FileProvider">
++        <provider class-name="org.apache.commons.vfs2.provider.tar.Tbz2FileProvider">
+             <scheme name="tbz2"/>
+             <if-available scheme="bz2"/>
+             <if-available scheme="tar"/>
+         </provider>
+     -->
+-    <provider class-name="org.apache.commons.vfs.provider.tar.TarFileProvider">
++    <provider class-name="org.apache.commons.vfs2.provider.tar.TarFileProvider">
+         <scheme name="tgz"/>
+         <if-available scheme="gz"/>
+         <if-available scheme="tar"/>
+     </provider>
+-    <provider class-name="org.apache.commons.vfs.provider.tar.TarFileProvider">
++    <provider class-name="org.apache.commons.vfs2.provider.tar.TarFileProvider">
+         <scheme name="tbz2"/>
+         <if-available scheme="bz2"/>
+         <if-available scheme="tar"/>
+     </provider>
+ 
+-    <provider class-name="org.apache.commons.vfs.provider.ram.RamFileProvider">
++    <provider class-name="org.apache.commons.vfs2.provider.ram.RamFileProvider">
+         <scheme name="ram"/>
+     </provider>
+     
+@@ -123,12 +123,12 @@
+     <extension-map extension="tbz2" scheme="tar"/>
+ 
+     <!--
+-    <filter-map class-name="org.apache.commons.vfs.content.bzip2.Bzip2Compress">
++    <filter-map class-name="org.apache.commons.vfs2.content.bzip2.Bzip2Compress">
+         <extension name="bz2"/>
+         <extension name="tbz2"/>
+         <if-available class-name="org.apache.commons.compress.bzip2.CBZip2InputStream"/>
+     </filter-map>
+-    <filter-map class-name="org.apache.commons.vfs.content.gzip.GzipCompress">
++    <filter-map class-name="org.apache.commons.vfs2.content.gzip.GzipCompress">
+         <extension name="gz"/>
+         <extension name="tgz"/>
+         <mime-type name="application/x-tgz" />
+Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java
+===================================================================
+--- java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java	(revision 1213627)
++++ java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java	(revision 1213628)
+@@ -31,11 +31,11 @@
+ import org.apache.axis2.transport.base.ManagementSupport;
+ import org.apache.commons.io.output.CountingOutputStream;
+ import org.apache.commons.logging.LogFactory;
+-import org.apache.commons.vfs.FileObject;
+-import org.apache.commons.vfs.FileSystemException;
+-import org.apache.commons.vfs.FileSystemManager;
+-import org.apache.commons.vfs.FileType;
+-import org.apache.commons.vfs.impl.StandardFileSystemManager;
++import org.apache.commons.vfs2.FileObject;
++import org.apache.commons.vfs2.FileSystemException;
++import org.apache.commons.vfs2.FileSystemManager;
++import org.apache.commons.vfs2.FileType;
++import org.apache.commons.vfs2.impl.StandardFileSystemManager;
+ 
+ import java.io.IOException;
+ 
+Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSUtils.java
+===================================================================
+--- java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSUtils.java	(revision 1213627)
++++ java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSUtils.java	(revision 1213628)
+@@ -23,10 +23,10 @@
+ import org.apache.axis2.transport.base.BaseUtils;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+-import org.apache.commons.vfs.FileContent;
+-import org.apache.commons.vfs.FileObject;
+-import org.apache.commons.vfs.FileSystemException;
+-import org.apache.commons.vfs.FileSystemManager;
++import org.apache.commons.vfs2.FileContent;
++import org.apache.commons.vfs2.FileObject;
++import org.apache.commons.vfs2.FileSystemException;
++import org.apache.commons.vfs2.FileSystemManager;
+ 
+ import java.io.IOException;
+ import java.io.InputStream;
+Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/FileObjectDataSource.java
+===================================================================
+--- java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/FileObjectDataSource.java	(revision 1213627)
++++ java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/FileObjectDataSource.java	(revision 1213628)
+@@ -19,8 +19,8 @@
+ package org.apache.synapse.transport.vfs;
+ 
+ import org.apache.axiom.attachments.SizeAwareDataSource;
+-import org.apache.commons.vfs.FileObject;
+-import org.apache.commons.vfs.FileSystemException;
++import org.apache.commons.vfs2.FileObject;
++import org.apache.commons.vfs2.FileSystemException;
+ 
+ import java.io.IOException;
+ import java.io.InputStream;
+Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java
+===================================================================
+--- java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java	(revision 1213627)
++++ java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java	(revision 1213628)
+@@ -36,8 +36,8 @@
+ import org.apache.axis2.transport.base.ManagementSupport;
+ import org.apache.axis2.transport.base.threads.WorkerPool;
+ import org.apache.commons.io.FileUtils;
+-import org.apache.commons.vfs.*;
+-import org.apache.commons.vfs.impl.StandardFileSystemManager;
++import org.apache.commons.vfs2.*;
++import org.apache.commons.vfs2.impl.StandardFileSystemManager;
+ 
+ import javax.mail.internet.ContentType;
+ import javax.mail.internet.ParseException;
+Index: java/modules/transports/core/vfs/pom.xml
+===================================================================
+--- java/modules/transports/core/vfs/pom.xml	(revision 1213627)
++++ java/modules/transports/core/vfs/pom.xml	(revision 1213628)
+@@ -52,7 +52,7 @@
+                         <Import-Package>
+                             !org.apache.commons.io.output,
+                             org.apache.commons.io.output; version=0.0.0,
+-                            org.apache.commons.vfs.*; version=0.0.0,
++                            org.apache.commons.vfs2.*; version=0.0.0,
+ 							org.apache.commons.io; version=0.0.0,
+                             *; resolution:=optional
+                         </Import-Package>
+@@ -135,7 +135,7 @@
+     <dependencies>
+         <dependency>
+             <groupId>org.apache.commons</groupId>
+-            <artifactId>commons-vfs</artifactId>
++            <artifactId>commons-vfs2</artifactId>
+             <version>${commons.vfs.version}</version>
+         </dependency>
+         <dependency>
+Index: java/modules/patches/jars/commons-vfs2-2.0-vfs-178.jar
+===================================================================
+Cannot display: file marked as a binary type.
+svn:mime-type = application/octet-stream
+Index: java/modules/patches/jars/commons-vfs2-2.0-vfs-178.jar
+===================================================================
+--- java/modules/patches/jars/commons-vfs2-2.0-vfs-178.jar	(nonexistent)
++++ java/modules/patches/jars/commons-vfs2-2.0-vfs-178.jar	(revision 1213628)
+
+Property changes on: java/modules/patches/jars/commons-vfs2-2.0-vfs-178.jar
+___________________________________________________________________
+Added: svn:executable
+## -0,0 +1 ##
++*
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++application/octet-stream
+\ No newline at end of property
+Index: java/modules/core/pom.xml
+===================================================================
+--- java/modules/core/pom.xml	(revision 1213627)
++++ java/modules/core/pom.xml	(revision 1213628)
+@@ -197,7 +197,7 @@
+         </dependency>
+         <dependency>
+             <groupId>org.apache.commons</groupId>
+-            <artifactId>commons-vfs</artifactId>
++            <artifactId>commons-vfs2</artifactId>
+             <version>${commons.vfs.version}</version>
+             <scope>test</scope>
+         </dependency>
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1213627)
++++ java/pom.xml	(revision 1213628)
+@@ -808,7 +808,7 @@
+         <synapse.version>2.1.0-SNAPSHOT</synapse.version>
+         <commons.dbcp.version>1.2.2</commons.dbcp.version>
+         <commons.pool.version>1.3</commons.pool.version>
+-        <commons.vfs.version>2.0-21092010</commons.vfs.version>
++        <commons.vfs.version>2.0</commons.vfs.version>
+         <truezip.version>6.6</truezip.version>
+         <commons.net.version>1.4.1</commons.net.version>
+         <jsch.version>0.1.31</jsch.version>
+-*-*-*-
+Migrating to commons-vfs2 and adding synapse patches to vfs 2.0

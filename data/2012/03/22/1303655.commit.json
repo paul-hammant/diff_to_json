@@ -1,0 +1,30 @@
+{
+  "when": "2012-03-22T00:45:15-04:00", 
+  "message": "Added myself as a developer.", 
+  "who": "rajikak", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-1294,6 +1294,11", 
+          "lines": [
+            "             <organization>WSO2</organization>\n", 
+            " \t    <url>http://heshans.blogspot.com/</url>\n", 
+            "         </developer>\n", 
+            "+        <developer>\n", 
+            "+            <name>Rajika Kumarasiri</name>\n", 
+            "+            <id>rajika</id>\n", 
+            "+            <email>rajikak AT apache.org</email>\n", 
+            "+        </developer>\n", 
+            " \n", 
+            "     </developers>\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/pom.xml", 
+      "from": "java/pom.xml"
+    }
+  ], 
+  "id": "1303655"
+}

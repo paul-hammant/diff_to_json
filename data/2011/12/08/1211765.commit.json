@@ -1,0 +1,406 @@
+{
+  "when": "2011-12-08T01:24:40-05:00", 
+  "message": "Adding some missing resources", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-0,0 +1,32", 
+          "lines": [
+            "+<synapseSample>\n", 
+            "+    <sampleID>52</sampleID>\n", 
+            "+    <sampleName>Session-less load balancing between 3 endpoints</sampleName>\n", 
+            "+    <synapseConfig>\n", 
+            "+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>\n", 
+            "+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>\n", 
+            "+        <synapseXml>repository/conf/sample/synapse_sample_52.xml</synapseXml>\n", 
+            "+    </synapseConfig>\n", 
+            "+    <backEndServerConfig>\n", 
+            "+        <axis2Server id='1'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+\t    <httpPort>9001</httpPort>\n", 
+            "+\t    <httpsPort>9005</httpsPort>\n", 
+            "+        </axis2Server>\n", 
+            "+        <axis2Server id='2'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+\t    <httpPort>9002</httpPort>\n", 
+            "+\t    <httpsPort>9006</httpsPort>\n", 
+            "+        </axis2Server>\n", 
+            "+        <axis2Server id='3'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+\t    <httpPort>9003</httpPort>\n", 
+            "+\t    <httpsPort>9007</httpsPort>\n", 
+            "+        </axis2Server>\n", 
+            "+    </backEndServerConfig>\n", 
+            "+    <clientConfig>\n", 
+            "+\t<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>\n", 
+            "+    </clientConfig>\n", 
+            "+</synapseSample>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/resources/sample52.xml", 
+      "from": "java/modules/integration/src/test/resources/sample52.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-0,0 +1,32", 
+          "lines": [
+            "+<synapseSample>\n", 
+            "+    <sampleID>53</sampleID>\n", 
+            "+    <sampleName>Failover sending among 3 endpoints</sampleName>\n", 
+            "+    <synapseConfig>\n", 
+            "+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>\n", 
+            "+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>\n", 
+            "+        <synapseXml>repository/conf/sample/synapse_sample_53.xml</synapseXml>\n", 
+            "+    </synapseConfig>\n", 
+            "+    <backEndServerConfig>\n", 
+            "+        <axis2Server id='1'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+\t    <httpPort>9001</httpPort>\n", 
+            "+\t    <httpsPort>9005</httpsPort>\n", 
+            "+        </axis2Server>\n", 
+            "+        <axis2Server id='2'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+\t    <httpPort>9002</httpPort>\n", 
+            "+\t    <httpsPort>9006</httpsPort>\n", 
+            "+        </axis2Server>\n", 
+            "+        <axis2Server id='3'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+\t    <httpPort>9003</httpPort>\n", 
+            "+\t    <httpsPort>9007</httpsPort>\n", 
+            "+        </axis2Server>\n", 
+            "+    </backEndServerConfig>\n", 
+            "+    <clientConfig>\n", 
+            "+\t<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>\n", 
+            "+    </clientConfig>\n", 
+            "+</synapseSample>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/resources/sample53.xml", 
+      "from": "java/modules/integration/src/test/resources/sample53.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-0,0 +1,32", 
+          "lines": [
+            "+<synapseSample>\n", 
+            "+    <sampleID>54</sampleID>\n", 
+            "+    <sampleName>Session affinity load balancing between 3 endpoints</sampleName>\n", 
+            "+    <synapseConfig>\n", 
+            "+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>\n", 
+            "+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>\n", 
+            "+        <synapseXml>repository/conf/sample/synapse_sample_54.xml</synapseXml>\n", 
+            "+    </synapseConfig>\n", 
+            "+    <backEndServerConfig>\n", 
+            "+        <axis2Server id='1'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+\t    <httpPort>9001</httpPort>\n", 
+            "+\t    <httpsPort>9005</httpsPort>\n", 
+            "+        </axis2Server>\n", 
+            "+        <axis2Server id='2'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+\t    <httpPort>9002</httpPort>\n", 
+            "+\t    <httpsPort>9006</httpsPort>\n", 
+            "+        </axis2Server>\n", 
+            "+        <axis2Server id='3'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+\t    <httpPort>9003</httpPort>\n", 
+            "+\t    <httpsPort>9007</httpsPort>\n", 
+            "+        </axis2Server>\n", 
+            "+    </backEndServerConfig>\n", 
+            "+    <clientConfig>\n", 
+            "+\t<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>\n", 
+            "+    </clientConfig>\n", 
+            "+</synapseSample>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/resources/sample54.xml", 
+      "from": "java/modules/integration/src/test/resources/sample54.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-0,0 +1,38", 
+          "lines": [
+            "+<synapseSample>\n", 
+            "+    <sampleID>55</sampleID>\n", 
+            "+    <sampleName>Session affinity load balancing between fail over endpoints</sampleName>\n", 
+            "+    <synapseConfig>\n", 
+            "+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>\n", 
+            "+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>\n", 
+            "+        <synapseXml>repository/conf/sample/synapse_sample_55.xml</synapseXml>\n", 
+            "+    </synapseConfig>\n", 
+            "+    <backEndServerConfig>\n", 
+            "+        <axis2Server id='1'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+\t    <httpPort>9001</httpPort>\n", 
+            "+\t    <httpsPort>9005</httpsPort>\n", 
+            "+        </axis2Server>\n", 
+            "+        <axis2Server id='2'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+\t    <httpPort>9002</httpPort>\n", 
+            "+\t    <httpsPort>9006</httpsPort>\n", 
+            "+        </axis2Server>\n", 
+            "+        <axis2Server id='3'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+\t    <httpPort>9003</httpPort>\n", 
+            "+\t    <httpsPort>9007</httpsPort>\n", 
+            "+        </axis2Server>\n", 
+            "+        <axis2Server id='4'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+\t    <httpPort>9004</httpPort>\n", 
+            "+\t    <httpsPort>9008</httpsPort>\n", 
+            "+        </axis2Server>\n", 
+            "+    </backEndServerConfig>\n", 
+            "+    <clientConfig>\n", 
+            "+\t<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>\n", 
+            "+    </clientConfig>\n", 
+            "+</synapseSample>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/resources/sample55.xml", 
+      "from": "java/modules/integration/src/test/resources/sample55.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-0,0 +1,18", 
+          "lines": [
+            "+<synapseSample>\n", 
+            "+    <sampleID>56</sampleID>\n", 
+            "+    <sampleName>WSDL endpoint</sampleName>\n", 
+            "+    <synapseConfig>\n", 
+            "+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>\n", 
+            "+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>\n", 
+            "+        <synapseXml>repository/conf/sample/synapse_sample_56.xml</synapseXml>\n", 
+            "+    </synapseConfig>\n", 
+            "+    <backEndServerConfig>\n", 
+            "+        <axis2Server id='0'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+        </axis2Server>\n", 
+            "+    </backEndServerConfig>\n", 
+            "+    <clientConfig>\n", 
+            "+\t<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>\n", 
+            "+    </clientConfig>\n", 
+            "+</synapseSample>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/resources/sample56.xml", 
+      "from": "java/modules/integration/src/test/resources/sample56.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-0,0 +1,36", 
+          "lines": [
+            "+<synapseSample>\n", 
+            "+    <sampleID>57</sampleID>\n", 
+            "+    <sampleName>Dynamic load balancing between 3 nodes</sampleName>\n", 
+            "+    <synapseConfig>\n", 
+            "+        <axis2Repo>>modules/integration/target/test_repos/synapse</axis2Repo>\n", 
+            "+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_clustering.xml</axis2Xml>\n", 
+            "+        <synapseXml>repository/conf/sample/synapse_sample_57.xml</synapseXml>\n", 
+            "+        <enableClustering>true</enableClustering>\n", 
+            "+    </synapseConfig>\n", 
+            "+    <backEndServerConfig>\n", 
+            "+        <axis2Server id='1'>\n", 
+            "+            <axis2Repo>>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>>modules/integration/target/test_repos/axis2Server/conf/axis2_clustering.xml</axis2Xml>\n", 
+            "+\t    <httpPort>9001</httpPort>\n", 
+            "+\t    <httpsPort>9005</httpsPort>\n", 
+            "+            <enableClustering>true</enableClustering>\n", 
+            "+        </axis2Server>\n", 
+            "+        <axis2Server id='2'>\n", 
+            "+            <axis2Repo>>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>>modules/integration/target/test_repos/axis2Server/conf/axis2_clustering.xml</axis2Xml>\n", 
+            "+\t    <httpPort>9002</httpPort>\n", 
+            "+\t    <httpsPort>9006</httpsPort>\n", 
+            "+            <enableClustering>true</enableClustering>\n", 
+            "+        </axis2Server>\n", 
+            "+        <axis2Server id='3'>\n", 
+            "+            <axis2Repo>>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>>modules/integration/target/test_repos/axis2Server/conf/axis2_clustering.xml</axis2Xml>\n", 
+            "+\t    <httpPort>9003</httpPort>\n", 
+            "+\t    <httpsPort>9007</httpsPort>\n", 
+            "+            <enableClustering>true</enableClustering>\n", 
+            "+        </axis2Server>\n", 
+            "+    </backEndServerConfig>\n", 
+            "+    <clientConfig>\n", 
+            "+\t<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>\n", 
+            "+    </clientConfig>\n", 
+            "+</synapseSample>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/resources/sample57.xml", 
+      "from": "java/modules/integration/src/test/resources/sample57.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-0,0 +1,32", 
+          "lines": [
+            "+<synapseSample>\n", 
+            "+    <sampleID>58</sampleID>\n", 
+            "+    <sampleName>Static load balancing between 3 nodes</sampleName>\n", 
+            "+     <synapseConfig>\n", 
+            "+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>\n", 
+            "+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>\n", 
+            "+        <synapseXml>repository/conf/sample/synapse_sample_58.xml</synapseXml>\n", 
+            "+    </synapseConfig>\n", 
+            "+    <backEndServerConfig>\n", 
+            "+        <axis2Server id='1'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+\t    <httpPort>9001</httpPort>\n", 
+            "+\t    <httpsPort>9005</httpsPort>\n", 
+            "+        </axis2Server>\n", 
+            "+        <axis2Server id='2'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+\t    <httpPort>9002</httpPort>\n", 
+            "+\t    <httpsPort>9006</httpsPort>\n", 
+            "+        </axis2Server>\n", 
+            "+        <axis2Server id='3'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+\t    <httpPort>9003</httpPort>\n", 
+            "+\t    <httpsPort>9007</httpsPort>\n", 
+            "+        </axis2Server>\n", 
+            "+    </backEndServerConfig>\n", 
+            "+    <clientConfig>\n", 
+            "+\t<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>\n", 
+            "+    </clientConfig>\n", 
+            "+</synapseSample>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/resources/sample58.xml", 
+      "from": "java/modules/integration/src/test/resources/sample58.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-0,0 +1,32", 
+          "lines": [
+            "+<synapseSample>\n", 
+            "+    <sampleID>59</sampleID>\n", 
+            "+    <sampleName>Weighted load balancing between 3 endpoints</sampleName>\n", 
+            "+  <synapseConfig>\n", 
+            "+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>\n", 
+            "+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>\n", 
+            "+        <synapseXml>repository/conf/sample/synapse_sample_59.xml</synapseXml>\n", 
+            "+    </synapseConfig>\n", 
+            "+    <backEndServerConfig>\n", 
+            "+        <axis2Server id='1'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+\t    <httpPort>9001</httpPort>\n", 
+            "+\t    <httpsPort>9005</httpsPort>\n", 
+            "+        </axis2Server>\n", 
+            "+        <axis2Server id='2'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+\t    <httpPort>9002</httpPort>\n", 
+            "+\t    <httpsPort>9006</httpsPort>\n", 
+            "+        </axis2Server>\n", 
+            "+        <axis2Server id='3'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+\t    <httpPort>9003</httpPort>\n", 
+            "+\t    <httpsPort>9007</httpsPort>\n", 
+            "+        </axis2Server>\n", 
+            "+    </backEndServerConfig>\n", 
+            "+    <clientConfig>\n", 
+            "+\t<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>\n", 
+            "+    </clientConfig>\n", 
+            "+</synapseSample>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/resources/sample59.xml", 
+      "from": "java/modules/integration/src/test/resources/sample59.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-0,0 +1,18", 
+          "lines": [
+            "+<synapseSample>\n", 
+            "+    <sampleID>50</sampleID>\n", 
+            "+    <sampleName>POX to SOAP conversion</sampleName>\n", 
+            "+    <synapseConfig>\n", 
+            "+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>\n", 
+            "+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>\n", 
+            "+        <synapseXml>repository/conf/sample/synapse_sample_50.xml</synapseXml>\n", 
+            "+    </synapseConfig>\n", 
+            "+    <backEndServerConfig>\n", 
+            "+        <axis2Server id='0'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+        </axis2Server>\n", 
+            "+    </backEndServerConfig>\n", 
+            "+    <clientConfig>\n", 
+            "+\t<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>\n", 
+            "+    </clientConfig>\n", 
+            "+</synapseSample>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/resources/sample50.xml", 
+      "from": "java/modules/integration/src/test/resources/sample50.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-0,0 +1,18", 
+          "lines": [
+            "+<synapseSample>\n", 
+            "+    <sampleID>51</sampleID>\n", 
+            "+    <sampleName>MTOM and SwA optimizations and request/response correlation</sampleName>\n", 
+            "+    <synapseConfig>\n", 
+            "+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>\n", 
+            "+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>\n", 
+            "+        <synapseXml>repository/conf/sample/synapse_sample_51.xml</synapseXml>\n", 
+            "+    </synapseConfig>\n", 
+            "+    <backEndServerConfig>\n", 
+            "+        <axis2Server id='0'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+        </axis2Server>\n", 
+            "+    </backEndServerConfig>\n", 
+            "+    <clientConfig>\n", 
+            "+\t<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>\n", 
+            "+    </clientConfig>\n", 
+            "+</synapseSample>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/resources/sample51.xml", 
+      "from": "java/modules/integration/src/test/resources/sample51.xml"
+    }
+  ], 
+  "id": "1211765"
+}

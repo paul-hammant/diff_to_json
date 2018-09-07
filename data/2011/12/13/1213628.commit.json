@@ -1,0 +1,325 @@
+{
+  "when": "2011-12-13T04:34:05-05:00", 
+  "message": "Migrating to commons-vfs2 and adding synapse patches to vfs 2.0", 
+  "who": "kasun", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-15,28 +15,28", 
+          "lines": [
+            "     limitations under the License.\n", 
+            " -->\n", 
+            " <providers>\n", 
+            "-    <default-provider class-name=\"org.apache.commons.vfs.provider.url.UrlFileProvider\">\n", 
+            "+    <default-provider class-name=\"org.apache.commons.vfs2.provider.url.UrlFileProvider\">\n", 
+            "     </default-provider>\n", 
+            "-    <provider class-name=\"org.apache.commons.vfs.provider.local.DefaultLocalFileProvider\">\n", 
+            "+    <provider class-name=\"org.apache.commons.vfs2.provider.local.DefaultLocalFileProvider\">\n", 
+            "         <scheme name=\"file\"/>\n", 
+            "     </provider>\n", 
+            "-    <provider class-name=\"org.apache.commons.vfs.provider.zip.ZipFileProvider\">\n", 
+            "+    <provider class-name=\"org.apache.commons.vfs2.provider.zip.ZipFileProvider\">\n", 
+            "         <scheme name=\"zip\"/>\n", 
+            "     </provider>\n", 
+            "-    <provider class-name=\"org.apache.commons.vfs.provider.tar.TarFileProvider\">\n", 
+            "+    <provider class-name=\"org.apache.commons.vfs2.provider.tar.TarFileProvider\">\n", 
+            "         <scheme name=\"tar\"/>\n", 
+            "-        <if-available class-name=\"org.apache.commons.vfs.provider.tar.TarInputStream\"/>\n", 
+            "+        <if-available class-name=\"org.apache.commons.vfs2.provider.tar.TarInputStream\"/>\n", 
+            "     </provider>\n", 
+            " \n", 
+            "-    <provider class-name=\"org.apache.commons.vfs.provider.bzip2.Bzip2FileProvider\">\n", 
+            "+    <provider class-name=\"org.apache.commons.vfs2.provider.bzip2.Bzip2FileProvider\">\n", 
+            "         <scheme name=\"bz2\"/>\n", 
+            "-        <if-available class-name=\"org.apache.commons.vfs.provider.bzip2.CBZip2InputStream\"/>\n", 
+            "+        <if-available class-name=\"org.apache.commons.vfs2.provider.bzip2.CBZip2InputStream\"/>\n", 
+            "     </provider>\n", 
+            "-    <provider class-name=\"org.apache.commons.vfs.provider.gzip.GzipFileProvider\">\n", 
+            "+    <provider class-name=\"org.apache.commons.vfs2.provider.gzip.GzipFileProvider\">\n", 
+            "         <scheme name=\"gz\"/>\n", 
+            "     </provider>\n", 
+            " \n", 
+            "-    <provider class-name=\"org.apache.commons.vfs.provider.jar.JarFileProvider\">\n", 
+            "+    <provider class-name=\"org.apache.commons.vfs2.provider.jar.JarFileProvider\">\n", 
+            "         <scheme name=\"jar\"/>\n", 
+            "         <scheme name=\"sar\"/>\n", 
+            "         <scheme name=\"ear\"/>\n"
+          ]
+        }, 
+        {
+          "locn": "-44,63 +44,63", 
+          "lines": [
+            "         <scheme name=\"ejb3\"/>\n", 
+            "         <scheme name=\"war\"/>\n", 
+            "     </provider>\n", 
+            "-    <provider class-name=\"org.apache.commons.vfs.provider.temp.TemporaryFileProvider\">\n", 
+            "+    <provider class-name=\"org.apache.commons.vfs2.provider.temp.TemporaryFileProvider\">\n", 
+            "         <scheme name=\"tmp\"/>\n", 
+            "     </provider>\n", 
+            "-    <provider class-name=\"org.apache.commons.vfs.provider.ftp.FtpFileProvider\">\n", 
+            "+    <provider class-name=\"org.apache.commons.vfs2.provider.ftp.FtpFileProvider\">\n", 
+            "         <scheme name=\"ftp\"/>\n", 
+            "         <if-available class-name=\"org.apache.commons.net.ftp.FTPFile\"/>\n", 
+            "     </provider>\n", 
+            "-    <provider class-name=\"org.apache.commons.vfs.provider.http.HttpFileProvider\">\n", 
+            "+    <provider class-name=\"org.apache.commons.vfs2.provider.http.HttpFileProvider\">\n", 
+            "         <scheme name=\"http\"/>\n", 
+            "         <if-available class-name=\"org.apache.commons.httpclient.HttpClient\"/>\n", 
+            "     </provider>\n", 
+            "-    <provider class-name=\"org.apache.commons.vfs.provider.https.HttpsFileProvider\">\n", 
+            "+    <provider class-name=\"org.apache.commons.vfs2.provider.https.HttpsFileProvider\">\n", 
+            "         <scheme name=\"https\"/>\n", 
+            "         <if-available class-name=\"org.apache.commons.httpclient.HttpClient\"/>\n", 
+            "     </provider>\n", 
+            "-    <provider class-name=\"org.apache.commons.vfs.provider.sftp.SftpFileProvider\">\n", 
+            "+    <provider class-name=\"org.apache.commons.vfs2.provider.sftp.SftpFileProvider\">\n", 
+            "         <scheme name=\"sftp\"/>\n", 
+            "         <if-available class-name=\"javax.crypto.Cipher\"/>\n", 
+            "         <if-available class-name=\"com.jcraft.jsch.JSch\"/>\n", 
+            "     </provider>\n", 
+            "-    <provider class-name=\"org.apache.commons.vfs.provider.res.ResourceFileProvider\">\n", 
+            "+    <provider class-name=\"org.apache.commons.vfs2.provider.res.ResourceFileProvider\">\n", 
+            "         <scheme name=\"res\"/>\n", 
+            "     </provider>\n", 
+            "-        <provider class-name=\"org.apache.commons.vfs.provider.webdav.WebdavFileProvider\">\n", 
+            "+        <provider class-name=\"org.apache.commons.vfs2.provider.webdav.WebdavFileProvider\">\n", 
+            "         <scheme name=\"webdav\"/>\n", 
+            "         <if-available class-name=\"org.apache.commons.httpclient.HttpClient\"/>\n", 
+            "         <if-available class-name=\"org.apache.jackrabbit.webdav.client.methods.DavMethod\"/>\n", 
+            "     </provider>\n", 
+            "     <!--\n", 
+            "-    <provider class-name=\"org.apache.commons.vfs.provider.svn.SvnFileProvider\">\n", 
+            "+    <provider class-name=\"org.apache.commons.vfs2.provider.svn.SvnFileProvider\">\n", 
+            "         <scheme name=\"svnhttps\"/>\n", 
+            "     </provider>\n", 
+            "     -->\n", 
+            "     <!--\n", 
+            "-        <provider class-name=\"org.apache.commons.vfs.provider.tar.TgzFileProvider\">\n", 
+            "+        <provider class-name=\"org.apache.commons.vfs2.provider.tar.TgzFileProvider\">\n", 
+            "             <scheme name=\"tgz\"/>\n", 
+            "             <if-available scheme=\"gz\"/>\n", 
+            "             <if-available scheme=\"tar\"/>\n", 
+            "         </provider>\n", 
+            "-        <provider class-name=\"org.apache.commons.vfs.provider.tar.Tbz2FileProvider\">\n", 
+            "+        <provider class-name=\"org.apache.commons.vfs2.provider.tar.Tbz2FileProvider\">\n", 
+            "             <scheme name=\"tbz2\"/>\n", 
+            "             <if-available scheme=\"bz2\"/>\n", 
+            "             <if-available scheme=\"tar\"/>\n", 
+            "         </provider>\n", 
+            "     -->\n", 
+            "-    <provider class-name=\"org.apache.commons.vfs.provider.tar.TarFileProvider\">\n", 
+            "+    <provider class-name=\"org.apache.commons.vfs2.provider.tar.TarFileProvider\">\n", 
+            "         <scheme name=\"tgz\"/>\n", 
+            "         <if-available scheme=\"gz\"/>\n", 
+            "         <if-available scheme=\"tar\"/>\n", 
+            "     </provider>\n", 
+            "-    <provider class-name=\"org.apache.commons.vfs.provider.tar.TarFileProvider\">\n", 
+            "+    <provider class-name=\"org.apache.commons.vfs2.provider.tar.TarFileProvider\">\n", 
+            "         <scheme name=\"tbz2\"/>\n", 
+            "         <if-available scheme=\"bz2\"/>\n", 
+            "         <if-available scheme=\"tar\"/>\n", 
+            "     </provider>\n", 
+            " \n", 
+            "-    <provider class-name=\"org.apache.commons.vfs.provider.ram.RamFileProvider\">\n", 
+            "+    <provider class-name=\"org.apache.commons.vfs2.provider.ram.RamFileProvider\">\n", 
+            "         <scheme name=\"ram\"/>\n", 
+            "     </provider>\n", 
+            "     \n"
+          ]
+        }, 
+        {
+          "locn": "-123,12 +123,12", 
+          "lines": [
+            "     <extension-map extension=\"tbz2\" scheme=\"tar\"/>\n", 
+            " \n", 
+            "     <!--\n", 
+            "-    <filter-map class-name=\"org.apache.commons.vfs.content.bzip2.Bzip2Compress\">\n", 
+            "+    <filter-map class-name=\"org.apache.commons.vfs2.content.bzip2.Bzip2Compress\">\n", 
+            "         <extension name=\"bz2\"/>\n", 
+            "         <extension name=\"tbz2\"/>\n", 
+            "         <if-available class-name=\"org.apache.commons.compress.bzip2.CBZip2InputStream\"/>\n", 
+            "     </filter-map>\n", 
+            "-    <filter-map class-name=\"org.apache.commons.vfs.content.gzip.GzipCompress\">\n", 
+            "+    <filter-map class-name=\"org.apache.commons.vfs2.content.gzip.GzipCompress\">\n", 
+            "         <extension name=\"gz\"/>\n", 
+            "         <extension name=\"tgz\"/>\n", 
+            "         <mime-type name=\"application/x-tgz\" />\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/distribution/src/main/conf/providers.xml", 
+      "from": "java/modules/distribution/src/main/conf/providers.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-31,11 +31,11", 
+          "lines": [
+            " import org.apache.axis2.transport.base.ManagementSupport;\n", 
+            " import org.apache.commons.io.output.CountingOutputStream;\n", 
+            " import org.apache.commons.logging.LogFactory;\n", 
+            "-import org.apache.commons.vfs.FileObject;\n", 
+            "-import org.apache.commons.vfs.FileSystemException;\n", 
+            "-import org.apache.commons.vfs.FileSystemManager;\n", 
+            "-import org.apache.commons.vfs.FileType;\n", 
+            "-import org.apache.commons.vfs.impl.StandardFileSystemManager;\n", 
+            "+import org.apache.commons.vfs2.FileObject;\n", 
+            "+import org.apache.commons.vfs2.FileSystemException;\n", 
+            "+import org.apache.commons.vfs2.FileSystemManager;\n", 
+            "+import org.apache.commons.vfs2.FileType;\n", 
+            "+import org.apache.commons.vfs2.impl.StandardFileSystemManager;\n", 
+            " \n", 
+            " import java.io.IOException;\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java", 
+      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-23,10 +23,10", 
+          "lines": [
+            " import org.apache.axis2.transport.base.BaseUtils;\n", 
+            " import org.apache.commons.logging.Log;\n", 
+            " import org.apache.commons.logging.LogFactory;\n", 
+            "-import org.apache.commons.vfs.FileContent;\n", 
+            "-import org.apache.commons.vfs.FileObject;\n", 
+            "-import org.apache.commons.vfs.FileSystemException;\n", 
+            "-import org.apache.commons.vfs.FileSystemManager;\n", 
+            "+import org.apache.commons.vfs2.FileContent;\n", 
+            "+import org.apache.commons.vfs2.FileObject;\n", 
+            "+import org.apache.commons.vfs2.FileSystemException;\n", 
+            "+import org.apache.commons.vfs2.FileSystemManager;\n", 
+            " \n", 
+            " import java.io.IOException;\n", 
+            " import java.io.InputStream;\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSUtils.java", 
+      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSUtils.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-19,8 +19,8", 
+          "lines": [
+            " package org.apache.synapse.transport.vfs;\n", 
+            " \n", 
+            " import org.apache.axiom.attachments.SizeAwareDataSource;\n", 
+            "-import org.apache.commons.vfs.FileObject;\n", 
+            "-import org.apache.commons.vfs.FileSystemException;\n", 
+            "+import org.apache.commons.vfs2.FileObject;\n", 
+            "+import org.apache.commons.vfs2.FileSystemException;\n", 
+            " \n", 
+            " import java.io.IOException;\n", 
+            " import java.io.InputStream;\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/FileObjectDataSource.java", 
+      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/FileObjectDataSource.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-36,8 +36,8", 
+          "lines": [
+            " import org.apache.axis2.transport.base.ManagementSupport;\n", 
+            " import org.apache.axis2.transport.base.threads.WorkerPool;\n", 
+            " import org.apache.commons.io.FileUtils;\n", 
+            "-import org.apache.commons.vfs.*;\n", 
+            "-import org.apache.commons.vfs.impl.StandardFileSystemManager;\n", 
+            "+import org.apache.commons.vfs2.*;\n", 
+            "+import org.apache.commons.vfs2.impl.StandardFileSystemManager;\n", 
+            " \n", 
+            " import javax.mail.internet.ContentType;\n", 
+            " import javax.mail.internet.ParseException;\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java", 
+      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-52,7 +52,7", 
+          "lines": [
+            "                         <Import-Package>\n", 
+            "                             !org.apache.commons.io.output,\n", 
+            "                             org.apache.commons.io.output; version=0.0.0,\n", 
+            "-                            org.apache.commons.vfs.*; version=0.0.0,\n", 
+            "+                            org.apache.commons.vfs2.*; version=0.0.0,\n", 
+            " \t\t\t\t\t\t\torg.apache.commons.io; version=0.0.0,\n", 
+            "                             *; resolution:=optional\n", 
+            "                         </Import-Package>\n"
+          ]
+        }, 
+        {
+          "locn": "-135,7 +135,7", 
+          "lines": [
+            "     <dependencies>\n", 
+            "         <dependency>\n", 
+            "             <groupId>org.apache.commons</groupId>\n", 
+            "-            <artifactId>commons-vfs</artifactId>\n", 
+            "+            <artifactId>commons-vfs2</artifactId>\n", 
+            "             <version>${commons.vfs.version}</version>\n", 
+            "         </dependency>\n", 
+            "         <dependency>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/vfs/pom.xml", 
+      "from": "java/modules/transports/core/vfs/pom.xml"
+    }, 
+    {
+      "chunks": [], 
+      "to": "java/modules/patches/jars/commons-vfs2-2.0-vfs-178.jar", 
+      "from": "java/modules/patches/jars/commons-vfs2-2.0-vfs-178.jar"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-197,7 +197,7", 
+          "lines": [
+            "         </dependency>\n", 
+            "         <dependency>\n", 
+            "             <groupId>org.apache.commons</groupId>\n", 
+            "-            <artifactId>commons-vfs</artifactId>\n", 
+            "+            <artifactId>commons-vfs2</artifactId>\n", 
+            "             <version>${commons.vfs.version}</version>\n", 
+            "             <scope>test</scope>\n", 
+            "         </dependency>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/pom.xml", 
+      "from": "java/modules/core/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-808,7 +808,7", 
+          "lines": [
+            "         <synapse.version>2.1.0-SNAPSHOT</synapse.version>\n", 
+            "         <commons.dbcp.version>1.2.2</commons.dbcp.version>\n", 
+            "         <commons.pool.version>1.3</commons.pool.version>\n", 
+            "-        <commons.vfs.version>2.0-21092010</commons.vfs.version>\n", 
+            "+        <commons.vfs.version>2.0</commons.vfs.version>\n", 
+            "         <truezip.version>6.6</truezip.version>\n", 
+            "         <commons.net.version>1.4.1</commons.net.version>\n", 
+            "         <jsch.version>0.1.31</jsch.version>\n"
+          ]
+        }
+      ], 
+      "to": "java/pom.xml", 
+      "from": "java/pom.xml"
+    }
+  ], 
+  "id": "1213628"
+}

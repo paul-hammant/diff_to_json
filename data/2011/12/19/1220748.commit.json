@@ -1,0 +1,45 @@
+{
+  "when": "2011-12-19T08:50:40-05:00", 
+  "message": "Fixing SYNAPSE-759", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-45,6 +45,7", 
+          "lines": [
+            "     public static final String FILE_BASED_MESSAGE_LOGGING = \"file\";\n", 
+            "     public static final String JDBC_BASED_MESSAGE_LOGGING = \"jdbc\";\n", 
+            "     public static final String CONSOLE_BASED_MESSAGE_LOGGING = \"console\";\n", 
+            "+    public static final String SLF4J_BASED_MESSAGE_LOGGING = \"slf4j\";\n", 
+            " \n", 
+            "     public static final String FILE_BASED_MESSAGE_STORE = \"file\";\n", 
+            "     public static final String JDBC_BASED_MESSAGE_STORE = \"jdbc\";\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/FIXConstants.java", 
+      "from": "java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/FIXConstants.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-430,6 +430,8", 
+          "lines": [
+            "                     logFactory = new JdbcLogFactory(settings);\n", 
+            "                 } else if (FIXConstants.CONSOLE_BASED_MESSAGE_LOGGING.equals(method)) {\n", 
+            "                     logFactory = new ScreenLogFactory();\n", 
+            "+                } else if (FIXConstants.SLF4J_BASED_MESSAGE_LOGGING.equals(method)) {\n", 
+            "+                    logFactory = new SLF4JLogFactory(settings);\n", 
+            "                 } else {\n", 
+            "                     log.warn(\"Invalid acceptor log method \" + method + \". Using defaults.\");\n", 
+            "                 }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/FIXSessionFactory.java", 
+      "from": "java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/FIXSessionFactory.java"
+    }
+  ], 
+  "id": "1220748"
+}

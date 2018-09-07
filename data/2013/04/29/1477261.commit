@@ -1,0 +1,15 @@
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1477260)
++++ java/pom.xml	(revision 1477261)
+@@ -1021,7 +1021,7 @@
+         <repository>
+             <id>snmp4j-repo</id>
+             <name>SNMP4J Repository</name>
+-            <url>https://server.oosnmp.net/dist/release/</url>
++            <url>https://oosnmp.net/dist/release/</url>
+             <releases>
+                 <updatePolicy>never</updatePolicy>
+             </releases>
+-*-*-*-
+Fixed build problems (with Maven != 3.0.4) caused by broken third party repository.

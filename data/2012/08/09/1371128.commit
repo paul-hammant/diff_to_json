@@ -1,0 +1,15 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseXMLConfigurationFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseXMLConfigurationFactory.java	(revision 1371127)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseXMLConfigurationFactory.java	(revision 1371128)
+@@ -109,7 +109,7 @@
+                 } else {
+                     handleException("Invalid configuration element at the top level, one of \'sequence\', " +
+                             "\'endpoint\', \'proxy\', \'eventSource\', \'localEntry\', \'priorityExecutor\' " +
+-                            "or \'registry\' is expected");
++                            "or \'registry\' is expected. Found '" + elt.getQName() + "'.");
+                 }
+             }
+         }
+-*-*-*-
+Fixed the error log.

@@ -1,0 +1,16 @@
+Index: java/modules/samples/services/MTOMSwASampleService/conf/services.xml
+===================================================================
+--- java/modules/samples/services/MTOMSwASampleService/conf/services.xml	(revision 1386771)
++++ java/modules/samples/services/MTOMSwASampleService/conf/services.xml	(revision 1386772)
+@@ -26,5 +26,8 @@
+                              class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver" />
+         </messageReceivers>
+         <parameter locked="false" name="ServiceClass">samples.services.MTOMSwASampleService</parameter>
++        <operation name="oneWayUploadUsingMTOM">
++            <messageReceiver class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver" />
++        </operation>
+     </service>
+ </serviceGroup>
+\ No newline at end of file
+-*-*-*-
+Ensure that the correct message receiver is used for oneWayUploadUsingMTOM.

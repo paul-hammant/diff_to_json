@@ -1,0 +1,111 @@
+{
+  "when": "2012-04-03T02:01:47-04:00", 
+  "message": "Making the MBean names unique so they work in situations where multiple NHTTP listeners are exposed", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-90,9 +90,9", 
+          "lines": [
+            "     private String latencyMode;\n", 
+            "     private String name;\n", 
+            " \n", 
+            "-    public LatencyView(final String latencyMode, boolean isHttps) {\n", 
+            "+    public LatencyView(final String latencyMode, String transportName) {\n", 
+            "         this.latencyMode = latencyMode;\n", 
+            "-        name = \"nio-http\" + (isHttps ? \"s\" : \"\");\n", 
+            "+        this.name = \"nio-\" + transportName;\n", 
+            " \n", 
+            "         scheduler =  Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {\n", 
+            "             public Thread newThread(Runnable r) {\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/util/LatencyView.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/util/LatencyView.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-40,9 +40,9", 
+          "lines": [
+            "     private ConnectionsView view;\n", 
+            "     private boolean listener;\n", 
+            " \n", 
+            "-    public NhttpMetricsCollector(boolean listener, boolean isHttps) {\n", 
+            "+    public NhttpMetricsCollector(boolean listener, String transportName) {\n", 
+            "         this.listener = listener;\n", 
+            "-        String name = \"http\" + (isHttps ? \"s\" : \"\") + \"-\" + (listener ? \"listener\" : \"sender\");\n", 
+            "+        String name = transportName + \"-\" + (listener ? \"listener\" : \"sender\");\n", 
+            "         this.view = new ConnectionsView(name);\n", 
+            "     }\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/util/NhttpMetricsCollector.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/util/NhttpMetricsCollector.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-136,8 +136,8", 
+          "lines": [
+            "         this.connStrategy = new DefaultConnectionReuseStrategy();\n", 
+            "         this.allocator = new HeapByteBufferAllocator();\n", 
+            "         this.activeConnections = new ArrayList<NHttpServerConnection>();\n", 
+            "-        this.latencyView = new LatencyView(\"NHTTPLatencyView\", isHttps);\n", 
+            "-        this.s2sLatencyView = new LatencyView(\"NHTTPS2SLatencyView\", isHttps);\n", 
+            "+        this.latencyView = new LatencyView(\"NHTTPLatencyView\", listenerContext.getTransportIn().getName());\n", 
+            "+        this.s2sLatencyView = new LatencyView(\"NHTTPS2SLatencyView\", listenerContext.getTransportIn().getName());\n", 
+            "         this.threadingView = new ThreadingView(\"HttpServerWorker\", true, 50);\n", 
+            "         this.restDispatching = listenerContext.isRestDispatching();\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ServerHandler.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ServerHandler.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-126,7 +126,7", 
+          "lines": [
+            "             }\n", 
+            "         }\n", 
+            " \n", 
+            "-        metrics = new NhttpMetricsCollector(true, ssl);\n", 
+            "+        metrics = new NhttpMetricsCollector(true, transportIn.getName());\n", 
+            " \n", 
+            "         // create the priority based executor and parser\n", 
+            "         param = transportIn.getParameter(NhttpConstants.PRIORITY_CONFIG_FILE_NAME);\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-185,7 +185,7", 
+          "lines": [
+            "             log.error(\"Error starting the IOReactor\", e);\n", 
+            "         }\n", 
+            " \n", 
+            "-        metrics = new NhttpMetricsCollector(false, sslContext != null);\n", 
+            "+        metrics = new NhttpMetricsCollector(false, transportOut.getName());\n", 
+            "         handler = new ClientHandler(cfgCtx, params, metrics);\n", 
+            "         final IOEventDispatch ioEventDispatch = getEventDispatch(\n", 
+            "             handler, sslContext, sslIOSessionHandler, params, transportOut);\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java"
+    }
+  ], 
+  "id": "1308712"
+}

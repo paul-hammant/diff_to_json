@@ -1,0 +1,14 @@
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1224740)
++++ java/pom.xml	(revision 1224741)
+@@ -939,6 +939,7 @@
+             </plugin>
+             <plugin>
+                 <artifactId>maven-project-info-reports-plugin</artifactId>
++		<version>2.2</version>
+                 <configuration>
+                     <!-- These features are disabled since they cause "mvn site" to hang -->
+                     <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+-*-*-*-
+Changing reports plugin version to 2.2 - Previous version causes the maven to throw out an error everytime the dependency report is generated - Known issue in the plugin v2.1.2

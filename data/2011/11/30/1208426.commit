@@ -1,0 +1,16 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/store/MessageStoreMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/store/MessageStoreMediator.java	(revision 1208425)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/store/MessageStoreMediator.java	(revision 1208426)
+@@ -78,7 +78,8 @@
+ 
+                 }
+ 
+-
++                // Ensure that the message is fully read
++                synCtx.getEnvelope().buildWithAttachments();
+                 messageStore.offer(synCtx);
+ 
+                 // with the nio transport, this causes the listener not to write a 202
+-*-*-*-
+applying the patchfor SYNAPSE-804

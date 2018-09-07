@@ -1,0 +1,54 @@
+Index: java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_jms.xml
+===================================================================
+--- java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_jms.xml	(revision 1349223)
++++ java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_jms.xml	(revision 1349224)
+@@ -78,7 +78,7 @@
+ 
+     <deployer extension=".aar" directory="services" class="org.apache.axis2.deployment.ServiceDeployer">
+         <serviceBuilderExtension name ="jwsbuilderExt" class="org.apache.axis2.jaxws.framework.JAXWSServiceBuilderExtension"/>
+-        <serviceBuilderExtension name ="jwsbuilderExt" class="org.apache.axis2.deployment.WSDLServiceBuilderExtension"/>
++        <serviceBuilderExtension name ="wsdlbuilderExt" class="org.apache.axis2.deployment.WSDLServiceBuilderExtension"/>
+     </deployer>
+ 
+     <!-- Following parameter will set the host name for the epr-->
+Index: java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_def.xml
+===================================================================
+--- java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_def.xml	(revision 1349223)
++++ java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_def.xml	(revision 1349224)
+@@ -78,7 +78,7 @@
+ 
+     <deployer extension=".aar" directory="services" class="org.apache.axis2.deployment.ServiceDeployer">
+         <serviceBuilderExtension name ="jwsbuilderExt" class="org.apache.axis2.jaxws.framework.JAXWSServiceBuilderExtension"/>
+-        <serviceBuilderExtension name ="jwsbuilderExt" class="org.apache.axis2.deployment.WSDLServiceBuilderExtension"/>
++        <serviceBuilderExtension name ="wsdlbuilderExt" class="org.apache.axis2.deployment.WSDLServiceBuilderExtension"/>
+     </deployer>
+ 
+     <!-- Following parameter will set the host name for the epr-->
+Index: java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_clustering.xml
+===================================================================
+--- java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_clustering.xml	(revision 1349223)
++++ java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_clustering.xml	(revision 1349224)
+@@ -78,7 +78,7 @@
+ 
+     <deployer extension=".aar" directory="services" class="org.apache.axis2.deployment.ServiceDeployer">
+         <serviceBuilderExtension name ="jwsbuilderExt" class="org.apache.axis2.jaxws.framework.JAXWSServiceBuilderExtension"/>
+-        <serviceBuilderExtension name ="jwsbuilderExt" class="org.apache.axis2.deployment.WSDLServiceBuilderExtension"/>
++        <serviceBuilderExtension name ="wsdlbuilderExt" class="org.apache.axis2.deployment.WSDLServiceBuilderExtension"/>
+     </deployer>
+ 
+     <!-- Following parameter will set the host name for the epr-->
+Index: java/repository/conf/sample/resources/misc/server/axis2.xml
+===================================================================
+--- java/repository/conf/sample/resources/misc/server/axis2.xml	(revision 1349223)
++++ java/repository/conf/sample/resources/misc/server/axis2.xml	(revision 1349224)
+@@ -78,7 +78,7 @@
+ 
+     <deployer extension=".aar" directory="services" class="org.apache.axis2.deployment.ServiceDeployer">
+         <serviceBuilderExtension name ="jwsbuilderExt" class="org.apache.axis2.jaxws.framework.JAXWSServiceBuilderExtension"/>
+-        <serviceBuilderExtension name ="jwsbuilderExt" class="org.apache.axis2.deployment.WSDLServiceBuilderExtension"/>
++        <serviceBuilderExtension name ="wsdlbuilderExt" class="org.apache.axis2.deployment.WSDLServiceBuilderExtension"/>
+     </deployer>
+ 
+     <!-- Following parameter will set the host name for the epr-->
+-*-*-*-
+Unique IDs for registered deployer extensions

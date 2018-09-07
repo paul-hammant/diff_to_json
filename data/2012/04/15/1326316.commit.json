@@ -1,0 +1,34 @@
+{
+  "when": "2012-04-15T08:16:36-04:00", 
+  "message": "Fixing java.util.ConcurrentModificationException caused by wrong usage of Axiom API\n", 
+  "who": "sadeep", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-82,12 +82,13", 
+          "lines": [
+            " \n", 
+            "         // replace the existing payload with the new payload\n", 
+            "         for (Iterator itr = soapBody.getChildElements(); itr.hasNext();) {\n", 
+            "-            OMElement child = (OMElement) itr.next();\n", 
+            "-            child.detach();\n", 
+            "+            itr.next();\n", 
+            "+            itr.remove();\n", 
+            "         }\n", 
+            " \n", 
+            "         for (Iterator itr = resultElement.getChildElements(); itr.hasNext();) {\n", 
+            "             OMElement child = (OMElement) itr.next();\n", 
+            "+            itr.remove();\n", 
+            "             soapBody.addChild(child);\n", 
+            "         }\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/transform/PayloadFactoryMediator.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/transform/PayloadFactoryMediator.java"
+    }
+  ], 
+  "id": "1326316"
+}

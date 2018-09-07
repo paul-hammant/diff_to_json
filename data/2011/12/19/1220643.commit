@@ -1,0 +1,27 @@
+Index: java/modules/distribution/src/main/assembly/bin.xml
+===================================================================
+--- java/modules/distribution/src/main/assembly/bin.xml	(revision 1220642)
++++ java/modules/distribution/src/main/assembly/bin.xml	(revision 1220643)
+@@ -249,6 +249,7 @@
+                 <exclude>org.slf4j:jcl-over-slf4j:jar</exclude>
+                 <exclude>org.slf4j:log4j-over-slf4j:jar</exclude>
+                 <exclude>com.oopsconsultancy:xmltask:jar</exclude>
++		<exclude>xalan:xalan:jar</exclude>
+             </excludes>
+         </dependencySet>
+         <dependencySet>
+Index: java/modules/distribution/pom.xml
+===================================================================
+--- java/modules/distribution/pom.xml	(revision 1220642)
++++ java/modules/distribution/pom.xml	(revision 1220643)
+@@ -82,7 +82,7 @@
+                     <artifactId>woden-api</artifactId>
+                 </exclusion>
+                 <exclusion>
+-                    <groupId>org.apache.xalan</groupId>
++                    <groupId>xalan</groupId>
+                     <artifactId>xalan</artifactId>
+                 </exclusion>
+             </exclusions>
+-*-*-*-
+Fixing xalan duplication issue

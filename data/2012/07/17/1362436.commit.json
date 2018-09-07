@@ -1,0 +1,27 @@
+{
+  "when": "2012-07-17T06:21:02-04:00", 
+  "message": "Changing wso2eventing-api version to a released version as the project is no longer maintained.\n", 
+  "who": "sadeep", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-1115,7 +1115,7", 
+          "lines": [
+            "         <wso2commons.version>1.2</wso2commons.version>\n", 
+            "         <wso2caching.version>3.5.0</wso2caching.version>\n", 
+            "         <wso2throttle.version>3.2.1</wso2throttle.version>\n", 
+            "-        <wso2eventing-api.version>SNAPSHOT</wso2eventing-api.version>\n", 
+            "+        <wso2eventing-api.version>2.1</wso2eventing-api.version>\n", 
+            "         <xbean.version>2.2.0</xbean.version>\n", 
+            "         <bsf.version>3.0</bsf.version>\n", 
+            "         <groovy.version>1.1-rc-1</groovy.version>\n"
+          ]
+        }
+      ], 
+      "to": "java/pom.xml", 
+      "from": "java/pom.xml"
+    }
+  ], 
+  "id": "1362436"
+}

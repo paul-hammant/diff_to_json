@@ -1,0 +1,80 @@
+{
+  "when": "2012-03-04T08:01:41-05:00", 
+  "message": "Adding comments to PayloadFactorMediator class", 
+  "who": "sadeep", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-43,11 +43,27", 
+          "lines": [
+            "  */\n", 
+            " public class PayloadFactoryMediator extends AbstractMediator {\n", 
+            " \n", 
+            "+    /**\n", 
+            "+     * Stores the new payload format.\n", 
+            "+     */\n", 
+            "     private String format;\n", 
+            "+\n", 
+            "+    /**\n", 
+            "+     * Stores the argument list, argument values are computed dynamically at mediation time.\n", 
+            "+     */\n", 
+            "     private List<Argument> argumentList = new ArrayList<Argument>();\n", 
+            " \n", 
+            "+    /**\n", 
+            "+     * Pattern object used for regex processing. This finds occurrences of $n, where n is a positive\n", 
+            "+     * number, to replace them with argument values.\n", 
+            "+     */\n", 
+            "     private Pattern pattern = Pattern.compile(\"\\\\$(\\\\d)+\");\n", 
+            " \n", 
+            "+    /**\n", 
+            "+     * Replaces the existing payload with a new payload as defined by the format and the argument list\n", 
+            "+     * @param synCtx the current message for mediation\n", 
+            "+     * @return true if the transformation is successful, false otherwise.\n", 
+            "+     */\n", 
+            "     public boolean mediate(MessageContext synCtx) {\n", 
+            " \n", 
+            "         SOAPBody soapBody = synCtx.getEnvelope().getBody();\n"
+          ]
+        }, 
+        {
+          "locn": "-78,7 +94,13", 
+          "lines": [
+            "         return true;\n", 
+            "     }\n", 
+            " \n", 
+            "+    /**\n", 
+            "+     * Replaces occurrences of $n with argument values.\n", 
+            "+     * @param result StringBuffer that stores the result.\n", 
+            "+     * @param synCtx Current message under mediation.\n", 
+            "+     */\n", 
+            "     private void transformPayload(StringBuffer result, MessageContext synCtx) {\n", 
+            "+\n", 
+            "         Object[] argValues = getArgValues(synCtx);\n", 
+            "         Matcher matcher = pattern.matcher(\"<dummy>\" + format + \"</dummy>\");\n", 
+            "         while (matcher.find()) {\n"
+          ]
+        }, 
+        {
+          "locn": "-89,6 +111,11", 
+          "lines": [
+            "         matcher.appendTail(result);\n", 
+            "     }\n", 
+            " \n", 
+            "+    /**\n", 
+            "+     * Extracts argument values from the current message context.\n", 
+            "+     * @param synCtx Current message under mediation.\n", 
+            "+     * @return Extracted argument values.\n", 
+            "+     */\n", 
+            "     private Object[] getArgValues(MessageContext synCtx) {\n", 
+            " \n", 
+            "         Object[] argValues = new Object[argumentList.size()];\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/transform/PayloadFactoryMediator.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/transform/PayloadFactoryMediator.java"
+    }
+  ], 
+  "id": "1296796"
+}

@@ -1,0 +1,15 @@
+Index: java/modules/samples/services/JAXWSStockQuoteService/build.xml
+===================================================================
+--- java/modules/samples/services/JAXWSStockQuoteService/build.xml	(revision 1395345)
++++ java/modules/samples/services/JAXWSStockQuoteService/build.xml	(revision 1395346)
+@@ -36,7 +36,7 @@
+             <src path="src"/>
+             <classpath>
+                 <fileset dir="../../lib">
+-                   	<include name="*.jar"/>
++                    <include name="*.jar"/>
+                 </fileset>
+             </classpath>
+         </javac>
+-*-*-*-
+Fixed formatting.

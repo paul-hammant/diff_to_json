@@ -1,0 +1,292 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/db/AbstractDBMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/db/AbstractDBMediator.java	(revision 1210453)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/db/AbstractDBMediator.java	(revision 1210454)
+@@ -269,57 +269,109 @@
+                 case Types.CHAR:
+                 case Types.VARCHAR:
+                 case Types.LONGVARCHAR: {
+-                    ps.setString(column++, value);
++                    if (value != null && value.length() != 0) {
++                        ps.setString(column++, value);
++                    } else {
++                        ps.setString(column++, null);
++                    }
+                     break;
+                 }
+                 case Types.NUMERIC:
+                 case Types.DECIMAL: {
+-                    ps.setBigDecimal(column++, new BigDecimal(value));
++                    if (value != null && value.length() != 0) {
++                        ps.setBigDecimal(column++, new BigDecimal(value));
++                    } else {
++                        ps.setBigDecimal(column++, null);
++                    }
+                     break;
+                 }
+                 case Types.BIT: {
+-                    ps.setBoolean(column++, Boolean.parseBoolean(value));
++                    if (value != null && value.length() != 0) {
++                        ps.setBoolean(column++, Boolean.parseBoolean(value));
++                    } else {
++                        ps.setNull(column++, Types.BIT);
++                    }
+                     break;
+                 }
+                 case Types.TINYINT: {
+-                    ps.setByte(column++, Byte.parseByte(value));
++                    if (value != null && value.length() != 0) {
++                        ps.setByte(column++, Byte.parseByte(value));
++                    } else {
++                        ps.setNull(column++, Types.TINYINT);
++                    }
+                     break;
+                 }
+                 case Types.SMALLINT: {
+-                    ps.setShort(column++, Short.parseShort(value));
++                    if (value != null && value.length() != 0) {
++                        ps.setShort(column++, Short.parseShort(value));
++                    } else {
++                        ps.setNull(column++, Types.SMALLINT);
++                    }
+                     break;
+                 }
+                 case Types.INTEGER: {
+-                    ps.setInt(column++, Integer.parseInt(value));
++                    if (value != null && value.length() != 0) {
++                        ps.setInt(column++, Integer.parseInt(value));
++                    } else {
++                        ps.setNull(column++, Types.INTEGER);
++                    }
+                     break;
+                 }
+                 case Types.BIGINT: {
+-                    ps.setLong(column++, Long.parseLong(value));
++                    if (value != null && value.length() != 0) {
++                        ps.setLong(column++, Long.parseLong(value));
++                    } else {
++                        ps.setNull(column++, Types.BIGINT);
++                    }
+                     break;
+                 }
+                 case Types.REAL: {
+-                    ps.setFloat(column++, Float.parseFloat(value));
++                    if (value != null && value.length() != 0) {
++                        ps.setFloat(column++, Float.parseFloat(value));
++                    } else {
++                        ps.setNull(column++, Types.REAL);
++                    }
+                     break;
+                 }
+                 case Types.FLOAT: {
+-                    ps.setDouble(column++, Double.parseDouble(value));
++                    if (value != null && value.length() != 0) {
++                        ps.setDouble(column++, Double.parseDouble(value));
++                    } else {
++                        ps.setNull(column++, Types.FLOAT);
++                    }
+                     break;
+                 }
+                 case Types.DOUBLE: {
+-                    ps.setDouble(column++, Double.parseDouble(value));
++                    if (value != null && value.length() != 0) {
++                        ps.setDouble(column++, Double.parseDouble(value));
++                    } else {
++                        ps.setNull(column++, Types.DOUBLE);
++                    }
+                     break;
+                 }
+                 // skip BINARY, VARBINARY and LONGVARBINARY
+                 case Types.DATE: {
+-                    ps.setDate(column++, Date.valueOf(value));
++                    if (value != null && value.length() != 0) {
++                        ps.setDate(column++, Date.valueOf(value));
++                    } else {
++                        ps.setNull(column++, Types.DATE);
++                    }
+                     break;
+                 }
+                 case Types.TIME: {
+-                    ps.setTime(column++, Time.valueOf(value));
++                    if (value != null && value.length() != 0) {
++                        ps.setTime(column++, Time.valueOf(value));
++                    } else {
++                        ps.setNull(column++, Types.TIME);
++                    }
+                     break;
+                 }
+                 case Types.TIMESTAMP: {
+-                    ps.setTimestamp(column++, Timestamp.valueOf(value));
++                    if (value != null && value.length() != 0) {
++                        ps.setTimestamp(column++, Timestamp.valueOf(value));
++                    } else {
++                        ps.setNull(column++, Types.TIMESTAMP);
++                    }
+                     break;
+                 }
+                 // skip CLOB, BLOB, ARRAY, DISTINCT, STRUCT, REF, JAVA_OBJECT
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/store/MessageStoreMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/store/MessageStoreMediator.java	(revision 1210453)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/store/MessageStoreMediator.java	(revision 1210454)
+@@ -78,8 +78,6 @@
+ 
+                 }
+ 
+-                // Ensure that the message is fully read
+-                synCtx.getEnvelope().buildWithAttachments();
+                 messageStore.offer(synCtx);
+ 
+                 // with the nio transport, this causes the listener not to write a 202
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/EnrichMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/EnrichMediator.java	(revision 1210453)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/EnrichMediator.java	(revision 1210454)
+@@ -29,12 +29,12 @@
+ /**
+  * Syntax for EnrichMediator
+  * <p/>
+- * <xmlStore>
++ * <enrich>
+  * <source [clone=true | false] type=[custom|envelope|body|property] xpath="" property=""/>
+  * <target [replace=true | false] type=[custom|envelope|body|property] xpath="" property=""/>
+- * </xmlStore>
++ * </enrich>
+  * <p/>
+- * This mediator will first get an OMELement from the source. Then put it to the current message
++ * This mediator will first get an OMElement from the source. Then put it to the current message
+  * according to the target element.
+  * <p/>
+  * Both target and source can specify a type. These are the types supported
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/Source.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/Source.java	(revision 1210453)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/Source.java	(revision 1210454)
+@@ -19,12 +19,7 @@
+ 
+ package org.apache.synapse.mediators.elementary;
+ 
+-import org.apache.axiom.om.OMAbstractFactory;
+-import org.apache.axiom.om.OMElement;
+-import org.apache.axiom.om.OMNode;
+-import org.apache.axiom.om.OMText;
+-import org.apache.axiom.om.OMFactory;
+-import org.apache.axiom.om.OMXMLBuilderFactory;
++import org.apache.axiom.om.*;
+ import org.apache.axiom.soap.SOAP12Constants;
+ import org.apache.axiom.soap.SOAPEnvelope;
+ import org.apache.axiom.soap.SOAPFactory;
+@@ -45,7 +40,7 @@
+  * 3. SOAP Envelope
+  * 4. SOAP Body
+  * <p/>
+- * If clone is true a clone will be create and stored from the origincal content. Otherwise a
++ * If clone is true a clone will be create and stored from the original content. Otherwise a
+  * reference will be stored.
+  * <p/>
+  * In case of property a OMElement is stored in a property and it will be fetched.
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/transform/Argument.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/transform/Argument.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/transform/Argument.java	(revision 1210454)
+@@ -0,0 +1,44 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.mediators.transform;
++
++import org.apache.synapse.util.xpath.SynapseXPath;
++
++public class Argument {
++
++    private String value;
++    private SynapseXPath expression;
++
++    public String getValue() {
++        return value;
++    }
++
++    public void setValue(String value) {
++        this.value = value;
++    }
++
++    public SynapseXPath getExpression() {
++        return expression;
++    }
++
++    public void setExpression(SynapseXPath expression) {
++        this.expression = expression;
++    }
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/template/InvokeMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/template/InvokeMediator.java	(revision 1210453)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/template/InvokeMediator.java	(revision 1210454)
+@@ -63,9 +63,10 @@
+                 synLog.traceTrace("Message : " + synCtx.getEnvelope());
+             }
+         }
+-        populateParameters(synCtx);
++
+         //get the target function template and invoke by passing populated parameters
+         Mediator mediator = synCtx.getSequenceTemplate(targetTemplate);
++        populateParameters(synCtx, ((TemplateMediator)mediator).getName());
+         if (mediator != null && mediator instanceof TemplateMediator) {
+             return mediator.mediate(synCtx);
+         }
+@@ -73,10 +74,11 @@
+     }
+ 
+     /**
+-     * poplulate declared parameters on temp synapse properties
++     * populate declared parameters on temp synapse properties
+      * @param synCtx
++     * @param templateQualifiedName
+      */
+-    private void populateParameters(MessageContext synCtx) {
++    private void populateParameters(MessageContext synCtx, String templateQualifiedName) {
+         Iterator<String> params = pName2ExpressionMap.keySet().iterator();
+         while (params.hasNext()) {
+             String parameter = params.next();
+@@ -83,7 +85,8 @@
+             if (!"".equals(parameter)) {
+                 Value expression = pName2ExpressionMap.get(parameter);
+                 if (expression != null) {
+-                    EIPUtils.createSynapseEIPTemplateProperty(synCtx, targetTemplate, parameter, expression);
++                    EIPUtils.createSynapseEIPTemplateProperty(synCtx, templateQualifiedName,
++                            parameter, expression);
+                 }
+             }
+         }
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/eip/splitter/CloneMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/eip/splitter/CloneMediator.java	(revision 1210453)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/eip/splitter/CloneMediator.java	(revision 1210454)
+@@ -122,6 +122,9 @@
+         MessageContext newCtx = null;
+         try {
+             newCtx = MessageHelper.cloneMessageContext(synCtx);
++            // Set isServerSide property in the cloned message context
++            ((Axis2MessageContext) newCtx).getAxis2MessageContext().setServerSide(
++                    ((Axis2MessageContext) synCtx).getAxis2MessageContext().isServerSide());
+ 
+             if (id != null) {
+                 // set the parent correlation details to the cloned MC -
+-*-*-*-
+Fixing some minor issues with clone mediator, DB mediators and InvokeMediator

@@ -1,0 +1,53 @@
+{
+  "when": "2011-12-19T03:40:45-05:00", 
+  "message": "Fixing SYNAPSE-743", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-557,7 +557,7", 
+          "lines": [
+            "   &lt;enableAddressing [version=\"final|submission\"] [separateListener=\"true|false\"]/&gt;?\n", 
+            "   \n", 
+            "   &lt;timeout&gt;\n", 
+            "-    &lt;duration&gt;<em>timeout duration in seconds</em>&lt;/duration&gt;\n", 
+            "+    &lt;duration&gt;<em>timeout duration in milliseconds</em>&lt;/duration&gt;\n", 
+            "     &lt;responseAction&gt;discard|fault&lt;/responseAction&gt;\n", 
+            "   &lt;/timeout&gt;?\n", 
+            "   \n"
+          ]
+        }, 
+        {
+          "locn": "-612,7 +612,7", 
+          "lines": [
+            "   &lt;enableAddressing [version=\"final|submission\"] [separateListener=\"true|false\"]/&gt;?\n", 
+            " \n", 
+            "   &lt;timeout&gt;\n", 
+            "-    &lt;duration&gt;<em>timeout duration in seconds</em>&lt;/duration&gt;\n", 
+            "+    &lt;duration&gt;<em>timeout duration in milliseconds</em>&lt;/duration&gt;\n", 
+            "     &lt;responseAction&gt;discard|fault&lt;/responseAction&gt;\n", 
+            "   &lt;/timeout&gt;?\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-649,7 +649,7", 
+          "lines": [
+            "   &lt;enableAddressing/&gt;?\n", 
+            "   \n", 
+            "   &lt;timeout&gt;\n", 
+            "-    &lt;duration&gt;timeout-duration&lt;/duration&gt;\n", 
+            "+    &lt;duration&gt;timeout duration in milliseconds&lt;/duration&gt;\n", 
+            "     &lt;responseAction&gt;discard|fault&lt;/responseAction&gt;\n", 
+            "   &lt;/timeout&gt;?\n", 
+            "   &lt;markForSuspension&gt;\n"
+          ]
+        }
+      ], 
+      "to": "java/src/site/xdoc/Synapse_Configuration_Language.xml", 
+      "from": "java/src/site/xdoc/Synapse_Configuration_Language.xml"
+    }
+  ], 
+  "id": "1220653"
+}

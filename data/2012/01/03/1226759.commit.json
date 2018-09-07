@@ -1,0 +1,26 @@
+{
+  "when": "2012-01-03T07:37:20-05:00", 
+  "message": "Unregistering message store MBeans", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-144,6 +144,7", 
+          "lines": [
+            " \n", 
+            " \n", 
+            "     public void destroy() {\n", 
+            "+        MBeanRegistrar.getInstance().unRegisterMBean(\"MessageStore\", this.name);\n", 
+            "     }\n", 
+            " \n", 
+            "     public void setDescription(String description) {\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/message/store/AbstractMessageStore.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/message/store/AbstractMessageStore.java"
+    }
+  ], 
+  "id": "1226759"
+}

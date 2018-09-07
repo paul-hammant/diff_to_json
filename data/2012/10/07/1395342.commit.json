@@ -1,0 +1,27 @@
+{
+  "when": "2012-10-07T13:09:41-04:00", 
+  "message": "Be a bit more realistic about the memory available on an average developer workstation (and avoid failures to create the JVM that runs the test cases).\n", 
+  "who": "veithen", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-337,7 +337,7", 
+          "lines": [
+            "                         <timeStamp>${maven.build.timestamp}</timeStamp>\n", 
+            "                         <log4j.configuration>test-log4j.properties</log4j.configuration>\n", 
+            "                     </systemPropertyVariables>\n", 
+            "-                    <argLine>-Xms512m -Xmx1024m -XX:MaxPermSize=512m</argLine>\n", 
+            "+                    <argLine>-Xms128m -Xmx384m -XX:MaxPermSize=128m</argLine>\n", 
+            "                     <workingDirectory>../..</workingDirectory>\n", 
+            "                     <!--redirectTestOutputToFile>true</redirectTestOutputToFile-->\n", 
+            "                     <forkMode>pertest</forkMode>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/pom.xml", 
+      "from": "java/modules/integration/pom.xml"
+    }
+  ], 
+  "id": "1395342"
+}

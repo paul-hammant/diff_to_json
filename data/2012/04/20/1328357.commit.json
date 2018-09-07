@@ -1,0 +1,46 @@
+{
+  "when": "2012-04-20T08:54:05-04:00", 
+  "message": "committing fix for unit test failure", 
+  "who": "uswick", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-31,7 +31,7", 
+          "lines": [
+            "  * Time: 4:54 PM\n", 
+            "  * To change this template use File | Settings | File Templates.\n", 
+            "  */\n", 
+            "-public class LibDeployerUtilsTest extends TestCase {\n", 
+            "+public abstract class LibDeployerUtilsTest extends TestCase {\n", 
+            " \n", 
+            " /*\n", 
+            "     String path;\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/test/java/org/apache/synapse/libraries/util/LibDeployerUtilsTest.java", 
+      "from": "java/modules/core/src/test/java/org/apache/synapse/libraries/util/LibDeployerUtilsTest.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-31,7 +31,7", 
+          "lines": [
+            "  * Time: 4:38 PM\n", 
+            "  * To change this template use File | Settings | File Templates.\n", 
+            "  */\n", 
+            "-public class LibImportTest extends TestCase {\n", 
+            "+public abstract class LibImportTest extends TestCase {\n", 
+            " \n", 
+            " \n", 
+            " /*\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/test/java/org/apache/synapse/libraries/LibImportTest.java", 
+      "from": "java/modules/core/src/test/java/org/apache/synapse/libraries/LibImportTest.java"
+    }
+  ], 
+  "id": "1328357"
+}

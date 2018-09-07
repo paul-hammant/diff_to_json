@@ -1,0 +1,34 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/deployers/AbstractSynapseArtifactDeployer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/deployers/AbstractSynapseArtifactDeployer.java	(revision 1210838)
++++ java/modules/core/src/main/java/org/apache/synapse/deployers/AbstractSynapseArtifactDeployer.java	(revision 1210839)
+@@ -92,13 +92,6 @@
+      */
+     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {
+ 
+-        if (!isHotDeploymentEnabled()) {
+-            if (log.isDebugEnabled()) {
+-                log.debug("Hot deployment has been suspended - Ignoring");
+-            }
+-            return;
+-        }
+-
+         String filename = SynapseArtifactDeploymentStore.getNormalizedAbsolutePath(
+                 deploymentFileData.getAbsolutePath());
+         if (log.isDebugEnabled()) {
+@@ -115,6 +108,13 @@
+             return;
+         }
+ 
++        if (!isHotDeploymentEnabled()) {
++            if (log.isDebugEnabled()) {
++                log.debug("Hot deployment has been suspended - Ignoring");
++            }
++            return;
++        }
++
+         SynapseArtifactDeploymentStore deploymentStore =
+                 getSynapseConfiguration().getArtifactDeploymentStore();
+ 
+-*-*-*-
+Fixing a startup error

@@ -1,0 +1,15 @@
+Index: java/modules/tasks/src/main/java/org/apache/synapse/task/TaskScheduler.java
+===================================================================
+--- java/modules/tasks/src/main/java/org/apache/synapse/task/TaskScheduler.java	(revision 1214673)
++++ java/modules/tasks/src/main/java/org/apache/synapse/task/TaskScheduler.java	(revision 1214674)
+@@ -281,7 +281,7 @@
+                     if (log.isDebugEnabled()) {
+                         log.debug("ShuttingDown Task Scheduler : " + scheduler.getMetaData());
+                     }
+-                    scheduler.shutdown();
++                    scheduler.shutdown(true);
+                 }
+                 initialized = false;
+             } catch (SchedulerException e) {
+-*-*-*-
+Making synapse wait will all the running jobs are finished before shutdown

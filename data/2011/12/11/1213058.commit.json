@@ -1,0 +1,31 @@
+{
+  "when": "2011-12-11T15:41:34-05:00", 
+  "message": "SYNAPSE-826: Fixed an error in the DOAP file.", 
+  "who": "veithen", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-35,9 +35,9", 
+          "lines": [
+            "     <download-page rdf:resource=\"http://synapse.apache.org/download.cgi\" />\n", 
+            "     <programming-language>Java</programming-language>\n", 
+            "     <category rdf:resource=\"http://projects.apache.org/category/xml\" />\n", 
+            "-    <category rdf:resource=\"http://www.apache.org/category/http\"/>\n", 
+            "-    <category rdf:resource=\"http://www.apache.org/category/network-server\"/>\n", 
+            "-    <category rdf:resource=\"http://www.apache.org/category/network-client\"/>\n", 
+            "+    <category rdf:resource=\"http://projects.apache.org/category/http\"/> \n", 
+            "+    <category rdf:resource=\"http://projects.apache.org/category/network-server\"/> \n", 
+            "+    <category rdf:resource=\"http://projects.apache.org/category/network-client\"/>\n", 
+            "     \n", 
+            "     <release>\n", 
+            "       <Version>\n"
+          ]
+        }
+      ], 
+      "to": "java/src/site/resources/doap_Synapse.rdf", 
+      "from": "java/src/site/resources/doap_Synapse.rdf"
+    }
+  ], 
+  "id": "1213058"
+}

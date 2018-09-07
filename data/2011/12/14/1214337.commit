@@ -1,0 +1,812 @@
+Index: java/modules/patches/jars/httpcore-nio-4.0-patch-httpcore-193.jar
+===================================================================
+Cannot display: file marked as a binary type.
+svn:mime-type = application/octet-stream
+Index: java/modules/patches/jars/httpcore-nio-4.0-patch-httpcore-193.jar
+===================================================================
+--- java/modules/patches/jars/httpcore-nio-4.0-patch-httpcore-193.jar	(revision 1214336)
++++ java/modules/patches/jars/httpcore-nio-4.0-patch-httpcore-193.jar	(nonexistent)
+
+Property changes on: java/modules/patches/jars/httpcore-nio-4.0-patch-httpcore-193.jar
+___________________________________________________________________
+Deleted: svn:executable
+## -1 +0,0 ##
+-*
+\ No newline at end of property
+Deleted: svn:mime-type
+## -1 +0,0 ##
+-application/octet-stream
+\ No newline at end of property
+Index: java/modules/patches/jars/commons-vfs2-2.0-vfs-178.jar
+===================================================================
+Cannot display: file marked as a binary type.
+svn:mime-type = application/octet-stream
+Index: java/modules/patches/jars/commons-vfs2-2.0-vfs-178.jar
+===================================================================
+--- java/modules/patches/jars/commons-vfs2-2.0-vfs-178.jar	(revision 1214336)
++++ java/modules/patches/jars/commons-vfs2-2.0-vfs-178.jar	(nonexistent)
+
+Property changes on: java/modules/patches/jars/commons-vfs2-2.0-vfs-178.jar
+___________________________________________________________________
+Deleted: svn:executable
+## -1 +0,0 ##
+-*
+\ No newline at end of property
+Deleted: svn:mime-type
+## -1 +0,0 ##
+-application/octet-stream
+\ No newline at end of property
+Index: java/modules/patches/src/main/java/org/apache/commons/vfs2/provider/ftp/FtpFileProvider.java
+===================================================================
+--- java/modules/patches/src/main/java/org/apache/commons/vfs2/provider/ftp/FtpFileProvider.java	(nonexistent)
++++ java/modules/patches/src/main/java/org/apache/commons/vfs2/provider/ftp/FtpFileProvider.java	(revision 1214337)
+@@ -0,0 +1,129 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.commons.vfs2.provider.ftp;
++
++import java.util.Arrays;
++import java.util.Collection;
++import java.util.Collections;
++import java.util.StringTokenizer;
++
++import org.apache.commons.vfs2.Capability;
++import org.apache.commons.vfs2.FileName;
++import org.apache.commons.vfs2.FileSystem;
++import org.apache.commons.vfs2.FileSystemConfigBuilder;
++import org.apache.commons.vfs2.FileSystemException;
++import org.apache.commons.vfs2.FileSystemOptions;
++import org.apache.commons.vfs2.UserAuthenticationData;
++import org.apache.commons.vfs2.provider.AbstractOriginatingFileProvider;
++import org.apache.commons.vfs2.provider.URLFileName;
++
++/**
++ * A provider for FTP file systems.
++ * PATCH for  : https://issues.apache.org/jira/browse/VFS-178
++ * @author <a href="http://commons.apache.org/vfs/team-list.html">Commons VFS team</a>
++ */
++public class FtpFileProvider
++    extends AbstractOriginatingFileProvider
++{
++    /**
++     * File Entry Parser.
++     */
++    public static final String ATTR_FILE_ENTRY_PARSER = "FEP";
++    public final static String PASSIVE_MODE = "vfs.passive";
++
++    /**
++     * Authenticator types.
++     */
++    public static final UserAuthenticationData.Type[] AUTHENTICATOR_TYPES = new UserAuthenticationData.Type[]
++        {
++            UserAuthenticationData.USERNAME, UserAuthenticationData.PASSWORD
++        };
++
++    static final Collection<Capability> capabilities = Collections.unmodifiableCollection(Arrays.asList(new Capability[]
++    {
++        Capability.CREATE,
++        Capability.DELETE,
++        Capability.RENAME,
++        Capability.GET_TYPE,
++        Capability.LIST_CHILDREN,
++        Capability.READ_CONTENT,
++        Capability.GET_LAST_MODIFIED,
++        Capability.URI,
++        Capability.WRITE_CONTENT,
++        Capability.APPEND_CONTENT,
++        Capability.RANDOM_ACCESS_READ,
++    }));
++
++    public FtpFileProvider()
++    {
++        super();
++        setFileNameParser(FtpFileNameParser.getInstance());
++    }
++
++    /**
++     * Creates the filesystem.
++     */
++    @Override
++    protected FileSystem doCreateFileSystem(final FileName name, final FileSystemOptions fileSystemOptions)
++        throws FileSystemException
++    {
++        // Create the file system
++        final URLFileName rootName = (URLFileName) name;
++
++              String queryString = rootName.getQueryString();
++        FileSystemOptions opts = fileSystemOptions;
++        if (opts == null) {
++            opts = new FileSystemOptions();
++        }
++
++        if (queryString != null) {
++            FtpFileSystemConfigBuilder cfgBuilder = FtpFileSystemConfigBuilder.getInstance();
++
++            StringTokenizer st = new StringTokenizer(queryString, "?&!=");
++            while (st.hasMoreTokens()) {
++                if (PASSIVE_MODE.equalsIgnoreCase(st.nextToken()) &&
++                    st.hasMoreTokens() && "true".equalsIgnoreCase(st.nextToken())) {
++                    cfgBuilder.setPassiveMode(opts, true);
++                }
++            }
++        }
++
++        FTPClientWrapper ftpClient = new FTPClientWrapper(rootName, opts);
++
++        /*
++        FTPClient ftpClient = FtpClientFactory.createConnection(rootName.getHostName(),
++            rootName.getPort(),
++            rootName.getUserName(),
++            rootName.getPassword(),
++            rootName.getPath(),
++            fileSystemOptions);
++        */
++
++        return new FtpFileSystem(rootName, ftpClient, fileSystemOptions);
++    }
++
++    @Override
++    public FileSystemConfigBuilder getConfigBuilder()
++    {
++        return FtpFileSystemConfigBuilder.getInstance();
++    }
++
++    public Collection<Capability> getCapabilities()
++    {
++        return capabilities;
++    }
++}
+Index: java/modules/patches/src/main/java/org/apache/commons/vfs2/provider/ftp/FtpFileNameParser.java
+===================================================================
+--- java/modules/patches/src/main/java/org/apache/commons/vfs2/provider/ftp/FtpFileNameParser.java	(nonexistent)
++++ java/modules/patches/src/main/java/org/apache/commons/vfs2/provider/ftp/FtpFileNameParser.java	(revision 1214337)
+@@ -0,0 +1,75 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.commons.vfs2.provider.ftp;
++
++import org.apache.commons.vfs2.provider.*;
++import org.apache.commons.vfs2.FileName;
++import org.apache.commons.vfs2.FileSystemException;
++import org.apache.commons.vfs2.FileType;
++
++/**
++ * Implementation for ftp. set default port to 21
++ * @author <a href="http://commons.apache.org/vfs/team-list.html">Commons VFS team</a>
++ * PATCH for  : https://issues.apache.org/jira/browse/VFS-178
++ */
++public class FtpFileNameParser extends HostFileNameParser
++{
++    private static final FtpFileNameParser INSTANCE = new FtpFileNameParser();
++
++    private static final int PORT = 21;
++
++    public FtpFileNameParser()
++    {
++        super(PORT);
++    }
++
++    public static FileNameParser getInstance()
++    {
++        return INSTANCE;
++    }
++
++    public FileName parseUri(final VfsComponentContext context, FileName base, final String filename) throws FileSystemException {
++        // FTP URI are generic URI (as per RFC 2396)
++        final StringBuilder name = new StringBuilder();
++
++        // Extract the scheme and authority parts
++        final Authority auth = extractToPath(filename, name);
++
++        // Extract the queryString
++        String queryString = UriParser.extractQueryString(name);
++        if (queryString == null && base instanceof URLFileName) {
++            queryString = ((URLFileName) base).getQueryString();
++        }
++
++        // Decode and normalise the file name
++        UriParser.canonicalizePath(name, 0, name.length(), this);
++        UriParser.fixSeparators(name);
++        FileType fileType = UriParser.normalisePath(name);
++        final String path = name.toString();
++
++        return new URLFileName(
++            auth.getScheme(),
++            auth.getHostName(),
++            auth.getPort(),
++            getDefaultPort(),
++            auth.getUserName(),
++            auth.getPassword(),
++            path,
++            fileType,
++            queryString);
++    }
++}
+Index: java/modules/patches/src/main/java/org/apache/commons/vfs2/provider/AbstractFileName.java
+===================================================================
+--- java/modules/patches/src/main/java/org/apache/commons/vfs2/provider/AbstractFileName.java	(nonexistent)
++++ java/modules/patches/src/main/java/org/apache/commons/vfs2/provider/AbstractFileName.java	(revision 1214337)
+@@ -0,0 +1,490 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one or more
++ * contributor license agreements.  See the NOTICE file distributed with
++ * this work for additional information regarding copyright ownership.
++ * The ASF licenses this file to You under the Apache License, Version 2.0
++ * (the "License"); you may not use this file except in compliance with
++ * the License.  You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.commons.vfs2.provider;
++
++import org.apache.commons.vfs2.FileName;
++import org.apache.commons.vfs2.FileSystemException;
++import org.apache.commons.vfs2.FileType;
++import org.apache.commons.vfs2.NameScope;
++import org.apache.commons.vfs2.VFS;
++
++/**
++ * A default file name implementation.
++ * PATCH for  : https://issues.apache.org/jira/browse/VFS-178
++ * @author <a href="http://commons.apache.org/vfs/team-list.html">Commons VFS team</a>
++ */
++public abstract class AbstractFileName implements FileName {
++
++    private final String scheme;
++    private final String absPath;
++    private FileType type;
++
++    // Cached stuff
++    private String uri;
++    private String baseName;
++    private String rootUri;
++    private String extension;
++    private String decodedAbsPath;
++
++    private String key = null;
++
++    public AbstractFileName(final String scheme, final String absPath, FileType type) {
++        this.rootUri = null;
++        this.scheme = scheme;
++        this.type = type;
++
++        String actualPath = absPath;
++        int pos = absPath.indexOf("?");
++        if (pos != -1) {
++            actualPath = absPath.substring(0, pos);
++        }
++
++        if (actualPath != null && actualPath.length() > 0) {
++            if (actualPath.length() > 1 && actualPath.endsWith("/")) {
++                this.absPath = actualPath.substring(0, actualPath.length() - 1);
++            } else {
++                this.absPath = actualPath;
++            }
++        } else {
++            this.absPath = ROOT_PATH;
++        }
++    }
++
++    @Override
++    public boolean equals(Object o) {
++        if (this == o) {
++            return true;
++        }
++        if (o == null || getClass() != o.getClass()) {
++            return false;
++        }
++
++        AbstractFileName that = (AbstractFileName) o;
++
++        return (getKey().equals(that.getKey()));
++    }
++
++    @Override
++    public int hashCode() {
++        return getKey().hashCode();
++    }
++
++    /**
++     * Implement Comparable.
++     *
++     * @param obj another abstractfilename
++     * @return negative number if less than, 0 if equal, postive if greater than.
++     */
++    public int compareTo(FileName obj) {
++        final AbstractFileName name = (AbstractFileName) obj;
++        return getKey().compareTo(name.getKey());
++    }
++
++    /**
++     * Returns the URI of the file.
++     *
++     * @return the FileName as a URI.
++     */
++    @Override
++    public String toString() {
++        return getURI();
++    }
++
++    /**
++     * Factory method for creating name instances.
++     *
++     * @param absPath The absolute path.
++     * @param type    The FileType.
++     * @return The FileName.
++     */
++    public abstract FileName createName(String absPath, FileType type);
++
++    /**
++     * Builds the root URI for this file name.  Note that the root URI must not
++     * end with a separator character.
++     *
++     * @param buffer      A StringBuilder to use to construct the URI.
++     * @param addPassword true if the password should be added, false otherwise.
++     */
++    protected abstract void appendRootUri(StringBuilder buffer, boolean addPassword);
++
++    /**
++     * Returns the base name of the file.
++     *
++     * @return The base name of the file.
++     */
++    public String getBaseName() {
++        if (baseName == null) {
++            final int idx = getPath().lastIndexOf(SEPARATOR_CHAR);
++            if (idx == -1) {
++                baseName = getPath();
++            } else {
++                baseName = getPath().substring(idx + 1);
++            }
++        }
++
++        return baseName;
++    }
++
++    /**
++     * Returns the absolute path of the file, relative to the root of the
++     * file system that the file belongs to.
++     *
++     * @return The path String.
++     */
++    public String getPath() {
++        if (VFS.isUriStyle()) {
++            return absPath + getUriTrailer();
++        }
++        return absPath;
++    }
++
++    protected String getUriTrailer() {
++        return getType().hasChildren() ? "/" : "";
++    }
++
++    /**
++     * Returns the decoded path.
++     *
++     * @return The decoded path String.
++     * @throws FileSystemException If an error occurs.
++     */
++    public String getPathDecoded() throws FileSystemException {
++        if (decodedAbsPath == null) {
++            decodedAbsPath = UriParser.decode(getPath());
++        }
++
++        return decodedAbsPath;
++    }
++
++    /**
++     * Returns the name of the parent of the file.
++     *
++     * @return the FileName of the parent.
++     */
++    public FileName getParent() {
++        final String parentPath;
++        final int idx = getPath().lastIndexOf(SEPARATOR_CHAR);
++        if (idx == -1 || idx == getPath().length() - 1) {
++            // No parent
++            return null;
++        } else if (idx == 0) {
++            // Root is the parent
++            parentPath = SEPARATOR;
++        } else {
++            parentPath = getPath().substring(0, idx);
++        }
++        return createName(parentPath, FileType.FOLDER);
++    }
++
++    /**
++     * find the root of the filesystem.
++     *
++     * @return The root FileName.
++     */
++    public FileName getRoot() {
++        FileName root = this;
++        while (root.getParent() != null) {
++            root = root.getParent();
++        }
++
++        return root;
++    }
++
++    /**
++     * Returns the URI scheme of this file.
++     *
++     * @return The protocol used to access the file.
++     */
++    public String getScheme() {
++        return scheme;
++    }
++
++    /**
++     * Returns the absolute URI of the file.
++     *
++     * @return The absolute URI of the file.
++     */
++    public String getURI() {
++        if (uri == null) {
++            uri = createURI();
++        }
++        return uri;
++    }
++
++    protected String createURI() {
++        return createURI(false, true);
++    }
++
++    /**
++     * Create a path that does not use the FileType since that field is not immutable.
++     *
++     * @return The key.
++     */
++    private String getKey() {
++        if (key == null) {
++            key = createURI(true, true);
++        }
++        return key;
++    }
++
++    /**
++     * returns a "friendly path", this is a path without a password.
++     *
++     * @return The "friendly" URI.
++     */
++    public String getFriendlyURI() {
++        return createURI(false, false);
++    }
++
++    private String createURI(boolean useAbsolutePath, boolean usePassword) {
++        final StringBuilder buffer = new StringBuilder();
++        appendRootUri(buffer, usePassword);
++        buffer.append(useAbsolutePath ? absPath : getPath());
++        return buffer.toString();
++    }
++
++
++    /**
++     * Converts a file name to a relative name, relative to this file name.
++     *
++     * @param name The FileName.
++     * @return The relative path to the file.
++     * @throws FileSystemException if an error occurs.
++     */
++    public String getRelativeName(final FileName name) throws FileSystemException {
++        final String path = name.getPath();
++
++        // Calculate the common prefix
++        final int basePathLen = getPath().length();
++        final int pathLen = path.length();
++
++        // Deal with root
++        if (basePathLen == 1 && pathLen == 1) {
++            return ".";
++        } else if (basePathLen == 1) {
++            return path.substring(1);
++        }
++
++        final int maxlen = Math.min(basePathLen, pathLen);
++        int pos = 0;
++        for (; pos < maxlen && getPath().charAt(pos) == path.charAt(pos); pos++) {
++        }
++
++        if (pos == basePathLen && pos == pathLen) {
++            // Same names
++            return ".";
++        } else if (pos == basePathLen && pos < pathLen && path.charAt(pos) == SEPARATOR_CHAR) {
++            // A descendent of the base path
++            return path.substring(pos + 1);
++        }
++
++        // Strip the common prefix off the path
++        final StringBuilder buffer = new StringBuilder();
++        if (pathLen > 1 && (pos < pathLen || getPath().charAt(pos) != SEPARATOR_CHAR)) {
++            // Not a direct ancestor, need to back up
++            pos = getPath().lastIndexOf(SEPARATOR_CHAR, pos);
++            buffer.append(path.substring(pos));
++        }
++
++        // Prepend a '../' for each element in the base path past the common
++        // prefix
++        buffer.insert(0, "..");
++        pos = getPath().indexOf(SEPARATOR_CHAR, pos + 1);
++        while (pos != -1) {
++            buffer.insert(0, "../");
++            pos = getPath().indexOf(SEPARATOR_CHAR, pos + 1);
++        }
++
++        return buffer.toString();
++    }
++
++    /**
++     * Returns the root URI of the file system this file belongs to.
++     *
++     * @return The URI of the root.
++     */
++    public String getRootURI() {
++        if (rootUri == null) {
++            final StringBuilder buffer = new StringBuilder();
++            appendRootUri(buffer, true);
++            buffer.append(SEPARATOR_CHAR);
++            rootUri = buffer.toString().intern();
++        }
++        return rootUri;
++    }
++
++    /**
++     * Returns the depth of this file name, within its file system.
++     *
++     * @return The depth of the file name.
++     */
++    public int getDepth() {
++        final int len = getPath().length();
++        if (len == 0 || (len == 1 && getPath().charAt(0) == SEPARATOR_CHAR)) {
++            return 0;
++        }
++        int depth = 1;
++        for (int pos = 0; pos > -1 && pos < len; depth++) {
++            pos = getPath().indexOf(SEPARATOR_CHAR, pos + 1);
++        }
++        return depth;
++    }
++
++    /**
++     * Returns the extension of this file name.
++     *
++     * @return The file extension.
++     */
++    public String getExtension() {
++        if (extension == null) {
++            getBaseName();
++            final int pos = baseName.lastIndexOf('.');
++            // if ((pos == -1) || (pos == baseName.length() - 1))
++            // imario@ops.co.at: Review of patch from adagoubard@chello.nl
++            // do not treat filenames like
++            // .bashrc c:\windows\.java c:\windows\.javaws c:\windows\.jedit c:\windows\.appletviewer
++            // as extension
++            if ((pos < 1) || (pos == baseName.length() - 1)) {
++                // No extension
++                extension = "";
++            } else {
++                extension = baseName.substring(pos + 1).intern();
++            }
++        }
++        return extension;
++    }
++
++    /**
++     * Determines if another file name is an ancestor of this file name.
++     *
++     * @param ancestor The FileName to check.
++     * @return true if the FileName is an ancestor, false otherwise.
++     */
++    public boolean isAncestor(final FileName ancestor) {
++        if (!ancestor.getRootURI().equals(getRootURI())) {
++            return false;
++        }
++        return checkName(ancestor.getPath(), getPath(), NameScope.DESCENDENT);
++    }
++
++    /**
++     * Determines if another file name is a descendent of this file name.
++     *
++     * @param descendent The FileName to check.
++     * @return true if the FileName is a descendent, false otherwise.
++     */
++    public boolean isDescendent(final FileName descendent) {
++        return isDescendent(descendent, NameScope.DESCENDENT);
++    }
++
++    /**
++     * Determines if another file name is a descendent of this file name.
++     *
++     * @param descendent The FileName to check.
++     * @param scope      The NameScope.
++     * @return true if the FileName is a descendent, false otherwise.
++     */
++    public boolean isDescendent(final FileName descendent,
++                                final NameScope scope) {
++        if (!descendent.getRootURI().equals(getRootURI())) {
++            return false;
++        }
++        return checkName(getPath(), descendent.getPath(), scope);
++    }
++
++    /**
++     * Returns the requested or current type of this name. <br />
++     * <p>
++     * The "requested" type is the one determined during resolving the name. <br/>
++     * In this case the name is a {@link FileType#FOLDER} if it ends with an "/" else
++     * it will be a {@link FileType#FILE}<br/>
++     * </p>
++     * <p>
++     * Once attached it will be changed to reflect the real type of this resource.
++     * </p>
++     *
++     * @return {@link FileType#FOLDER} or {@link FileType#FILE}
++     */
++    public FileType getType() {
++        return type;
++    }
++
++    /**
++     * sets the type of this file e.g. when it will be attached.
++     *
++     * @param type {@link FileType#FOLDER} or {@link FileType#FILE}
++     * @throws FileSystemException if an error occurs.
++     */
++    void setType(FileType type) throws FileSystemException {
++        if (type != FileType.FOLDER && type != FileType.FILE && type != FileType.FILE_OR_FOLDER) {
++            throw new FileSystemException("vfs.provider/filename-type.error");
++        }
++
++        this.type = type;
++    }
++
++    /**
++     * Checks whether a path fits in a particular scope of another path.
++     *
++     * @param basePath An absolute, normalised path.
++     * @param path     An absolute, normalised path.
++     * @param scope    The NameScope.
++     * @return true if the path fits in the scope, false otherwise.
++     */
++    public static boolean checkName(final String basePath,
++                                    final String path,
++                                    final NameScope scope) {
++        if (scope == NameScope.FILE_SYSTEM) {
++            // All good
++            return true;
++        }
++
++        if (!path.startsWith(basePath)) {
++            return false;
++        }
++
++        int baseLen = basePath.length();
++        if (VFS.isUriStyle()) {
++            // strip the trailing "/"
++            baseLen--;
++        }
++
++        if (scope == NameScope.CHILD) {
++            if (path.length() == baseLen
++                    || (baseLen > 1 && path.charAt(baseLen) != SEPARATOR_CHAR)
++                    || path.indexOf(SEPARATOR_CHAR, baseLen + 1) != -1) {
++                return false;
++            }
++        } else if (scope == NameScope.DESCENDENT) {
++            if (path.length() == baseLen
++                    || (baseLen > 1 && path.charAt(baseLen) != SEPARATOR_CHAR)) {
++                return false;
++            }
++        } else if (scope == NameScope.DESCENDENT_OR_SELF) {
++            if (baseLen > 1
++                    && path.length() > baseLen
++                    && path.charAt(baseLen) != SEPARATOR_CHAR) {
++                return false;
++            }
++        } else if (scope != NameScope.FILE_SYSTEM) {
++            throw new IllegalArgumentException();
++        }
++
++        return true;
++    }
++}
+Index: java/modules/patches/pom.xml
+===================================================================
+--- java/modules/patches/pom.xml	(revision 1214336)
++++ java/modules/patches/pom.xml	(revision 1214337)
+@@ -18,9 +18,9 @@
+   ~  under the License.
+   -->
+ <project
+-    xmlns="http://maven.apache.org/POM/4.0.0"
+-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++        xmlns="http://maven.apache.org/POM/4.0.0"
++        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
++        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+@@ -32,13 +32,30 @@
+     <packaging>jar</packaging>
+     <name>Apache Synapse - Patches</name>
+     <description>
+-        Contains patches for dependencies of Synapse. The project's main artifact is a JAR file
+-        containing all the patched classes. It also attaches a ZIP file with the individual JAR
+-        files.
++        Automatically generates patches for dependencies of Synapse. The required source code should
++        be included with a dependency to the original dependency. It also attaches a ZIP file with
++        the individual JAR files.
+     </description>
++
+     <build>
+         <plugins>
+             <plugin>
++                <groupId>org.apache.maven.plugins</groupId>
++                <artifactId>maven-jar-plugin</artifactId>
++                <version>2.3.2</version>
++                <executions>
++                    <execution>
++                        <phase>process-classes</phase>
++                        <goals>
++                            <goal>jar</goal>
++                        </goals>
++                        <configuration>
++                            <outputDirectory>./jars</outputDirectory>
++                        </configuration>
++                    </execution>
++                </executions>
++            </plugin>
++            <plugin>
+                 <artifactId>maven-antrun-plugin</artifactId>
+                 <executions>
+                     <execution>
+@@ -78,4 +95,11 @@
+             </plugin>
+         </plugins>
+     </build>
++    <dependencies>
++        <dependency>
++            <groupId>org.apache.commons</groupId>
++            <artifactId>commons-vfs2</artifactId>
++            <version>${commons.vfs.version}</version>
++        </dependency>
++    </dependencies>
+ </project>
+-*-*-*-
+Adding a new patching process to Synapse and applying commons-vfs2 patch for vfs-178

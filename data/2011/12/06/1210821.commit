@@ -1,0 +1,30 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/EndpointContext.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/endpoints/EndpointContext.java	(revision 1210820)
++++ java/modules/core/src/main/java/org/apache/synapse/endpoints/EndpointContext.java	(revision 1210821)
+@@ -387,7 +387,7 @@
+                 } else if (state == ST_OFF) {
+                     return false;
+ 
+-                } else if (System.currentTimeMillis() > nextRetryTime) {
++                } else if (System.currentTimeMillis() >= nextRetryTime) {
+                     // if we are not active, but reached the next retry time, return true but do not
+                     // make a state change. We will make the state change on a successful send
+                     // if we are in the ST_TIMEOUT state, reduce a remaining retry
+@@ -420,13 +420,12 @@
+             } else if (localState == ST_OFF) {
+                 return false;
+ 
+-            } else if (System.currentTimeMillis() > localNextRetryTime) {
++            } else if (System.currentTimeMillis() >= localNextRetryTime) {
+ 
+                 // if we are not active, but reached the next retry time, return true but do not
+                 // make a state change. We will make the state change on a successful send
+                 // if we are in the ST_TIMEOUT state, reduce a remaining retry
+                 if (localState == ST_TIMEOUT) {
+-                    localRemainingRetries--;
+ 
+                     if (log.isDebugEnabled()) {
+                         log.debug("Endpoint : " + endpointName + " which is currently in timeout " +
+-*-*-*-
+fix SYNAPSE-820

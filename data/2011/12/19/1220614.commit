@@ -1,0 +1,15 @@
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1220613)
++++ java/pom.xml	(revision 1220614)
+@@ -584,7 +584,7 @@
+         </dependency>
+ 
+         <dependency>
+-            <groupId>org.apache.xalan</groupId>
++            <groupId>xalan</groupId>
+             <artifactId>xalan</artifactId>
+             <version>${xalan.version}</version>
+         </dependency>
+-*-*-*-
+Fixing test failure

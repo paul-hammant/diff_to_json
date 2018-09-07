@@ -1,0 +1,13 @@
+{
+  "when": "2012-04-19T07:15:27-04:00", 
+  "message": "removing library resource file", 
+  "who": "uswick", 
+  "changes": [
+    {
+      "chunks": [], 
+      "to": "java/modules/core/src/test/resources/synapse-libraries/SynapseTestLibrary.zip", 
+      "from": "java/modules/core/src/test/resources/synapse-libraries/SynapseTestLibrary.zip"
+    }
+  ], 
+  "id": "1327899"
+}

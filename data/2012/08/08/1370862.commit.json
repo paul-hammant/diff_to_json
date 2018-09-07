@@ -1,0 +1,38 @@
+{
+  "when": "2012-08-08T13:59:01-04:00", 
+  "message": "Fixed incorrect sample number.", 
+  "who": "veithen", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-23,7 +23,7", 
+          "lines": [
+            "         <title>Apache Synapse - Sample 158</title>\n", 
+            "     </properties>\n", 
+            "     <body>\n", 
+            "-        <section name=\"Sample 156: Exposing a SOAP service over JSON\">\n", 
+            "+        <section name=\"Sample 158: Exposing a SOAP service over JSON\">\n", 
+            "             <div class=\"xmlConf\">&lt;definitions xmlns=\"http://ws.apache.org/ns/synapse\"&gt;\n", 
+            " \n", 
+            "     &lt;proxy name=\"JSONProxy\" transports=\"http https\"&gt;\n"
+          ]
+        }, 
+        {
+          "locn": "-112,4 +112,4", 
+          "lines": [
+            "         </section>\n", 
+            "         <p><a href=\"../samples.html\">Back to Catalog</a></p>        \n", 
+            "     </body>\n", 
+            "-</document>\n", 
+            "\\ No newline at end of file\n", 
+            "+</document>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/documentation/src/site/xdoc/userguide/samples/sample158.xml", 
+      "from": "java/modules/documentation/src/site/xdoc/userguide/samples/sample158.xml"
+    }
+  ], 
+  "id": "1370862"
+}

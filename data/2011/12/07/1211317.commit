@@ -1,0 +1,222 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/RecipientListEndpointFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/RecipientListEndpointFactory.java	(revision 1211316)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/RecipientListEndpointFactory.java	(revision 1211317)
+@@ -121,15 +121,15 @@
+                 if (name != null) {
+                     recipientListEndpoint.setName(name.getAttributeValue());
+                 }
+-                recipientListEndpoint.setDynamicEnpointSet(dynamicEndpointSet);
++                recipientListEndpoint.setDynamicEndpointSet(dynamicEndpointSet);
+             }
+ 
+             if (recipientListEndpoint.getChildren() == null && 
+             		recipientListEndpoint.getMembers() == null &&
+-                    recipientListEndpoint.getDynamicEnpointSet() == null) {
+-                String msg = "Invalid Synapse configuration.\n"
+-                    + "A RecipientListEndpoint must have child/member elements, but the RecipientListEndpoint "
+-                    + "'" + recipientListEndpoint.getName() + "' does not have any child/member/dynamic endpoint elements.";
++                    recipientListEndpoint.getDynamicEndpointSet() == null) {
++                String msg = "A RecipientListEndpoint must have child/member elements, but the " +
++                        "RecipientListEndpoint " + "'" + recipientListEndpoint.getName() + "' " +
++                        "does not have any child/member/dynamic endpoint elements.";
+                 log.error(msg);
+                 throw new SynapseException(msg);
+             }
+@@ -149,12 +149,7 @@
+         
+         for(Iterator memberIter = loadbalanceElement.getChildrenWithName(MEMBER);
+             memberIter.hasNext();){
+-        	
+-        	if(log.isDebugEnabled()){
+-        		log.debug("Getting Members..");
+-        	}
+-        	
+-            OMElement memberEle = (OMElement) memberIter.next();
++        	OMElement memberEle = (OMElement) memberIter.next();
+             Member member = new Member(memberEle.getAttributeValue(new QName("hostName")), -1);
+             String http = memberEle.getAttributeValue(new QName("httpPort"));
+             if (http != null) {
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/RecipientListEndpointSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/RecipientListEndpointSerializer.java	(revision 1211316)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/RecipientListEndpointSerializer.java	(revision 1211317)
+@@ -74,10 +74,10 @@
+                         "httpsPort", null, String.valueOf(member.getHttpsPort())));
+                 recipientListElement.addChild(memberEle);
+             }
+-        }else{
++        } else {
+             OMElement dynamicEpEle = fac.createOMElement(
+                     "endpoints", SynapseConstants.SYNAPSE_OMNAMESPACE, recipientListElement);
+-            new ValueSerializer().serializeValue(recipientListEndpoint.getDynamicEnpointSet(),
++            new ValueSerializer().serializeValue(recipientListEndpoint.getDynamicEndpointSet(),
+                     "value", dynamicEpEle);
+             dynamicEpEle.addAttribute(fac.createOMAttribute("max-cache", null,
+                     String.valueOf(recipientListEndpoint.getCurrentPoolSize())));
+Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/RecipientListEndpoint.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/endpoints/RecipientListEndpoint.java	(revision 1211316)
++++ java/modules/core/src/main/java/org/apache/synapse/endpoints/RecipientListEndpoint.java	(revision 1211317)
+@@ -38,7 +38,6 @@
+ import org.apache.synapse.util.MessageHelper;
+ 
+ /**
+- * @author nuwan
+  * <p>
+  * A Recipient List endpoint can contain multiple child endpoints or member elements. 
+  * It routes cloned copies of messages to each child recipient. This will assume that 
+@@ -49,7 +48,8 @@
+ public class RecipientListEndpoint extends AbstractEndpoint {
+ 
+     private static final Log log = LogFactory.getLog(RecipientListEndpoint.class);
+-    private static final String DELIMETER = ",";
++
++    private static final String DELIMITER = ",";
+     /**
+ 	 * The list of members to which the message is delivered to
+ 	 */
+@@ -56,10 +56,10 @@
+ 	private List<Member> members;
+ 
+     private Map<String,Endpoint> dynamicEndpointPool ;
+-    private Value dynamicEnpointSet;
++    private Value dynamicEndpointSet;
+     public final static int DEFAULT_MAX_POOL = 20;
+ 	/**
+-	 * Should this recipient list failover;
++	 * Should this recipient list fail over;
+ 	 */
+     private boolean failover;
+     private int currentPool;
+@@ -66,9 +66,10 @@
+ 
+     private SynapseEnvironment env = null;
+ 
+-    public RecipientListEndpoint(int poolsize){
+-        dynamicEndpointPool = Collections.synchronizedMap(new DynamicEndpointPool<String, Endpoint>(poolsize));
+-        this.currentPool = poolsize;
++    public RecipientListEndpoint(int poolSize){
++        dynamicEndpointPool = Collections.synchronizedMap(
++                new DynamicEndpointPool<String, Endpoint>(poolSize));
++        this.currentPool = poolSize;
+     }
+ 
+     public RecipientListEndpoint(){
+@@ -100,16 +101,13 @@
+ 		//Service child endpoints
+         if (children != null && !children.isEmpty()) {
+             sendToEndpointList(synCtx, children);
+-        }
+-        //Service member elements if specified
+-        else if (members != null && !members.isEmpty()) {
++        } else if (members != null && !members.isEmpty()) {
++            //Service member elements if specified
+             sendToApplicationMembers(synCtx);
+-        }
+-        else if (dynamicEnpointSet != null) {
++        } else if (dynamicEndpointSet != null) {
+             sendToDynamicMembers(synCtx);
+-        }
+-        else {
+-            String msg = "No child endpoints nor member elements available";
++        } else {
++            String msg = "No child endpoints nor members available";
+             log.error(msg);
+             throw new SynapseException(msg);
+         }
+@@ -118,16 +116,15 @@
+     private void sendToEndpointList(MessageContext synCtx, List<Endpoint> children) {
+         int i = 0;
+         boolean foundEndpoint = false;
+-
+         for (Endpoint childEndpoint : children) {
+-
+             if (childEndpoint.readyToSend()) {
+                 foundEndpoint = true;
+-                MessageContext newCtx = null;
++                MessageContext newCtx;
+                 try {
+                     newCtx = MessageHelper.cloneMessageContext(synCtx);
+                 } catch (AxisFault e) {
+                     handleException("Error cloning the message context", e);
++                    return;
+                 }
+                 //Used when aggregating responses
+                 newCtx.setProperty(EIPConstants.MESSAGE_SEQUENCE,
+@@ -150,10 +147,10 @@
+     }
+ 
+     private void sendToDynamicMembers(MessageContext synCtx) {
+-        String dynamicUrlStr = dynamicEnpointSet.evaluateValue(synCtx);
+-        String[] dynamicUrlSet = dynamicUrlStr.split(DELIMETER);
++        String dynamicUrlStr = dynamicEndpointSet.evaluateValue(synCtx);
++        String[] dynamicUrlSet = dynamicUrlStr.split(DELIMITER);
+         if (dynamicUrlSet.length == 0) {
+-            log.warn("No recipient/s was derived from the expression : " + dynamicEnpointSet.toString());
++            log.warn("No recipients were derived from the expression : " + dynamicEndpointSet.toString());
+             return;
+         }
+         List<Endpoint> children = new ArrayList<Endpoint>();
+@@ -212,20 +209,18 @@
+ 				continue;
+ 			}	
+ 			
+-			MessageContext newCtx = null;
+-
++			MessageContext newCtx;
+ 			try {
+ 				newCtx = MessageHelper.cloneMessageContext(synCtx);
+ 			} catch (AxisFault e) {
+ 				handleException("Error cloning the message context", e);
++                return;
+ 			}
+ 
+ 			// Used when aggregating responses
+ 			newCtx.setProperty(
+-					EIPConstants.MESSAGE_SEQUENCE,
+-					String.valueOf(i++)
+-							+ EIPConstants.MESSAGE_SEQUENCE_DELEMITER
+-							+ members.size());
++					EIPConstants.MESSAGE_SEQUENCE, String.valueOf(i++) +
++                    EIPConstants.MESSAGE_SEQUENCE_DELEMITER + members.size());
+ 
+ 			// evaluate the endpoint properties
+ 			evaluateProperties(newCtx);
+@@ -232,7 +227,7 @@
+ 
+ 			// URL rewrite
+ 			String address = newCtx.getTo().getAddress();
+-			if (address.indexOf(":") != -1) {
++			if (address.contains(":")) {
+ 				try {
+ 					address = new URL(address).getPath();
+ 				} catch (MalformedURLException e) {
+@@ -308,12 +303,12 @@
+ 		this.members = members;
+ 	}
+ 
+-    public Value getDynamicEnpointSet() {
+-        return dynamicEnpointSet;
++    public Value getDynamicEndpointSet() {
++        return dynamicEndpointSet;
+     }
+ 
+-    public void setDynamicEnpointSet(Value dynamicEnpointSet) {
+-        this.dynamicEnpointSet = dynamicEnpointSet;
++    public void setDynamicEndpointSet(Value dynamicEndpointSet) {
++        this.dynamicEndpointSet = dynamicEndpointSet;
+     }
+ 
+     public int getCurrentPoolSize() {
+@@ -344,8 +339,6 @@
+         protected boolean removeEldestEntry(final Map.Entry<String, Endpoint> eldest) {
+             return super.size() > maxPoolSize;
+         }
+-
+-
+     }
+ 
+ }
+-*-*-*-
+Cleaned up the recipient list endpoint source
