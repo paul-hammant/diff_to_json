@@ -12,4 +12,6 @@ Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/trans
  
      // server listener
 -*-*-*-
-commting patch for Synapse 842
+Message: commting patch for Synapse 842
+-*-*-*-
+When: 2012-02-09 06:35:24 -0500 

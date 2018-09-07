@@ -12,4 +12,6 @@ Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transpo
                  try {
                      Thread.sleep(vfsOutInfo.getReconnectTimeout());
 -*-*-*-
-Masked the password in the file URL in log.
+Message: Masked the password in the file URL in log.
+-*-*-*-
+When: 2012-08-29 02:53:21 -0400 

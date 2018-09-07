@@ -35,4 +35,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/Sch
              log.error("Error while destroying the task " + e);
          }
 -*-*-*-
-Shutting down the schedulers initiated by the scheduled processors
+Message: Shutting down the schedulers initiated by the scheduled processors
+-*-*-*-
+When: 2012-01-13 00:25:15 -0500 

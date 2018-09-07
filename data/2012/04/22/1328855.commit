@@ -158,4 +158,6 @@ Index: java/modules/core/src/test/java/org/apache/synapse/mediators/transform/Pa
 +
 +}
 -*-*-*-
-Adding unit tests for PayloadFactory mediator
+Message: Adding unit tests for PayloadFactory mediator
+-*-*-*-
+When: 2012-04-22 07:50:14 -0400 

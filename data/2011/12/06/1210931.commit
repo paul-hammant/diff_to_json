@@ -155,4 +155,7 @@ Index: java/src/site/xdoc/Synapse_Samples.xml
  <h2>
  <a name="Sample100" id="Sample100">Sample 100: Using WS-Security for outgoing messages</a></h2>
 -*-*-*-
-Added documentation for sample 60 - Service dynamic load balancing
+Message: Added documentation for sample 60 - Service dynamic load balancing
+
+-*-*-*-
+When: 2011-12-06 09:27:22 -0500 

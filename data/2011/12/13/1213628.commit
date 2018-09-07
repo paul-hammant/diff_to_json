@@ -132,6 +132,58 @@ Index: java/modules/distribution/src/main/conf/providers.xml
          <extension name="gz"/>
          <extension name="tgz"/>
          <mime-type name="application/x-tgz" />
+Index: java/modules/transports/core/vfs/pom.xml
+===================================================================
+--- java/modules/transports/core/vfs/pom.xml	(revision 1213627)
++++ java/modules/transports/core/vfs/pom.xml	(revision 1213628)
+@@ -52,7 +52,7 @@
+                         <Import-Package>
+                             !org.apache.commons.io.output,
+                             org.apache.commons.io.output; version=0.0.0,
+-                            org.apache.commons.vfs.*; version=0.0.0,
++                            org.apache.commons.vfs2.*; version=0.0.0,
+ 							org.apache.commons.io; version=0.0.0,
+                             *; resolution:=optional
+                         </Import-Package>
+@@ -135,7 +135,7 @@
+     <dependencies>
+         <dependency>
+             <groupId>org.apache.commons</groupId>
+-            <artifactId>commons-vfs</artifactId>
++            <artifactId>commons-vfs2</artifactId>
+             <version>${commons.vfs.version}</version>
+         </dependency>
+         <dependency>
+Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/FileObjectDataSource.java
+===================================================================
+--- java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/FileObjectDataSource.java	(revision 1213627)
++++ java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/FileObjectDataSource.java	(revision 1213628)
+@@ -19,8 +19,8 @@
+ package org.apache.synapse.transport.vfs;
+ 
+ import org.apache.axiom.attachments.SizeAwareDataSource;
+-import org.apache.commons.vfs.FileObject;
+-import org.apache.commons.vfs.FileSystemException;
++import org.apache.commons.vfs2.FileObject;
++import org.apache.commons.vfs2.FileSystemException;
+ 
+ import java.io.IOException;
+ import java.io.InputStream;
+Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java
+===================================================================
+--- java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java	(revision 1213627)
++++ java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java	(revision 1213628)
+@@ -36,8 +36,8 @@
+ import org.apache.axis2.transport.base.ManagementSupport;
+ import org.apache.axis2.transport.base.threads.WorkerPool;
+ import org.apache.commons.io.FileUtils;
+-import org.apache.commons.vfs.*;
+-import org.apache.commons.vfs.impl.StandardFileSystemManager;
++import org.apache.commons.vfs2.*;
++import org.apache.commons.vfs2.impl.StandardFileSystemManager;
+ 
+ import javax.mail.internet.ContentType;
+ import javax.mail.internet.ParseException;
 Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java
 ===================================================================
 --- java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java	(revision 1213627)
@@ -172,58 +224,6 @@ Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transpo
  
  import java.io.IOException;
  import java.io.InputStream;
-Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/FileObjectDataSource.java
-===================================================================
---- java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/FileObjectDataSource.java	(revision 1213627)
-+++ java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/FileObjectDataSource.java	(revision 1213628)
-@@ -19,8 +19,8 @@
- package org.apache.synapse.transport.vfs;
- 
- import org.apache.axiom.attachments.SizeAwareDataSource;
--import org.apache.commons.vfs.FileObject;
--import org.apache.commons.vfs.FileSystemException;
-+import org.apache.commons.vfs2.FileObject;
-+import org.apache.commons.vfs2.FileSystemException;
- 
- import java.io.IOException;
- import java.io.InputStream;
-Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java
-===================================================================
---- java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java	(revision 1213627)
-+++ java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java	(revision 1213628)
-@@ -36,8 +36,8 @@
- import org.apache.axis2.transport.base.ManagementSupport;
- import org.apache.axis2.transport.base.threads.WorkerPool;
- import org.apache.commons.io.FileUtils;
--import org.apache.commons.vfs.*;
--import org.apache.commons.vfs.impl.StandardFileSystemManager;
-+import org.apache.commons.vfs2.*;
-+import org.apache.commons.vfs2.impl.StandardFileSystemManager;
- 
- import javax.mail.internet.ContentType;
- import javax.mail.internet.ParseException;
-Index: java/modules/transports/core/vfs/pom.xml
-===================================================================
---- java/modules/transports/core/vfs/pom.xml	(revision 1213627)
-+++ java/modules/transports/core/vfs/pom.xml	(revision 1213628)
-@@ -52,7 +52,7 @@
-                         <Import-Package>
-                             !org.apache.commons.io.output,
-                             org.apache.commons.io.output; version=0.0.0,
--                            org.apache.commons.vfs.*; version=0.0.0,
-+                            org.apache.commons.vfs2.*; version=0.0.0,
- 							org.apache.commons.io; version=0.0.0,
-                             *; resolution:=optional
-                         </Import-Package>
-@@ -135,7 +135,7 @@
-     <dependencies>
-         <dependency>
-             <groupId>org.apache.commons</groupId>
--            <artifactId>commons-vfs</artifactId>
-+            <artifactId>commons-vfs2</artifactId>
-             <version>${commons.vfs.version}</version>
-         </dependency>
-         <dependency>
 Index: java/modules/patches/jars/commons-vfs2-2.0-vfs-178.jar
 ===================================================================
 Cannot display: file marked as a binary type.
@@ -270,4 +270,6 @@ Index: java/pom.xml
          <commons.net.version>1.4.1</commons.net.version>
          <jsch.version>0.1.31</jsch.version>
 -*-*-*-
-Migrating to commons-vfs2 and adding synapse patches to vfs 2.0
+Message: Migrating to commons-vfs2 and adding synapse patches to vfs 2.0
+-*-*-*-
+When: 2011-12-13 04:34:05 -0500 

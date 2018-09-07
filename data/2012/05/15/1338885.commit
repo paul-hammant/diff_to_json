@@ -12,4 +12,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/eventing/builders/Resp
                      new QName(EventingConstants.WSE_EVENTING_NS,
                              EventingConstants.WSE_EN_SUBSCRIPTION_MANAGER,
 -*-*-*-
-Eliminated a dependency on the bug described in AXIOM-422; the children of a SOAPHeaderBlock should be plain OMElements, not SOAPHeaderBlocks.
+Message: Eliminated a dependency on the bug described in AXIOM-422; the children of a SOAPHeaderBlock should be plain OMElements, not SOAPHeaderBlocks.
+-*-*-*-
+When: 2012-05-15 16:57:03 -0400 

@@ -85,4 +85,6 @@ Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framewo
          assertNotNull("Did not receive expected error", resultEx);
          log.info("Got an error as expected: " + resultEx.getMessage());
 -*-*-*-
-Updated sample 53 test
+Message: Updated sample 53 test
+-*-*-*-
+When: 2011-12-08 05:59:31 -0500 

@@ -36,4 +36,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/util/MessageHelper.jav
       * manually get a clone of the changing part of the MC and set that cloned part to your MC.
       * Changing the MC after doing that will solve most of the issues. (Note: You don't have to worry
 -*-*-*-
-Preserving the tracing state of the message when it's being cloned
+Message: Preserving the tracing state of the message when it's being cloned
+-*-*-*-
+When: 2012-01-05 03:10:36 -0500 

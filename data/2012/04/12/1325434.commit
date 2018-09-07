@@ -12,4 +12,6 @@ Index: java/pom.xml
          <wsdl4j.version>1.6.2</wsdl4j.version>
  
 -*-*-*-
-Updated Axiom version.
+Message: Updated Axiom version.
+-*-*-*-
+When: 2012-04-12 14:39:39 -0400 

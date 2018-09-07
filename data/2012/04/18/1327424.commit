@@ -12,4 +12,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/AbstractEndp
                  if (log.isDebugEnabled()) {
                      log.debug("Encountered a retry disabled error : " + errorCode
 -*-*-*-
-fixed SYNAPSE-845
+Message: fixed SYNAPSE-845
+-*-*-*-
+When: 2012-04-18 04:33:11 -0400 

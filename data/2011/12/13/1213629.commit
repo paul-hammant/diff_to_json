@@ -1,21 +1,3 @@
-Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/MessageForwardingProcessorView.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/MessageForwardingProcessorView.java	(revision 1213628)
-+++ java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/MessageForwardingProcessorView.java	(revision 1213629)
-@@ -199,11 +199,10 @@
-                 Endpoint ep = messageContext.getEndpoint(targetEp);
- 
-                 if (ep instanceof AddressEndpoint) {
--                    AddressEndpoint addEp = (AddressEndpoint) ep;
--                    String addressUrl = addEp.getDefinition().getAddress();
- 
-                     try {
--                        MessageContext outCtx = sender.send(messageContext, addressUrl);
-+                        MessageContext outCtx = sender.send(
-+                                ((AddressEndpoint) ep).getDefinition(), messageContext);
-                         // If no Exception Occurred We remove the Message
-                         if (delete) {
-                             messageStore.poll();
 Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ForwardingJob.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ForwardingJob.java	(revision 1213628)
@@ -117,5 +99,25 @@ Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/for
              sc.setOptions(options);
              OMElement result = null;
              try {
+Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/MessageForwardingProcessorView.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/MessageForwardingProcessorView.java	(revision 1213628)
++++ java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/MessageForwardingProcessorView.java	(revision 1213629)
+@@ -199,11 +199,10 @@
+                 Endpoint ep = messageContext.getEndpoint(targetEp);
+ 
+                 if (ep instanceof AddressEndpoint) {
+-                    AddressEndpoint addEp = (AddressEndpoint) ep;
+-                    String addressUrl = addEp.getDefinition().getAddress();
+ 
+                     try {
+-                        MessageContext outCtx = sender.send(messageContext, addressUrl);
++                        MessageContext outCtx = sender.send(
++                                ((AddressEndpoint) ep).getDefinition(), messageContext);
+                         // If no Exception Occurred We remove the Message
+                         if (delete) {
+                             messageStore.poll();
 -*-*-*-
-Fix SYNAPSE-805
+Message: Fix SYNAPSE-805
+-*-*-*-
+When: 2011-12-13 04:38:48 -0500 

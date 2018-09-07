@@ -1,27 +1,3 @@
-Index: java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfiguration.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfiguration.java	(revision 1366840)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfiguration.java	(revision 1366841)
-@@ -739,10 +739,15 @@
-         if (o == null || o instanceof Entry) {
-             if (o == null) {
-                 // this is not a local definition
--                Entry entry = new Entry(key);
--                entry.setType(Entry.REMOTE_ENTRY);
--                addEntry(key, entry);
--                return entry;
-+                synchronized (this) {
-+                    o = localRegistry.get(key);
-+                    if (o == null) {
-+                        Entry entry = new Entry(key);
-+                        entry.setType(Entry.REMOTE_ENTRY);
-+                        addEntry(key, entry);
-+                        return entry;
-+                    }
-+                }
-             }
-             return (Entry) o;
-         } else {
 Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/EndpointView.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/endpoints/EndpointView.java	(revision 1366840)
@@ -120,5 +96,31 @@ Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/EndpointView
       */
      public long getBytesReceived() {
          if (endpoint.getChildren() != null) {
+Index: java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfiguration.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfiguration.java	(revision 1366840)
++++ java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfiguration.java	(revision 1366841)
+@@ -739,10 +739,15 @@
+         if (o == null || o instanceof Entry) {
+             if (o == null) {
+                 // this is not a local definition
+-                Entry entry = new Entry(key);
+-                entry.setType(Entry.REMOTE_ENTRY);
+-                addEntry(key, entry);
+-                return entry;
++                synchronized (this) {
++                    o = localRegistry.get(key);
++                    if (o == null) {
++                        Entry entry = new Entry(key);
++                        entry.setType(Entry.REMOTE_ENTRY);
++                        addEntry(key, entry);
++                        return entry;
++                    }
++                }
+             }
+             return (Entry) o;
+         } else {
 -*-*-*-
-Fixing a race condition in SynapseConfiguration and using a shared thread pool for running endpoint stat collector tasks
+Message: Fixing a race condition in SynapseConfiguration and using a shared thread pool for running endpoint stat collector tasks
+-*-*-*-
+When: 2012-07-29 08:57:15 -0400 

@@ -12,4 +12,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2Flexib
                  if (originalInMsgCtx.getProperty(Constants.Configuration.HTTP_METHOD) != null) {
                      Object method = originalInMsgCtx.getProperty(Constants.Configuration.HTTP_METHOD);
 -*-*-*-
-refactoring comment
+Message: refactoring comment
+-*-*-*-
+When: 2011-12-11 09:07:03 -0500 

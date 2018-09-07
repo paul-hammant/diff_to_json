@@ -20,4 +20,7 @@ Index: java/modules/extensions/src/test/java/org/apache/synapse/format/syslog/Sy
          return new SyslogMessage(element.getAttributeValue(new QName(SyslogConstants.FACILITY)),
                                   element.getAttributeValue(new QName(SyslogConstants.SEVERITY)),
 -*-*-*-
-Avoid usage of deprecated API.
+Message: Avoid usage of deprecated API.
+
+-*-*-*-
+When: 2013-05-11 08:15:41 -0400 

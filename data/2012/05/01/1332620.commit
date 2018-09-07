@@ -34,4 +34,7 @@ Index: java/modules/core/src/main/java/org/apache/synapse/util/MessageHelper.jav
          Iterator itr = ori.getPropertyNames();
          while (itr.hasNext()) {
 -*-*-*-
-Simplified MessageHelper#clonePartially based on the change implemented by AXIS2-5308 (see also SYNAPSE-867).
+Message: Simplified MessageHelper#clonePartially based on the change implemented by AXIS2-5308 (see also SYNAPSE-867).
+
+-*-*-*-
+When: 2012-05-01 07:25:51 -0400 

@@ -12,4 +12,7 @@ Index: java/modules/integration/pom.xml
                      <!--redirectTestOutputToFile>true</redirectTestOutputToFile-->
                      <forkMode>pertest</forkMode>
 -*-*-*-
-Be a bit more realistic about the memory available on an average developer workstation (and avoid failures to create the JVM that runs the test cases).
+Message: Be a bit more realistic about the memory available on an average developer workstation (and avoid failures to create the JVM that runs the test cases).
+
+-*-*-*-
+When: 2012-10-07 13:09:41 -0400 

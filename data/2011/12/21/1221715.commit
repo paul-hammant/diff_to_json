@@ -261,4 +261,6 @@ Index: scratch/hiranya/website/src/site/site.xml
              <item name="Samples Setup Guide" href="userguide/samples/setup/index.html"/>
              <item name="Extending the Service Bus" href="userguide/extending.html"/>
 -*-*-*-
-Adding installation guide - Thanks Sadeep for the contribution
+Message: Adding installation guide - Thanks Sadeep for the contribution
+-*-*-*-
+When: 2011-12-21 08:23:45 -0500 

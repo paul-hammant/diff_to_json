@@ -61,4 +61,6 @@ Index: scratch/hiranya/website/src/site/xdoc/userguide/deployment.xml
                      This will create a ZIP file (in the <tt>target</tt> directory) containing
                      everything that is needed to run your custom Synapse configuration. You only
 -*-*-*-
-doc update
+Message: doc update
+-*-*-*-
+When: 2011-12-21 08:30:12 -0500 

@@ -42,4 +42,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/Sch
 +
  }
 -*-*-*-
-Fixing an issue with persisting messages in a message store
+Message: Fixing an issue with persisting messages in a message store
+-*-*-*-
+When: 2011-12-05 08:14:12 -0500 

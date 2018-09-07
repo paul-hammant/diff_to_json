@@ -120,4 +120,7 @@ Index: java/repository/conf/sample/synapse_sample_158.xml
              </outSequence>
          </target>
 -*-*-*-
-SYNAPSE-906: Fixed sample 158 so that it actually sends SOAP (not POX) to the target service.
+Message: SYNAPSE-906: Fixed sample 158 so that it actually sends SOAP (not POX) to the target service.
+
+-*-*-*-
+When: 2012-08-15 15:21:08 -0400 

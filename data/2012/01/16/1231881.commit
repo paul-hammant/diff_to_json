@@ -91,28 +91,6 @@ Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/trans
  
          public void addElement(StringBuilder buf, Date date, HttpRequest request,
                                 HttpResponse response) {
-Index: java/modules/core/src/main/java/org/apache/synapse/deployers/TemplateDeployer.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/deployers/TemplateDeployer.java	(revision 1231880)
-+++ java/modules/core/src/main/java/org/apache/synapse/deployers/TemplateDeployer.java	(revision 1231881)
-@@ -248,7 +248,7 @@
-             }
-         } catch (Exception e) {
-             handleSynapseArtifactDeploymentError(
--                    "Template Undeployement of template named : " + artifactName + " : Failed", e);
-+                    "Template Undeployment of template named : " + artifactName + " : Failed", e);
-         }
-     }
- 
-@@ -283,7 +283,7 @@
-                     if (mt.getFileName() != null) {
-                         String fileName = getServerConfigurationInformation().getSynapseXMLLocation()
-                                 + File.separator + MultiXMLConfigurationBuilder.TEMPLATES_DIR
--                                + File.separator + st.getFileName();
-+                                + File.separator + mt.getFileName();
-                         writeToFile(stElem, fileName);
-                         if (log.isDebugEnabled()) {
-                             log.debug("Restoring the Sequence Template with name : " +
 Index: java/modules/core/src/main/java/org/apache/synapse/rest/dispatch/URLMappingHelper.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/rest/dispatch/URLMappingHelper.java	(revision 1231880)
@@ -161,6 +139,47 @@ Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/EndpointCont
                      localLastSuspendDuration = -1;
                      break;
                  }
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/InvokeMediatorSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/InvokeMediatorSerializer.java	(revision 1231880)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/InvokeMediatorSerializer.java	(revision 1231881)
+@@ -23,7 +23,6 @@
+ import org.apache.synapse.mediators.Value;
+ import org.apache.synapse.mediators.template.InvokeMediator;
+ 
+-import java.util.Iterator;
+ import java.util.Map;
+ 
+ /**
+@@ -43,6 +42,7 @@
+     protected OMElement serializeSpecificMediator(Mediator m) {
+         if (!(m instanceof InvokeMediator)) {
+             handleException("Unsupported mediator passed in for serialization : " + m.getType());
++            return null;
+         }
+         InvokeMediator mediator = (InvokeMediator) m;
+         OMElement invokeElem = fac.createOMElement(INVOKE_N, synNS);
+@@ -60,16 +60,13 @@
+ 
+     private void serializeParams(OMElement invokeElem, InvokeMediator mediator) {
+         Map<String, Value> paramsMap = mediator.getpName2ExpressionMap();
+-        Iterator<String> paramIterator = paramsMap.keySet().iterator();
+-        while (paramIterator.hasNext()) {
+-            String paramName = paramIterator.next();
+-            if (!"".equals(paramName)) {
++        for (Map.Entry<String,Value> entry : paramsMap.entrySet()) {
++            if (!"".equals(entry.getKey())) {
+                 OMElement paramEl = fac.createOMElement(InvokeMediatorFactory.WITH_PARAM_Q.getLocalPart(),
+                                                         synNS);
+-                paramEl.addAttribute(fac.createOMAttribute("name", nullNS, paramName));
++                paramEl.addAttribute(fac.createOMAttribute("name", nullNS, entry.getKey()));
+                 //serialize value attribute
+-                Value value = paramsMap.get(paramName);
+-                new ValueSerializer().serializeValue(value, "value", paramEl);
++                new ValueSerializer().serializeValue(entry.getValue(), "value", paramEl);
+                 invokeElem.addChild(paramEl);
+             }
+         }
 Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/TemplateSerializer.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/TemplateSerializer.java	(revision 1231880)
@@ -204,47 +223,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/CloneMediat
          }
          return cloneElem;
      }
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/InvokeMediatorSerializer.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/InvokeMediatorSerializer.java	(revision 1231880)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/InvokeMediatorSerializer.java	(revision 1231881)
-@@ -23,7 +23,6 @@
- import org.apache.synapse.mediators.Value;
- import org.apache.synapse.mediators.template.InvokeMediator;
- 
--import java.util.Iterator;
- import java.util.Map;
- 
- /**
-@@ -43,6 +42,7 @@
-     protected OMElement serializeSpecificMediator(Mediator m) {
-         if (!(m instanceof InvokeMediator)) {
-             handleException("Unsupported mediator passed in for serialization : " + m.getType());
-+            return null;
-         }
-         InvokeMediator mediator = (InvokeMediator) m;
-         OMElement invokeElem = fac.createOMElement(INVOKE_N, synNS);
-@@ -60,16 +60,13 @@
- 
-     private void serializeParams(OMElement invokeElem, InvokeMediator mediator) {
-         Map<String, Value> paramsMap = mediator.getpName2ExpressionMap();
--        Iterator<String> paramIterator = paramsMap.keySet().iterator();
--        while (paramIterator.hasNext()) {
--            String paramName = paramIterator.next();
--            if (!"".equals(paramName)) {
-+        for (Map.Entry<String,Value> entry : paramsMap.entrySet()) {
-+            if (!"".equals(entry.getKey())) {
-                 OMElement paramEl = fac.createOMElement(InvokeMediatorFactory.WITH_PARAM_Q.getLocalPart(),
-                                                         synNS);
--                paramEl.addAttribute(fac.createOMAttribute("name", nullNS, paramName));
-+                paramEl.addAttribute(fac.createOMAttribute("name", nullNS, entry.getKey()));
-                 //serialize value attribute
--                Value value = paramsMap.get(paramName);
--                new ValueSerializer().serializeValue(value, "value", paramEl);
-+                new ValueSerializer().serializeValue(entry.getValue(), "value", paramEl);
-                 invokeElem.addChild(paramEl);
-             }
-         }
 Index: java/modules/core/src/main/java/org/apache/synapse/registry/AbstractRegistry.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/registry/AbstractRegistry.java	(revision 1231880)
@@ -357,5 +335,29 @@ Index: java/modules/core/src/main/java/org/apache/synapse/mediators/template/Inv
              return mediator.mediate(synCtx);
          }
          return false;
+Index: java/modules/core/src/main/java/org/apache/synapse/deployers/TemplateDeployer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/deployers/TemplateDeployer.java	(revision 1231880)
++++ java/modules/core/src/main/java/org/apache/synapse/deployers/TemplateDeployer.java	(revision 1231881)
+@@ -248,7 +248,7 @@
+             }
+         } catch (Exception e) {
+             handleSynapseArtifactDeploymentError(
+-                    "Template Undeployement of template named : " + artifactName + " : Failed", e);
++                    "Template Undeployment of template named : " + artifactName + " : Failed", e);
+         }
+     }
+ 
+@@ -283,7 +283,7 @@
+                     if (mt.getFileName() != null) {
+                         String fileName = getServerConfigurationInformation().getSynapseXMLLocation()
+                                 + File.separator + MultiXMLConfigurationBuilder.TEMPLATES_DIR
+-                                + File.separator + st.getFileName();
++                                + File.separator + mt.getFileName();
+                         writeToFile(stElem, fileName);
+                         if (log.isDebugEnabled()) {
+                             log.debug("Restoring the Sequence Template with name : " +
 -*-*-*-
-Some refactoring and cleanup
+Message: Some refactoring and cleanup
+-*-*-*-
+When: 2012-01-16 04:31:20 -0500 

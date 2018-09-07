@@ -11,4 +11,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/rest/RESTConstants.jav
  
  }
 -*-*-*-
-Renaming API error handler sequence
+Message: Renaming API error handler sequence
+-*-*-*-
+When: 2012-06-24 00:55:46 -0400 

@@ -12,4 +12,6 @@ Index: java/pom.xml
              <version>${xalan.version}</version>
          </dependency>
 -*-*-*-
-Fixing xalan jar duplication in distribution : SYNAPSE-825
+Message: Fixing xalan jar duplication in distribution : SYNAPSE-825
+-*-*-*-
+When: 2011-12-17 22:46:21 -0500 

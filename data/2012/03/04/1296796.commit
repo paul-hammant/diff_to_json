@@ -57,4 +57,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/mediators/transform/Pa
  
          Object[] argValues = new Object[argumentList.size()];
 -*-*-*-
-Adding comments to PayloadFactorMediator class
+Message: Adding comments to PayloadFactorMediator class
+-*-*-*-
+When: 2012-03-04 08:01:41 -0500 

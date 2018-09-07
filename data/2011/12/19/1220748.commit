@@ -24,4 +24,6 @@ Index: java/modules/transports/optional/fix/src/main/java/org/apache/synapse/tra
      public static final String FILE_BASED_MESSAGE_STORE = "file";
      public static final String JDBC_BASED_MESSAGE_STORE = "jdbc";
 -*-*-*-
-Fixing SYNAPSE-759
+Message: Fixing SYNAPSE-759
+-*-*-*-
+When: 2011-12-19 08:50:40 -0500 

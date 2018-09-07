@@ -11,4 +11,6 @@ Index: java/pom.xml
  
      <properties>
 -*-*-*-
-Adding documentation module to the build
+Message: Adding documentation module to the build
+-*-*-*-
+When: 2012-03-19 04:48:38 -0400 

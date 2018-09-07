@@ -114,5 +114,8 @@ Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/E
          // just to make the compiler happy : never executes
          return null;
 -*-*-*-
-Added support for class endpoint. This allows users to externally define their own endpoints. This will be an extensibility mechanism for defining new Endpoints.
+Message: Added support for class endpoint. This allows users to externally define their own endpoints. This will be an extensibility mechanism for defining new Endpoints.
 
+
+-*-*-*-
+When: 2012-02-21 02:13:06 -0500 

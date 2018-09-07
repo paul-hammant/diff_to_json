@@ -13,4 +13,6 @@ Index: java/modules/samples/services/JAXWSStockQuoteService/build.xml
                      <include name="*.jar"/>
                  </fileset>
 -*-*-*-
-Allow the JAXWSStockQuoteService to be built on Java 1.5.
+Message: Allow the JAXWSStockQuoteService to be built on Java 1.5.
+-*-*-*-
+When: 2012-10-07 13:57:27 -0400 

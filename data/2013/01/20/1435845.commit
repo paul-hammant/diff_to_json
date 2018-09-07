@@ -1,19 +1,29 @@
-Index: java/modules/core/src/main/java/org/apache/synapse/mediators/transform/HeaderMediator.java
+Index: java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMessageContext.java
 ===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/mediators/transform/HeaderMediator.java	(revision 1435844)
-+++ java/modules/core/src/main/java/org/apache/synapse/mediators/transform/HeaderMediator.java	(revision 1435845)
-@@ -159,10 +159,7 @@
-             return;
-         }
-         SOAPFactory fac = (SOAPFactory) env.getOMFactory();
--        SOAPHeader header = env.getHeader();
+--- java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMessageContext.java	(revision 1435844)
++++ java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMessageContext.java	(revision 1435845)
+@@ -32,7 +32,6 @@
+ import org.apache.axiom.om.OMNode;
+ import org.apache.axiom.soap.SOAPBody;
+ import org.apache.axiom.soap.SOAPEnvelope;
+-import org.apache.axiom.soap.SOAPFactory;
+ import org.apache.axiom.soap.SOAPHeader;
+ import org.apache.axiom.soap.SOAPHeaderBlock;
+ import org.apache.axis2.AxisFault;
+@@ -106,12 +105,7 @@
+      * @throws ScriptException if an error occurs when converting the XML to OM
+      */
+     public void addHeader(boolean mustUnderstand, Object content) throws ScriptException {
+-        SOAPEnvelope envelope = mc.getEnvelope();
+-        SOAPFactory factory = (SOAPFactory)envelope.getOMFactory();
+-        SOAPHeader header = envelope.getHeader();
 -        if (header == null) {
--            header = fac.createSOAPHeader(env);
+-            header = factory.createSOAPHeader(envelope);
 -        }
-+        SOAPHeader header = env.getOrCreateHeader();
-         SOAPHeaderBlock hb = header.addHeaderBlock(qName.getLocalPart(),
-                 fac.createOMNamespace(qName.getNamespaceURI(), qName.getPrefix()));
-         hb.setText(value);
++        SOAPHeader header = mc.getEnvelope().getOrCreateHeader();
+         OMElement element = xmlHelper.toOMElement(content);
+         // We can't add the element directly to the SOAPHeader. Instead, we need to copy the
+         // information over to a SOAPHeaderBlock.
 Index: java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/Source.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/Source.java	(revision 1435844)
@@ -50,6 +60,22 @@ Index: java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/S
                              sourceNodeList.add(soapEnvelope);
                          } else {
                              OMElement ele = (OMElement) node;
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/transform/HeaderMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/transform/HeaderMediator.java	(revision 1435844)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/transform/HeaderMediator.java	(revision 1435845)
+@@ -159,10 +159,7 @@
+             return;
+         }
+         SOAPFactory fac = (SOAPFactory) env.getOMFactory();
+-        SOAPHeader header = env.getHeader();
+-        if (header == null) {
+-            header = fac.createSOAPHeader(env);
+-        }
++        SOAPHeader header = env.getOrCreateHeader();
+         SOAPHeaderBlock hb = header.addHeaderBlock(qName.getLocalPart(),
+                 fac.createOMNamespace(qName.getNamespaceURI(), qName.getPrefix()));
+         hb.setText(value);
 Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2Sender.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2Sender.java	(revision 1435844)
@@ -104,31 +130,7 @@ Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2Flexib
          }
  
          OperationClient mepClient = axisAnonymousOperation.createClient(serviceCtx, clientOptions);
-Index: java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMessageContext.java
-===================================================================
---- java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMessageContext.java	(revision 1435844)
-+++ java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMessageContext.java	(revision 1435845)
-@@ -32,7 +32,6 @@
- import org.apache.axiom.om.OMNode;
- import org.apache.axiom.soap.SOAPBody;
- import org.apache.axiom.soap.SOAPEnvelope;
--import org.apache.axiom.soap.SOAPFactory;
- import org.apache.axiom.soap.SOAPHeader;
- import org.apache.axiom.soap.SOAPHeaderBlock;
- import org.apache.axis2.AxisFault;
-@@ -106,12 +105,7 @@
-      * @throws ScriptException if an error occurs when converting the XML to OM
-      */
-     public void addHeader(boolean mustUnderstand, Object content) throws ScriptException {
--        SOAPEnvelope envelope = mc.getEnvelope();
--        SOAPFactory factory = (SOAPFactory)envelope.getOMFactory();
--        SOAPHeader header = envelope.getHeader();
--        if (header == null) {
--            header = factory.createSOAPHeader(envelope);
--        }
-+        SOAPHeader header = mc.getEnvelope().getOrCreateHeader();
-         OMElement element = xmlHelper.toOMElement(content);
-         // We can't add the element directly to the SOAPHeader. Instead, we need to copy the
-         // information over to a SOAPHeaderBlock.
 -*-*-*-
-Use the new SOAPEnvelope#getOrCreateHeader() method where appropriate.
+Message: Use the new SOAPEnvelope#getOrCreateHeader() method where appropriate.
+-*-*-*-
+When: 2013-01-20 09:06:32 -0500 

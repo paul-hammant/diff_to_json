@@ -12,4 +12,6 @@ Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample158.xml
  					Axis2 server will be converted into a JSON message and sent back to the
  					JSON client.</p>
 -*-*-*-
-Fixed typo.
+Message: Fixed typo.
+-*-*-*-
+When: 2012-08-08 14:05:16 -0400 

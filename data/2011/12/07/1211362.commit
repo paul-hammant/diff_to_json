@@ -48,4 +48,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/mediators/transform/Ar
 -    }
 -}
 -*-*-*-
-Removing unused class
+Message: Removing unused class
+-*-*-*-
+When: 2011-12-07 05:04:24 -0500 

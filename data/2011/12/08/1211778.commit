@@ -1,16 +1,3 @@
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample59.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample59.java	(revision 1211777)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample59.java	(revision 1211778)
-@@ -41,7 +41,7 @@
- 
-         log.info("Running test: Weighted load balancing between 3 endpoints");
-         result = client.sessionlessClient(addUrl,null, 100);
--        assertTrue("Client did not get run successfully ", result.gotResponse());
-+        assertTrue("Client did not run successfully ", result.gotResponse());
-     }
- 
- 
 Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample50.java
 ===================================================================
 --- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample50.java	(revision 1211777)
@@ -72,84 +59,19 @@ Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framewo
      }
  
  
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample10.java
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample59.java
 ===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample10.java	(revision 1211777)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample10.java	(revision 1211778)
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample59.java	(revision 1211777)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample59.java	(revision 1211778)
 @@ -41,7 +41,7 @@
  
-         log.info("Running test: Dynamic EndPoints with Registry");
-         result = client.requestStandardQuote(null, trpUrl, null, "IBM", null);
+         log.info("Running test: Weighted load balancing between 3 endpoints");
+         result = client.sessionlessClient(addUrl,null, 100);
 -        assertTrue("Client did not get run successfully ", result.gotResponse());
 +        assertTrue("Client did not run successfully ", result.gotResponse());
      }
  
- }
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample11.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample11.java	(revision 1211777)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample11.java	(revision 1211778)
-@@ -42,7 +42,7 @@
  
-         log.info("Running test: Local Registry entry definitions, reusable endpoints and sequences");
-         result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM",null);
--        assertTrue("Client did not get run successfully ", result.gotResponse());
-+        assertTrue("Client did not run successfully ", result.gotResponse());
-     }
- 
- }
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample12.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample12.java	(revision 1211777)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample12.java	(revision 1211778)
-@@ -42,7 +42,7 @@
- 
-         log.info("Running test: One way messaging / fireAndForget through Synapse");
-         result = client.placeOrder(addUrl, trpUrl, null, "IBM");
--        assertTrue("Client did not get run successfully ", result.gotResponse());
-+        assertTrue("Client did not run successfully ", result.gotResponse());
-     }
- 
- }
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample13.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample13.java	(revision 1211777)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample13.java	(revision 1211778)
-@@ -42,7 +42,7 @@
- 
-         log.info("Running test: Dual channel invocation through Synapse");
-         result = client.requestDualQuote(addUrl, trpUrl, null, "IBM");
--        assertTrue("Client did not get run successfully ", result.gotResponse());
-+        assertTrue("Client did not run successfully ", result.gotResponse());
-     }
- 
- }
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample15.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample15.java	(revision 1211777)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample15.java	(revision 1211778)
-@@ -41,7 +41,7 @@
- 
-         log.info("Running test: Message Enrichment through Synapse");
-         result = client.requestStandardQuote(null, trpUrl, null, "IBM" ,null);
--        assertTrue("Client did not get run successfully ", result.gotResponse());
-+        assertTrue("Client did not run successfully ", result.gotResponse());
-     }
- 
- }
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample16.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample16.java	(revision 1211777)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample16.java	(revision 1211778)
-@@ -42,7 +42,7 @@
- 
-         log.info("Running test: Introduction to dynamic and static keys ");
-         result = client.requestCustomQuote(addUrl, trpUrl, null, "IBM");
--        assertTrue("Client did not get run successfully ", result.gotResponse());
-+        assertTrue("Client did not run successfully ", result.gotResponse());
-     }
- 
- }
 Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample0.java
 ===================================================================
 --- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample0.java	(revision 1211777)
@@ -253,5 +175,85 @@ Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framewo
      }
  
  }
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample10.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample10.java	(revision 1211777)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample10.java	(revision 1211778)
+@@ -41,7 +41,7 @@
+ 
+         log.info("Running test: Dynamic EndPoints with Registry");
+         result = client.requestStandardQuote(null, trpUrl, null, "IBM", null);
+-        assertTrue("Client did not get run successfully ", result.gotResponse());
++        assertTrue("Client did not run successfully ", result.gotResponse());
+     }
+ 
+ }
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample11.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample11.java	(revision 1211777)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample11.java	(revision 1211778)
+@@ -42,7 +42,7 @@
+ 
+         log.info("Running test: Local Registry entry definitions, reusable endpoints and sequences");
+         result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM",null);
+-        assertTrue("Client did not get run successfully ", result.gotResponse());
++        assertTrue("Client did not run successfully ", result.gotResponse());
+     }
+ 
+ }
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample12.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample12.java	(revision 1211777)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample12.java	(revision 1211778)
+@@ -42,7 +42,7 @@
+ 
+         log.info("Running test: One way messaging / fireAndForget through Synapse");
+         result = client.placeOrder(addUrl, trpUrl, null, "IBM");
+-        assertTrue("Client did not get run successfully ", result.gotResponse());
++        assertTrue("Client did not run successfully ", result.gotResponse());
+     }
+ 
+ }
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample13.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample13.java	(revision 1211777)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample13.java	(revision 1211778)
+@@ -42,7 +42,7 @@
+ 
+         log.info("Running test: Dual channel invocation through Synapse");
+         result = client.requestDualQuote(addUrl, trpUrl, null, "IBM");
+-        assertTrue("Client did not get run successfully ", result.gotResponse());
++        assertTrue("Client did not run successfully ", result.gotResponse());
+     }
+ 
+ }
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample15.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample15.java	(revision 1211777)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample15.java	(revision 1211778)
+@@ -41,7 +41,7 @@
+ 
+         log.info("Running test: Message Enrichment through Synapse");
+         result = client.requestStandardQuote(null, trpUrl, null, "IBM" ,null);
+-        assertTrue("Client did not get run successfully ", result.gotResponse());
++        assertTrue("Client did not run successfully ", result.gotResponse());
+     }
+ 
+ }
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample16.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample16.java	(revision 1211777)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample16.java	(revision 1211778)
+@@ -42,7 +42,7 @@
+ 
+         log.info("Running test: Introduction to dynamic and static keys ");
+         result = client.requestCustomQuote(addUrl, trpUrl, null, "IBM");
+-        assertTrue("Client did not get run successfully ", result.gotResponse());
++        assertTrue("Client did not run successfully ", result.gotResponse());
+     }
+ 
+ }
 -*-*-*-
-Log messages updated
+Message: Log messages updated
+-*-*-*-
+When: 2011-12-08 03:05:30 -0500 

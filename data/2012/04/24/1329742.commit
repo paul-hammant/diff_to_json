@@ -60,6 +60,47 @@ Index: java/modules/core/src/test/resources/synapse-libraries/assembly/filter.pr
 +product.name=Apache Synapse
 +product.version=2.2.0-SNAPSHOT
 +
+Index: java/modules/core/src/test/resources/synapse-libraries/skeleton/artifacts.xml
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/skeleton/artifacts.xml	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/skeleton/artifacts.xml	(revision 1329742)
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<artifacts>
++    <artifact name="SynapseLinkedinLib" package="org.apache.synapse.linkedin" >
++        <dependency artifact="linkedin_core" />
++        <description>synapse library for Linkedin</description>
++    </artifact>
++</artifacts>
+
+Property changes on: java/modules/core/src/test/resources/synapse-libraries/skeleton/artifacts.xml
+___________________________________________________________________
+Added: svn:executable
+## -0,0 +1 ##
++*
+\ No newline at end of property
+Index: java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/post_status.xml
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/post_status.xml	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/post_status.xml	(revision 1329742)
+@@ -0,0 +1,10 @@
++<template xmlns="http://ws.apache.org/ns/synapse" name="post_status">
++        <parameter name="status"/>
++        <sequence>
++            	<log level="full">
++			<property name="Linkedin sample operation" expression="$func:status" />
++		</log>
++		<!--use a Log mediator just for testing for the Test Lib -->
++		<class name="org.apache.synapse.mediators.builtin.LogMediator" />
++        </sequence>
++    </template>	
+
+Property changes on: java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/post_status.xml
+___________________________________________________________________
+Added: svn:executable
+## -0,0 +1 ##
++*
+\ No newline at end of property
 Index: java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/show_headline.xml
 ===================================================================
 --- java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/show_headline.xml	(nonexistent)
@@ -162,47 +203,6 @@ Index: java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_
 +    </template>	
 
 Property changes on: java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/register_user.xml
-___________________________________________________________________
-Added: svn:executable
-## -0,0 +1 ##
-+*
-\ No newline at end of property
-Index: java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/post_status.xml
-===================================================================
---- java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/post_status.xml	(nonexistent)
-+++ java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/post_status.xml	(revision 1329742)
-@@ -0,0 +1,10 @@
-+<template xmlns="http://ws.apache.org/ns/synapse" name="post_status">
-+        <parameter name="status"/>
-+        <sequence>
-+            	<log level="full">
-+			<property name="Linkedin sample operation" expression="$func:status" />
-+		</log>
-+		<!--use a Log mediator just for testing for the Test Lib -->
-+		<class name="org.apache.synapse.mediators.builtin.LogMediator" />
-+        </sequence>
-+    </template>	
-
-Property changes on: java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/post_status.xml
-___________________________________________________________________
-Added: svn:executable
-## -0,0 +1 ##
-+*
-\ No newline at end of property
-Index: java/modules/core/src/test/resources/synapse-libraries/skeleton/artifacts.xml
-===================================================================
---- java/modules/core/src/test/resources/synapse-libraries/skeleton/artifacts.xml	(nonexistent)
-+++ java/modules/core/src/test/resources/synapse-libraries/skeleton/artifacts.xml	(revision 1329742)
-@@ -0,0 +1,7 @@
-+<?xml version="1.0" encoding="UTF-8"?>
-+<artifacts>
-+    <artifact name="SynapseLinkedinLib" package="org.apache.synapse.linkedin" >
-+        <dependency artifact="linkedin_core" />
-+        <description>synapse library for Linkedin</description>
-+    </artifact>
-+</artifacts>
-
-Property changes on: java/modules/core/src/test/resources/synapse-libraries/skeleton/artifacts.xml
 ___________________________________________________________________
 Added: svn:executable
 ## -0,0 +1 ##
@@ -424,4 +424,6 @@ Index: java/modules/core/pom.xml
              </plugin>
              <plugin>
 -*-*-*-
-fixing synapse tests cases for Synapse libraries
+Message: fixing synapse tests cases for Synapse libraries
+-*-*-*-
+When: 2012-04-24 10:35:29 -0400 

@@ -1,3 +1,101 @@
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1225149)
++++ java/pom.xml	(revision 1225150)
+@@ -27,7 +27,7 @@
+     <parent>
+         <groupId>org.apache</groupId>
+         <artifactId>apache</artifactId>
+-        <version>7</version>
++        <version>9</version>
+     </parent>
+ 
+     <groupId>org.apache.synapse</groupId>
+@@ -59,7 +59,7 @@
+             <post>user@synapse.apache.org</post>
+             <archive>http://mail-archives.apache.org/mod_mbox/synapse-user/</archive>
+         </mailingList>
+-	<mailingList>
++	    <mailingList>
+             <name>Apache Synapse Commits List</name>
+             <subscribe>commits-subscribe@synapse.apache.org</subscribe>
+             <unsubscribe>commits-unsubscribe@synapse.apache.org</unsubscribe>
+@@ -79,10 +79,8 @@
+     </licenses>
+ 
+     <scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java
+-        </connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java
+-        </developerConnection>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java</developerConnection>
+         <url>http://svn.apache.org/viewvc/synapse/trunk/java/</url>
+     </scm>
+ 
+@@ -959,18 +957,8 @@
+     </reporting>
+ 
+     <distributionManagement>
+-        <snapshotRepository>
+-            <id>apache-snapshots</id>
+-            <name>Apache Development Repository</name>
+-            <url>scpexe://people.apache.org//www/people.apache.org/repo/m2-snapshot-repository</url>
+-        </snapshotRepository>
+-        <repository>
+-            <id>apache-releases</id>
+-            <name>Apache Ibiblio rsync Repository</name>
+-            <url>scpexe://people.apache.org/www/people.apache.org/repo/m2-ibiblio-rsync-repository</url>
+-        </repository>
+         <site>
+-            <id>website</id>
++            <id>apache.website</id>
+             <url>scpexe://people.apache.org/www/synapse.apache.org/</url>
+         </site>
+     </distributionManagement>
+@@ -1082,7 +1070,7 @@
+         <truezip.version>6.6</truezip.version>
+         <jsch.version>0.1.31</jsch.version>
+         <jms-1.1-spec.version>1.1</jms-1.1-spec.version>
+-        <httpcore.nio.version>4.1</httpcore.nio.version>
++        <httpcore.nio.version>4.1.4</httpcore.nio.version>
+         <http.client.version>4.1</http.client.version>
+         <aspectj.version>1.6.1</aspectj.version>
+         <qfj.version>1.4.0</qfj.version>
+Index: java/modules/commons/pom.xml
+===================================================================
+--- java/modules/commons/pom.xml	(revision 1225149)
++++ java/modules/commons/pom.xml	(revision 1225150)
+@@ -37,6 +37,12 @@
+     <description>Apache Synapse - Common Utilities</description>
+     <packaging>bundle</packaging>
+ 
++    <scm>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/commons</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/commons</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/commons</url>
++    </scm>
++
+     <build>
+         <plugins>
+             <plugin>
+Index: java/modules/handler/pom.xml
+===================================================================
+--- java/modules/handler/pom.xml	(revision 1225149)
++++ java/modules/handler/pom.xml	(revision 1225150)
+@@ -37,6 +37,12 @@
+     <description>Apache Synapse - Handler Module</description>
+     <packaging>bundle</packaging>
+ 
++    <scm>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/handler</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/handler</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/handler</url>
++    </scm>
++
+     <build>
+         <plugins>
+             <plugin>
 Index: java/modules/distribution/pom.xml
 ===================================================================
 --- java/modules/distribution/pom.xml	(revision 1225149)
@@ -16,6 +114,40 @@ Index: java/modules/distribution/pom.xml
      <dependencies>
          <dependency>
              <groupId>org.apache.synapse</groupId>
+Index: java/modules/transports/pom.xml
+===================================================================
+--- java/modules/transports/pom.xml	(revision 1225149)
++++ java/modules/transports/pom.xml	(revision 1225150)
+@@ -36,6 +36,12 @@
+     <description>Apache Synapse - Transports</description>
+     <packaging>pom</packaging>
+ 
++    <scm>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports</url>
++    </scm>
++
+     <modules>
+         <module>core/nhttp</module>
+         <module>core/pipe</module>
+Index: java/modules/transports/optional/fix/pom.xml
+===================================================================
+--- java/modules/transports/optional/fix/pom.xml	(revision 1225149)
++++ java/modules/transports/optional/fix/pom.xml	(revision 1225150)
+@@ -36,6 +36,12 @@
+     <description>Apache Synapse - FIX Transport</description>
+     <packaging>bundle</packaging>
+ 
++    <scm>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/optional/fix</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/optional/fix</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports/core/optional/fix</url>
++    </scm>
++
+     <build>
+         <plugins>
+             <plugin>
 Index: java/modules/transports/core/nhttp/pom.xml
 ===================================================================
 --- java/modules/transports/core/nhttp/pom.xml	(revision 1225149)
@@ -62,40 +194,6 @@ Index: java/modules/transports/core/vfs/pom.xml
 +        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/core/vfs</connection>
 +        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/core/vfs</developerConnection>
 +        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports/core/vfs</url>
-+    </scm>
-+
-     <build>
-         <plugins>
-             <plugin>
-Index: java/modules/transports/pom.xml
-===================================================================
---- java/modules/transports/pom.xml	(revision 1225149)
-+++ java/modules/transports/pom.xml	(revision 1225150)
-@@ -36,6 +36,12 @@
-     <description>Apache Synapse - Transports</description>
-     <packaging>pom</packaging>
- 
-+    <scm>
-+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports</connection>
-+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports</developerConnection>
-+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports</url>
-+    </scm>
-+
-     <modules>
-         <module>core/nhttp</module>
-         <module>core/pipe</module>
-Index: java/modules/transports/optional/fix/pom.xml
-===================================================================
---- java/modules/transports/optional/fix/pom.xml	(revision 1225149)
-+++ java/modules/transports/optional/fix/pom.xml	(revision 1225150)
-@@ -36,6 +36,12 @@
-     <description>Apache Synapse - FIX Transport</description>
-     <packaging>bundle</packaging>
- 
-+    <scm>
-+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/optional/fix</connection>
-+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/optional/fix</developerConnection>
-+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports/core/optional/fix</url>
 +    </scm>
 +
      <build>
@@ -362,103 +460,7 @@ Index: java/modules/samples/pom.xml
      <profiles>
          <profile>
              <id>integration</id>
-Index: java/modules/commons/pom.xml
-===================================================================
---- java/modules/commons/pom.xml	(revision 1225149)
-+++ java/modules/commons/pom.xml	(revision 1225150)
-@@ -37,6 +37,12 @@
-     <description>Apache Synapse - Common Utilities</description>
-     <packaging>bundle</packaging>
- 
-+    <scm>
-+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/commons</connection>
-+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/commons</developerConnection>
-+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/commons</url>
-+    </scm>
-+
-     <build>
-         <plugins>
-             <plugin>
-Index: java/modules/handler/pom.xml
-===================================================================
---- java/modules/handler/pom.xml	(revision 1225149)
-+++ java/modules/handler/pom.xml	(revision 1225150)
-@@ -37,6 +37,12 @@
-     <description>Apache Synapse - Handler Module</description>
-     <packaging>bundle</packaging>
- 
-+    <scm>
-+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/handler</connection>
-+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/handler</developerConnection>
-+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/handler</url>
-+    </scm>
-+
-     <build>
-         <plugins>
-             <plugin>
-Index: java/pom.xml
-===================================================================
---- java/pom.xml	(revision 1225149)
-+++ java/pom.xml	(revision 1225150)
-@@ -27,7 +27,7 @@
-     <parent>
-         <groupId>org.apache</groupId>
-         <artifactId>apache</artifactId>
--        <version>7</version>
-+        <version>9</version>
-     </parent>
- 
-     <groupId>org.apache.synapse</groupId>
-@@ -59,7 +59,7 @@
-             <post>user@synapse.apache.org</post>
-             <archive>http://mail-archives.apache.org/mod_mbox/synapse-user/</archive>
-         </mailingList>
--	<mailingList>
-+	    <mailingList>
-             <name>Apache Synapse Commits List</name>
-             <subscribe>commits-subscribe@synapse.apache.org</subscribe>
-             <unsubscribe>commits-unsubscribe@synapse.apache.org</unsubscribe>
-@@ -79,10 +79,8 @@
-     </licenses>
- 
-     <scm>
--        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java
--        </connection>
--        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java
--        </developerConnection>
-+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java</connection>
-+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java</developerConnection>
-         <url>http://svn.apache.org/viewvc/synapse/trunk/java/</url>
-     </scm>
- 
-@@ -959,18 +957,8 @@
-     </reporting>
- 
-     <distributionManagement>
--        <snapshotRepository>
--            <id>apache-snapshots</id>
--            <name>Apache Development Repository</name>
--            <url>scpexe://people.apache.org//www/people.apache.org/repo/m2-snapshot-repository</url>
--        </snapshotRepository>
--        <repository>
--            <id>apache-releases</id>
--            <name>Apache Ibiblio rsync Repository</name>
--            <url>scpexe://people.apache.org/www/people.apache.org/repo/m2-ibiblio-rsync-repository</url>
--        </repository>
-         <site>
--            <id>website</id>
-+            <id>apache.website</id>
-             <url>scpexe://people.apache.org/www/synapse.apache.org/</url>
-         </site>
-     </distributionManagement>
-@@ -1082,7 +1070,7 @@
-         <truezip.version>6.6</truezip.version>
-         <jsch.version>0.1.31</jsch.version>
-         <jms-1.1-spec.version>1.1</jms-1.1-spec.version>
--        <httpcore.nio.version>4.1</httpcore.nio.version>
-+        <httpcore.nio.version>4.1.4</httpcore.nio.version>
-         <http.client.version>4.1</http.client.version>
-         <aspectj.version>1.6.1</aspectj.version>
-         <qfj.version>1.4.0</qfj.version>
 -*-*-*-
-Setting the trunk up for Nexus
+Message: Setting the trunk up for Nexus
+-*-*-*-
+When: 2011-12-28 04:53:03 -0500 

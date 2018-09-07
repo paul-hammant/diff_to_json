@@ -30,4 +30,6 @@ Index: java/src/site/xdoc/Synapse_Samples.xml
  
  <br/>Enable clustering in the &lt;Synapse installation directory&gt;/ repository/conf/axis2.xml file. This can be done by setting the &quot;enable&quot; attribute of the &quot;clustering&quot; element.
 -*-*-*-
-committing patch for https://issues.apache.org/jira/browse/SYNAPSE-822
+Message: committing patch for https://issues.apache.org/jira/browse/SYNAPSE-822
+-*-*-*-
+When: 2011-12-08 06:23:50 -0500 

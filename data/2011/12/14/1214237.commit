@@ -22,4 +22,6 @@ Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framewo
          log.info("Running test: Switching transports and message format from SOAP to REST/POX");
  
 -*-*-*-
-File path update
+Message: File path update
+-*-*-*-
+When: 2011-12-14 08:30:36 -0500 

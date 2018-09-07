@@ -17,4 +17,7 @@ Index: java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanUti
                  throw new SynapseException("Incompatible argument found in argument " + i +
                          " for '" + method.getName() + "' method.");
 -*-*-*-
-Incorporating fixes of AXIS2-5212.
+Message: Incorporating fixes of AXIS2-5212.
+
+-*-*-*-
+When: 2012-07-20 04:24:09 -0400 

@@ -177,4 +177,6 @@ Added: svn:mime-type
 +application/octet-stream
 \ No newline at end of property
 -*-*-*-
-committing patch for https://issues.apache.org/jira/browse/SYNAPSE-862
+Message: committing patch for https://issues.apache.org/jira/browse/SYNAPSE-862
+-*-*-*-
+When: 2012-04-18 11:23:07 -0400 

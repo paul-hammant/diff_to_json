@@ -24,4 +24,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/ProxyServic
              StatisticsReporter.endReportForAllOnRequestProcessed(synCtx);
          }
 -*-*-*-
-Fixing SYNAPSE-721
+Message: Fixing SYNAPSE-721
+-*-*-*-
+When: 2011-12-19 05:12:43 -0500 

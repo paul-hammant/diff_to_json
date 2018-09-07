@@ -1,3 +1,55 @@
+Index: java/modules/transports/optional/fix/pom.xml
+===================================================================
+--- java/modules/transports/optional/fix/pom.xml	(revision 1226391)
++++ java/modules/transports/optional/fix/pom.xml	(revision 1226392)
+@@ -50,7 +50,7 @@
+                 <extensions>true</extensions>
+                 <configuration>
+                     <instructions>
+-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
++                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                         <Export-Package>
+                             org.apache.synapse.transport.fix.*,
+                         </Export-Package>
+Index: java/modules/transports/core/nhttp/pom.xml
+===================================================================
+--- java/modules/transports/core/nhttp/pom.xml	(revision 1226391)
++++ java/modules/transports/core/nhttp/pom.xml	(revision 1226392)
+@@ -50,7 +50,7 @@
+                 <extensions>true</extensions>
+                 <configuration>
+                     <instructions>
+-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
++                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                         <Export-Package>
+                             org.apache.synapse.transport.nhttp.*,
+                         </Export-Package>
+Index: java/modules/transports/core/pipe/pom.xml
+===================================================================
+--- java/modules/transports/core/pipe/pom.xml	(revision 1226391)
++++ java/modules/transports/core/pipe/pom.xml	(revision 1226392)
+@@ -50,7 +50,7 @@
+                 <extensions>true</extensions>
+                 <configuration>
+                     <instructions>
+-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
++                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                         <Export-Package>
+                             org.apache.synapse.transport.pipe.*,
+                         </Export-Package>
+Index: java/modules/transports/core/vfs/pom.xml
+===================================================================
+--- java/modules/transports/core/vfs/pom.xml	(revision 1226391)
++++ java/modules/transports/core/vfs/pom.xml	(revision 1226392)
+@@ -50,7 +50,7 @@
+                 <extensions>true</extensions>
+                 <configuration>
+                     <instructions>
+-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
++                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                         <Export-Package>
+                             org.apache.synapse.transport.vfs.*,
+                         </Export-Package>
 Index: java/modules/integration/pom.xml
 ===================================================================
 --- java/modules/integration/pom.xml	(revision 1226391)
@@ -127,58 +179,6 @@ Index: java/modules/handler/pom.xml
                          <Private-Package>
                              org.apache.synapse.handler.util,
                              org.apache.synapse.handler,
-Index: java/modules/transports/optional/fix/pom.xml
-===================================================================
---- java/modules/transports/optional/fix/pom.xml	(revision 1226391)
-+++ java/modules/transports/optional/fix/pom.xml	(revision 1226392)
-@@ -50,7 +50,7 @@
-                 <extensions>true</extensions>
-                 <configuration>
-                     <instructions>
--                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
-+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                         <Export-Package>
-                             org.apache.synapse.transport.fix.*,
-                         </Export-Package>
-Index: java/modules/transports/core/nhttp/pom.xml
-===================================================================
---- java/modules/transports/core/nhttp/pom.xml	(revision 1226391)
-+++ java/modules/transports/core/nhttp/pom.xml	(revision 1226392)
-@@ -50,7 +50,7 @@
-                 <extensions>true</extensions>
-                 <configuration>
-                     <instructions>
--                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
-+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                         <Export-Package>
-                             org.apache.synapse.transport.nhttp.*,
-                         </Export-Package>
-Index: java/modules/transports/core/pipe/pom.xml
-===================================================================
---- java/modules/transports/core/pipe/pom.xml	(revision 1226391)
-+++ java/modules/transports/core/pipe/pom.xml	(revision 1226392)
-@@ -50,7 +50,7 @@
-                 <extensions>true</extensions>
-                 <configuration>
-                     <instructions>
--                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
-+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                         <Export-Package>
-                             org.apache.synapse.transport.pipe.*,
-                         </Export-Package>
-Index: java/modules/transports/core/vfs/pom.xml
-===================================================================
---- java/modules/transports/core/vfs/pom.xml	(revision 1226391)
-+++ java/modules/transports/core/vfs/pom.xml	(revision 1226392)
-@@ -50,7 +50,7 @@
-                 <extensions>true</extensions>
-                 <configuration>
-                     <instructions>
--                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
-+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                         <Export-Package>
-                             org.apache.synapse.transport.vfs.*,
-                         </Export-Package>
 Index: java/pom.xml
 ===================================================================
 --- java/pom.xml	(revision 1226391)
@@ -223,4 +223,6 @@ Index: java/pom.xml
              </plugin>
              <plugin>
 -*-*-*-
-Fixing some maven warnings
+Message: Fixing some maven warnings
+-*-*-*-
+When: 2012-01-02 06:21:27 -0500 

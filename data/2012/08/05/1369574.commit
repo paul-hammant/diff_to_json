@@ -1,3 +1,37 @@
+Index: java/modules/core/src/test/java/org/apache/synapse/config/xml/MessageStoreSerializationTest.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/config/xml/MessageStoreSerializationTest.java	(revision 1369573)
++++ java/modules/core/src/test/java/org/apache/synapse/config/xml/MessageStoreSerializationTest.java	(revision 1369574)
+@@ -30,18 +30,14 @@
+  */
+ public class MessageStoreSerializationTest extends AbstractTestCase {
+ 
+-    MessageStoreSerializer messageStoreSerializer;
+-
+     public MessageStoreSerializationTest() {
+         super(MessageStoreSerializationTest.class.getName());
+-        this.messageStoreSerializer = new MessageStoreSerializer();
+     }
+ 
+     /**
+-     * Test case for InMemory Message Store Configuration Factory and serializer.
+-     * @throws Exception in case of a error while creating or in the serialize process.
++     * Test case for InMemory Message Store Configuration Factory and serializer with no parameters.
+      */
+-    public void testMessageStoreSerialization() throws Exception {
++    public void testMessageStoreSerialization() {
+         String messageStoreConfiguration = "<syn:messageStore xmlns:syn=\"" +
+                 "http://ws.apache.org/ns/synapse\"" +
+                 " name=\"foo\" >" +
+@@ -53,7 +49,7 @@
+         OMElement serializedElement = MessageStoreSerializer.serializeMessageStore(null,
+                 messageStore);
+ 
+-            assertTrue(compare(messageStoreElement, serializedElement));
++        assertTrue(compare(messageStoreElement, serializedElement));
+ 
+     }
+ 
 Index: java/modules/core/src/test/java/org/apache/synapse/config/xml/MessageProcessorSerializationTest.java
 ===================================================================
 --- java/modules/core/src/test/java/org/apache/synapse/config/xml/MessageProcessorSerializationTest.java	(nonexistent)
@@ -78,39 +112,7 @@ Index: java/modules/core/src/test/java/org/apache/synapse/config/xml/MessageProc
 +        }
 +    }
 +}
-Index: java/modules/core/src/test/java/org/apache/synapse/config/xml/MessageStoreSerializationTest.java
-===================================================================
---- java/modules/core/src/test/java/org/apache/synapse/config/xml/MessageStoreSerializationTest.java	(revision 1369573)
-+++ java/modules/core/src/test/java/org/apache/synapse/config/xml/MessageStoreSerializationTest.java	(revision 1369574)
-@@ -30,18 +30,14 @@
-  */
- public class MessageStoreSerializationTest extends AbstractTestCase {
- 
--    MessageStoreSerializer messageStoreSerializer;
--
-     public MessageStoreSerializationTest() {
-         super(MessageStoreSerializationTest.class.getName());
--        this.messageStoreSerializer = new MessageStoreSerializer();
-     }
- 
-     /**
--     * Test case for InMemory Message Store Configuration Factory and serializer.
--     * @throws Exception in case of a error while creating or in the serialize process.
-+     * Test case for InMemory Message Store Configuration Factory and serializer with no parameters.
-      */
--    public void testMessageStoreSerialization() throws Exception {
-+    public void testMessageStoreSerialization() {
-         String messageStoreConfiguration = "<syn:messageStore xmlns:syn=\"" +
-                 "http://ws.apache.org/ns/synapse\"" +
-                 " name=\"foo\" >" +
-@@ -53,7 +49,7 @@
-         OMElement serializedElement = MessageStoreSerializer.serializeMessageStore(null,
-                 messageStore);
- 
--            assertTrue(compare(messageStoreElement, serializedElement));
-+        assertTrue(compare(messageStoreElement, serializedElement));
- 
-     }
- 
 -*-*-*-
-adding Message Processor serialization test
+Message: adding Message Processor serialization test
+-*-*-*-
+When: 2012-08-05 09:09:50 -0400 

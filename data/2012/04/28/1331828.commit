@@ -67,4 +67,7 @@ Added: svn:ignore
 ## -0,0 +1 ##
 +target
 -*-*-*-
-Adjusted svn:ignore.
+Message: Adjusted svn:ignore.
+
+-*-*-*-
+When: 2012-04-28 16:40:28 -0400 

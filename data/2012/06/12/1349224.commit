@@ -1,7 +1,7 @@
-Index: java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_jms.xml
+Index: java/repository/conf/sample/resources/misc/server/axis2.xml
 ===================================================================
---- java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_jms.xml	(revision 1349223)
-+++ java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_jms.xml	(revision 1349224)
+--- java/repository/conf/sample/resources/misc/server/axis2.xml	(revision 1349223)
++++ java/repository/conf/sample/resources/misc/server/axis2.xml	(revision 1349224)
 @@ -78,7 +78,7 @@
  
      <deployer extension=".aar" directory="services" class="org.apache.axis2.deployment.ServiceDeployer">
@@ -37,10 +37,10 @@ Index: java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_cl
      </deployer>
  
      <!-- Following parameter will set the host name for the epr-->
-Index: java/repository/conf/sample/resources/misc/server/axis2.xml
+Index: java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_jms.xml
 ===================================================================
---- java/repository/conf/sample/resources/misc/server/axis2.xml	(revision 1349223)
-+++ java/repository/conf/sample/resources/misc/server/axis2.xml	(revision 1349224)
+--- java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_jms.xml	(revision 1349223)
++++ java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_jms.xml	(revision 1349224)
 @@ -78,7 +78,7 @@
  
      <deployer extension=".aar" directory="services" class="org.apache.axis2.deployment.ServiceDeployer">
@@ -51,4 +51,6 @@ Index: java/repository/conf/sample/resources/misc/server/axis2.xml
  
      <!-- Following parameter will set the host name for the epr-->
 -*-*-*-
-Unique IDs for registered deployer extensions
+Message: Unique IDs for registered deployer extensions
+-*-*-*-
+When: 2012-06-12 05:59:07 -0400 

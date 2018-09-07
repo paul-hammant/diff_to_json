@@ -809,4 +809,6 @@ Index: java/modules/patches/pom.xml
 +    </dependencies>
  </project>
 -*-*-*-
-Adding a new patching process to Synapse and applying commons-vfs2 patch for vfs-178
+Message: Adding a new patching process to Synapse and applying commons-vfs2 patch for vfs-178
+-*-*-*-
+When: 2011-12-14 12:00:13 -0500 

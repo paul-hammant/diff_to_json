@@ -16,4 +16,6 @@ Index: java/src/site/resources/doap_Synapse.rdf
      <release>
        <Version>
 -*-*-*-
-SYNAPSE-826: Fixed an error in the DOAP file.
+Message: SYNAPSE-826: Fixed an error in the DOAP file.
+-*-*-*-
+When: 2011-12-11 15:41:34 -0500 

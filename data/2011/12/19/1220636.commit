@@ -14,4 +14,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/AbstractEndp
          }
          invokeNextFaultHandler(synCtx);
 -*-*-*-
-Fixing SYNAPSE-830
+Message: Fixing SYNAPSE-830
+-*-*-*-
+When: 2011-12-19 02:55:22 -0500 

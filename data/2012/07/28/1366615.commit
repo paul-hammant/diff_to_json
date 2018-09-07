@@ -87,4 +87,7 @@ Index: java/modules/core/src/main/java/org/apache/synapse/util/PayloadHelper.jav
  		body.addChild(element);
  	}
 -*-*-*-
-Fixed an issue in PayloadHelper#setXMLPayload that caused an error for SOAP envelopes having a body that is not completely built.
+Message: Fixed an issue in PayloadHelper#setXMLPayload that caused an error for SOAP envelopes having a body that is not completely built.
+
+-*-*-*-
+When: 2012-07-28 04:50:15 -0400 

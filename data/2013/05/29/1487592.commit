@@ -31,6 +31,162 @@ Index: java/modules/core/src/test/java/org/apache/synapse/config/xml/MessageProc
       * This is a Test Message Processor implementation used only to test the XML Serialization
       */
      @SuppressWarnings("unused")
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MessageProcessorFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/MessageProcessorFactory.java	(revision 1487591)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/MessageProcessorFactory.java	(revision 1487592)
+@@ -25,6 +25,8 @@
+ import org.apache.synapse.SynapseConstants;
+ import org.apache.synapse.SynapseException;
+ import org.apache.synapse.message.processors.MessageProcessor;
++import org.apache.synapse.util.xpath.SynapseXPath;
++import org.jaxen.JaxenException;
+ 
+ import javax.xml.namespace.QName;
+ import java.util.HashMap;
+@@ -47,10 +49,11 @@
+     private static final Log log = LogFactory.getLog(MessageProcessorFactory.class);
+     public static final QName CLASS_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "class");
+     public static final QName NAME_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "name");
++    public static final QName EXPRESSION_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "expression");
+     public static final QName PARAMETER_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
+-            "parameter");
+-    public static final QName MESSAGE_STORE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE ,
+-            "messageStore");
++                                                      "parameter");
++    public static final QName MESSAGE_STORE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE,
++                                                          "messageStore");
+     private static final QName DESCRIPTION_Q
+             = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "description");
+ 
+@@ -57,14 +60,15 @@
+ 
+     /**
+      * Creates a Message processor instance from given xml configuration element
++     *
+      * @param elem OMElement of that contain the Message processor configuration
+-     * @return  created message processor instance
++     * @return created message processor instance
+      */
+     public static MessageProcessor createMessageProcessor(OMElement elem) {
+         MessageProcessor processor = null;
+         OMAttribute clssAtt = elem.getAttribute(CLASS_Q);
+ 
+-        if(clssAtt != null) {
++        if (clssAtt != null) {
+             try {
+                 Class cls = Class.forName(clssAtt.getAttributeValue());
+                 processor = (MessageProcessor) cls.newInstance();
+@@ -86,7 +90,7 @@
+ 
+         OMAttribute storeAtt = elem.getAttribute(MESSAGE_STORE_Q);
+ 
+-        if(storeAtt != null) {
++        if (storeAtt != null) {
+             assert processor != null;
+             processor.setMessageStoreName(storeAtt.getAttributeValue());
+         } else {
+@@ -115,9 +119,19 @@
+                 OMElement prop = (OMElement) o;
+                 OMAttribute paramName = prop.getAttribute(NAME_Q);
+                 String paramValue = prop.getText();
++                OMAttribute paramExpression = prop.getAttribute(EXPRESSION_Q);
+                 if (paramName != null) {
+-                    if (paramValue != null) {
++                    if (paramExpression != null) {
++                        try {
++                            SynapseXPath expression = SynapseXPathFactory.getSynapseXPath(prop, paramExpression.getAttributeValue());
++                            parameters.put(paramName.getAttributeValue(), expression);
++                        } catch (JaxenException e) {
++                            handleException("Error while creating expression " + e.getMessage());
++                        }
++                    } else if (paramValue != null) {
+                         parameters.put(paramName.getAttributeValue(), paramValue);
++                    } else {
++                        handleException("Invalid MessageStore parameter - Parameter must have a value or an expression ");
+                     }
+                 } else {
+                     handleException("Invalid MessageStore parameter - Parameter must have a name ");
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MessageProcessorSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/MessageProcessorSerializer.java	(revision 1487591)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/MessageProcessorSerializer.java	(revision 1487592)
+@@ -27,6 +27,7 @@
+ import org.apache.synapse.SynapseConstants;
+ import org.apache.synapse.SynapseException;
+ import org.apache.synapse.message.processors.MessageProcessor;
++import org.apache.synapse.util.xpath.SynapseXPath;
+ 
+ import javax.xml.namespace.QName;
+ import java.util.Iterator;
+@@ -39,6 +40,7 @@
+  * &lt;parameter name="string"&gt"string" &lt;parameter&gt;
+  * &lt;parameter name="string"&gt"string" &lt;parameter&gt;
+  * &lt;parameter name="string"&gt"string" &lt;parameter&gt;
++ * &lt;parameter name="string" expression="string"&gt;
+  * .
+  * .
+  * &lt;/messageProcessor&gt;
+@@ -55,15 +57,17 @@
+ 
+     /**
+      * Serialize a give Message processor instance to XML configuration
+-     * @param parent parent configuration
++     *
++     * @param parent    parent configuration
+      * @param processor message processor instance
+-     * @return  created XML configuration
++     * @return created XML configuration
+      */
+-    public static OMElement serializeMessageProcessor(OMElement parent, MessageProcessor processor) {
++    public static OMElement serializeMessageProcessor(OMElement parent,
++                                                      MessageProcessor processor) {
+         OMElement processorElem = fac.createOMElement("messageProcessor", synNS);
+         if (processor != null) {
+             processorElem.addAttribute(fac.createOMAttribute("class", nullNS,
+-                    processor.getClass().getName()));
++                                                             processor.getClass().getName()));
+         } else {
+             handleException("Invalid processor. Provider is required");
+         }
+@@ -74,9 +78,9 @@
+             handleException("Message store Name not specified");
+         }
+ 
+-        if(processor.getMessageStoreName() != null) {
++        if (processor.getMessageStoreName() != null) {
+             processorElem.addAttribute(fac.createOMAttribute(
+-                    "messageStore",nullNS,processor.getMessageStoreName()));
++                    "messageStore", nullNS, processor.getMessageStoreName()));
+         }
+ 
+         if (processor.getParameters() != null) {
+@@ -83,12 +87,23 @@
+             Iterator iterator = processor.getParameters().keySet().iterator();
+             while (iterator.hasNext()) {
+                 String name = (String) iterator.next();
+-                String value = (String) processor.getParameters().get(name);
++                Object object = processor.getParameters().get(name);
+                 OMElement property = fac.createOMElement("parameter", synNS);
+                 property.addAttribute(fac.createOMAttribute(
+                         "name", nullNS, name));
+-                property.setText(value.trim());
++
++                if (object instanceof String) {
++                    String value = (String) object;
++                    property.setText(value.trim());
++
++                } else if (object instanceof SynapseXPath) {
++                    SynapseXPath expression = (SynapseXPath) object;
++                    SynapseXPathSerializer.serializeXPath(expression,property,"expression");
++
++                }
++
+                 processorElem.addChild(property);
++
+             }
+         }
+ 
 Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/resequence/ResequencingProcessor.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/message/processors/resequence/ResequencingProcessor.java	(nonexistent)
@@ -659,161 +815,7 @@ Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/res
 +    }
 +
 +}
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MessageProcessorSerializer.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/MessageProcessorSerializer.java	(revision 1487591)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/MessageProcessorSerializer.java	(revision 1487592)
-@@ -27,6 +27,7 @@
- import org.apache.synapse.SynapseConstants;
- import org.apache.synapse.SynapseException;
- import org.apache.synapse.message.processors.MessageProcessor;
-+import org.apache.synapse.util.xpath.SynapseXPath;
- 
- import javax.xml.namespace.QName;
- import java.util.Iterator;
-@@ -39,6 +40,7 @@
-  * &lt;parameter name="string"&gt"string" &lt;parameter&gt;
-  * &lt;parameter name="string"&gt"string" &lt;parameter&gt;
-  * &lt;parameter name="string"&gt"string" &lt;parameter&gt;
-+ * &lt;parameter name="string" expression="string"&gt;
-  * .
-  * .
-  * &lt;/messageProcessor&gt;
-@@ -55,15 +57,17 @@
- 
-     /**
-      * Serialize a give Message processor instance to XML configuration
--     * @param parent parent configuration
-+     *
-+     * @param parent    parent configuration
-      * @param processor message processor instance
--     * @return  created XML configuration
-+     * @return created XML configuration
-      */
--    public static OMElement serializeMessageProcessor(OMElement parent, MessageProcessor processor) {
-+    public static OMElement serializeMessageProcessor(OMElement parent,
-+                                                      MessageProcessor processor) {
-         OMElement processorElem = fac.createOMElement("messageProcessor", synNS);
-         if (processor != null) {
-             processorElem.addAttribute(fac.createOMAttribute("class", nullNS,
--                    processor.getClass().getName()));
-+                                                             processor.getClass().getName()));
-         } else {
-             handleException("Invalid processor. Provider is required");
-         }
-@@ -74,9 +78,9 @@
-             handleException("Message store Name not specified");
-         }
- 
--        if(processor.getMessageStoreName() != null) {
-+        if (processor.getMessageStoreName() != null) {
-             processorElem.addAttribute(fac.createOMAttribute(
--                    "messageStore",nullNS,processor.getMessageStoreName()));
-+                    "messageStore", nullNS, processor.getMessageStoreName()));
-         }
- 
-         if (processor.getParameters() != null) {
-@@ -83,12 +87,23 @@
-             Iterator iterator = processor.getParameters().keySet().iterator();
-             while (iterator.hasNext()) {
-                 String name = (String) iterator.next();
--                String value = (String) processor.getParameters().get(name);
-+                Object object = processor.getParameters().get(name);
-                 OMElement property = fac.createOMElement("parameter", synNS);
-                 property.addAttribute(fac.createOMAttribute(
-                         "name", nullNS, name));
--                property.setText(value.trim());
-+
-+                if (object instanceof String) {
-+                    String value = (String) object;
-+                    property.setText(value.trim());
-+
-+                } else if (object instanceof SynapseXPath) {
-+                    SynapseXPath expression = (SynapseXPath) object;
-+                    SynapseXPathSerializer.serializeXPath(expression,property,"expression");
-+
-+                }
-+
-                 processorElem.addChild(property);
-+
-             }
-         }
- 
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MessageProcessorFactory.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/MessageProcessorFactory.java	(revision 1487591)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/MessageProcessorFactory.java	(revision 1487592)
-@@ -25,6 +25,8 @@
- import org.apache.synapse.SynapseConstants;
- import org.apache.synapse.SynapseException;
- import org.apache.synapse.message.processors.MessageProcessor;
-+import org.apache.synapse.util.xpath.SynapseXPath;
-+import org.jaxen.JaxenException;
- 
- import javax.xml.namespace.QName;
- import java.util.HashMap;
-@@ -47,10 +49,11 @@
-     private static final Log log = LogFactory.getLog(MessageProcessorFactory.class);
-     public static final QName CLASS_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "class");
-     public static final QName NAME_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "name");
-+    public static final QName EXPRESSION_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "expression");
-     public static final QName PARAMETER_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
--            "parameter");
--    public static final QName MESSAGE_STORE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE ,
--            "messageStore");
-+                                                      "parameter");
-+    public static final QName MESSAGE_STORE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE,
-+                                                          "messageStore");
-     private static final QName DESCRIPTION_Q
-             = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "description");
- 
-@@ -57,14 +60,15 @@
- 
-     /**
-      * Creates a Message processor instance from given xml configuration element
-+     *
-      * @param elem OMElement of that contain the Message processor configuration
--     * @return  created message processor instance
-+     * @return created message processor instance
-      */
-     public static MessageProcessor createMessageProcessor(OMElement elem) {
-         MessageProcessor processor = null;
-         OMAttribute clssAtt = elem.getAttribute(CLASS_Q);
- 
--        if(clssAtt != null) {
-+        if (clssAtt != null) {
-             try {
-                 Class cls = Class.forName(clssAtt.getAttributeValue());
-                 processor = (MessageProcessor) cls.newInstance();
-@@ -86,7 +90,7 @@
- 
-         OMAttribute storeAtt = elem.getAttribute(MESSAGE_STORE_Q);
- 
--        if(storeAtt != null) {
-+        if (storeAtt != null) {
-             assert processor != null;
-             processor.setMessageStoreName(storeAtt.getAttributeValue());
-         } else {
-@@ -115,9 +119,19 @@
-                 OMElement prop = (OMElement) o;
-                 OMAttribute paramName = prop.getAttribute(NAME_Q);
-                 String paramValue = prop.getText();
-+                OMAttribute paramExpression = prop.getAttribute(EXPRESSION_Q);
-                 if (paramName != null) {
--                    if (paramValue != null) {
-+                    if (paramExpression != null) {
-+                        try {
-+                            SynapseXPath expression = SynapseXPathFactory.getSynapseXPath(prop, paramExpression.getAttributeValue());
-+                            parameters.put(paramName.getAttributeValue(), expression);
-+                        } catch (JaxenException e) {
-+                            handleException("Error while creating expression " + e.getMessage());
-+                        }
-+                    } else if (paramValue != null) {
-                         parameters.put(paramName.getAttributeValue(), paramValue);
-+                    } else {
-+                        handleException("Invalid MessageStore parameter - Parameter must have a value or an expression ");
-                     }
-                 } else {
-                     handleException("Invalid MessageStore parameter - Parameter must have a name ");
 -*-*-*-
-Applying patch for SYNAPSE-893 .Thanks Buddhima Wijeweera for contribution.
+Message: Applying patch for SYNAPSE-893 .Thanks Buddhima Wijeweera for contribution.
+-*-*-*-
+When: 2013-05-29 14:55:01 -0400 

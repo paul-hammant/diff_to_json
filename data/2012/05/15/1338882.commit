@@ -127,4 +127,6 @@ Index: java/modules/core/src/test/java/org/apache/synapse/eventing/builders/Resp
      }
  }
 -*-*-*-
-Eliminated a couple of instances of the catch-and-fail JUnit anti-pattern.
+Message: Eliminated a couple of instances of the catch-and-fail JUnit anti-pattern.
+-*-*-*-
+When: 2012-05-15 16:39:00 -0400 

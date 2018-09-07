@@ -1,16 +1,3 @@
-Index: java/modules/core/src/test/java/org/apache/synapse/libraries/util/LibDeployerUtilsTest.java
-===================================================================
---- java/modules/core/src/test/java/org/apache/synapse/libraries/util/LibDeployerUtilsTest.java	(revision 1328356)
-+++ java/modules/core/src/test/java/org/apache/synapse/libraries/util/LibDeployerUtilsTest.java	(revision 1328357)
-@@ -31,7 +31,7 @@
-  * Time: 4:54 PM
-  * To change this template use File | Settings | File Templates.
-  */
--public class LibDeployerUtilsTest extends TestCase {
-+public abstract class LibDeployerUtilsTest extends TestCase {
- 
- /*
-     String path;
 Index: java/modules/core/src/test/java/org/apache/synapse/libraries/LibImportTest.java
 ===================================================================
 --- java/modules/core/src/test/java/org/apache/synapse/libraries/LibImportTest.java	(revision 1328356)
@@ -24,5 +11,20 @@ Index: java/modules/core/src/test/java/org/apache/synapse/libraries/LibImportTes
  
  
  /*
+Index: java/modules/core/src/test/java/org/apache/synapse/libraries/util/LibDeployerUtilsTest.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/libraries/util/LibDeployerUtilsTest.java	(revision 1328356)
++++ java/modules/core/src/test/java/org/apache/synapse/libraries/util/LibDeployerUtilsTest.java	(revision 1328357)
+@@ -31,7 +31,7 @@
+  * Time: 4:54 PM
+  * To change this template use File | Settings | File Templates.
+  */
+-public class LibDeployerUtilsTest extends TestCase {
++public abstract class LibDeployerUtilsTest extends TestCase {
+ 
+ /*
+     String path;
 -*-*-*-
-committing fix for unit test failure
+Message: committing fix for unit test failure
+-*-*-*-
+When: 2012-04-20 08:54:05 -0400 

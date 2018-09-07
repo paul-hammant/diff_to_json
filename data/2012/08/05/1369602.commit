@@ -34,4 +34,6 @@ Index: java/modules/core/src/test/java/org/apache/synapse/config/xml/MessageProc
  
  
 -*-*-*-
-adding Test case for MessageProcessor serialization test to test the config with params
+Message: adding Test case for MessageProcessor serialization test to test the config with params
+-*-*-*-
+When: 2012-08-05 10:23:23 -0400 

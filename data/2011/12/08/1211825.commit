@@ -1,3 +1,97 @@
+Index: java/modules/integration/src/test/resources/sample100.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample100.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample100.xml	(revision 1211825)
+@@ -0,0 +1,18 @@
++<synapseSample>
++    <sampleID>100</sampleID>
++    <sampleName>Using WS-Security for outgoing messages</sampleName>
++    <synapseConfig>
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>repository/conf/sample/synapse_sample_100.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+Index: java/modules/integration/src/test/resources/sample101.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample101.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample101.xml	(revision 1211825)
+@@ -0,0 +1,18 @@
++<synapseSample>
++    <sampleID>101</sampleID>
++    <sampleName>Reliable message exchange between Synapse and the back-end server using WS-ReliableMessaging</sampleName>
++    <synapseConfig>
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>repository/conf/sample/synapse_sample_101.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1211824)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1211825)
+@@ -24,6 +24,8 @@
+ import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.tests.endpoint.*;
+ import org.apache.synapse.samples.framework.tests.message.*;
++import org.apache.synapse.samples.framework.tests.qos.Sample100;
++import org.apache.synapse.samples.framework.tests.qos.Sample101;
+ 
+ import java.util.ArrayList;
+ import java.util.HashMap;
+@@ -182,5 +184,9 @@
+         //sampleClassRepo.put("57", Sample57.class);  //intermittently fail
+         sampleClassRepo.put("58", Sample58.class);
+         sampleClassRepo.put("59", Sample59.class);
++
++        //QoS
++        sampleClassRepo.put("100", Sample100.class);
++        sampleClassRepo.put("101", Sample101.class);
+     }
+ }
+\ No newline at end of file
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample57.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample57.java	(revision 1211824)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample57.java	(revision 1211825)
+@@ -58,19 +58,6 @@
+ 
+         }
+ 
+-        t = new Thread(new Runnable() {
+-            public void run() {
+-                result = client.sessionlessClient(addUrl, null, 500);
+-            }
+-        });
+-        t.start();
+-
+-        try {
+-            t.join();
+-        } catch (InterruptedException e) {
+-
+-        }
+-
+         assertResponseReceived(result);
+     }
+ }
 Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/qos/Sample100.java
 ===================================================================
 --- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/qos/Sample100.java	(nonexistent)
@@ -101,99 +195,7 @@ Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framewo
 +    }
 +
 +}
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample57.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample57.java	(revision 1211824)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample57.java	(revision 1211825)
-@@ -58,19 +58,6 @@
- 
-         }
- 
--        t = new Thread(new Runnable() {
--            public void run() {
--                result = client.sessionlessClient(addUrl, null, 500);
--            }
--        });
--        t.start();
--
--        try {
--            t.join();
--        } catch (InterruptedException e) {
--
--        }
--
-         assertResponseReceived(result);
-     }
- }
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1211824)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1211825)
-@@ -24,6 +24,8 @@
- import org.apache.commons.logging.LogFactory;
- import org.apache.synapse.samples.framework.tests.endpoint.*;
- import org.apache.synapse.samples.framework.tests.message.*;
-+import org.apache.synapse.samples.framework.tests.qos.Sample100;
-+import org.apache.synapse.samples.framework.tests.qos.Sample101;
- 
- import java.util.ArrayList;
- import java.util.HashMap;
-@@ -182,5 +184,9 @@
-         //sampleClassRepo.put("57", Sample57.class);  //intermittently fail
-         sampleClassRepo.put("58", Sample58.class);
-         sampleClassRepo.put("59", Sample59.class);
-+
-+        //QoS
-+        sampleClassRepo.put("100", Sample100.class);
-+        sampleClassRepo.put("101", Sample101.class);
-     }
- }
-\ No newline at end of file
-Index: java/modules/integration/src/test/resources/sample100.xml
-===================================================================
---- java/modules/integration/src/test/resources/sample100.xml	(nonexistent)
-+++ java/modules/integration/src/test/resources/sample100.xml	(revision 1211825)
-@@ -0,0 +1,18 @@
-+<synapseSample>
-+    <sampleID>100</sampleID>
-+    <sampleName>Using WS-Security for outgoing messages</sampleName>
-+    <synapseConfig>
-+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
-+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
-+        <synapseXml>repository/conf/sample/synapse_sample_100.xml</synapseXml>
-+    </synapseConfig>
-+    <backEndServerConfig>
-+        <axis2Server id='0'>
-+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
-+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
-+        </axis2Server>
-+    </backEndServerConfig>
-+    <clientConfig>
-+	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
-+    </clientConfig>
-+</synapseSample>
-Index: java/modules/integration/src/test/resources/sample101.xml
-===================================================================
---- java/modules/integration/src/test/resources/sample101.xml	(nonexistent)
-+++ java/modules/integration/src/test/resources/sample101.xml	(revision 1211825)
-@@ -0,0 +1,18 @@
-+<synapseSample>
-+    <sampleID>101</sampleID>
-+    <sampleName>Reliable message exchange between Synapse and the back-end server using WS-ReliableMessaging</sampleName>
-+    <synapseConfig>
-+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
-+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
-+        <synapseXml>repository/conf/sample/synapse_sample_101.xml</synapseXml>
-+    </synapseConfig>
-+    <backEndServerConfig>
-+        <axis2Server id='0'>
-+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
-+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
-+        </axis2Server>
-+    </backEndServerConfig>
-+    <clientConfig>
-+	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
-+    </clientConfig>
-+</synapseSample>
 -*-*-*-
-Adding qos samples
+Message: Adding qos samples
+-*-*-*-
+When: 2011-12-08 06:01:42 -0500 

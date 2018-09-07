@@ -158,20 +158,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/mediators/transform/Pa
 +    }
 +
 +}
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java	(revision 1211360)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java	(revision 1211361)
-@@ -68,7 +68,8 @@
-         TemplateMediatorSerializer.class,
-         InvokeMediatorSerializer.class,
-         MessageStoreMediatorSerializer.class,
--        URLRewriteMediatorSerializer.class
-+        URLRewriteMediatorSerializer.class,
-+        PayloadFactoryMediatorSerializer.class
-     };
- 
-     private final static MediatorSerializerFinder instance = new MediatorSerializerFinder();
 Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/PayloadFactoryMediatorFactory.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/config/xml/PayloadFactoryMediatorFactory.java	(nonexistent)
@@ -309,6 +295,20 @@ Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/PayloadFact
 +    }
 +
 +}
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java	(revision 1211360)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java	(revision 1211361)
+@@ -68,7 +68,8 @@
+         TemplateMediatorSerializer.class,
+         InvokeMediatorSerializer.class,
+         MessageStoreMediatorSerializer.class,
+-        URLRewriteMediatorSerializer.class
++        URLRewriteMediatorSerializer.class,
++        PayloadFactoryMediatorSerializer.class
+     };
+ 
+     private final static MediatorSerializerFinder instance = new MediatorSerializerFinder();
 Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/PayloadFactoryMediatorSerializer.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/config/xml/PayloadFactoryMediatorSerializer.java	(nonexistent)
@@ -426,4 +426,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFac
  
      private final static MediatorFactoryFinder instance  = new MediatorFactoryFinder();
 -*-*-*-
-Adding payload factory mediator. SYNAPSE-821. Thanks Sadeep for the patch
+Message: Adding payload factory mediator. SYNAPSE-821. Thanks Sadeep for the patch
+-*-*-*-
+When: 2011-12-07 05:01:53 -0500 

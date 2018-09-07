@@ -1,731 +1,3 @@
-Index: java/modules/core/src/main/java/org/apache/synapse/libraries/util/LibDeployerUtils.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/libraries/util/LibDeployerUtils.java	(revision 1373301)
-+++ java/modules/core/src/main/java/org/apache/synapse/libraries/util/LibDeployerUtils.java	(revision 1373302)
-@@ -56,6 +56,8 @@
- 
- 
-     public static Library createSynapseLibrary(String libPath) {
-+        createDir(APP_UNZIP_DIR);
-+
-         String libFilePath = LibDeployerUtils.formatPath(libPath);
-         //extract
-         String extractPath = LibDeployerUtils.extractSynapseLib(libFilePath);
-Index: java/modules/core/src/main/java/org/apache/synapse/mediators/TemplateParameter.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/mediators/TemplateParameter.java	(nonexistent)
-+++ java/modules/core/src/main/java/org/apache/synapse/mediators/TemplateParameter.java	(revision 1373302)
-@@ -0,0 +1,71 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+package org.apache.synapse.mediators;
-+
-+import javax.xml.namespace.QName;
-+
-+import org.apache.synapse.config.xml.XMLConfigConstants;
-+
-+/**
-+ * A template parameter is a variable which is used when creating templates and contains following configuration
-+ * parameter name="p1" [default="value|expression"] [optional=(true|false)]
-+ *
-+ */
-+public class TemplateParameter {
-+    public static final QName PARAMETER_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "parameter");
-+    public static final QName ATT_NAME_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "name");
-+    public static final QName ATT_DEFAULT_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "default");
-+    public static final QName ATT_OPTIONAL_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "optional");
-+
-+
-+    private String name;
-+    private Value defaultValue;
-+    private boolean isOptional;
-+
-+    public TemplateParameter() {
-+        this.name = null;
-+        this.defaultValue = null;
-+        this.isOptional = false;
-+    }
-+
-+    public String getName() {
-+        return name;
-+    }
-+
-+    public void setName(String name) {
-+        this.name = name;
-+    }
-+
-+    public Value getDefaultValue() {
-+        return defaultValue;
-+    }
-+
-+    public void setDefaultValue(Value defaultValue) {
-+        this.defaultValue = defaultValue;
-+    }
-+
-+    public boolean isOptional() {
-+        return isOptional;
-+    }
-+
-+    public void setOptional(boolean optional) {
-+        isOptional = optional;
-+    }
-+
-+}
-Index: java/modules/core/src/main/java/org/apache/synapse/mediators/template/TemplateContext.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/mediators/template/TemplateContext.java	(revision 1373301)
-+++ java/modules/core/src/main/java/org/apache/synapse/mediators/template/TemplateContext.java	(revision 1373302)
-@@ -18,7 +18,10 @@
-  */
- package org.apache.synapse.mediators.template;
- 
-+import org.apache.commons.logging.Log;
-+import org.apache.commons.logging.LogFactory;
- import org.apache.synapse.MessageContext;
-+import org.apache.synapse.mediators.TemplateParameter;
- import org.apache.synapse.mediators.Value;
- import org.apache.synapse.mediators.eip.EIPUtils;
- import org.jaxen.JaxenException;
-@@ -30,6 +33,7 @@
-  * a context will be populated with function parameters.
-  */
- public class TemplateContext {
-+    private static final Log log = LogFactory.getLog(TemplateContext.class);
-     /**
-      * refers to the function-template name this context is binded to
-      */
-@@ -37,13 +41,13 @@
-     /**
-      * refers to the parameter names of the function
-      */
--    private Collection<String> parameters;
-+    private Collection<TemplateParameter> parameters;
-     /**
-      * contains a map for parameterNames to evaluated values
-      */
-     private Map mappedValues;
- 
--    TemplateContext(String name, Collection<String> parameters) {
-+    TemplateContext(String name, Collection<TemplateParameter> parameters) {
-         this.fName = name;
-         this.parameters = parameters;
-         mappedValues = new HashMap();
-@@ -50,18 +54,27 @@
-     }
- 
-     /**
--     * evaluate raw parameters passed from an invoke medaiator and store them in this context
-+     * evaluate raw parameters passed from an invoke mediator and store them in this context
-      * @param synCtxt Synapse MessageContext
-      */
-     public void setupParams(MessageContext synCtxt) {
--        Iterator<String> paramNames = parameters.iterator();
-+        Iterator<TemplateParameter> paramNames = parameters.iterator();
-         while (paramNames.hasNext()) {
--            String parameter = paramNames.next();
--            String mapping = EIPUtils.getTemplatePropertyMapping(fName, parameter);
-+            TemplateParameter parameter = paramNames.next();
-+            String mapping = EIPUtils.getTemplatePropertyMapping(fName, parameter.getName());
-             Object propertyValue = synCtxt.getProperty(mapping);
--            Object paramValue = getEvaluatedParamValue(synCtxt, parameter, (Value) propertyValue);
-+            //If property value is not provided assign default value
-+            if (propertyValue == null && parameter.getDefaultValue() != null) {
-+                propertyValue = parameter.getDefaultValue();
-+            }
-+            //If this parameter is a required one give an error
-+            if (!parameter.isOptional() && propertyValue == null) {
-+                String msg = parameter.getName() + " is a required parameter for " + fName + " template";
-+                log.error(msg);
-+            }
-+            Object paramValue = getEvaluatedParamValue(synCtxt, parameter.getName(), (Value) propertyValue);
-             if (paramValue != null) {
--                mappedValues.put(parameter, paramValue);
-+                mappedValues.put(parameter.getName(), paramValue);
-                 //remove temp property from the context
-                 removeProperty(synCtxt, mapping);
-             }
-Index: java/modules/core/src/main/java/org/apache/synapse/mediators/template/TemplateMediator.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/mediators/template/TemplateMediator.java	(revision 1373301)
-+++ java/modules/core/src/main/java/org/apache/synapse/mediators/template/TemplateMediator.java	(revision 1373302)
-@@ -23,6 +23,7 @@
- import org.apache.synapse.SynapseLog;
- import org.apache.synapse.core.SynapseEnvironment;
- import org.apache.synapse.mediators.AbstractListMediator;
-+import org.apache.synapse.mediators.TemplateParameter;
- 
- import javax.sound.midi.Sequence;
- import java.util.Collection;
-@@ -37,7 +38,7 @@
-  */
- public class TemplateMediator extends AbstractListMediator {
- 
--    private Collection<String> paramNames;
-+    private Collection<TemplateParameter> parameters;
- 
-     private String eipPatternName;
-     private String fileName;
-@@ -44,12 +45,12 @@
-     /** flag to ensure that each and every sequence is initialized and destroyed atmost once */
-     private boolean initialized = false;
- 
--    public void setParameters(Collection<String> paramNames) {
--        this.paramNames = paramNames;
-+    public void setParameters(Collection<TemplateParameter> paramNames) {
-+        this.parameters = paramNames;
-     }
- 
--    public Collection<String> getParameters() {
--        return paramNames;
-+    public Collection<TemplateParameter> getParameters() {
-+        return parameters;
-     }
- 
-     public void setName(String name) {
-@@ -64,7 +65,7 @@
-         SynapseLog synLog = getLog(synCtx);
- 
-         if (synLog.isTraceOrDebugEnabled()) {
--            synLog.traceOrDebug("Start : EIP Sequence " + "paramNames : " + paramNames);
-+            synLog.traceOrDebug("Start : EIP Sequence " + "paramNames : " + parameters);
- 
-             if (synLog.isTraceTraceEnabled()) {
-                 synLog.traceTrace("Message : " + synCtx.getEnvelope());
-@@ -86,7 +87,7 @@
-      * @param synCtx  Synapse Message context
-      */
-     private void pushFuncContextTo(MessageContext synCtx) {
--        TemplateContext funcContext = new TemplateContext(eipPatternName, paramNames);
-+        TemplateContext funcContext = new TemplateContext(eipPatternName, parameters);
-         //process the raw parameters parsed in
-         funcContext.setupParams(synCtx);
-         //if a function stack has not already been created for this message flow create new one
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateMediatorSerializer.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateMediatorSerializer.java	(revision 1373301)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateMediatorSerializer.java	(revision 1373302)
-@@ -20,17 +20,17 @@
- 
- import org.apache.axiom.om.OMElement;
- import org.apache.synapse.Mediator;
-+import org.apache.synapse.mediators.TemplateParameter;
- import org.apache.synapse.mediators.template.TemplateMediator;
- 
- import java.util.Collection;
--import java.util.Iterator;
- import java.util.List;
- 
- /**
-  *  Serializer class for Template to serialize into a  configuration as follows
-  * <template name="simple_func">
--	    <parameter name="p1"/>
--        <parameter name="p2"/>*
-+	    <parameter name="p1" [default="value|expression"] [optional=(true|false)]/>
-+        <parameter name="p2" [default="value|expression"] [optional=(true|false)]/>*
-         <mediator/>+
-     </template>
-  */
-@@ -47,6 +47,7 @@
-         if (mediator.getName() != null) {
-             templateElem.addAttribute(fac.createOMAttribute(
-                     "name", nullNS, mediator.getName()));
-+            //serialize parameters
-             serializeParams(templateElem,mediator);
-             serializeBody(templateElem, mediator.getList());
-             saveTracingState(templateElem, mediator);
-@@ -55,14 +56,16 @@
-         return templateElem;
-     }
- 
-+     /**
-+     * Serialize parameters for the template mediator specified
-+     *
-+     * @param templateElem the OMElement that specifies the template configuration
-+     * @param mediator the TemplateMediator
-+     */
-     private void serializeParams(OMElement templateElem, TemplateMediator mediator) {
--        Collection<String> params = mediator.getParameters();
--        for (String param : params) {
--            if (param != null && !"".equals(param)) {
--                OMElement paramEl = fac.createOMElement("parameter", synNS);
--                paramEl.addAttribute(fac.createOMAttribute("name", nullNS, param));
--                templateElem.addChild(paramEl);
--            }
-+        Collection<TemplateParameter> params = mediator.getParameters();
-+        if (params != null && params.size() > 0) {
-+               TemplateParameterSerializer.serializeTemplateParameters(templateElem,mediator.getParameters());
-         }
-     }
- 
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/IterateMediatorSerializer.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/IterateMediatorSerializer.java	(revision 1373301)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/IterateMediatorSerializer.java	(revision 1373302)
-@@ -85,8 +85,8 @@
-             handleException("Missing expression of the IterateMediator which is required.");
-         }
- 
--        if (itrMed.getTarget() != null && !itrMed.getTarget().isAsynchronous()) {
--            itrElem.addAttribute("sequential", "true", nullNS);
-+        if (itrMed.getTarget() != null && itrMed.getTarget().isAsynchronous()) {
-+            itrElem.addAttribute("sequential", "false", nullNS);
-         }
- 
-         itrElem.addChild(TargetSerializer.serializeTarget(itrMed.getTarget()));
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateMediatorFactory.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateMediatorFactory.java	(revision 1373301)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateMediatorFactory.java	(revision 1373302)
-@@ -22,6 +22,7 @@
- import org.apache.axiom.om.OMElement;
- import org.apache.synapse.Mediator;
- import org.apache.synapse.SynapseException;
-+import org.apache.synapse.mediators.TemplateParameter;
- import org.apache.synapse.mediators.template.TemplateMediator;
- 
- import javax.xml.namespace.QName;
-@@ -32,8 +33,8 @@
- /**
-  * Factory class for Template configuration as follows
-  * <template name="simple_func">
--	    <parameter name="p1"/>
--        <parameter name="p2"/>*
-+	    <parameter name="p1" [default="value|expression"] [optional=(true|false)]/>
-+        <parameter name="p2" [default="value|expression"] [optional=(true|false)]/>*
-         <mediator/>+
-     </template>
-  */
-@@ -43,13 +44,6 @@
-     private static final QName TEMPLATE_BODY_Q
-             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "sequence");
- 
--    /**
--     * Element  QName Definitions
--     */
--    public static final QName PARAMETER_Q = new QName(
--            XMLConfigConstants.SYNAPSE_NAMESPACE, "parameter");
--
--
-     protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
-         TemplateMediator templateTemplateMediator = new TemplateMediator();
-         OMAttribute nameAttr = elem.getAttribute(ATT_NAME);
-@@ -56,7 +50,8 @@
-         if (nameAttr != null) {
-             templateTemplateMediator.setName(nameAttr.getAttributeValue());
-             processAuditStatus(templateTemplateMediator, elem);
--            initParameters(elem, templateTemplateMediator);
-+            //set template parameters
-+            templateTemplateMediator.setParameters(TemplateParameterFactory.getTemplateParameters(elem));
-             OMElement templateBodyElem = elem.getFirstChildWithName(TEMPLATE_BODY_Q);
-             addChildren(templateBodyElem, templateTemplateMediator, properties);
-         } else {
-@@ -67,22 +62,6 @@
-         return templateTemplateMediator;
-     }
- 
--    private void initParameters(OMElement templateElem, TemplateMediator templateMediator) {
--        Iterator subElements = templateElem.getChildElements();
--        Collection<String> paramNames = new ArrayList<String>();
--        while (subElements.hasNext()) {
--            OMElement child = (OMElement) subElements.next();
--            if (child.getQName().equals(PARAMETER_Q)) {
--                OMAttribute paramNameAttr = child.getAttribute(ATT_NAME);
--                if (paramNameAttr != null) {
--                    paramNames.add(paramNameAttr.getAttributeValue());
--                }
--//                child.detach();
--            }
--        }
--        templateMediator.setParameters(paramNames);
--    }
--
-     public QName getTagQName() {
-         return TEMPLATE_Q;
-     }
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateParameterFactory.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateParameterFactory.java	(nonexistent)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateParameterFactory.java	(revision 1373302)
-@@ -0,0 +1,98 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+package org.apache.synapse.config.xml;
-+
-+import org.apache.axiom.om.OMAttribute;
-+import org.apache.axiom.om.OMElement;
-+import org.apache.commons.logging.Log;
-+import org.apache.commons.logging.LogFactory;
-+import org.apache.synapse.SynapseException;
-+import org.apache.synapse.mediators.TemplateParameter;
-+import org.apache.synapse.mediators.Value;
-+
-+import java.util.ArrayList;
-+import java.util.Iterator;
-+import java.util.List;
-+
-+/**
-+ * A utility class capable of creating instances of TemplateParameter objects by reading
-+ * through a given XML configuration
-+ *
-+ * <pre>
-+ * &lt;element&gt;
-+ *    &lt;parameter name="p1" [default="value|expression"] [optional=(true|false)]/&gt;*
-+ * &lt;/element&gt;
-+ * </pre>
-+ */
-+public class TemplateParameterFactory {
-+    private static final Log log = LogFactory.getLog(TemplateParameterFactory.class);
-+
-+     /**
-+     * Creates a list of parameters in a given template
-+     *
-+     * @param elem the OMElement that specifies the template configuration
-+     * @return the list of TemplateParameter instances created
-+     */
-+    public static List<TemplateParameter> getTemplateParameters(OMElement elem) {
-+
-+        List<TemplateParameter> parameterList = new ArrayList<TemplateParameter>();
-+
-+        Iterator iter = elem.getChildrenWithName(TemplateParameter.PARAMETER_Q);
-+
-+        while (iter.hasNext()) {
-+
-+            OMElement paramEle = (OMElement) iter.next();
-+            OMAttribute attName = paramEle.getAttribute(TemplateParameter.ATT_NAME_Q);
-+            OMAttribute attDefault = paramEle.getAttribute(TemplateParameter.ATT_DEFAULT_Q);
-+            OMAttribute attOptional = paramEle.getAttribute(TemplateParameter.ATT_OPTIONAL_Q);
-+
-+            TemplateParameter param = new TemplateParameter();
-+
-+            if (attName == null || attName.getAttributeValue() == null ||
-+                    attName.getAttributeValue().trim().length() == 0) {
-+                String msg = "Parameter name is a required attribute for a Template Parameter";
-+                log.error(msg);
-+                throw new SynapseException(msg);
-+            } else {
-+                param.setName(attName.getAttributeValue());
-+            }
-+
-+
-+            if (attDefault == null || attDefault.getAttributeValue() == null ||
-+                    attDefault.getAttributeValue().trim().length() == 0) {
-+                String msg = "Default value is not specified for " + param.getName() + " Parameter";
-+                log.warn(msg);
-+            } else {
-+                Value paramValue = new ValueFactory().createValue("default", paramEle);
-+                param.setDefaultValue(paramValue);
-+            }
-+
-+            if (attOptional == null || attOptional.getAttributeValue() == null ||
-+                    attOptional.getAttributeValue().trim().length() == 0) {
-+            } else {
-+                param.setOptional(Boolean.valueOf(attOptional.getAttributeValue()));
-+            }
-+
-+            parameterList.add(param);
-+        }
-+
-+        return parameterList;
-+    }
-+
-+}
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/CloneMediatorFactory.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/CloneMediatorFactory.java	(revision 1373301)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/CloneMediatorFactory.java	(revision 1373302)
-@@ -73,7 +73,7 @@
-      */
-     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
-     	
--    	boolean asynchronousExe = true;
-+    	boolean asynchronousExe = false;
-         
-     	CloneMediator mediator = new CloneMediator();
-         processAuditStatus(mediator, elem);
-@@ -94,8 +94,6 @@
-         if (synchronousExeAttr != null && synchronousExeAttr.getAttributeValue().equals("true")) {
-         	asynchronousExe = false;
-         }
--
--        mediator.setSequential(!asynchronousExe);
-         
-         Iterator targetElements = elem.getChildrenWithName(TARGET_Q);
-         while (targetElements.hasNext()) {
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateParameterSerializer.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateParameterSerializer.java	(nonexistent)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateParameterSerializer.java	(revision 1373302)
-@@ -0,0 +1,111 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+package org.apache.synapse.config.xml;
-+
-+import org.apache.axiom.om.OMAbstractFactory;
-+import org.apache.axiom.om.OMElement;
-+import org.apache.axiom.om.OMFactory;
-+import org.apache.axiom.om.OMNamespace;
-+import org.apache.commons.logging.Log;
-+import org.apache.commons.logging.LogFactory;
-+import org.apache.synapse.SynapseConstants;
-+import org.apache.synapse.SynapseException;
-+import org.apache.synapse.mediators.TemplateParameter;
-+
-+import javax.xml.namespace.QName;
-+import java.util.Collection;
-+
-+/**
-+ * A utility class for serializing instances of TemplateParameter objects by reading
-+ * through a given XML configuration
-+ *
-+ * <pre>
-+ * &lt;element&gt;
-+ *    &lt;parameter name="p1" [default="value|expression"] [optional=(true|false)]/&gt;*
-+ * &lt;/element&gt;
-+ * </pre>
-+ */
-+public class TemplateParameterSerializer {
-+    private static final Log log = LogFactory.getLog(TemplateParameterSerializer.class);
-+
-+    protected static final OMFactory fac = OMAbstractFactory.getOMFactory();
-+    protected static final OMNamespace synNS = SynapseConstants.SYNAPSE_OMNAMESPACE;
-+    protected static final OMNamespace nullNS
-+            = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
-+
-+    protected static final QName PARAMETER_Q
-+        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "parameter");
-+
-+    /**
-+     * Serialize all the parameters to the given parent element. For each and every
-+     * parameter there will be a separate parameter element created inside the parent element.
-+     *
-+     * @param parent element to which parameter elements should be added
-+     * @param params the list of  TemplateParameter objects
-+     */
-+    public static void serializeTemplateParameters(OMElement parent,
-+                                               Collection<TemplateParameter> params) {
-+            serializeTemplateParameters(parent, params, PARAMETER_Q);
-+    }
-+
-+    /**
-+     * Serialize all the parameters to the given parent element. For each and every
-+     * parameter there will be a separate parameter element created inside the parent element.
-+     *
-+     * @param parent element to which parameter elements should be added
-+     * @param params the list of  TemplateParameter objects
-+     * @param childElementName of the parameter element to be created
-+     */
-+    public static void serializeTemplateParameters(OMElement parent,
-+                                               Collection<TemplateParameter> params,
-+                                               QName childElementName) {
-+        for (TemplateParameter tp : params) {
-+            serializeTemplateParameter(parent,tp, childElementName);
-+        }
-+    }
-+
-+    /**
-+     * Serialize the parameter to the given parent element. There will be a element created with
-+     * given configuration inside the parent element.
-+     *
-+     * @param parent element to which parameter elements should be added
-+     * @param tp a property to be serialized
-+     * @param childElementName of the parameter element to be created
-+     */
-+    public static void serializeTemplateParameter(OMElement parent,
-+                                             TemplateParameter tp,
-+                                             QName childElementName) {
-+        OMElement param = fac.createOMElement(childElementName, parent);
-+        if (tp.getName() != null) {
-+            param.addAttribute(fac.createOMAttribute("name", nullNS, tp.getName()));
-+        } else {
-+            String msg = "Template parameter name missing";
-+            log.error(msg);
-+            throw new SynapseException(msg);
-+        }
-+
-+        if (tp.getDefaultValue() != null) {
-+            new ValueSerializer().serializeValue(tp.getDefaultValue(), "default", param);
-+
-+        if (tp.isOptional()) {
-+            param.addAttribute(fac.createOMAttribute("optional", nullNS, "true"));
-+        }
-+    }
-+}
-+}
-\ No newline at end of file
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/IterateMediatorFactory.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/IterateMediatorFactory.java	(revision 1373301)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/IterateMediatorFactory.java	(revision 1373302)
-@@ -128,7 +128,7 @@
-                 attachPathValue, e);
-         }
- 
--        boolean asynchronous = true;
-+        boolean asynchronous = false;
-         OMAttribute asynchronousAttr = elem.getAttribute(ATT_SEQUENCIAL);
-         if (asynchronousAttr != null && asynchronousAttr.getAttributeValue().equals("true")) {
-             asynchronous = false;
-Index: java/modules/core/src/test/resources/synapse-libraries/assembly/assemble-eip-lib.xml
-===================================================================
---- java/modules/core/src/test/resources/synapse-libraries/assembly/assemble-eip-lib.xml	(nonexistent)
-+++ java/modules/core/src/test/resources/synapse-libraries/assembly/assemble-eip-lib.xml	(revision 1373302)
-@@ -0,0 +1,23 @@
-+<?xml version="1.0" encoding="UTF-8"?>
-+<assembly>
-+    <formats>
-+        <format>zip</format>
-+    </formats>
-+    <includeBaseDirectory>false</includeBaseDirectory>
-+    <fileSets>
-+        <fileSet>
-+            <directory>src/test/resources/synapse-libraries/synapse-eip-lib</directory>
-+            <outputDirectory></outputDirectory>
-+        </fileSet>
-+        <fileSet>
-+            <directory>target/classes</directory>
-+            <outputDirectory></outputDirectory>
-+            <excludes>
-+                <exclude>**/metrics_module.xml</exclude>
-+                <exclude>**/META-INF/*</exclude>
-+            </excludes>
-+        </fileSet>
-+    </fileSets>
-+    
-+    
-+</assembly>
-Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/eip_systemManagement/artifact.xml
-===================================================================
---- java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/eip_systemManagement/artifact.xml	(nonexistent)
-+++ java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/eip_systemManagement/artifact.xml	(revision 1373302)
-@@ -0,0 +1,11 @@
-+<?xml version="1.0" encoding="UTF-8"?>
-+<artifact name="systemManagement" type="synapse/template">
-+
-+    <subArtifacts>
-+        <artifact name="splitter">
-+            <file>template_splitter.xml</file>
-+            <description>Splitter library function</description>
-+        </artifact>
-+    </subArtifacts>
-+
-+</artifact>
-\ No newline at end of file
-Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/eip_systemManagement/template_splitter.xml
-===================================================================
---- java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/eip_systemManagement/template_splitter.xml	(nonexistent)
-+++ java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/eip_systemManagement/template_splitter.xml	(revision 1373302)
-@@ -0,0 +1,20 @@
-+<template xmlns="http://ws.apache.org/ns/synapse" name="splitter">
-+    <parameter name="iterate_exp"/>
-+    <parameter name="endpoint_uri"/>
-+    <parameter name="attach_path" default="{{//original}}" optional="true"/>
-+    <parameter name="sequence_ref"/>
-+    <sequence>
-+        <property name="ItrExp" expression="$func:iterate_exp" />
-+        <property name="EndPUri" expression="$func:endpoint_uri" />
-+        <property name="AttachPath" expression="$func:attach_path" />
-+        <property name="SRef" expression="$func:sequence_ref" />
-+        <property name="Endpoint_1" expression="get-property('To')" />
-+        <header name="To" expression="$func:endpoint_uri"/>
-+        <iterate xmlns:ns="http://org.apache.synapse/xsd" continueParent="true" preservePayload="true" attachPath="$func:attach_path" expression="$func:iterate_exp">
-+            <target>
-+              <sequence key="{$func:sequence_ref}"/>
-+            </target>
-+        </iterate>
-+        <property name="Endpoint_2" expression="get-property('To')" />
-+    </sequence>
-+</template>
-Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/artifacts.xml
-===================================================================
---- java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/artifacts.xml	(nonexistent)
-+++ java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/artifacts.xml	(revision 1373302)
-@@ -0,0 +1,7 @@
-+<?xml version="1.0" encoding="UTF-8"?>
-+<artifacts>
-+    <artifact name="EipLibrary" package="synapse.lang.eip" >
-+        <dependency artifact="systemManagement" />
-+        <description>eip synapse library</description>
-+    </artifact>
-+</artifacts>
-Index: java/modules/core/src/test/java/org/apache/synapse/libraries/eip/AbstractEipLibTestCase.java
-===================================================================
---- java/modules/core/src/test/java/org/apache/synapse/libraries/eip/AbstractEipLibTestCase.java	(nonexistent)
-+++ java/modules/core/src/test/java/org/apache/synapse/libraries/eip/AbstractEipLibTestCase.java	(revision 1373302)
-@@ -0,0 +1,26 @@
-+package org.apache.synapse.libraries.eip;
-+
-+import junit.framework.TestCase;
-+import org.apache.synapse.libraries.imports.SynapseImport;
-+import org.apache.synapse.libraries.model.Library;
-+import org.apache.synapse.libraries.util.LibDeployerUtils;
-+import org.apache.synapse.mediators.eip.AbstractSplitMediatorTestCase;
-+
-+import java.io.File;
-+import java.net.URISyntaxException;
-+
-+public abstract class AbstractEipLibTestCase extends TestCase {
-+    public String path = null;
-+
-+    protected String getResourcePath() {
-+        try {
-+            if (path == null) {
-+                path = new File("./target/test_repos/synapse/synapse-libraries/synapse-eip-lib.zip").getAbsolutePath();
-+            }
-+        } catch (Exception e) {
-+            return null;
-+        }
-+        return path;
-+
-+    }
-+}
 Index: java/modules/core/src/test/java/org/apache/synapse/libraries/eip/EipLibTest.java
 ===================================================================
 --- java/modules/core/src/test/java/org/apache/synapse/libraries/eip/EipLibTest.java	(nonexistent)
@@ -818,52 +90,184 @@ Index: java/modules/core/src/test/java/org/apache/synapse/libraries/eip/EipLibTe
 +
 +
 +}
-Index: java/modules/core/pom.xml
+Index: java/repository/conf/sample/synapse_sample_855.xml
 ===================================================================
---- java/modules/core/pom.xml	(revision 1373301)
-+++ java/modules/core/pom.xml	(revision 1373302)
-@@ -96,6 +96,25 @@
-                             </descriptors>
-                         </configuration>
-                     </execution>
-+                     <execution>
-+                        <id>eip-library-assembly</id>
-+                        <phase>generate-test-resources</phase>
-+                        <goals>
-+                            <goal>attached</goal>
-+                        </goals>
-+                        <configuration>
-+                            <finalName>synapse-eip-lib</finalName>
-+                            <filters>
-+                                <filter>
-+                                    ${basedir}/src/test/resources/synapse-libraries/assembly/filter.properties
-+                                </filter>
-+                            </filters>
-+                            <descriptors>
-+                                <descriptor>src/test/resources/synapse-libraries/assembly/assemble-eip-lib.xml
-+                                </descriptor>
-+                            </descriptors>
-+                        </configuration>
-+                    </execution>
-                 </executions>
-             </plugin>
- 
-@@ -115,6 +134,7 @@
-                                 <mkdir dir="target/test_repos/client/modules"/>
-                                 <mkdir dir="target/test_repos/synapse/synapse-libraries"/>
-                                 <copy file="target/synapse-test-lib.zip" todir="target/test_repos/synapse/synapse-libraries"/>
-+                                <copy file="target/synapse-eip-lib.zip" todir="target/test_repos/synapse/synapse-libraries"/>
-                             </tasks>
-                         </configuration>
-                         <goals>
-@@ -127,6 +147,7 @@
-                         <configuration>
-                             <tasks>
-                                 <delete file="target/synapse-test-lib.zip"/>
-+                                <delete file="target/synapse-eip-lib.zip"/>
-                             </tasks>
-                         </configuration>
-                         <goals>
+--- java/repository/conf/sample/synapse_sample_855.xml	(nonexistent)
++++ java/repository/conf/sample/synapse_sample_855.xml	(revision 1373302)
+@@ -0,0 +1,66 @@
++<?xml version="1.0" encoding="ISO-8859-1"?>
++<!--
++  ~  Licensed to the Apache Software Foundation (ASF) under one
++  ~  or more contributor license agreements.  See the NOTICE file
++  ~  distributed with this work for additional information
++  ~  regarding copyright ownership.  The ASF licenses this file
++  ~  to you under the Apache License, Version 2.0 (the
++  ~  "License"); you may not use this file except in compliance
++  ~  with the License.  You may obtain a copy of the License at
++  ~
++  ~   http://www.apache.org/licenses/LICENSE-2.0
++  ~
++  ~  Unless required by applicable law or agreed to in writing,
++  ~  software distributed under the License is distributed on an
++  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++  ~  KIND, either express or implied.  See the License for the
++  ~  specific language governing permissions and limitations
++  ~  under the License.
++  -->
++        
++<!-- Introduction to Synapse Content Based Router eip function template -->
++<definitions xmlns="http://ws.apache.org/ns/synapse">
++<import xmlns="http://ws.apache.org/ns/synapse" name="EipLibrary" package="synapse.lang.eip" />
++<proxy name="StockQuoteProxy" transports="https http" startOnLoad="true" trace="disable">
++        <target>
++        <inSequence>		
++               <call-template target="synapse.lang.eip.content_based_router">
++<with-param name="routing_exp" value="{{//m0:getQuote/m0:request/m0:symbol}}" xmlns:m0="http://services.samples"/>
++<with-param name="match_content" value="IBM:cnd1_seq,MSFT:cnd2_seq;cnd3_seq"/>
++    </call-template>
++</inSequence>
++<outSequence>
++<send/>
++   </outSequence>
++    </target>
++    </proxy>
++<sequence name="send_seq">
++        <log level="custom">
++            <property name="DEBUG" value="Condition Satisfied"/>
++        </log>
++        <send>
++            <endpoint name="simple">
++                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
++            </endpoint>
++        </send>
++    </sequence>
++
++    <sequence name="cnd1_seq">
++        <log level="custom">
++            <property name="MSG_FLOW" value="Condition (I) Satisfied"/>
++        </log>
++        <sequence key="send_seq"/>
++    </sequence>
++    <sequence name="cnd2_seq">
++        <log level="custom">
++            <property name="MSG_FLOW" value="Condition (II) Satisfied"/>
++        </log>
++        <sequence key="send_seq"/>
++    </sequence>
++    <sequence name="cnd3_seq">
++        <log level="custom">
++            <property name="MSG_FLOW" value="Condition (III) Satisfied"/>
++        </log>
++        <sequence key="send_seq"/>
++    </sequence>
++</definitions>
+Index: java/repository/conf/sample/synapse_sample_856.xml
+===================================================================
+--- java/repository/conf/sample/synapse_sample_856.xml	(nonexistent)
++++ java/repository/conf/sample/synapse_sample_856.xml	(revision 1373302)
+@@ -0,0 +1,65 @@
++<?xml version="1.0" encoding="ISO-8859-1"?>
++<!--
++  ~  Licensed to the Apache Software Foundation (ASF) under one
++  ~  or more contributor license agreements.  See the NOTICE file
++  ~  distributed with this work for additional information
++  ~  regarding copyright ownership.  The ASF licenses this file
++  ~  to you under the Apache License, Version 2.0 (the
++  ~  "License"); you may not use this file except in compliance
++  ~  with the License.  You may obtain a copy of the License at
++  ~
++  ~   http://www.apache.org/licenses/LICENSE-2.0
++  ~
++  ~  Unless required by applicable law or agreed to in writing,
++  ~  software distributed under the License is distributed on an
++  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++  ~  KIND, either express or implied.  See the License for the
++  ~  specific language governing permissions and limitations
++  ~  under the License.
++  -->
++        
++<!-- Introduction to Synapse Dynamic Router eip function template -->
++<definitions xmlns="http://ws.apache.org/ns/synapse">
++<import xmlns="http://ws.apache.org/ns/synapse" name="EipLibrary" package="synapse.lang.eip" />
++ <proxy name="StockQuoteProxy" transports="https http" startOnLoad="true" trace="disable">
++        <target>
++            <inSequence>
++               <call-template target="synapse.lang.eip.dynamic_router">
++<with-param name="conditions" value="header=foo:bar.*#url=/services/StockQuoteProxy.*;seq=cnd1_seq,header=custom_header1:bar.*@header=custom_header1:foo.*;seq=cnd2_seq,header=custom_header2:foo.*;seq=cnd3_seq"/>
++    </call-template>
++     </inSequence>
++            <outSequence>
++                <send/>
++            </outSequence>
++        </target>
++    </proxy>
++<sequence name="send_seq">
++        <log level="custom">
++            <property name="DEBUG" value="Condition Satisfied"/>
++        </log>
++        <send>
++            <endpoint name="simple">
++                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
++            </endpoint>
++        </send>
++    </sequence>
++
++    <sequence name="cnd1_seq">
++        <log level="custom">
++            <property name="MSG_FLOW" value="Condition (I) Satisfied"/>
++        </log>
++        <sequence key="send_seq"/>
++    </sequence>
++    <sequence name="cnd2_seq">
++        <log level="custom">
++            <property name="MSG_FLOW" value="Condition (II) Satisfied"/>
++        </log>
++        <sequence key="send_seq"/>
++    </sequence>
++    <sequence name="cnd3_seq">
++        <log level="custom">
++            <property name="MSG_FLOW" value="Condition (III) Satisfied"/>
++        </log>
++        <sequence key="send_seq"/>
++    </sequence>
++</definitions>
+Index: java/repository/conf/sample/synapse_sample_857.xml
+===================================================================
+--- java/repository/conf/sample/synapse_sample_857.xml	(nonexistent)
++++ java/repository/conf/sample/synapse_sample_857.xml	(revision 1373302)
+@@ -0,0 +1,32 @@
++<?xml version="1.0" encoding="ISO-8859-1"?>
++<!--
++  ~  Licensed to the Apache Software Foundation (ASF) under one
++  ~  or more contributor license agreements.  See the NOTICE file
++  ~  distributed with this work for additional information
++  ~  regarding copyright ownership.  The ASF licenses this file
++  ~  to you under the Apache License, Version 2.0 (the
++  ~  "License"); you may not use this file except in compliance
++  ~  with the License.  You may obtain a copy of the License at
++  ~
++  ~   http://www.apache.org/licenses/LICENSE-2.0
++  ~
++  ~  Unless required by applicable law or agreed to in writing,
++  ~  software distributed under the License is distributed on an
++  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++  ~  KIND, either express or implied.  See the License for the
++  ~  specific language governing permissions and limitations
++  ~  under the License.
++  -->
++        
++<!-- Introduction to Synapse Recipient List eip function template -->
++<definitions xmlns="http://ws.apache.org/ns/synapse">
++<import xmlns="http://ws.apache.org/ns/synapse" name="EipLibrary" package="synapse.lang.eip" />
++   <sequence name="main">
++    <property name="OUT_ONLY" value="true"/>
++                <property name="FORCE_SC_ACCEPTED" value="true" scope="axis2"/>
++    <call-template target="synapse.lang.eip.recipient_list">
++        <with-param name="recipient_list" value="http://localhost:9000/services/SimpleStockQuoteService,http://localhost:9001/services/SimpleStockQuoteService"/>
++    </call-template>
++    <drop/>
++</sequence>
++</definitions>
 Index: java/repository/conf/sample/synapse_sample_850.xml
 ===================================================================
 --- java/repository/conf/sample/synapse_sample_850.xml	(nonexistent)
@@ -1102,183 +506,781 @@ Index: java/repository/conf/sample/synapse_sample_854.xml
 +        </call-template>
 +    </sequence>
 +</definitions>
-Index: java/repository/conf/sample/synapse_sample_855.xml
+Index: java/modules/core/pom.xml
 ===================================================================
---- java/repository/conf/sample/synapse_sample_855.xml	(nonexistent)
-+++ java/repository/conf/sample/synapse_sample_855.xml	(revision 1373302)
-@@ -0,0 +1,66 @@
-+<?xml version="1.0" encoding="ISO-8859-1"?>
-+<!--
-+  ~  Licensed to the Apache Software Foundation (ASF) under one
-+  ~  or more contributor license agreements.  See the NOTICE file
-+  ~  distributed with this work for additional information
-+  ~  regarding copyright ownership.  The ASF licenses this file
-+  ~  to you under the Apache License, Version 2.0 (the
-+  ~  "License"); you may not use this file except in compliance
-+  ~  with the License.  You may obtain a copy of the License at
-+  ~
-+  ~   http://www.apache.org/licenses/LICENSE-2.0
-+  ~
-+  ~  Unless required by applicable law or agreed to in writing,
-+  ~  software distributed under the License is distributed on an
-+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+  ~  KIND, either express or implied.  See the License for the
-+  ~  specific language governing permissions and limitations
-+  ~  under the License.
-+  -->
-+        
-+<!-- Introduction to Synapse Content Based Router eip function template -->
-+<definitions xmlns="http://ws.apache.org/ns/synapse">
-+<import xmlns="http://ws.apache.org/ns/synapse" name="EipLibrary" package="synapse.lang.eip" />
-+<proxy name="StockQuoteProxy" transports="https http" startOnLoad="true" trace="disable">
-+        <target>
-+        <inSequence>		
-+               <call-template target="synapse.lang.eip.content_based_router">
-+<with-param name="routing_exp" value="{{//m0:getQuote/m0:request/m0:symbol}}" xmlns:m0="http://services.samples"/>
-+<with-param name="match_content" value="IBM:cnd1_seq,MSFT:cnd2_seq;cnd3_seq"/>
-+    </call-template>
-+</inSequence>
-+<outSequence>
-+<send/>
-+   </outSequence>
-+    </target>
-+    </proxy>
-+<sequence name="send_seq">
-+        <log level="custom">
-+            <property name="DEBUG" value="Condition Satisfied"/>
-+        </log>
-+        <send>
-+            <endpoint name="simple">
-+                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
-+            </endpoint>
-+        </send>
-+    </sequence>
+--- java/modules/core/pom.xml	(revision 1373301)
++++ java/modules/core/pom.xml	(revision 1373302)
+@@ -96,6 +96,25 @@
+                             </descriptors>
+                         </configuration>
+                     </execution>
++                     <execution>
++                        <id>eip-library-assembly</id>
++                        <phase>generate-test-resources</phase>
++                        <goals>
++                            <goal>attached</goal>
++                        </goals>
++                        <configuration>
++                            <finalName>synapse-eip-lib</finalName>
++                            <filters>
++                                <filter>
++                                    ${basedir}/src/test/resources/synapse-libraries/assembly/filter.properties
++                                </filter>
++                            </filters>
++                            <descriptors>
++                                <descriptor>src/test/resources/synapse-libraries/assembly/assemble-eip-lib.xml
++                                </descriptor>
++                            </descriptors>
++                        </configuration>
++                    </execution>
+                 </executions>
+             </plugin>
+ 
+@@ -115,6 +134,7 @@
+                                 <mkdir dir="target/test_repos/client/modules"/>
+                                 <mkdir dir="target/test_repos/synapse/synapse-libraries"/>
+                                 <copy file="target/synapse-test-lib.zip" todir="target/test_repos/synapse/synapse-libraries"/>
++                                <copy file="target/synapse-eip-lib.zip" todir="target/test_repos/synapse/synapse-libraries"/>
+                             </tasks>
+                         </configuration>
+                         <goals>
+@@ -127,6 +147,7 @@
+                         <configuration>
+                             <tasks>
+                                 <delete file="target/synapse-test-lib.zip"/>
++                                <delete file="target/synapse-eip-lib.zip"/>
+                             </tasks>
+                         </configuration>
+                         <goals>
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateParameterSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateParameterSerializer.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateParameterSerializer.java	(revision 1373302)
+@@ -0,0 +1,111 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++package org.apache.synapse.config.xml;
 +
-+    <sequence name="cnd1_seq">
-+        <log level="custom">
-+            <property name="MSG_FLOW" value="Condition (I) Satisfied"/>
-+        </log>
-+        <sequence key="send_seq"/>
-+    </sequence>
-+    <sequence name="cnd2_seq">
-+        <log level="custom">
-+            <property name="MSG_FLOW" value="Condition (II) Satisfied"/>
-+        </log>
-+        <sequence key="send_seq"/>
-+    </sequence>
-+    <sequence name="cnd3_seq">
-+        <log level="custom">
-+            <property name="MSG_FLOW" value="Condition (III) Satisfied"/>
-+        </log>
-+        <sequence key="send_seq"/>
-+    </sequence>
-+</definitions>
-Index: java/repository/conf/sample/synapse_sample_856.xml
-===================================================================
---- java/repository/conf/sample/synapse_sample_856.xml	(nonexistent)
-+++ java/repository/conf/sample/synapse_sample_856.xml	(revision 1373302)
-@@ -0,0 +1,65 @@
-+<?xml version="1.0" encoding="ISO-8859-1"?>
-+<!--
-+  ~  Licensed to the Apache Software Foundation (ASF) under one
-+  ~  or more contributor license agreements.  See the NOTICE file
-+  ~  distributed with this work for additional information
-+  ~  regarding copyright ownership.  The ASF licenses this file
-+  ~  to you under the Apache License, Version 2.0 (the
-+  ~  "License"); you may not use this file except in compliance
-+  ~  with the License.  You may obtain a copy of the License at
-+  ~
-+  ~   http://www.apache.org/licenses/LICENSE-2.0
-+  ~
-+  ~  Unless required by applicable law or agreed to in writing,
-+  ~  software distributed under the License is distributed on an
-+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+  ~  KIND, either express or implied.  See the License for the
-+  ~  specific language governing permissions and limitations
-+  ~  under the License.
-+  -->
-+        
-+<!-- Introduction to Synapse Dynamic Router eip function template -->
-+<definitions xmlns="http://ws.apache.org/ns/synapse">
-+<import xmlns="http://ws.apache.org/ns/synapse" name="EipLibrary" package="synapse.lang.eip" />
-+ <proxy name="StockQuoteProxy" transports="https http" startOnLoad="true" trace="disable">
-+        <target>
-+            <inSequence>
-+               <call-template target="synapse.lang.eip.dynamic_router">
-+<with-param name="conditions" value="header=foo:bar.*#url=/services/StockQuoteProxy.*;seq=cnd1_seq,header=custom_header1:bar.*@header=custom_header1:foo.*;seq=cnd2_seq,header=custom_header2:foo.*;seq=cnd3_seq"/>
-+    </call-template>
-+     </inSequence>
-+            <outSequence>
-+                <send/>
-+            </outSequence>
-+        </target>
-+    </proxy>
-+<sequence name="send_seq">
-+        <log level="custom">
-+            <property name="DEBUG" value="Condition Satisfied"/>
-+        </log>
-+        <send>
-+            <endpoint name="simple">
-+                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
-+            </endpoint>
-+        </send>
-+    </sequence>
++import org.apache.axiom.om.OMAbstractFactory;
++import org.apache.axiom.om.OMElement;
++import org.apache.axiom.om.OMFactory;
++import org.apache.axiom.om.OMNamespace;
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.SynapseConstants;
++import org.apache.synapse.SynapseException;
++import org.apache.synapse.mediators.TemplateParameter;
 +
-+    <sequence name="cnd1_seq">
-+        <log level="custom">
-+            <property name="MSG_FLOW" value="Condition (I) Satisfied"/>
-+        </log>
-+        <sequence key="send_seq"/>
-+    </sequence>
-+    <sequence name="cnd2_seq">
-+        <log level="custom">
-+            <property name="MSG_FLOW" value="Condition (II) Satisfied"/>
-+        </log>
-+        <sequence key="send_seq"/>
-+    </sequence>
-+    <sequence name="cnd3_seq">
-+        <log level="custom">
-+            <property name="MSG_FLOW" value="Condition (III) Satisfied"/>
-+        </log>
-+        <sequence key="send_seq"/>
-+    </sequence>
-+</definitions>
-Index: java/repository/conf/sample/synapse_sample_857.xml
++import javax.xml.namespace.QName;
++import java.util.Collection;
++
++/**
++ * A utility class for serializing instances of TemplateParameter objects by reading
++ * through a given XML configuration
++ *
++ * <pre>
++ * &lt;element&gt;
++ *    &lt;parameter name="p1" [default="value|expression"] [optional=(true|false)]/&gt;*
++ * &lt;/element&gt;
++ * </pre>
++ */
++public class TemplateParameterSerializer {
++    private static final Log log = LogFactory.getLog(TemplateParameterSerializer.class);
++
++    protected static final OMFactory fac = OMAbstractFactory.getOMFactory();
++    protected static final OMNamespace synNS = SynapseConstants.SYNAPSE_OMNAMESPACE;
++    protected static final OMNamespace nullNS
++            = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
++
++    protected static final QName PARAMETER_Q
++        = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "parameter");
++
++    /**
++     * Serialize all the parameters to the given parent element. For each and every
++     * parameter there will be a separate parameter element created inside the parent element.
++     *
++     * @param parent element to which parameter elements should be added
++     * @param params the list of  TemplateParameter objects
++     */
++    public static void serializeTemplateParameters(OMElement parent,
++                                               Collection<TemplateParameter> params) {
++            serializeTemplateParameters(parent, params, PARAMETER_Q);
++    }
++
++    /**
++     * Serialize all the parameters to the given parent element. For each and every
++     * parameter there will be a separate parameter element created inside the parent element.
++     *
++     * @param parent element to which parameter elements should be added
++     * @param params the list of  TemplateParameter objects
++     * @param childElementName of the parameter element to be created
++     */
++    public static void serializeTemplateParameters(OMElement parent,
++                                               Collection<TemplateParameter> params,
++                                               QName childElementName) {
++        for (TemplateParameter tp : params) {
++            serializeTemplateParameter(parent,tp, childElementName);
++        }
++    }
++
++    /**
++     * Serialize the parameter to the given parent element. There will be a element created with
++     * given configuration inside the parent element.
++     *
++     * @param parent element to which parameter elements should be added
++     * @param tp a property to be serialized
++     * @param childElementName of the parameter element to be created
++     */
++    public static void serializeTemplateParameter(OMElement parent,
++                                             TemplateParameter tp,
++                                             QName childElementName) {
++        OMElement param = fac.createOMElement(childElementName, parent);
++        if (tp.getName() != null) {
++            param.addAttribute(fac.createOMAttribute("name", nullNS, tp.getName()));
++        } else {
++            String msg = "Template parameter name missing";
++            log.error(msg);
++            throw new SynapseException(msg);
++        }
++
++        if (tp.getDefaultValue() != null) {
++            new ValueSerializer().serializeValue(tp.getDefaultValue(), "default", param);
++
++        if (tp.isOptional()) {
++            param.addAttribute(fac.createOMAttribute("optional", nullNS, "true"));
++        }
++    }
++}
++}
+\ No newline at end of file
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/IterateMediatorFactory.java
 ===================================================================
---- java/repository/conf/sample/synapse_sample_857.xml	(nonexistent)
-+++ java/repository/conf/sample/synapse_sample_857.xml	(revision 1373302)
-@@ -0,0 +1,32 @@
-+<?xml version="1.0" encoding="ISO-8859-1"?>
-+<!--
-+  ~  Licensed to the Apache Software Foundation (ASF) under one
-+  ~  or more contributor license agreements.  See the NOTICE file
-+  ~  distributed with this work for additional information
-+  ~  regarding copyright ownership.  The ASF licenses this file
-+  ~  to you under the Apache License, Version 2.0 (the
-+  ~  "License"); you may not use this file except in compliance
-+  ~  with the License.  You may obtain a copy of the License at
-+  ~
-+  ~   http://www.apache.org/licenses/LICENSE-2.0
-+  ~
-+  ~  Unless required by applicable law or agreed to in writing,
-+  ~  software distributed under the License is distributed on an
-+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+  ~  KIND, either express or implied.  See the License for the
-+  ~  specific language governing permissions and limitations
-+  ~  under the License.
-+  -->
-+        
-+<!-- Introduction to Synapse Recipient List eip function template -->
-+<definitions xmlns="http://ws.apache.org/ns/synapse">
-+<import xmlns="http://ws.apache.org/ns/synapse" name="EipLibrary" package="synapse.lang.eip" />
-+   <sequence name="main">
-+    <property name="OUT_ONLY" value="true"/>
-+                <property name="FORCE_SC_ACCEPTED" value="true" scope="axis2"/>
-+    <call-template target="synapse.lang.eip.recipient_list">
-+        <with-param name="recipient_list" value="http://localhost:9000/services/SimpleStockQuoteService,http://localhost:9001/services/SimpleStockQuoteService"/>
-+    </call-template>
-+    <drop/>
-+</sequence>
-+</definitions>
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/IterateMediatorFactory.java	(revision 1373301)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/IterateMediatorFactory.java	(revision 1373302)
+@@ -128,7 +128,7 @@
+                 attachPathValue, e);
+         }
+ 
+-        boolean asynchronous = true;
++        boolean asynchronous = false;
+         OMAttribute asynchronousAttr = elem.getAttribute(ATT_SEQUENCIAL);
+         if (asynchronousAttr != null && asynchronousAttr.getAttributeValue().equals("true")) {
+             asynchronous = false;
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateMediatorSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateMediatorSerializer.java	(revision 1373301)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateMediatorSerializer.java	(revision 1373302)
+@@ -20,17 +20,17 @@
+ 
+ import org.apache.axiom.om.OMElement;
+ import org.apache.synapse.Mediator;
++import org.apache.synapse.mediators.TemplateParameter;
+ import org.apache.synapse.mediators.template.TemplateMediator;
+ 
+ import java.util.Collection;
+-import java.util.Iterator;
+ import java.util.List;
+ 
+ /**
+  *  Serializer class for Template to serialize into a  configuration as follows
+  * <template name="simple_func">
+-	    <parameter name="p1"/>
+-        <parameter name="p2"/>*
++	    <parameter name="p1" [default="value|expression"] [optional=(true|false)]/>
++        <parameter name="p2" [default="value|expression"] [optional=(true|false)]/>*
+         <mediator/>+
+     </template>
+  */
+@@ -47,6 +47,7 @@
+         if (mediator.getName() != null) {
+             templateElem.addAttribute(fac.createOMAttribute(
+                     "name", nullNS, mediator.getName()));
++            //serialize parameters
+             serializeParams(templateElem,mediator);
+             serializeBody(templateElem, mediator.getList());
+             saveTracingState(templateElem, mediator);
+@@ -55,14 +56,16 @@
+         return templateElem;
+     }
+ 
++     /**
++     * Serialize parameters for the template mediator specified
++     *
++     * @param templateElem the OMElement that specifies the template configuration
++     * @param mediator the TemplateMediator
++     */
+     private void serializeParams(OMElement templateElem, TemplateMediator mediator) {
+-        Collection<String> params = mediator.getParameters();
+-        for (String param : params) {
+-            if (param != null && !"".equals(param)) {
+-                OMElement paramEl = fac.createOMElement("parameter", synNS);
+-                paramEl.addAttribute(fac.createOMAttribute("name", nullNS, param));
+-                templateElem.addChild(paramEl);
+-            }
++        Collection<TemplateParameter> params = mediator.getParameters();
++        if (params != null && params.size() > 0) {
++               TemplateParameterSerializer.serializeTemplateParameters(templateElem,mediator.getParameters());
+         }
+     }
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateParameterFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateParameterFactory.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateParameterFactory.java	(revision 1373302)
+@@ -0,0 +1,98 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++package org.apache.synapse.config.xml;
++
++import org.apache.axiom.om.OMAttribute;
++import org.apache.axiom.om.OMElement;
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.SynapseException;
++import org.apache.synapse.mediators.TemplateParameter;
++import org.apache.synapse.mediators.Value;
++
++import java.util.ArrayList;
++import java.util.Iterator;
++import java.util.List;
++
++/**
++ * A utility class capable of creating instances of TemplateParameter objects by reading
++ * through a given XML configuration
++ *
++ * <pre>
++ * &lt;element&gt;
++ *    &lt;parameter name="p1" [default="value|expression"] [optional=(true|false)]/&gt;*
++ * &lt;/element&gt;
++ * </pre>
++ */
++public class TemplateParameterFactory {
++    private static final Log log = LogFactory.getLog(TemplateParameterFactory.class);
++
++     /**
++     * Creates a list of parameters in a given template
++     *
++     * @param elem the OMElement that specifies the template configuration
++     * @return the list of TemplateParameter instances created
++     */
++    public static List<TemplateParameter> getTemplateParameters(OMElement elem) {
++
++        List<TemplateParameter> parameterList = new ArrayList<TemplateParameter>();
++
++        Iterator iter = elem.getChildrenWithName(TemplateParameter.PARAMETER_Q);
++
++        while (iter.hasNext()) {
++
++            OMElement paramEle = (OMElement) iter.next();
++            OMAttribute attName = paramEle.getAttribute(TemplateParameter.ATT_NAME_Q);
++            OMAttribute attDefault = paramEle.getAttribute(TemplateParameter.ATT_DEFAULT_Q);
++            OMAttribute attOptional = paramEle.getAttribute(TemplateParameter.ATT_OPTIONAL_Q);
++
++            TemplateParameter param = new TemplateParameter();
++
++            if (attName == null || attName.getAttributeValue() == null ||
++                    attName.getAttributeValue().trim().length() == 0) {
++                String msg = "Parameter name is a required attribute for a Template Parameter";
++                log.error(msg);
++                throw new SynapseException(msg);
++            } else {
++                param.setName(attName.getAttributeValue());
++            }
++
++
++            if (attDefault == null || attDefault.getAttributeValue() == null ||
++                    attDefault.getAttributeValue().trim().length() == 0) {
++                String msg = "Default value is not specified for " + param.getName() + " Parameter";
++                log.warn(msg);
++            } else {
++                Value paramValue = new ValueFactory().createValue("default", paramEle);
++                param.setDefaultValue(paramValue);
++            }
++
++            if (attOptional == null || attOptional.getAttributeValue() == null ||
++                    attOptional.getAttributeValue().trim().length() == 0) {
++            } else {
++                param.setOptional(Boolean.valueOf(attOptional.getAttributeValue()));
++            }
++
++            parameterList.add(param);
++        }
++
++        return parameterList;
++    }
++
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/IterateMediatorSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/IterateMediatorSerializer.java	(revision 1373301)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/IterateMediatorSerializer.java	(revision 1373302)
+@@ -85,8 +85,8 @@
+             handleException("Missing expression of the IterateMediator which is required.");
+         }
+ 
+-        if (itrMed.getTarget() != null && !itrMed.getTarget().isAsynchronous()) {
+-            itrElem.addAttribute("sequential", "true", nullNS);
++        if (itrMed.getTarget() != null && itrMed.getTarget().isAsynchronous()) {
++            itrElem.addAttribute("sequential", "false", nullNS);
+         }
+ 
+         itrElem.addChild(TargetSerializer.serializeTarget(itrMed.getTarget()));
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/CloneMediatorFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/CloneMediatorFactory.java	(revision 1373301)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/CloneMediatorFactory.java	(revision 1373302)
+@@ -73,7 +73,7 @@
+      */
+     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+     	
+-    	boolean asynchronousExe = true;
++    	boolean asynchronousExe = false;
+         
+     	CloneMediator mediator = new CloneMediator();
+         processAuditStatus(mediator, elem);
+@@ -94,8 +94,6 @@
+         if (synchronousExeAttr != null && synchronousExeAttr.getAttributeValue().equals("true")) {
+         	asynchronousExe = false;
+         }
+-
+-        mediator.setSequential(!asynchronousExe);
+         
+         Iterator targetElements = elem.getChildrenWithName(TARGET_Q);
+         while (targetElements.hasNext()) {
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateMediatorFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateMediatorFactory.java	(revision 1373301)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateMediatorFactory.java	(revision 1373302)
+@@ -22,6 +22,7 @@
+ import org.apache.axiom.om.OMElement;
+ import org.apache.synapse.Mediator;
+ import org.apache.synapse.SynapseException;
++import org.apache.synapse.mediators.TemplateParameter;
+ import org.apache.synapse.mediators.template.TemplateMediator;
+ 
+ import javax.xml.namespace.QName;
+@@ -32,8 +33,8 @@
+ /**
+  * Factory class for Template configuration as follows
+  * <template name="simple_func">
+-	    <parameter name="p1"/>
+-        <parameter name="p2"/>*
++	    <parameter name="p1" [default="value|expression"] [optional=(true|false)]/>
++        <parameter name="p2" [default="value|expression"] [optional=(true|false)]/>*
+         <mediator/>+
+     </template>
+  */
+@@ -43,13 +44,6 @@
+     private static final QName TEMPLATE_BODY_Q
+             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "sequence");
+ 
+-    /**
+-     * Element  QName Definitions
+-     */
+-    public static final QName PARAMETER_Q = new QName(
+-            XMLConfigConstants.SYNAPSE_NAMESPACE, "parameter");
+-
+-
+     protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
+         TemplateMediator templateTemplateMediator = new TemplateMediator();
+         OMAttribute nameAttr = elem.getAttribute(ATT_NAME);
+@@ -56,7 +50,8 @@
+         if (nameAttr != null) {
+             templateTemplateMediator.setName(nameAttr.getAttributeValue());
+             processAuditStatus(templateTemplateMediator, elem);
+-            initParameters(elem, templateTemplateMediator);
++            //set template parameters
++            templateTemplateMediator.setParameters(TemplateParameterFactory.getTemplateParameters(elem));
+             OMElement templateBodyElem = elem.getFirstChildWithName(TEMPLATE_BODY_Q);
+             addChildren(templateBodyElem, templateTemplateMediator, properties);
+         } else {
+@@ -67,22 +62,6 @@
+         return templateTemplateMediator;
+     }
+ 
+-    private void initParameters(OMElement templateElem, TemplateMediator templateMediator) {
+-        Iterator subElements = templateElem.getChildElements();
+-        Collection<String> paramNames = new ArrayList<String>();
+-        while (subElements.hasNext()) {
+-            OMElement child = (OMElement) subElements.next();
+-            if (child.getQName().equals(PARAMETER_Q)) {
+-                OMAttribute paramNameAttr = child.getAttribute(ATT_NAME);
+-                if (paramNameAttr != null) {
+-                    paramNames.add(paramNameAttr.getAttributeValue());
+-                }
+-//                child.detach();
+-            }
+-        }
+-        templateMediator.setParameters(paramNames);
+-    }
+-
+     public QName getTagQName() {
+         return TEMPLATE_Q;
+     }
+Index: java/modules/core/src/main/java/org/apache/synapse/libraries/util/LibDeployerUtils.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/libraries/util/LibDeployerUtils.java	(revision 1373301)
++++ java/modules/core/src/main/java/org/apache/synapse/libraries/util/LibDeployerUtils.java	(revision 1373302)
+@@ -56,6 +56,8 @@
+ 
+ 
+     public static Library createSynapseLibrary(String libPath) {
++        createDir(APP_UNZIP_DIR);
++
+         String libFilePath = LibDeployerUtils.formatPath(libPath);
+         //extract
+         String extractPath = LibDeployerUtils.extractSynapseLib(libFilePath);
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/template/TemplateContext.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/template/TemplateContext.java	(revision 1373301)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/template/TemplateContext.java	(revision 1373302)
+@@ -18,7 +18,10 @@
+  */
+ package org.apache.synapse.mediators.template;
+ 
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.MessageContext;
++import org.apache.synapse.mediators.TemplateParameter;
+ import org.apache.synapse.mediators.Value;
+ import org.apache.synapse.mediators.eip.EIPUtils;
+ import org.jaxen.JaxenException;
+@@ -30,6 +33,7 @@
+  * a context will be populated with function parameters.
+  */
+ public class TemplateContext {
++    private static final Log log = LogFactory.getLog(TemplateContext.class);
+     /**
+      * refers to the function-template name this context is binded to
+      */
+@@ -37,13 +41,13 @@
+     /**
+      * refers to the parameter names of the function
+      */
+-    private Collection<String> parameters;
++    private Collection<TemplateParameter> parameters;
+     /**
+      * contains a map for parameterNames to evaluated values
+      */
+     private Map mappedValues;
+ 
+-    TemplateContext(String name, Collection<String> parameters) {
++    TemplateContext(String name, Collection<TemplateParameter> parameters) {
+         this.fName = name;
+         this.parameters = parameters;
+         mappedValues = new HashMap();
+@@ -50,18 +54,27 @@
+     }
+ 
+     /**
+-     * evaluate raw parameters passed from an invoke medaiator and store them in this context
++     * evaluate raw parameters passed from an invoke mediator and store them in this context
+      * @param synCtxt Synapse MessageContext
+      */
+     public void setupParams(MessageContext synCtxt) {
+-        Iterator<String> paramNames = parameters.iterator();
++        Iterator<TemplateParameter> paramNames = parameters.iterator();
+         while (paramNames.hasNext()) {
+-            String parameter = paramNames.next();
+-            String mapping = EIPUtils.getTemplatePropertyMapping(fName, parameter);
++            TemplateParameter parameter = paramNames.next();
++            String mapping = EIPUtils.getTemplatePropertyMapping(fName, parameter.getName());
+             Object propertyValue = synCtxt.getProperty(mapping);
+-            Object paramValue = getEvaluatedParamValue(synCtxt, parameter, (Value) propertyValue);
++            //If property value is not provided assign default value
++            if (propertyValue == null && parameter.getDefaultValue() != null) {
++                propertyValue = parameter.getDefaultValue();
++            }
++            //If this parameter is a required one give an error
++            if (!parameter.isOptional() && propertyValue == null) {
++                String msg = parameter.getName() + " is a required parameter for " + fName + " template";
++                log.error(msg);
++            }
++            Object paramValue = getEvaluatedParamValue(synCtxt, parameter.getName(), (Value) propertyValue);
+             if (paramValue != null) {
+-                mappedValues.put(parameter, paramValue);
++                mappedValues.put(parameter.getName(), paramValue);
+                 //remove temp property from the context
+                 removeProperty(synCtxt, mapping);
+             }
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/template/TemplateMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/template/TemplateMediator.java	(revision 1373301)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/template/TemplateMediator.java	(revision 1373302)
+@@ -23,6 +23,7 @@
+ import org.apache.synapse.SynapseLog;
+ import org.apache.synapse.core.SynapseEnvironment;
+ import org.apache.synapse.mediators.AbstractListMediator;
++import org.apache.synapse.mediators.TemplateParameter;
+ 
+ import javax.sound.midi.Sequence;
+ import java.util.Collection;
+@@ -37,7 +38,7 @@
+  */
+ public class TemplateMediator extends AbstractListMediator {
+ 
+-    private Collection<String> paramNames;
++    private Collection<TemplateParameter> parameters;
+ 
+     private String eipPatternName;
+     private String fileName;
+@@ -44,12 +45,12 @@
+     /** flag to ensure that each and every sequence is initialized and destroyed atmost once */
+     private boolean initialized = false;
+ 
+-    public void setParameters(Collection<String> paramNames) {
+-        this.paramNames = paramNames;
++    public void setParameters(Collection<TemplateParameter> paramNames) {
++        this.parameters = paramNames;
+     }
+ 
+-    public Collection<String> getParameters() {
+-        return paramNames;
++    public Collection<TemplateParameter> getParameters() {
++        return parameters;
+     }
+ 
+     public void setName(String name) {
+@@ -64,7 +65,7 @@
+         SynapseLog synLog = getLog(synCtx);
+ 
+         if (synLog.isTraceOrDebugEnabled()) {
+-            synLog.traceOrDebug("Start : EIP Sequence " + "paramNames : " + paramNames);
++            synLog.traceOrDebug("Start : EIP Sequence " + "paramNames : " + parameters);
+ 
+             if (synLog.isTraceTraceEnabled()) {
+                 synLog.traceTrace("Message : " + synCtx.getEnvelope());
+@@ -86,7 +87,7 @@
+      * @param synCtx  Synapse Message context
+      */
+     private void pushFuncContextTo(MessageContext synCtx) {
+-        TemplateContext funcContext = new TemplateContext(eipPatternName, paramNames);
++        TemplateContext funcContext = new TemplateContext(eipPatternName, parameters);
+         //process the raw parameters parsed in
+         funcContext.setupParams(synCtx);
+         //if a function stack has not already been created for this message flow create new one
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/TemplateParameter.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/TemplateParameter.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/TemplateParameter.java	(revision 1373302)
+@@ -0,0 +1,71 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++package org.apache.synapse.mediators;
++
++import javax.xml.namespace.QName;
++
++import org.apache.synapse.config.xml.XMLConfigConstants;
++
++/**
++ * A template parameter is a variable which is used when creating templates and contains following configuration
++ * parameter name="p1" [default="value|expression"] [optional=(true|false)]
++ *
++ */
++public class TemplateParameter {
++    public static final QName PARAMETER_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "parameter");
++    public static final QName ATT_NAME_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "name");
++    public static final QName ATT_DEFAULT_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "default");
++    public static final QName ATT_OPTIONAL_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "optional");
++
++
++    private String name;
++    private Value defaultValue;
++    private boolean isOptional;
++
++    public TemplateParameter() {
++        this.name = null;
++        this.defaultValue = null;
++        this.isOptional = false;
++    }
++
++    public String getName() {
++        return name;
++    }
++
++    public void setName(String name) {
++        this.name = name;
++    }
++
++    public Value getDefaultValue() {
++        return defaultValue;
++    }
++
++    public void setDefaultValue(Value defaultValue) {
++        this.defaultValue = defaultValue;
++    }
++
++    public boolean isOptional() {
++        return isOptional;
++    }
++
++    public void setOptional(boolean optional) {
++        isOptional = optional;
++    }
++
++}
+Index: java/modules/core/src/test/resources/synapse-libraries/assembly/assemble-eip-lib.xml
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/assembly/assemble-eip-lib.xml	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/assembly/assemble-eip-lib.xml	(revision 1373302)
+@@ -0,0 +1,23 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<assembly>
++    <formats>
++        <format>zip</format>
++    </formats>
++    <includeBaseDirectory>false</includeBaseDirectory>
++    <fileSets>
++        <fileSet>
++            <directory>src/test/resources/synapse-libraries/synapse-eip-lib</directory>
++            <outputDirectory></outputDirectory>
++        </fileSet>
++        <fileSet>
++            <directory>target/classes</directory>
++            <outputDirectory></outputDirectory>
++            <excludes>
++                <exclude>**/metrics_module.xml</exclude>
++                <exclude>**/META-INF/*</exclude>
++            </excludes>
++        </fileSet>
++    </fileSets>
++    
++    
++</assembly>
+Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/eip_systemManagement/artifact.xml
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/eip_systemManagement/artifact.xml	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/eip_systemManagement/artifact.xml	(revision 1373302)
+@@ -0,0 +1,11 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<artifact name="systemManagement" type="synapse/template">
++
++    <subArtifacts>
++        <artifact name="splitter">
++            <file>template_splitter.xml</file>
++            <description>Splitter library function</description>
++        </artifact>
++    </subArtifacts>
++
++</artifact>
+\ No newline at end of file
+Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/eip_systemManagement/template_splitter.xml
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/eip_systemManagement/template_splitter.xml	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/eip_systemManagement/template_splitter.xml	(revision 1373302)
+@@ -0,0 +1,20 @@
++<template xmlns="http://ws.apache.org/ns/synapse" name="splitter">
++    <parameter name="iterate_exp"/>
++    <parameter name="endpoint_uri"/>
++    <parameter name="attach_path" default="{{//original}}" optional="true"/>
++    <parameter name="sequence_ref"/>
++    <sequence>
++        <property name="ItrExp" expression="$func:iterate_exp" />
++        <property name="EndPUri" expression="$func:endpoint_uri" />
++        <property name="AttachPath" expression="$func:attach_path" />
++        <property name="SRef" expression="$func:sequence_ref" />
++        <property name="Endpoint_1" expression="get-property('To')" />
++        <header name="To" expression="$func:endpoint_uri"/>
++        <iterate xmlns:ns="http://org.apache.synapse/xsd" continueParent="true" preservePayload="true" attachPath="$func:attach_path" expression="$func:iterate_exp">
++            <target>
++              <sequence key="{$func:sequence_ref}"/>
++            </target>
++        </iterate>
++        <property name="Endpoint_2" expression="get-property('To')" />
++    </sequence>
++</template>
+Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/artifacts.xml
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/artifacts.xml	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/artifacts.xml	(revision 1373302)
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<artifacts>
++    <artifact name="EipLibrary" package="synapse.lang.eip" >
++        <dependency artifact="systemManagement" />
++        <description>eip synapse library</description>
++    </artifact>
++</artifacts>
+Index: java/modules/core/src/test/java/org/apache/synapse/libraries/eip/AbstractEipLibTestCase.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/libraries/eip/AbstractEipLibTestCase.java	(nonexistent)
++++ java/modules/core/src/test/java/org/apache/synapse/libraries/eip/AbstractEipLibTestCase.java	(revision 1373302)
+@@ -0,0 +1,26 @@
++package org.apache.synapse.libraries.eip;
++
++import junit.framework.TestCase;
++import org.apache.synapse.libraries.imports.SynapseImport;
++import org.apache.synapse.libraries.model.Library;
++import org.apache.synapse.libraries.util.LibDeployerUtils;
++import org.apache.synapse.mediators.eip.AbstractSplitMediatorTestCase;
++
++import java.io.File;
++import java.net.URISyntaxException;
++
++public abstract class AbstractEipLibTestCase extends TestCase {
++    public String path = null;
++
++    protected String getResourcePath() {
++        try {
++            if (path == null) {
++                path = new File("./target/test_repos/synapse/synapse-libraries/synapse-eip-lib.zip").getAbsolutePath();
++            }
++        } catch (Exception e) {
++            return null;
++        }
++        return path;
++
++    }
++}
 -*-*-*-
-commiting patches SYNAPSE-898,SYNAPSE-884, SYNAPSE-897 SYNAPSE-899, SYNAPSE-901
+Message: commiting patches SYNAPSE-898,SYNAPSE-884, SYNAPSE-897 SYNAPSE-899, SYNAPSE-901
+-*-*-*-
+When: 2012-08-15 06:03:18 -0400 

@@ -30,4 +30,6 @@ Index: java/src/site/xdoc/Synapse_Configuration_Language.xml
    &lt;/timeout&gt;?
    &lt;markForSuspension&gt;
 -*-*-*-
-Fixing SYNAPSE-743
+Message: Fixing SYNAPSE-743
+-*-*-*-
+When: 2011-12-19 03:40:45 -0500 

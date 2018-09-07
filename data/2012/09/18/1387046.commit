@@ -381,4 +381,6 @@ Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framewo
  import java.net.URL;
  import java.util.HashMap;
 -*-*-*-
-Avoid code duplication.
+Message: Avoid code duplication.
+-*-*-*-
+When: 2012-09-18 04:35:19 -0400 

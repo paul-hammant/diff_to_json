@@ -1,3 +1,48 @@
+Index: java/modules/core/pom.xml
+===================================================================
+--- java/modules/core/pom.xml	(revision 1224737)
++++ java/modules/core/pom.xml	(revision 1224738)
+@@ -231,5 +231,11 @@
+             <artifactId>synapse-vfs-transport</artifactId>
+             <scope>test</scope>
+         </dependency>
++	<dependency>
++	    <!-- Required for validate mediator tests on JDK 5 -->
++            <groupId>xerces</groupId>
++            <artifactId>xercesImpl</artifactId>
++	    <scope>test</scope>
++        </dependency>
+     </dependencies>
+ </project>
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/Axis2BackEndServerController.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/Axis2BackEndServerController.java	(revision 1224737)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/Axis2BackEndServerController.java	(revision 1224738)
+@@ -92,7 +92,7 @@
+                 TransportInDescription httpTrsIn = configContext.getAxisConfiguration().
+                         getTransportsIn().get("http");
+                 String httpPort = configuration.getHttpPort();
+-                if (httpPort != null && !httpPort.isEmpty()) {
++                if (httpPort != null && httpPort.length() > 0) {
+                     try {
+                         new Integer(httpPort);
+                         httpTrsIn.getParameter("port").setValue(httpPort);
+@@ -104,7 +104,7 @@
+                 TransportInDescription httpsTrsIn = configContext.getAxisConfiguration().
+                         getTransportsIn().get("https");
+                 String httpsPort = configuration.getHttpsPort();
+-                if (httpsPort != null && !httpsPort.isEmpty()) {
++                if (httpsPort != null && httpsPort.length() > 0) {
+                     try {
+                         new Integer(httpsPort);
+                         httpsTrsIn.getParameter("port").setValue(httpsPort);
+@@ -154,4 +154,4 @@
+             cdLatch.countDown();
+         }
+     }
+-}
+\ No newline at end of file
++}
 Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java
 ===================================================================
 --- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java	(revision 1224737)
@@ -38,51 +83,6 @@ Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framewo
 -}
 \ No newline at end of file
 +}
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/Axis2BackEndServerController.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/Axis2BackEndServerController.java	(revision 1224737)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/Axis2BackEndServerController.java	(revision 1224738)
-@@ -92,7 +92,7 @@
-                 TransportInDescription httpTrsIn = configContext.getAxisConfiguration().
-                         getTransportsIn().get("http");
-                 String httpPort = configuration.getHttpPort();
--                if (httpPort != null && !httpPort.isEmpty()) {
-+                if (httpPort != null && httpPort.length() > 0) {
-                     try {
-                         new Integer(httpPort);
-                         httpTrsIn.getParameter("port").setValue(httpPort);
-@@ -104,7 +104,7 @@
-                 TransportInDescription httpsTrsIn = configContext.getAxisConfiguration().
-                         getTransportsIn().get("https");
-                 String httpsPort = configuration.getHttpsPort();
--                if (httpsPort != null && !httpsPort.isEmpty()) {
-+                if (httpsPort != null && httpsPort.length() > 0) {
-                     try {
-                         new Integer(httpsPort);
-                         httpsTrsIn.getParameter("port").setValue(httpsPort);
-@@ -154,4 +154,4 @@
-             cdLatch.countDown();
-         }
-     }
--}
-\ No newline at end of file
-+}
-Index: java/modules/core/pom.xml
-===================================================================
---- java/modules/core/pom.xml	(revision 1224737)
-+++ java/modules/core/pom.xml	(revision 1224738)
-@@ -231,5 +231,11 @@
-             <artifactId>synapse-vfs-transport</artifactId>
-             <scope>test</scope>
-         </dependency>
-+	<dependency>
-+	    <!-- Required for validate mediator tests on JDK 5 -->
-+            <groupId>xerces</groupId>
-+            <artifactId>xercesImpl</artifactId>
-+	    <scope>test</scope>
-+        </dependency>
-     </dependencies>
- </project>
 Index: java/pom.xml
 ===================================================================
 --- java/pom.xml	(revision 1224737)
@@ -118,7 +118,10 @@ Index: java/pom.xml
          <!-- dependencies of Synapse extensions module -->
          <wso2commons.version>1.2</wso2commons.version>
 -*-*-*-
-1. Reducing DBCP version to support JDK 5
+Message: 1. Reducing DBCP version to support JDK 5
 2. Adding Xerces as a test dependency to core (needed for validate and few other mediator tests)
 3. Removing some Java6 code from integration module
 
+
+-*-*-*-
+When: 2011-12-26 10:31:00 -0500 

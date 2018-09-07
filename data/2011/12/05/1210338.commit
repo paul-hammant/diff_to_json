@@ -59,4 +59,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/config/Entry.java
      }
  
 -*-*-*-
-Synchronized the endpoint init. in order to avoid double locking.
+Message: Synchronized the endpoint init. in order to avoid double locking.
+-*-*-*-
+When: 2011-12-05 01:17:50 -0500 

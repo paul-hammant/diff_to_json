@@ -1,3 +1,103 @@
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1211429)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1211430)
+@@ -22,6 +22,7 @@
+ import junit.framework.TestSuite;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.samples.framework.tests.endpoint.*;
+ import org.apache.synapse.samples.framework.tests.message.*;
+ 
+ import java.util.ArrayList;
+@@ -169,5 +170,17 @@
+         sampleClassRepo.put("13", Sample13.class);
+         sampleClassRepo.put("15", Sample15.class);
+         sampleClassRepo.put("16", Sample16.class);
++
++        //Endpoint
++        sampleClassRepo.put("50", Sample50.class);
++        sampleClassRepo.put("51", Sample51.class);
++        sampleClassRepo.put("52", Sample52.class);
++        sampleClassRepo.put("53", Sample53.class);
++        sampleClassRepo.put("54", Sample54.class);
++        sampleClassRepo.put("55", Sample55.class);
++        sampleClassRepo.put("56", Sample56.class);
++        //sampleClassRepo.put("57", Sample57.class);  //intermittently fail
++        sampleClassRepo.put("58", Sample58.class);
++        sampleClassRepo.put("59", Sample59.class);
+     }
+ }
+\ No newline at end of file
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java	(revision 1211429)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java	(revision 1211430)
+@@ -23,6 +23,7 @@
+ import org.apache.axiom.om.OMElement;
+ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
+ import org.apache.commons.io.FileUtils;
++import org.apache.commons.io.FilenameUtils;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.clients.EventSampleClient;
+@@ -59,12 +60,11 @@
+         this.sampleId = sampleId;
+         log.info("Creating Synapse TestCase for test " + sampleId);
+         currentLocation = System.getProperty("user.dir") + File.separator;
+-        sampleDescriptor = File.separator + "sample" + sampleId + ".xml";
++        sampleDescriptor = "/sample" + sampleId + ".xml";
+         configuration = new SampleConfiguration();
+         backendServerControllers = new ArrayList<BackEndServerController>();
+-        System.setProperty("java.io.tmpdir", currentLocation + "modules" + File.separator +
+-                "integration" + File.separator + "target" + File.separator + "temp");
+-
++        System.setProperty("java.io.tmpdir", FilenameUtils.normalize(
++                currentLocation + "modules/integration/target/temp"));
+     }
+ 
+     /**
+@@ -412,19 +412,21 @@
+                 SampleConfigConstants.TAG_CLIENT_CONF_AXIS2_XML);
+ 
+         if (clientRepo == null) {
+-            configuration.getClientConfig().setClientRepo(currentLocation +
+-                    SampleConfigConstants.DEFAULT_CLIENT_CONF_REPO);
++            configuration.getClientConfig().setClientRepo(FilenameUtils.normalize(
++                    currentLocation + SampleConfigConstants.DEFAULT_CLIENT_CONF_REPO));
+         } else {
+             log.info("Using client Axis2 repository location: " + clientRepo);
+-            configuration.getClientConfig().setClientRepo(currentLocation + clientRepo);
++            configuration.getClientConfig().setClientRepo(FilenameUtils.normalize(
++                    currentLocation + clientRepo));
+         }
+ 
+         if (clientAxis2Xml == null) {
+-            configuration.getClientConfig().setAxis2Xml(currentLocation +
+-                    SampleConfigConstants.DEFAULT_CLIENT_CONF_AXIS2_XML);
++            configuration.getClientConfig().setAxis2Xml(FilenameUtils.normalize(
++                    currentLocation + SampleConfigConstants.DEFAULT_CLIENT_CONF_AXIS2_XML));
+         } else {
+             log.info("Using client Axis2 XML: " + clientAxis2Xml);
+-            configuration.getClientConfig().setAxis2Xml(currentLocation + clientAxis2Xml);
++            configuration.getClientConfig().setAxis2Xml(FilenameUtils.normalize(
++                    currentLocation + clientAxis2Xml));
+         }
+         return true;
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample0.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample0.java	(revision 1211429)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample0.java	(revision 1211430)
+@@ -51,7 +51,7 @@
+         String prxUrl = "http://localhost:8280/";
+ 
+         log.info("Running test: Using Synapse as a HTTP Proxy");
+-        result = client.requestStandardQuote(addUrl, null, prxUrl, "IBM" ,null);
++        result = client.requestStandardQuote(addUrl, null, prxUrl, "IBM", null);
+         assertTrue("Client did not get run successfully ", result.gotResponse());
+     }
+ 
 Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample50.java
 ===================================================================
 --- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample50.java	(nonexistent)
@@ -642,105 +742,7 @@ Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framewo
 +
 +
 +}
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample0.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample0.java	(revision 1211429)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample0.java	(revision 1211430)
-@@ -51,7 +51,7 @@
-         String prxUrl = "http://localhost:8280/";
- 
-         log.info("Running test: Using Synapse as a HTTP Proxy");
--        result = client.requestStandardQuote(addUrl, null, prxUrl, "IBM" ,null);
-+        result = client.requestStandardQuote(addUrl, null, prxUrl, "IBM", null);
-         assertTrue("Client did not get run successfully ", result.gotResponse());
-     }
- 
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1211429)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1211430)
-@@ -22,6 +22,7 @@
- import junit.framework.TestSuite;
- import org.apache.commons.logging.Log;
- import org.apache.commons.logging.LogFactory;
-+import org.apache.synapse.samples.framework.tests.endpoint.*;
- import org.apache.synapse.samples.framework.tests.message.*;
- 
- import java.util.ArrayList;
-@@ -169,5 +170,17 @@
-         sampleClassRepo.put("13", Sample13.class);
-         sampleClassRepo.put("15", Sample15.class);
-         sampleClassRepo.put("16", Sample16.class);
-+
-+        //Endpoint
-+        sampleClassRepo.put("50", Sample50.class);
-+        sampleClassRepo.put("51", Sample51.class);
-+        sampleClassRepo.put("52", Sample52.class);
-+        sampleClassRepo.put("53", Sample53.class);
-+        sampleClassRepo.put("54", Sample54.class);
-+        sampleClassRepo.put("55", Sample55.class);
-+        sampleClassRepo.put("56", Sample56.class);
-+        //sampleClassRepo.put("57", Sample57.class);  //intermittently fail
-+        sampleClassRepo.put("58", Sample58.class);
-+        sampleClassRepo.put("59", Sample59.class);
-     }
- }
-\ No newline at end of file
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java	(revision 1211429)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java	(revision 1211430)
-@@ -23,6 +23,7 @@
- import org.apache.axiom.om.OMElement;
- import org.apache.axiom.om.impl.builder.StAXOMBuilder;
- import org.apache.commons.io.FileUtils;
-+import org.apache.commons.io.FilenameUtils;
- import org.apache.commons.logging.Log;
- import org.apache.commons.logging.LogFactory;
- import org.apache.synapse.samples.framework.clients.EventSampleClient;
-@@ -59,12 +60,11 @@
-         this.sampleId = sampleId;
-         log.info("Creating Synapse TestCase for test " + sampleId);
-         currentLocation = System.getProperty("user.dir") + File.separator;
--        sampleDescriptor = File.separator + "sample" + sampleId + ".xml";
-+        sampleDescriptor = "/sample" + sampleId + ".xml";
-         configuration = new SampleConfiguration();
-         backendServerControllers = new ArrayList<BackEndServerController>();
--        System.setProperty("java.io.tmpdir", currentLocation + "modules" + File.separator +
--                "integration" + File.separator + "target" + File.separator + "temp");
--
-+        System.setProperty("java.io.tmpdir", FilenameUtils.normalize(
-+                currentLocation + "modules/integration/target/temp"));
-     }
- 
-     /**
-@@ -412,19 +412,21 @@
-                 SampleConfigConstants.TAG_CLIENT_CONF_AXIS2_XML);
- 
-         if (clientRepo == null) {
--            configuration.getClientConfig().setClientRepo(currentLocation +
--                    SampleConfigConstants.DEFAULT_CLIENT_CONF_REPO);
-+            configuration.getClientConfig().setClientRepo(FilenameUtils.normalize(
-+                    currentLocation + SampleConfigConstants.DEFAULT_CLIENT_CONF_REPO));
-         } else {
-             log.info("Using client Axis2 repository location: " + clientRepo);
--            configuration.getClientConfig().setClientRepo(currentLocation + clientRepo);
-+            configuration.getClientConfig().setClientRepo(FilenameUtils.normalize(
-+                    currentLocation + clientRepo));
-         }
- 
-         if (clientAxis2Xml == null) {
--            configuration.getClientConfig().setAxis2Xml(currentLocation +
--                    SampleConfigConstants.DEFAULT_CLIENT_CONF_AXIS2_XML);
-+            configuration.getClientConfig().setAxis2Xml(FilenameUtils.normalize(
-+                    currentLocation + SampleConfigConstants.DEFAULT_CLIENT_CONF_AXIS2_XML));
-         } else {
-             log.info("Using client Axis2 XML: " + clientAxis2Xml);
--            configuration.getClientConfig().setAxis2Xml(currentLocation + clientAxis2Xml);
-+            configuration.getClientConfig().setAxis2Xml(FilenameUtils.normalize(
-+                    currentLocation + clientAxis2Xml));
-         }
-         return true;
- 
 -*-*-*-
-Endpoint samples SYNAPS-746
+Message: Endpoint samples SYNAPS-746
+-*-*-*-
+When: 2011-12-07 08:30:46 -0500 

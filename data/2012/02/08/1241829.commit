@@ -48,4 +48,6 @@ Index: java/modules/samples/src/main/java/samples/userguide/PWCallback.java
                      pc.setPassword("password");
  
 -*-*-*-
-Fixing a compilation error
+Message: Fixing a compilation error
+-*-*-*-
+When: 2012-02-08 04:15:58 -0500 

@@ -226,4 +226,6 @@ Index: java/modules/distribution/src/main/assembly/bin.xml
                  <exclude>org.apache.rampart:rampart:mar</exclude>
                  <exclude>org.apache.sandesha2:sandesha2:mar</exclude>
 -*-*-*-
-Cleaning up some build descriptors
+Message: Cleaning up some build descriptors
+-*-*-*-
+When: 2012-04-02 01:12:07 -0400 

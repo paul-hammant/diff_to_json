@@ -60,4 +60,6 @@ Index: java/pom.xml
              <name>WSO2 Maven 2 Repository</name>
              <url>http://dist.wso2.org/maven2/</url>
 -*-*-*-
-Removed unnecessary repositories.
+Message: Removed unnecessary repositories.
+-*-*-*-
+When: 2012-05-01 06:37:18 -0400 

@@ -12,4 +12,6 @@ Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/trans
      public static final String REQUEST_SOURCE_BUFFER = "synapse.request-source-buffer";
      public static final String RESPONSE_SINK_BUFFER = "synapse.response-sink-buffer";
 -*-*-*-
-Fixing a typo
+Message: Fixing a typo
+-*-*-*-
+When: 2012-02-17 07:51:24 -0500 

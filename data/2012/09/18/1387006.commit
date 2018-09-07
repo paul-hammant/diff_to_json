@@ -1316,4 +1316,7 @@ Index: java/modules/documentation/src/site/site.xml
              <item name="Deployment" href="userguide/deployment.html"/>
              <item name="Javadocs" href="apidocs/"/>
 -*-*-*-
-SYNAPSE-745: Committed EIPLibraryDocumentation.patch. Note that I didn't review the documentation; I just need it to validate the samples with respect to SYNAPSE-905.
+Message: SYNAPSE-745: Committed EIPLibraryDocumentation.patch. Note that I didn't review the documentation; I just need it to validate the samples with respect to SYNAPSE-905.
+
+-*-*-*-
+When: 2012-09-18 02:56:52 -0400 

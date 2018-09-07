@@ -11,4 +11,6 @@ Index: java/pom.xml
                      <!-- These features are disabled since they cause "mvn site" to hang -->
                      <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
 -*-*-*-
-Changing reports plugin version to 2.2 - Previous version causes the maven to throw out an error everytime the dependency report is generated - Known issue in the plugin v2.1.2
+Message: Changing reports plugin version to 2.2 - Previous version causes the maven to throw out an error everytime the dependency report is generated - Known issue in the plugin v2.1.2
+-*-*-*-
+When: 2011-12-26 10:39:39 -0500 

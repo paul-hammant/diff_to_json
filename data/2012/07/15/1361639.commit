@@ -1,8 +1,8 @@
-Index: java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanConstants.java
+Index: java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkManager.java
 ===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanConstants.java	(nonexistent)
-+++ java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanConstants.java	(revision 1361639)
-@@ -0,0 +1,41 @@
+--- java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkManager.java	(nonexistent)
++++ java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkManager.java	(revision 1361639)
+@@ -0,0 +1,150 @@
 +/*
 + *  Licensed to the Apache Software Foundation (ASF) under one
 + *  or more contributor license agreements.  See the NOTICE file
@@ -22,28 +22,1481 @@ Index: java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanCon
 + *  under the License.
 + */
 +
-+package org.apache.synapse.mediators.bean;
++package org.apache.synapse.commons.beanstalk.enterprise;
++
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.commons.util.MiscellaneousUtil;
++
++import java.util.Iterator;
++import java.util.Map;
++import java.util.Properties;
++import java.util.concurrent.ConcurrentHashMap;
++import java.util.concurrent.Executors;
++import java.util.concurrent.ScheduledExecutorService;
++import java.util.concurrent.ThreadFactory;
 +
 +/**
-+ * Defines constants used by Bean mediator configuration.
++ * Manages Enterprise Beanstalks configured in the Synapse Environment. Only one instance of this
++ * class is created per Synapse environment.
 + */
-+public interface BeanConstants {
++public class EnterpriseBeanstalkManager {
 +
-+    public static final String ACTION = "action";
++    private final static Log log = LogFactory.getLog(EnterpriseBeanstalkManager.class);
 +
-+    public static final String CLASS = "class";
++    /**
++     * Stores all configured enterprise beanstalks.
++     */
++    private Map<String, EnterpriseBeanstalk> beanstalkMap = new ConcurrentHashMap<String, EnterpriseBeanstalk>();
 +
-+    public static final String VAR = "var";
++    /**
++     * ScheduledExecutorService for cleaning up timed out client stubs in all beanstalks.
++     */
++    private ScheduledExecutorService scheduler;
 +
-+    public static final String REPLACE = "replace";
++    /**
++     * Initializes the beanstalk manager, which creates and initializes beanstalks defined in the
++     * given Properties instance.
++     * @param props Properties to read enterprise beanstalk configurations from. Usually, source of
++     * this is synapse.properties file.
++     */
++    public void init(Properties props) {
 +
-+    public static final String PROPERTY = "property";
++        if (props == null) {
++            if (log.isDebugEnabled()) {
++                log.debug("Enterprise Beanstalk properties cannot be found.");
++            }
++            return;
++        }
 +
-+    public static final String VALUE = "value";
++        String beanstalkNameList = MiscellaneousUtil.getProperty(props,
++                EnterpriseBeanstalkConstants.SYNAPSE_BEANSTALK_PREFIX, null);
 +
-+    public static final String TARGET = "target";
++        if (beanstalkNameList == null || "".equals(beanstalkNameList)) {
++            if (log.isDebugEnabled()) {
++                log.debug("No beanstalks defined for initialization.");
++            }
++            return;
++        }
++
++        String[] beanstalkNames = beanstalkNameList.split(",");
++        if (beanstalkNames == null || beanstalkNames.length == 0) {
++            if (log.isDebugEnabled()) {
++                log.debug("No beanstalk definitions found for initialization.");
++            }
++            return;
++        }
++
++        scheduler = Executors.newSingleThreadScheduledExecutor(
++                new ThreadFactory() {
++                    public Thread newThread(Runnable r) {
++                        return new Thread(r, "enterprise-beanstalk-cache-cleaner");
++                    }
++                }
++        );
++
++        for (String beanstalkName : beanstalkNames) {
++
++            if (beanstalkName == null || beanstalkName.trim().length() == 0) {
++                continue;
++            }
++
++            String propertyPrefix = EnterpriseBeanstalkConstants.SYNAPSE_BEANSTALK_PREFIX + "." +
++                    beanstalkName + ".";
++            Properties currentBeanstalkProps = new Properties();
++
++            for (Map.Entry<Object, Object> entry : props.entrySet()) {
++
++                if (entry.getKey() instanceof String && entry.getValue() instanceof String) {
++
++                    String key = (String) entry.getKey();
++                    if (key.startsWith(propertyPrefix)) {
++                        currentBeanstalkProps.setProperty(
++                                        key.replace(propertyPrefix, ""), (String) entry.getValue());
++                    }
++                }
++            }
++
++            EnterpriseBeanstalk beanstalk =
++                    new EnterpriseBeanstalk(beanstalkName, currentBeanstalkProps, scheduler);
++            beanstalk.init();
++
++            beanstalkMap.put(beanstalkName, beanstalk);
++        }
++    }
++
++    /**
++     * Returns the beanstalk with the given name, null if it's not found.
++     * @param name Name of the beanstalk.
++     * @return Beanstalk specified by the name, null if it's not found.
++     */
++    public EnterpriseBeanstalk getEnterpriseBeanstalk(String name) {
++        return beanstalkMap.get(name);
++    }
++
++    /**
++     * Cleans up resources allocated by this BeanstalkManager.
++     */
++    public void destroy() {
++
++        Iterator<EnterpriseBeanstalk> it = beanstalkMap.values().iterator();
++        while (it.hasNext()) {
++            it.next().destroy();
++            it.remove();
++        }
++
++        if (scheduler != null && !scheduler.isShutdown()) {
++            if (log.isDebugEnabled()) {
++                log.debug("Shutting down enterprise beanstalk cache cleaner executor...");
++            }
++            scheduler.shutdownNow();
++        }
++    }
++}
+Index: java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkView.java
+===================================================================
+--- java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkView.java	(nonexistent)
++++ java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkView.java	(revision 1361639)
+@@ -0,0 +1,76 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.commons.beanstalk.enterprise;
++
++import java.util.Date;
++import java.util.HashMap;
++import java.util.Map;
++
++/**
++ * MBean implementation class that enables monitoring/managing enterprise beanstalks via JMX.
++ */
++public class EnterpriseBeanstalkView implements EnterpriseBeanstalkViewMBean {
++
++    private EnterpriseBeanstalk beanstalk;
++
++    EnterpriseBeanstalkView(EnterpriseBeanstalk beanstalk) {
++        this.beanstalk = beanstalk;
++    }
++
++    public String getBeanstalkName() {
++        return beanstalk.getName();
++    }
++
++    public int getCachedStatelessStubCount() {
++        return beanstalk.getStatelessBeans().size();
++    }
++
++    public int getCachedStatefulStubCount() {
++        return beanstalk.getStatefulBeans().size();
++    }
++
++    public Map getStatelessStubCacheLastAccessTimes() {
++        return getLastAccessTimesMap(beanstalk.getStatelessBeans());
++    }
++
++    public Map getStatefulStubCacheLastAccessTimes() {
++        return getLastAccessTimesMap(beanstalk.getStatefulBeans());
++    }
++
++    private Map getLastAccessTimesMap(Map<String, CacheEntry> beanMap) {
++        Map<String, Date> results = new HashMap<String, Date>();
++        for (Map.Entry<String, CacheEntry> entry : beanMap.entrySet()) {
++            results.put(entry.getKey(), new Date(entry.getValue().getLastAccessTime()));
++        }
++        return results;
++    }
++
++    public void cleanExpiredStubsNow() throws Exception {
++        beanstalk.removeExpiredBeans();
++    }
++
++    public void removeStatelessStub(String className) {
++        beanstalk.removeEnterpriseBean(className, null);
++    }
++
++    public void removeStatefulStub(String className, String sessionId) {
++        beanstalk.removeEnterpriseBean(className, sessionId);
++    }
++}
+Index: java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkConstants.java
+===================================================================
+--- java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkConstants.java	(nonexistent)
++++ java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkConstants.java	(revision 1361639)
+@@ -0,0 +1,74 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.commons.beanstalk.enterprise;
++
++/**
++ * Holds constants used in Enterprise Beanstalk configurations.
++ */
++public interface EnterpriseBeanstalkConstants {
++
++    /**
++     * Prefix for beanstalk related configuration property names in synapse.properties.
++     */
++    public static final String SYNAPSE_BEANSTALK_PREFIX = "synapse.beanstalks";
++
++    /**
++     * Cache timeout in minutes for stateless session beans
++     */
++    public static final String STATELESS_BEANS_TIMEOUT = "cache.timeout.stateless";
++
++    /**
++     * Cache timeout in minutes for stateful session beans
++     */
++    public static final String STATEFUL_BEANS_TIMEOUT = "cache.timeout.stateful";
++
++    /**
++     * Warn limit for stateless session beans. A warning is generated when more than this many of
++     * stateless bean stubs are cached in this beanstalk.
++     */
++    public static final String STATELESS_BEANS_WARN_LIMIT = "cache.warn.limit.stateless";
++
++    /**
++     * Warn limit for stateless session beans. A warning is generated when more than this many of
++     * stateless bean stubs are cached in this beanstalk.
++     */
++    public static final String STATEFUL_BEANS_WARN_LIMIT = "cache.warn.limit.stateful";
++
++
++    // -------------------- Internally used constants -------------------- //
++
++    /**
++     * ServerContextInformation property name of the EnterpriseBeanstalkManager.
++     */
++    public static final String ENTERPRISE_BEANSTALK_MANAGER_PROP_NAME =
++                                                       "__SYNAPSE.ENTERPRISE.BEANSTALK.MANAGER";
++
++    /**
++     * ServerContextInformation property name of the EnterpriseBeanstalkManager configuration.
++     */
++    public static final String ENTERPRISE_BEANSTALK_CONFIG_PROP_NAME =
++                                                       "__SYNAPSE.ENTERPRISE.BEANSTALK.CONFIG";
++
++    /**
++     * Category name for JMX MBeans registered to monitor beanstalks.
++     */
++    public static final String ENTERPRISE_BEANSTALK_MBEAN_CATEGORY_NAME = "EnterpriseBeanstalk";
 +
 +}
+Index: java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkViewMBean.java
+===================================================================
+--- java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkViewMBean.java	(nonexistent)
++++ java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkViewMBean.java	(revision 1361639)
+@@ -0,0 +1,47 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.commons.beanstalk.enterprise;
++
++import java.util.Map;
++
++/**
++ * MBean interface that enables monitoring/managing enterprise beanstalks via JMX.
++ */
++public interface EnterpriseBeanstalkViewMBean {
++
++    // JMX Attributes
++    public String getBeanstalkName();
++
++    public int getCachedStatelessStubCount();
++
++    public int getCachedStatefulStubCount();
++
++    public Map getStatelessStubCacheLastAccessTimes();
++
++    public Map getStatefulStubCacheLastAccessTimes();
++
++
++    // JMX Operations
++    public void cleanExpiredStubsNow() throws Exception;
++
++    public void removeStatelessStub(String className);
++
++    public void removeStatefulStub(String className, String sessionId);
++}
+Index: java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/CacheEntry.java
+===================================================================
+--- java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/CacheEntry.java	(nonexistent)
++++ java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/CacheEntry.java	(revision 1361639)
+@@ -0,0 +1,52 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.commons.beanstalk.enterprise;
++
++/**
++ * CacheEntry records last access time of the EJB client stub it encapsulates.
++ */
++class CacheEntry {
++
++    private long lastAccessTime;
++
++    private final Object bean;
++
++    CacheEntry(Object bean) {
++        this.lastAccessTime = System.currentTimeMillis();
++        this.bean = bean;
++    }
++
++    public synchronized long getLastAccessTime() {
++        return lastAccessTime;
++    }
++
++    public synchronized void setLastAccessTime(long lastAccessTime) {
++        this.lastAccessTime = lastAccessTime;
++    }
++
++    public synchronized void markLastAccessTime() {
++        this.lastAccessTime = System.currentTimeMillis();
++    }
++
++    public Object getBean() {
++        return bean;
++    }
++
++}
+Index: java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalk.java
+===================================================================
+--- java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalk.java	(nonexistent)
++++ java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalk.java	(revision 1361639)
+@@ -0,0 +1,341 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.commons.beanstalk.enterprise;
++
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.commons.jmx.MBeanRegistrar;
++
++import javax.naming.InitialContext;
++import javax.naming.NamingException;
++import java.util.*;
++import java.util.concurrent.ConcurrentHashMap;
++import java.util.concurrent.ScheduledExecutorService;
++import java.util.concurrent.ScheduledFuture;
++import java.util.concurrent.TimeUnit;
++
++/**
++ * An Enterprise Beanstalk is used to retrieve Enterprise JavaBean (EJB) client stubs. This class
++ * implements Service Locator J2EE pattern and supports stateless and stateful session beans.
++ * Enterprise beanstalks can be configured in synapse.properties file. Parameters of the JNDI
++ * service to be looked up for EJBs should be provided with this configuration.
++ * Beanstalks cache EJB client stubs to improve efficiency by omitting excessive JNDI
++ * context creation and look ups. Cache timeout for both stateless and stateful session beans could
++ * be configured independently.
++ */
++public class EnterpriseBeanstalk {
++
++    private static final Log log = LogFactory.getLog(EnterpriseBeanstalk.class);
++
++    /**
++     * Name of the beanstalk
++     */
++    private String name;
++
++    /**
++     * Properties used while initializing this beanstalk.
++     */
++    private Properties props;
++
++    /**
++     * Executor that periodically runs the Cleaner.
++     */
++    private ScheduledExecutorService scheduler;
++
++    /**
++     * Scheduled future that represents the scheduled Cleaner.
++     */
++    private ScheduledFuture<?> scheduledFuture;
++
++    /**
++     * Cache timeout for stateless session bean stubs.
++     */
++    private int statelessBeanTimeoutMinutes = 30;
++
++    /**
++     * Cache timeout for stateful session bean stubs.
++     */
++    private int statefulBeanTimeoutMinutes = 30;
++
++    /**
++     * Warn limit for stateless session beans. A warning is generated when more than this many of
++     * stateless bean stubs are cached by this beanstalk.
++     */
++    private int statelessBeanWarnLimit = Short.MAX_VALUE;
++
++    /**
++     * Warn limit for stateful session beans. A warning is generated when more than this many of
++     * stateful bean stubs are cached by this beanstalk.
++     */
++    private int statefulBeanWarnLimit = Short.MAX_VALUE;
++
++    /**
++     * JNDI context constructed with the properties provided while initializing this beanstalk.
++     */
++    private InitialContext initialCtx;
++
++    /**
++     * Stateless session bean stub cache.
++     */
++    private Map<String, CacheEntry> statelessBeans = new ConcurrentHashMap<String, CacheEntry>();
++
++    /**
++     * Stateful session bean stub cache.
++     */
++    private Map<String, CacheEntry> statefulBeans = new ConcurrentHashMap<String, CacheEntry>();
++
++    /**
++     * Constructs a new enterprise beanstalk with the given name and properties.
++     * @param name Name of the enterprise beanstalk.
++     * @param props Configuration properties. This should include properties of the JNDI service
++     * to be looked up for EJBs.
++     * @param scheduler ScheduledExecutorService for cleaning up timed-out stubs.
++     */
++    public EnterpriseBeanstalk(String name, Properties props, ScheduledExecutorService scheduler) {
++        this.name = name;
++        this.scheduler = scheduler;
++        this.props = props;
++    }
++
++    /**
++     * Initialize the current beanstalk by creating the JNDI context, registering the MBean etc.
++     */
++    public void init() {
++
++        if (log.isDebugEnabled()) {
++            log.debug("Initializing Beanstalk: " + name);
++        }
++
++        // Initialize the JNDI context.
++        try {
++            initialCtx = new InitialContext(props);
++        } catch (NamingException e) {
++            log.error("Could not initialize JNDI context for the Enterprise Beanstalk " +
++                    "named '" + name + "'.", e);
++            return;
++        }
++
++        // Read settings from the provided properties.
++        if (props != null) {
++            String value;
++
++            value = props.getProperty(EnterpriseBeanstalkConstants.STATELESS_BEANS_TIMEOUT);
++            if (value != null) {
++                statelessBeanTimeoutMinutes = Integer.parseInt(value);
++            }
++
++            value = props.getProperty(EnterpriseBeanstalkConstants.STATEFUL_BEANS_TIMEOUT);
++            if (value != null) {
++                statefulBeanTimeoutMinutes = Integer.parseInt(value);
++            }
++
++            value = props.getProperty(EnterpriseBeanstalkConstants.STATELESS_BEANS_WARN_LIMIT);
++            if (value != null) {
++                statelessBeanWarnLimit = Integer.parseInt(value);
++            }
++
++            value = props.getProperty(EnterpriseBeanstalkConstants.STATEFUL_BEANS_WARN_LIMIT);
++            if (value != null) {
++                statefulBeanWarnLimit = Integer.parseInt(value);
++            }
++        }
++
++        // Schedule the cleaner that removes expired beans periodically.
++        int minDelay = Math.min(statelessBeanTimeoutMinutes, statefulBeanTimeoutMinutes);
++        scheduledFuture = scheduler.scheduleWithFixedDelay(
++                            new Runnable() {
++                                public void run() {
++                                    removeExpiredBeans();
++                                }
++                            }, minDelay, minDelay, TimeUnit.MINUTES);
++
++        // Register the MBean for this beanstalk.
++        MBeanRegistrar.getInstance().registerMBean(new EnterpriseBeanstalkView(this),
++                EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_MBEAN_CATEGORY_NAME, name);
++
++        if (log.isDebugEnabled()) {
++            log.debug("Successfully initialized Beanstalk: " + name);
++        }
++    }
++
++    /**
++     * Destroys the beanstalk by performing clean up.
++     */
++    public void destroy() {
++
++        scheduledFuture.cancel(false);
++
++        MBeanRegistrar.getInstance().unRegisterMBean(
++                EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_MBEAN_CATEGORY_NAME, name);
++    }
++
++    /**
++     * Returns the name of this beanstalk.
++     *
++     * @return Name of the beanstalk.
++     */
++    public String getName() {
++        return name;
++    }
++
++    /**
++     * Returns a client stub for the EJB with given class name, session id and jndi name. If the
++     * stub is already available in cache, it is retrieved from there. Otherwise, a JNDI lookup
++     * is performed with the given JNDI name.
++     *
++     * @param className Fully qualified name of the remote interface of the session bean.
++     * @param sessionId Session id for stateful beans. null for stateless ones.
++     * @param jndiName JNDI name of the EJB. null could be used if the bean is already available in
++     * the cache.
++     * @return Retrieved EJB client stub. null if the EJB is not found.
++     */
++    public Object getEnterpriseBean(String className, String sessionId, String jndiName) {
++        return sessionId == null ?
++            findEjb(statelessBeans, className, sessionId, jndiName, statelessBeanWarnLimit) :
++            findEjb(statefulBeans, className, sessionId, jndiName, statefulBeanWarnLimit);
++    }
++
++    /**
++     * Remove the specified client stub from cache. If the stub is not removed using this
++     * method it will be automatically removed from the beanstalk after it times out.
++     * @param className Fully qualified name of the remote interface of the session bean.
++     * @param sessionId Session id for stateful session beans, null for stateless ones.
++     * @return EJB client stub that was removed from the beanstalk.
++     */
++    public Object removeEnterpriseBean(String className, String sessionId) {
++        return (sessionId == null) ?
++                statelessBeans.remove(getMapKey(className, sessionId)) :
++                statefulBeans.remove(getMapKey(className, sessionId));
++    }
++
++    /**
++     * Removes expired stateless and stateful bean stubs from cache. Timeouts are configurable.
++     */
++    public void removeExpiredBeans() {
++        removeExpiredBeansFromMap(statelessBeans, statelessBeanTimeoutMinutes);
++        removeExpiredBeansFromMap(statefulBeans, statefulBeanTimeoutMinutes);
++    }
++
++    /**
++     * Retrieves an EJB client stub from the cache, looks up in the JNDI service if it is not
++     * available in the cache. If the bean is found from JNDI lookup, it is added to the cache.
++     *
++     * @param map Cache to search the stub in.
++     * @param className Fully qualified name of the remote interface of the session bean.
++     * @param sessionId Session id for stateful beans. null for stateless ones.
++     * @param jndiName JNDI name of the EJB. null could be used if the bean is already available in
++     * the cache.
++     * @param warnLimit If this many of stubs are already available in the cache, a warning is
++     * generated before adding a new stub to it.
++     * @return Retrieved EJB client stub. null if the EJB is not found.
++     */
++    private Object findEjb(Map<String, CacheEntry> map, String className, String sessionId,
++                           String jndiName, int warnLimit) {
++
++        CacheEntry entry = map.get(getMapKey(className, sessionId));
++
++        if (entry == null && jndiName != null) {
++
++            synchronized (this) {
++                entry = map.get(getMapKey(className, sessionId));
++                if (entry == null) {
++                    Object ejb = lookupInJndi(jndiName);
++                    if (ejb != null) {
++                        map.put(getMapKey(className, sessionId), entry = new CacheEntry(ejb));
++                        int size = map.size();
++                        if (size > warnLimit) {
++                            String type = sessionId == null ? "stateless" : "stateful";
++                            log.warn("Warn limit reached for " + type + " beans. Currently there " +
++                                    "are " + size + " " + type + " EJB stubs cached in '" + name +
++                                    "' " + "beanstalk.");
++                        }
++                    }
++                }
++            }
++
++        }
++
++        if (entry == null) {
++            return null;
++        } else {
++            entry.markLastAccessTime();
++            return entry.getBean();
++        }
++
++    }
++
++    /**
++     * Looks up the given resource in the JNDI service.
++     * @param jndiName JNDI name of the resource (EJB).
++     * @return Resource retrieved from the JNDI lookup. null if no resource is found.
++     */
++    private Object lookupInJndi(String jndiName) {
++        try {
++            return initialCtx.lookup(jndiName);
++        } catch (NamingException ex) {
++            log.error("Lookup failed for JNDI name: " + jndiName, ex);
++            return null;
++        }
++    }
++
++    /**
++     * Remove stubs from the given map that have not been used for a time period longer than the
++     * provided timeout.
++     * @param map Bean stub cache.
++     * @param timeoutInMinutes Expiry timeout.
++     */
++    private void removeExpiredBeansFromMap(Map<String, CacheEntry> map, int timeoutInMinutes) {
++
++        Iterator<Map.Entry<String, CacheEntry>> itr = map.entrySet().iterator();
++
++        while (itr.hasNext()) {
++
++            Map.Entry<String, CacheEntry> mapEntry = itr.next();
++
++            if (System.currentTimeMillis() - mapEntry.getValue().getLastAccessTime() >
++                                                        timeoutInMinutes * 60L * 1000L) {
++
++                if (log.isDebugEnabled()) {
++                    log.debug("Removing the timed-out EJB stub with key '" + mapEntry.getKey() +
++                            "', from '" + name + "' beanstalk cache.");
++                }
++                itr.remove();
++            }
++        }
++    }
++
++    /**
++     * Derives the map key for this session bean.
++     * @param className Fully qualified name of the remote interface of the EJB.
++     * @param sessionId Session Id for stateful beans, null for stateless ones.
++     * @return Map key derived from the given parameters.
++     */
++    private String getMapKey(String className, String sessionId) {
++        return sessionId == null ? className : className + "-" + sessionId;
++    }
++
++    Map<String, CacheEntry> getStatelessBeans() {
++        return statelessBeans;
++    }
++
++    Map<String, CacheEntry> getStatefulBeans() {
++        return statefulBeans;
++    }
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java	(revision 1361638)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java	(revision 1361639)
+@@ -83,7 +83,9 @@
+         MessageStoreMediatorFactory.class,
+         TemplateMediatorFactory.class,
+         InvokeMediatorFactory.class,
+-        PayloadFactoryMediatorFactory.class
++        PayloadFactoryMediatorFactory.class,
++        BeanMediatorFactory.class,
++        EJBMediatorFactory.class
+     };
+ 
+     private final static MediatorFactoryFinder instance  = new MediatorFactoryFinder();
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediatorFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediatorFactory.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediatorFactory.java	(revision 1361639)
+@@ -0,0 +1,138 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.config.xml;
++
++import org.apache.axiom.om.OMElement;
++import org.apache.synapse.Mediator;
++import org.apache.synapse.mediators.bean.BeanConstants;
++import org.apache.synapse.mediators.bean.BeanUtils;
++import org.apache.synapse.mediators.bean.Target;
++import org.apache.synapse.mediators.bean.enterprise.EJBConstants;
++import org.apache.synapse.mediators.bean.enterprise.EJBMediator;
++
++import javax.xml.namespace.QName;
++import java.lang.reflect.Method;
++import java.util.Iterator;
++import java.util.Properties;
++
++/**
++ * Creates an {@link EJBMediator} from the provided XML configuration.
++ *
++ * <p/>
++ * <pre>
++ * &lt;ejb beanstalk="string" class="string" [sessionId="string"] [remove="true | false"]
++ * [method="string"] [target="string | {xpath}"] [jndiName="string"] /&gt;
++ *   &lt;args&gt;
++ *     &lt;arg (value="string | {xpath}")/&gt;*
++ *   &lt;/args&gt;
++ * &lt;/ejb&gt;
++ * </pre>
++ */
++public class EJBMediatorFactory extends AbstractMediatorFactory {
++
++    private static final QName EJB_Q =
++            new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "ejb");
++
++    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
++
++        EJBMediator mediator = new EJBMediator();
++
++        String attributeValue;
++
++        attributeValue = elem.getAttributeValue(new QName(EJBConstants.BEANSTALK));
++        if (attributeValue != null) {
++            mediator.setBeanstalkName(attributeValue.trim());
++        } else {
++            handleException("'beanstalk' attribute of callEjb mediator is required");
++        }
++
++        attributeValue = elem.getAttributeValue(new QName(BeanConstants.CLASS));
++        if (attributeValue != null) {
++            mediator.setClassName(attributeValue.trim());
++        } else {
++            handleException("'class' attribute of callEjb mediator is required");
++        }
++
++        attributeValue = elem.getAttributeValue(new QName(EJBConstants.SESSION_ID));
++        if (attributeValue != null) {
++            mediator.setSessionId(new ValueFactory().createValue(EJBConstants.SESSION_ID, elem));
++        }
++
++        boolean remove;
++        attributeValue = elem.getAttributeValue(new QName(EJBConstants.REMOVE));
++        remove = Boolean.valueOf(attributeValue);
++        if (remove) {
++            mediator.setRemove(true);
++        }
++
++        if (elem.getAttributeValue(new QName(BeanConstants.TARGET)) != null) {
++            mediator.setTarget(new Target(BeanConstants.TARGET, elem));
++        }
++
++        attributeValue = elem.getAttributeValue(new QName(EJBConstants.JNDI_NAME));
++        if (attributeValue != null) {
++            mediator.setJndiName(attributeValue);
++        }
++
++        OMElement argumentsElem = elem.getFirstChildWithName(
++                new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, EJBConstants.ARGS));
++
++        if (argumentsElem != null) {
++
++            Iterator itr = argumentsElem.getChildrenWithName(
++                    new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, EJBConstants.ARG));
++
++            while (itr.hasNext()) {
++                OMElement argElem = (OMElement) itr.next();
++
++                if (argElem.getAttributeValue(ATT_VALUE) != null) {
++                    mediator.addArgument(
++                            new ValueFactory().createValue(BeanConstants.VALUE, argElem));
++                } else {
++                    handleException("'value' attribute of 'arg' element is required.");
++                }
++            }
++        }
++
++        attributeValue = elem.getAttributeValue(new QName(EJBConstants.METHOD));
++        if (attributeValue != null) {
++            Method method = null;
++            try {
++                method = BeanUtils.resolveMethod(
++                                        Class.forName(mediator.getClassName()),
++                                        attributeValue,
++                                        mediator.getArgumentList().size());
++            } catch (ClassNotFoundException e) {
++                handleException("Could not load '" + mediator.getClassName() + "' class.", e);
++            }
++            mediator.setMethod(method);
++        } else if (!remove) {
++            handleException("'method' attribute of EJB mediator is optional only when it's a " +
++                    "bean removal.");
++        }
++
++        return mediator;
++    }
++
++    public QName getTagQName() {
++        return EJB_Q;
++    }
++
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediatorSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediatorSerializer.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediatorSerializer.java	(revision 1361639)
+@@ -0,0 +1,118 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.config.xml;
++
++import org.apache.axiom.om.OMElement;
++import org.apache.synapse.Mediator;
++import org.apache.synapse.mediators.Value;
++import org.apache.synapse.mediators.bean.BeanConstants;
++import org.apache.synapse.mediators.bean.enterprise.EJBConstants;
++import org.apache.synapse.mediators.bean.enterprise.EJBMediator;
++
++import java.util.List;
++
++/**
++ * Serializer for {@link EJBMediator} instances.
++ *
++ * @see EJBMediatorFactory
++ */
++public class EJBMediatorSerializer extends AbstractMediatorSerializer {
++
++    private static final String EJB = "ejb";
++
++    public OMElement serializeSpecificMediator(Mediator m) {
++
++        if (!(m instanceof EJBMediator)) {
++            handleException("An unsupported mediator was passed in for serialization : " +
++                    m.getType());
++            return null;
++        }
++
++        EJBMediator mediator = (EJBMediator) m;
++
++        OMElement mediatorElem = fac.createOMElement(EJB, synNS);
++        saveTracingState(mediatorElem, mediator);
++
++        if (mediator.getBeanstalkName() != null) {
++            mediatorElem.addAttribute(fac.createOMAttribute(
++                    EJBConstants.BEANSTALK, nullNS, mediator.getBeanstalkName()));
++        } else {
++            handleException();
++        }
++
++        if (mediator.getClassName() != null) {
++            mediatorElem.addAttribute(fac.createOMAttribute(
++                    BeanConstants.CLASS, nullNS, mediator.getClassName()));
++        } else {
++            handleException();
++        }
++
++        if (mediator.getSessionId() != null) {
++            new ValueSerializer().serializeValue(
++                    mediator.getSessionId(), EJBConstants.SESSION_ID, mediatorElem);
++        }
++
++        if (mediator.getMethod() != null) {
++            mediatorElem.addAttribute(fac.createOMAttribute(
++                    EJBConstants.METHOD, nullNS, mediator.getMethod().getName()));
++        } else if (!mediator.isRemove()) {
++            handleException();
++        }
++
++        if (mediator.getTarget() != null) {
++            mediator.getTarget().serializeTarget(BeanConstants.TARGET, mediatorElem);
++        }
++
++        if (mediator.getJndiName() != null) {
++            mediatorElem.addAttribute(fac.createOMAttribute(
++                    EJBConstants.JNDI_NAME, nullNS, mediator.getJndiName()));
++        }
++
++        if (mediator.isRemove()) {
++            mediatorElem.addAttribute(fac.createOMAttribute(
++                    EJBConstants.REMOVE, nullNS, Boolean.toString(true)));
++        }
++
++        List<Value> argList = mediator.getArgumentList();
++
++        if (argList != null && argList.size() > 0) {
++
++            OMElement argumentsElem = fac.createOMElement(EJBConstants.ARGS, synNS);
++
++            for (Value arg : argList) {
++                OMElement argElem = fac.createOMElement(EJBConstants.ARG, synNS);
++                new ValueSerializer().serializeValue(arg, BeanConstants.VALUE, argElem);
++                argumentsElem.addChild(argElem);
++            }
++
++            mediatorElem.addChild(argumentsElem);
++        }
++
++        return mediatorElem;
++    }
++
++    public String getMediatorClassName() {
++        return EJBMediator.class.getName();
++    }
++
++    private void handleException() {
++        handleException("Invalid ejb mediator was passed in for serialization.");
++    }
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java	(revision 1361638)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java	(revision 1361639)
+@@ -69,7 +69,9 @@
+         InvokeMediatorSerializer.class,
+         MessageStoreMediatorSerializer.class,
+         URLRewriteMediatorSerializer.class,
+-        PayloadFactoryMediatorSerializer.class
++        PayloadFactoryMediatorSerializer.class,
++        BeanMediatorSerializer.class,
++        EJBMediatorSerializer.class
+     };
+ 
+     private final static MediatorSerializerFinder instance = new MediatorSerializerFinder();
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/BeanMediatorFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/BeanMediatorFactory.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/BeanMediatorFactory.java	(revision 1361639)
+@@ -0,0 +1,159 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.config.xml;
++
++import org.apache.axiom.om.OMElement;
++import org.apache.synapse.Mediator;
++import org.apache.synapse.mediators.bean.BeanConstants;
++import org.apache.synapse.mediators.bean.BeanMediator;
++import org.apache.synapse.mediators.bean.Target;
++
++import javax.xml.namespace.QName;
++import java.util.Properties;
++
++/**
++ * Creates a {@link BeanMediator} from the provided XML configuration.
++ *
++ * <p/>
++ * <pre>
++ * &lt;bean action=&quot;CREATE | REMOVE | SET_PROPERTY | GET_PROPERTY&quot; var=&quot;string&quot;
++ * [class=&quot;string&quot;]  [property=&quot;string&quot;]
++ * [value=&quot;string | {xpath}&quot;] /&gt;
++ * </pre>
++ */
++public class BeanMediatorFactory extends AbstractMediatorFactory {
++
++    private static final QName BEAN_Q
++            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "bean");
++
++    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
++
++        BeanMediator mediator = new BeanMediator();
++
++        String attributeValue;
++
++        attributeValue = elem.getAttributeValue(new QName(BeanConstants.VAR));
++        if (attributeValue != null) {
++            mediator.setVarName(attributeValue);
++        } else {
++            handleException("'var' attribute of Bean mediator is required.");
++        }
++
++        attributeValue = elem.getAttributeValue(new QName(BeanConstants.ACTION));
++        if (attributeValue != null) {
++            try {
++                switch (BeanMediator.Action.valueOf(attributeValue.toUpperCase())) {
++                    case CREATE:
++                        populateCreateBeanCase(mediator, elem);
++                        break;
++                    case REMOVE:
++                        mediator.setAction(BeanMediator.Action.REMOVE);
++                        break;
++                    case SET_PROPERTY:
++                        populateSetPropertyCase(mediator, elem);
++                        break;
++                    case GET_PROPERTY:
++                        populateGetPropertyCase(mediator, elem);
++                        break;
++                    default:
++                        assert false;
++                }
++            } catch (IllegalArgumentException e) {
++                handleException("'action' attribute of bean mediator must be set to 'CREATE', " +
++                        "'REMOVE', 'SET_PROPERTY' or 'GET_PROPERTY'.");
++            }
++        } else {
++            handleException("'action' attribute of Bean mediator is required.");
++        }
++
++        return mediator;
++    }
++
++    private void populateCreateBeanCase(BeanMediator mediator, OMElement elem) {
++
++        mediator.setAction(BeanMediator.Action.CREATE);
++
++        String attributeValue;
++
++        attributeValue = elem.getAttributeValue(new QName(BeanConstants.CLASS));
++        if (attributeValue != null) {
++            try {
++                mediator.setClazz(Class.forName(attributeValue.trim()));
++            } catch (Exception e) {
++                handleException("Error while loading '" + attributeValue + "' class.", e);
++            }
++        } else {
++            handleException("'class' attribute of Bean mediator is required when 'CREATE' action " +
++                    "is set.");
++        }
++
++        attributeValue = elem.getAttributeValue(new QName(BeanConstants.REPLACE));
++        if (attributeValue != null) {
++            mediator.setReplace(Boolean.parseBoolean(attributeValue.trim()));
++        }
++
++    }
++
++    private void populateSetPropertyCase(BeanMediator mediator, OMElement elem) {
++
++        mediator.setAction(BeanMediator.Action.SET_PROPERTY);
++
++        populatePropertyName(mediator, elem);
++
++        if (elem.getAttributeValue(ATT_VALUE) != null) {
++            mediator.setValue(new ValueFactory().createValue(BeanConstants.VALUE, elem));
++        } else {
++            handleException("'value' attribute of Bean mediator is required when 'SET_PROPERTY' " +
++                    "action is set.");
++        }
++    }
++
++    private void populateGetPropertyCase(BeanMediator mediator, OMElement elem) {
++
++        mediator.setAction(BeanMediator.Action.GET_PROPERTY);
++
++        populatePropertyName(mediator, elem);
++
++        if (elem.getAttributeValue(new QName(BeanConstants.TARGET)) != null) {
++            mediator.setTarget(new Target(BeanConstants.TARGET, elem));
++        } else {
++            handleException("'target' attribute of Bean mediator is required when 'GET_PROPERTY' " +
++                    "action is set.");
++        }
++    }
++
++    private void populatePropertyName(BeanMediator mediator, OMElement elem) {
++
++        String attributeValue;
++
++        attributeValue = elem.getAttributeValue(new QName(BeanConstants.PROPERTY));
++        if (attributeValue != null) {
++            mediator.setPropertyName(attributeValue);
++        } else {
++            handleException("'property' attribute of Bean mediator is required when " +
++                    "SET/GET_PROPERTY action is set.");
++        }
++    }
++
++    public QName getTagQName() {
++        return BEAN_Q;
++    }
++
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/BeanMediatorSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/BeanMediatorSerializer.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/BeanMediatorSerializer.java	(revision 1361639)
+@@ -0,0 +1,134 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.config.xml;
++
++import org.apache.axiom.om.OMElement;
++import org.apache.synapse.Mediator;
++import org.apache.synapse.mediators.bean.BeanConstants;
++import org.apache.synapse.mediators.bean.BeanMediator;
++
++/**
++ * Serializer for {@link BeanMediator} instances.
++ *
++ * @see BeanMediatorFactory
++ */
++public class BeanMediatorSerializer extends AbstractMediatorSerializer {
++
++    private static final String BEAN = "bean";
++
++    public OMElement serializeSpecificMediator(Mediator m) {
++
++        if (!(m instanceof BeanMediator)) {
++            handleException("Unsupported mediator was passed in for serialization: " + m.getType());
++            return null;
++        }
++
++        BeanMediator mediator = (BeanMediator) m;
++
++        OMElement mediatorElem = fac.createOMElement(BEAN, synNS);
++        saveTracingState(mediatorElem, mediator);
++
++        if (mediator.getAction() != null) {
++            mediatorElem.addAttribute(fac.createOMAttribute(
++                    BeanConstants.ACTION, nullNS, mediator.getAction().toString()));
++        } else {
++            handleException();
++        }
++
++        if (mediator.getVarName() != null) {
++            mediatorElem.addAttribute(fac.createOMAttribute(
++                    BeanConstants.VAR, nullNS, mediator.getVarName()));
++        } else {
++            handleException();
++        }
++
++        switch (mediator.getAction()) {
++            case CREATE:
++                serializeCreateBeanCase(mediatorElem, mediator);
++                break;
++            case SET_PROPERTY:
++                serializeSetPropertyCase(mediatorElem, mediator);
++                break;
++            case GET_PROPERTY:
++                serializeGetPropertyCase(mediatorElem, mediator);
++                break;
++            default:
++                assert false;
++        }
++
++        return mediatorElem;
++    }
++
++    private void serializeCreateBeanCase(OMElement mediatorElem, BeanMediator mediator) {
++
++        if (mediator.getClazz() != null) {
++            mediatorElem.addAttribute(fac.createOMAttribute(
++                    BeanConstants.CLASS, nullNS, mediator.getClazz().getName()));
++        } else {
++            handleException();
++        }
++
++        if (!mediator.isReplace()) {
++            mediatorElem.addAttribute(fac.createOMAttribute(
++                    BeanConstants.REPLACE, nullNS, Boolean.toString(false)));
++        }
++    }
++
++    private void serializeSetPropertyCase(OMElement mediatorElem, BeanMediator mediator) {
++
++        serializePropertyName(mediatorElem, mediator);
++
++        if (mediator.getValue() != null) {
++            new ValueSerializer().serializeValue(
++                    mediator.getValue(), BeanConstants.VALUE, mediatorElem);
++        } else {
++            handleException();
++        }
++    }
++
++    private void serializeGetPropertyCase(OMElement mediatorElem, BeanMediator mediator) {
++
++        serializePropertyName(mediatorElem, mediator);
++
++        if (mediator.getTarget() != null) {
++            mediator.getTarget().serializeTarget(BeanConstants.TARGET, mediatorElem);
++        } else {
++            handleException();
++        }
++    }
++
++    private void serializePropertyName(OMElement mediatorElem, BeanMediator mediator) {
++
++        if (mediator.getPropertyName() != null) {
++            mediatorElem.addAttribute(fac.createOMAttribute(
++                    BeanConstants.PROPERTY, nullNS, mediator.getPropertyName()));
++        } else {
++            handleException();
++        }
++    }
++
++    public String getMediatorClassName() {
++        return BeanMediator.class.getName();
++    }
++
++    private void handleException() {
++        handleException("Invalid bean mediator was passed in for serialization");
++    }
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java	(revision 1361638)
++++ java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java	(revision 1361639)
+@@ -36,6 +36,8 @@
+ import org.apache.commons.io.FilenameUtils;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.commons.beanstalk.enterprise.EnterpriseBeanstalkConstants;
++import org.apache.synapse.commons.beanstalk.enterprise.EnterpriseBeanstalkManager;
+ import org.apache.synapse.commons.datasource.DataSourceRepositoryHolder;
+ import org.apache.synapse.commons.snmp.SNMPConstants;
+ import org.apache.synapse.commons.snmp.SynapseSNMPAgent;
+@@ -187,6 +189,7 @@
+         deployMediatorExtensions();
+         initDataSourceHelper(serverContextInformation);
+         initSharedSecretCallbackHandlerCache(serverContextInformation);
++        initEnterpriseBeanstalkManager(serverContextInformation);
+         initialized = true;
+     }
+ 
+@@ -397,6 +400,15 @@
+                 synapseTaskManager.cleanup();
+             }
+ 
++            // destroy beanstalks.
++            EnterpriseBeanstalkManager manager = (EnterpriseBeanstalkManager)
++                    serverContextInformation.getProperty(
++                            EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_MANAGER_PROP_NAME);
++
++            if (manager != null) {
++                manager.destroy();
++            }
++
+             // stop the listener manager
+             if (listenerManager != null) {
+                 listenerManager.stop();
+@@ -864,6 +876,28 @@
+         }
+     }
+ 
++    private synchronized void initEnterpriseBeanstalkManager(ServerContextInformation serverInfo) {
++
++        if (serverInfo.getProperty(
++                EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_MANAGER_PROP_NAME) == null) {
++
++            EnterpriseBeanstalkManager beanstalkManager = new EnterpriseBeanstalkManager();
++
++            Object configProps = serverInfo.getProperty(
++                    EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_CONFIG_PROP_NAME);
++
++            if (configProps instanceof Properties) {
++                beanstalkManager.init((Properties) configProps);
++            } else {
++                Properties synapseProperties = SynapsePropertiesLoader.reloadSynapseProperties();
++                beanstalkManager.init(synapseProperties);
++            }
++            serverInfo.addProperty(
++                    EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_MANAGER_PROP_NAME,
++                    beanstalkManager);
++        }
++    }
++
+     private void addDefaultBuildersAndFormatters(AxisConfiguration axisConf) {
+         if (axisConf.getMessageBuilder("text/plain") == null) {
+             axisConf.addMessageBuilder("text/plain", new PlainTextBuilder());
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/Value.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/Value.java	(revision 1361638)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/Value.java	(revision 1361639)
+@@ -19,8 +19,7 @@
+ 
+ package org.apache.synapse.mediators;
+ 
+-import org.apache.axiom.om.OMElement;
+-import org.apache.axiom.om.OMNamespace;
++import org.apache.axiom.om.*;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.MessageContext;
+@@ -126,6 +125,38 @@
+ 
+     }
+ 
++    public Object evaluateObjectValue(MessageContext synCtx) {
++        if (keyValue != null) {
++            return keyValue;
++        } else if (expression != null) {
++            return getObjectValue(synCtx);
++        } else {
++            handleException("Unable to resolve the value: " + toString());
++            return null;
++        }
++    }
++
++    private Object getObjectValue(MessageContext synCtx) {
++        try {
++            Object result = expression.selectSingleNode(synCtx);
++
++            if (result instanceof OMText) {
++                return ((OMText) result).getText();
++            } else if (result instanceof OMElement) {
++                return ((OMElement) result).getText();
++            } else if (result instanceof OMDocument) {
++                return ((OMDocument) result).getOMDocumentElement().toString();
++            } else if (result instanceof OMAttribute) {
++                return ((OMAttribute) result).getAttributeValue();
++            } else {
++                return result;
++            }
++        } catch (JaxenException e) {
++            handleException("Failed to evaluate the XPath expression: " + expression, e);
++        }
++        return null;
++    }
++
+     /**
+      * Get the name of the value attribute
+      *
+@@ -145,6 +176,10 @@
+         throw new SynapseException(msg);
+     }
+ 
++    private void handleException(String msg, Exception e) {
++        log.error(msg, e);
++        throw new SynapseException(msg, e);
++    }
+ 
+     /**
+      * checks whether key returned by #getKeyValue() is a string of an expression type.
 Index: java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanUtils.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanUtils.java	(nonexistent)
@@ -890,75 +2343,11 @@ Index: java/modules/core/src/main/java/org/apache/synapse/mediators/bean/enterpr
 +    }
 +
 +}
-Index: java/modules/core/src/main/java/org/apache/synapse/mediators/Value.java
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanConstants.java
 ===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/mediators/Value.java	(revision 1361638)
-+++ java/modules/core/src/main/java/org/apache/synapse/mediators/Value.java	(revision 1361639)
-@@ -19,8 +19,7 @@
- 
- package org.apache.synapse.mediators;
- 
--import org.apache.axiom.om.OMElement;
--import org.apache.axiom.om.OMNamespace;
-+import org.apache.axiom.om.*;
- import org.apache.commons.logging.Log;
- import org.apache.commons.logging.LogFactory;
- import org.apache.synapse.MessageContext;
-@@ -126,6 +125,38 @@
- 
-     }
- 
-+    public Object evaluateObjectValue(MessageContext synCtx) {
-+        if (keyValue != null) {
-+            return keyValue;
-+        } else if (expression != null) {
-+            return getObjectValue(synCtx);
-+        } else {
-+            handleException("Unable to resolve the value: " + toString());
-+            return null;
-+        }
-+    }
-+
-+    private Object getObjectValue(MessageContext synCtx) {
-+        try {
-+            Object result = expression.selectSingleNode(synCtx);
-+
-+            if (result instanceof OMText) {
-+                return ((OMText) result).getText();
-+            } else if (result instanceof OMElement) {
-+                return ((OMElement) result).getText();
-+            } else if (result instanceof OMDocument) {
-+                return ((OMDocument) result).getOMDocumentElement().toString();
-+            } else if (result instanceof OMAttribute) {
-+                return ((OMAttribute) result).getAttributeValue();
-+            } else {
-+                return result;
-+            }
-+        } catch (JaxenException e) {
-+            handleException("Failed to evaluate the XPath expression: " + expression, e);
-+        }
-+        return null;
-+    }
-+
-     /**
-      * Get the name of the value attribute
-      *
-@@ -145,6 +176,10 @@
-         throw new SynapseException(msg);
-     }
- 
-+    private void handleException(String msg, Exception e) {
-+        log.error(msg, e);
-+        throw new SynapseException(msg, e);
-+    }
- 
-     /**
-      * checks whether key returned by #getKeyValue() is a string of an expression type.
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediatorFactory.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediatorFactory.java	(nonexistent)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediatorFactory.java	(revision 1361639)
-@@ -0,0 +1,138 @@
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanConstants.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanConstants.java	(revision 1361639)
+@@ -0,0 +1,41 @@
 +/*
 + *  Licensed to the Apache Software Foundation (ASF) under one
 + *  or more contributor license agreements.  See the NOTICE file
@@ -978,1416 +2367,30 @@ Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediator
 + *  under the License.
 + */
 +
-+package org.apache.synapse.config.xml;
-+
-+import org.apache.axiom.om.OMElement;
-+import org.apache.synapse.Mediator;
-+import org.apache.synapse.mediators.bean.BeanConstants;
-+import org.apache.synapse.mediators.bean.BeanUtils;
-+import org.apache.synapse.mediators.bean.Target;
-+import org.apache.synapse.mediators.bean.enterprise.EJBConstants;
-+import org.apache.synapse.mediators.bean.enterprise.EJBMediator;
-+
-+import javax.xml.namespace.QName;
-+import java.lang.reflect.Method;
-+import java.util.Iterator;
-+import java.util.Properties;
++package org.apache.synapse.mediators.bean;
 +
 +/**
-+ * Creates an {@link EJBMediator} from the provided XML configuration.
-+ *
-+ * <p/>
-+ * <pre>
-+ * &lt;ejb beanstalk="string" class="string" [sessionId="string"] [remove="true | false"]
-+ * [method="string"] [target="string | {xpath}"] [jndiName="string"] /&gt;
-+ *   &lt;args&gt;
-+ *     &lt;arg (value="string | {xpath}")/&gt;*
-+ *   &lt;/args&gt;
-+ * &lt;/ejb&gt;
-+ * </pre>
++ * Defines constants used by Bean mediator configuration.
 + */
-+public class EJBMediatorFactory extends AbstractMediatorFactory {
++public interface BeanConstants {
 +
-+    private static final QName EJB_Q =
-+            new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "ejb");
++    public static final String ACTION = "action";
 +
-+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
++    public static final String CLASS = "class";
 +
-+        EJBMediator mediator = new EJBMediator();
++    public static final String VAR = "var";
 +
-+        String attributeValue;
++    public static final String REPLACE = "replace";
 +
-+        attributeValue = elem.getAttributeValue(new QName(EJBConstants.BEANSTALK));
-+        if (attributeValue != null) {
-+            mediator.setBeanstalkName(attributeValue.trim());
-+        } else {
-+            handleException("'beanstalk' attribute of callEjb mediator is required");
-+        }
++    public static final String PROPERTY = "property";
 +
-+        attributeValue = elem.getAttributeValue(new QName(BeanConstants.CLASS));
-+        if (attributeValue != null) {
-+            mediator.setClassName(attributeValue.trim());
-+        } else {
-+            handleException("'class' attribute of callEjb mediator is required");
-+        }
++    public static final String VALUE = "value";
 +
-+        attributeValue = elem.getAttributeValue(new QName(EJBConstants.SESSION_ID));
-+        if (attributeValue != null) {
-+            mediator.setSessionId(new ValueFactory().createValue(EJBConstants.SESSION_ID, elem));
-+        }
++    public static final String TARGET = "target";
 +
-+        boolean remove;
-+        attributeValue = elem.getAttributeValue(new QName(EJBConstants.REMOVE));
-+        remove = Boolean.valueOf(attributeValue);
-+        if (remove) {
-+            mediator.setRemove(true);
-+        }
-+
-+        if (elem.getAttributeValue(new QName(BeanConstants.TARGET)) != null) {
-+            mediator.setTarget(new Target(BeanConstants.TARGET, elem));
-+        }
-+
-+        attributeValue = elem.getAttributeValue(new QName(EJBConstants.JNDI_NAME));
-+        if (attributeValue != null) {
-+            mediator.setJndiName(attributeValue);
-+        }
-+
-+        OMElement argumentsElem = elem.getFirstChildWithName(
-+                new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, EJBConstants.ARGS));
-+
-+        if (argumentsElem != null) {
-+
-+            Iterator itr = argumentsElem.getChildrenWithName(
-+                    new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, EJBConstants.ARG));
-+
-+            while (itr.hasNext()) {
-+                OMElement argElem = (OMElement) itr.next();
-+
-+                if (argElem.getAttributeValue(ATT_VALUE) != null) {
-+                    mediator.addArgument(
-+                            new ValueFactory().createValue(BeanConstants.VALUE, argElem));
-+                } else {
-+                    handleException("'value' attribute of 'arg' element is required.");
-+                }
-+            }
-+        }
-+
-+        attributeValue = elem.getAttributeValue(new QName(EJBConstants.METHOD));
-+        if (attributeValue != null) {
-+            Method method = null;
-+            try {
-+                method = BeanUtils.resolveMethod(
-+                                        Class.forName(mediator.getClassName()),
-+                                        attributeValue,
-+                                        mediator.getArgumentList().size());
-+            } catch (ClassNotFoundException e) {
-+                handleException("Could not load '" + mediator.getClassName() + "' class.", e);
-+            }
-+            mediator.setMethod(method);
-+        } else if (!remove) {
-+            handleException("'method' attribute of EJB mediator is optional only when it's a " +
-+                    "bean removal.");
-+        }
-+
-+        return mediator;
-+    }
-+
-+    public QName getTagQName() {
-+        return EJB_Q;
-+    }
-+
-+}
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/BeanMediatorSerializer.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/BeanMediatorSerializer.java	(nonexistent)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/BeanMediatorSerializer.java	(revision 1361639)
-@@ -0,0 +1,134 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+
-+package org.apache.synapse.config.xml;
-+
-+import org.apache.axiom.om.OMElement;
-+import org.apache.synapse.Mediator;
-+import org.apache.synapse.mediators.bean.BeanConstants;
-+import org.apache.synapse.mediators.bean.BeanMediator;
-+
-+/**
-+ * Serializer for {@link BeanMediator} instances.
-+ *
-+ * @see BeanMediatorFactory
-+ */
-+public class BeanMediatorSerializer extends AbstractMediatorSerializer {
-+
-+    private static final String BEAN = "bean";
-+
-+    public OMElement serializeSpecificMediator(Mediator m) {
-+
-+        if (!(m instanceof BeanMediator)) {
-+            handleException("Unsupported mediator was passed in for serialization: " + m.getType());
-+            return null;
-+        }
-+
-+        BeanMediator mediator = (BeanMediator) m;
-+
-+        OMElement mediatorElem = fac.createOMElement(BEAN, synNS);
-+        saveTracingState(mediatorElem, mediator);
-+
-+        if (mediator.getAction() != null) {
-+            mediatorElem.addAttribute(fac.createOMAttribute(
-+                    BeanConstants.ACTION, nullNS, mediator.getAction().toString()));
-+        } else {
-+            handleException();
-+        }
-+
-+        if (mediator.getVarName() != null) {
-+            mediatorElem.addAttribute(fac.createOMAttribute(
-+                    BeanConstants.VAR, nullNS, mediator.getVarName()));
-+        } else {
-+            handleException();
-+        }
-+
-+        switch (mediator.getAction()) {
-+            case CREATE:
-+                serializeCreateBeanCase(mediatorElem, mediator);
-+                break;
-+            case SET_PROPERTY:
-+                serializeSetPropertyCase(mediatorElem, mediator);
-+                break;
-+            case GET_PROPERTY:
-+                serializeGetPropertyCase(mediatorElem, mediator);
-+                break;
-+            default:
-+                assert false;
-+        }
-+
-+        return mediatorElem;
-+    }
-+
-+    private void serializeCreateBeanCase(OMElement mediatorElem, BeanMediator mediator) {
-+
-+        if (mediator.getClazz() != null) {
-+            mediatorElem.addAttribute(fac.createOMAttribute(
-+                    BeanConstants.CLASS, nullNS, mediator.getClazz().getName()));
-+        } else {
-+            handleException();
-+        }
-+
-+        if (!mediator.isReplace()) {
-+            mediatorElem.addAttribute(fac.createOMAttribute(
-+                    BeanConstants.REPLACE, nullNS, Boolean.toString(false)));
-+        }
-+    }
-+
-+    private void serializeSetPropertyCase(OMElement mediatorElem, BeanMediator mediator) {
-+
-+        serializePropertyName(mediatorElem, mediator);
-+
-+        if (mediator.getValue() != null) {
-+            new ValueSerializer().serializeValue(
-+                    mediator.getValue(), BeanConstants.VALUE, mediatorElem);
-+        } else {
-+            handleException();
-+        }
-+    }
-+
-+    private void serializeGetPropertyCase(OMElement mediatorElem, BeanMediator mediator) {
-+
-+        serializePropertyName(mediatorElem, mediator);
-+
-+        if (mediator.getTarget() != null) {
-+            mediator.getTarget().serializeTarget(BeanConstants.TARGET, mediatorElem);
-+        } else {
-+            handleException();
-+        }
-+    }
-+
-+    private void serializePropertyName(OMElement mediatorElem, BeanMediator mediator) {
-+
-+        if (mediator.getPropertyName() != null) {
-+            mediatorElem.addAttribute(fac.createOMAttribute(
-+                    BeanConstants.PROPERTY, nullNS, mediator.getPropertyName()));
-+        } else {
-+            handleException();
-+        }
-+    }
-+
-+    public String getMediatorClassName() {
-+        return BeanMediator.class.getName();
-+    }
-+
-+    private void handleException() {
-+        handleException("Invalid bean mediator was passed in for serialization");
-+    }
-+}
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/BeanMediatorFactory.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/BeanMediatorFactory.java	(nonexistent)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/BeanMediatorFactory.java	(revision 1361639)
-@@ -0,0 +1,159 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+
-+package org.apache.synapse.config.xml;
-+
-+import org.apache.axiom.om.OMElement;
-+import org.apache.synapse.Mediator;
-+import org.apache.synapse.mediators.bean.BeanConstants;
-+import org.apache.synapse.mediators.bean.BeanMediator;
-+import org.apache.synapse.mediators.bean.Target;
-+
-+import javax.xml.namespace.QName;
-+import java.util.Properties;
-+
-+/**
-+ * Creates a {@link BeanMediator} from the provided XML configuration.
-+ *
-+ * <p/>
-+ * <pre>
-+ * &lt;bean action=&quot;CREATE | REMOVE | SET_PROPERTY | GET_PROPERTY&quot; var=&quot;string&quot;
-+ * [class=&quot;string&quot;]  [property=&quot;string&quot;]
-+ * [value=&quot;string | {xpath}&quot;] /&gt;
-+ * </pre>
-+ */
-+public class BeanMediatorFactory extends AbstractMediatorFactory {
-+
-+    private static final QName BEAN_Q
-+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "bean");
-+
-+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
-+
-+        BeanMediator mediator = new BeanMediator();
-+
-+        String attributeValue;
-+
-+        attributeValue = elem.getAttributeValue(new QName(BeanConstants.VAR));
-+        if (attributeValue != null) {
-+            mediator.setVarName(attributeValue);
-+        } else {
-+            handleException("'var' attribute of Bean mediator is required.");
-+        }
-+
-+        attributeValue = elem.getAttributeValue(new QName(BeanConstants.ACTION));
-+        if (attributeValue != null) {
-+            try {
-+                switch (BeanMediator.Action.valueOf(attributeValue.toUpperCase())) {
-+                    case CREATE:
-+                        populateCreateBeanCase(mediator, elem);
-+                        break;
-+                    case REMOVE:
-+                        mediator.setAction(BeanMediator.Action.REMOVE);
-+                        break;
-+                    case SET_PROPERTY:
-+                        populateSetPropertyCase(mediator, elem);
-+                        break;
-+                    case GET_PROPERTY:
-+                        populateGetPropertyCase(mediator, elem);
-+                        break;
-+                    default:
-+                        assert false;
-+                }
-+            } catch (IllegalArgumentException e) {
-+                handleException("'action' attribute of bean mediator must be set to 'CREATE', " +
-+                        "'REMOVE', 'SET_PROPERTY' or 'GET_PROPERTY'.");
-+            }
-+        } else {
-+            handleException("'action' attribute of Bean mediator is required.");
-+        }
-+
-+        return mediator;
-+    }
-+
-+    private void populateCreateBeanCase(BeanMediator mediator, OMElement elem) {
-+
-+        mediator.setAction(BeanMediator.Action.CREATE);
-+
-+        String attributeValue;
-+
-+        attributeValue = elem.getAttributeValue(new QName(BeanConstants.CLASS));
-+        if (attributeValue != null) {
-+            try {
-+                mediator.setClazz(Class.forName(attributeValue.trim()));
-+            } catch (Exception e) {
-+                handleException("Error while loading '" + attributeValue + "' class.", e);
-+            }
-+        } else {
-+            handleException("'class' attribute of Bean mediator is required when 'CREATE' action " +
-+                    "is set.");
-+        }
-+
-+        attributeValue = elem.getAttributeValue(new QName(BeanConstants.REPLACE));
-+        if (attributeValue != null) {
-+            mediator.setReplace(Boolean.parseBoolean(attributeValue.trim()));
-+        }
-+
-+    }
-+
-+    private void populateSetPropertyCase(BeanMediator mediator, OMElement elem) {
-+
-+        mediator.setAction(BeanMediator.Action.SET_PROPERTY);
-+
-+        populatePropertyName(mediator, elem);
-+
-+        if (elem.getAttributeValue(ATT_VALUE) != null) {
-+            mediator.setValue(new ValueFactory().createValue(BeanConstants.VALUE, elem));
-+        } else {
-+            handleException("'value' attribute of Bean mediator is required when 'SET_PROPERTY' " +
-+                    "action is set.");
-+        }
-+    }
-+
-+    private void populateGetPropertyCase(BeanMediator mediator, OMElement elem) {
-+
-+        mediator.setAction(BeanMediator.Action.GET_PROPERTY);
-+
-+        populatePropertyName(mediator, elem);
-+
-+        if (elem.getAttributeValue(new QName(BeanConstants.TARGET)) != null) {
-+            mediator.setTarget(new Target(BeanConstants.TARGET, elem));
-+        } else {
-+            handleException("'target' attribute of Bean mediator is required when 'GET_PROPERTY' " +
-+                    "action is set.");
-+        }
-+    }
-+
-+    private void populatePropertyName(BeanMediator mediator, OMElement elem) {
-+
-+        String attributeValue;
-+
-+        attributeValue = elem.getAttributeValue(new QName(BeanConstants.PROPERTY));
-+        if (attributeValue != null) {
-+            mediator.setPropertyName(attributeValue);
-+        } else {
-+            handleException("'property' attribute of Bean mediator is required when " +
-+                    "SET/GET_PROPERTY action is set.");
-+        }
-+    }
-+
-+    public QName getTagQName() {
-+        return BEAN_Q;
-+    }
-+
-+}
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java	(revision 1361638)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java	(revision 1361639)
-@@ -83,7 +83,9 @@
-         MessageStoreMediatorFactory.class,
-         TemplateMediatorFactory.class,
-         InvokeMediatorFactory.class,
--        PayloadFactoryMediatorFactory.class
-+        PayloadFactoryMediatorFactory.class,
-+        BeanMediatorFactory.class,
-+        EJBMediatorFactory.class
-     };
- 
-     private final static MediatorFactoryFinder instance  = new MediatorFactoryFinder();
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java	(revision 1361638)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java	(revision 1361639)
-@@ -69,7 +69,9 @@
-         InvokeMediatorSerializer.class,
-         MessageStoreMediatorSerializer.class,
-         URLRewriteMediatorSerializer.class,
--        PayloadFactoryMediatorSerializer.class
-+        PayloadFactoryMediatorSerializer.class,
-+        BeanMediatorSerializer.class,
-+        EJBMediatorSerializer.class
-     };
- 
-     private final static MediatorSerializerFinder instance = new MediatorSerializerFinder();
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediatorSerializer.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediatorSerializer.java	(nonexistent)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediatorSerializer.java	(revision 1361639)
-@@ -0,0 +1,118 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+
-+package org.apache.synapse.config.xml;
-+
-+import org.apache.axiom.om.OMElement;
-+import org.apache.synapse.Mediator;
-+import org.apache.synapse.mediators.Value;
-+import org.apache.synapse.mediators.bean.BeanConstants;
-+import org.apache.synapse.mediators.bean.enterprise.EJBConstants;
-+import org.apache.synapse.mediators.bean.enterprise.EJBMediator;
-+
-+import java.util.List;
-+
-+/**
-+ * Serializer for {@link EJBMediator} instances.
-+ *
-+ * @see EJBMediatorFactory
-+ */
-+public class EJBMediatorSerializer extends AbstractMediatorSerializer {
-+
-+    private static final String EJB = "ejb";
-+
-+    public OMElement serializeSpecificMediator(Mediator m) {
-+
-+        if (!(m instanceof EJBMediator)) {
-+            handleException("An unsupported mediator was passed in for serialization : " +
-+                    m.getType());
-+            return null;
-+        }
-+
-+        EJBMediator mediator = (EJBMediator) m;
-+
-+        OMElement mediatorElem = fac.createOMElement(EJB, synNS);
-+        saveTracingState(mediatorElem, mediator);
-+
-+        if (mediator.getBeanstalkName() != null) {
-+            mediatorElem.addAttribute(fac.createOMAttribute(
-+                    EJBConstants.BEANSTALK, nullNS, mediator.getBeanstalkName()));
-+        } else {
-+            handleException();
-+        }
-+
-+        if (mediator.getClassName() != null) {
-+            mediatorElem.addAttribute(fac.createOMAttribute(
-+                    BeanConstants.CLASS, nullNS, mediator.getClassName()));
-+        } else {
-+            handleException();
-+        }
-+
-+        if (mediator.getSessionId() != null) {
-+            new ValueSerializer().serializeValue(
-+                    mediator.getSessionId(), EJBConstants.SESSION_ID, mediatorElem);
-+        }
-+
-+        if (mediator.getMethod() != null) {
-+            mediatorElem.addAttribute(fac.createOMAttribute(
-+                    EJBConstants.METHOD, nullNS, mediator.getMethod().getName()));
-+        } else if (!mediator.isRemove()) {
-+            handleException();
-+        }
-+
-+        if (mediator.getTarget() != null) {
-+            mediator.getTarget().serializeTarget(BeanConstants.TARGET, mediatorElem);
-+        }
-+
-+        if (mediator.getJndiName() != null) {
-+            mediatorElem.addAttribute(fac.createOMAttribute(
-+                    EJBConstants.JNDI_NAME, nullNS, mediator.getJndiName()));
-+        }
-+
-+        if (mediator.isRemove()) {
-+            mediatorElem.addAttribute(fac.createOMAttribute(
-+                    EJBConstants.REMOVE, nullNS, Boolean.toString(true)));
-+        }
-+
-+        List<Value> argList = mediator.getArgumentList();
-+
-+        if (argList != null && argList.size() > 0) {
-+
-+            OMElement argumentsElem = fac.createOMElement(EJBConstants.ARGS, synNS);
-+
-+            for (Value arg : argList) {
-+                OMElement argElem = fac.createOMElement(EJBConstants.ARG, synNS);
-+                new ValueSerializer().serializeValue(arg, BeanConstants.VALUE, argElem);
-+                argumentsElem.addChild(argElem);
-+            }
-+
-+            mediatorElem.addChild(argumentsElem);
-+        }
-+
-+        return mediatorElem;
-+    }
-+
-+    public String getMediatorClassName() {
-+        return EJBMediator.class.getName();
-+    }
-+
-+    private void handleException() {
-+        handleException("Invalid ejb mediator was passed in for serialization.");
-+    }
-+}
-Index: java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java	(revision 1361638)
-+++ java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java	(revision 1361639)
-@@ -36,6 +36,8 @@
- import org.apache.commons.io.FilenameUtils;
- import org.apache.commons.logging.Log;
- import org.apache.commons.logging.LogFactory;
-+import org.apache.synapse.commons.beanstalk.enterprise.EnterpriseBeanstalkConstants;
-+import org.apache.synapse.commons.beanstalk.enterprise.EnterpriseBeanstalkManager;
- import org.apache.synapse.commons.datasource.DataSourceRepositoryHolder;
- import org.apache.synapse.commons.snmp.SNMPConstants;
- import org.apache.synapse.commons.snmp.SynapseSNMPAgent;
-@@ -187,6 +189,7 @@
-         deployMediatorExtensions();
-         initDataSourceHelper(serverContextInformation);
-         initSharedSecretCallbackHandlerCache(serverContextInformation);
-+        initEnterpriseBeanstalkManager(serverContextInformation);
-         initialized = true;
-     }
- 
-@@ -397,6 +400,15 @@
-                 synapseTaskManager.cleanup();
-             }
- 
-+            // destroy beanstalks.
-+            EnterpriseBeanstalkManager manager = (EnterpriseBeanstalkManager)
-+                    serverContextInformation.getProperty(
-+                            EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_MANAGER_PROP_NAME);
-+
-+            if (manager != null) {
-+                manager.destroy();
-+            }
-+
-             // stop the listener manager
-             if (listenerManager != null) {
-                 listenerManager.stop();
-@@ -864,6 +876,28 @@
-         }
-     }
- 
-+    private synchronized void initEnterpriseBeanstalkManager(ServerContextInformation serverInfo) {
-+
-+        if (serverInfo.getProperty(
-+                EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_MANAGER_PROP_NAME) == null) {
-+
-+            EnterpriseBeanstalkManager beanstalkManager = new EnterpriseBeanstalkManager();
-+
-+            Object configProps = serverInfo.getProperty(
-+                    EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_CONFIG_PROP_NAME);
-+
-+            if (configProps instanceof Properties) {
-+                beanstalkManager.init((Properties) configProps);
-+            } else {
-+                Properties synapseProperties = SynapsePropertiesLoader.reloadSynapseProperties();
-+                beanstalkManager.init(synapseProperties);
-+            }
-+            serverInfo.addProperty(
-+                    EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_MANAGER_PROP_NAME,
-+                    beanstalkManager);
-+        }
-+    }
-+
-     private void addDefaultBuildersAndFormatters(AxisConfiguration axisConf) {
-         if (axisConf.getMessageBuilder("text/plain") == null) {
-             axisConf.addMessageBuilder("text/plain", new PlainTextBuilder());
-Index: java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkConstants.java
-===================================================================
---- java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkConstants.java	(nonexistent)
-+++ java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkConstants.java	(revision 1361639)
-@@ -0,0 +1,74 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+
-+package org.apache.synapse.commons.beanstalk.enterprise;
-+
-+/**
-+ * Holds constants used in Enterprise Beanstalk configurations.
-+ */
-+public interface EnterpriseBeanstalkConstants {
-+
-+    /**
-+     * Prefix for beanstalk related configuration property names in synapse.properties.
-+     */
-+    public static final String SYNAPSE_BEANSTALK_PREFIX = "synapse.beanstalks";
-+
-+    /**
-+     * Cache timeout in minutes for stateless session beans
-+     */
-+    public static final String STATELESS_BEANS_TIMEOUT = "cache.timeout.stateless";
-+
-+    /**
-+     * Cache timeout in minutes for stateful session beans
-+     */
-+    public static final String STATEFUL_BEANS_TIMEOUT = "cache.timeout.stateful";
-+
-+    /**
-+     * Warn limit for stateless session beans. A warning is generated when more than this many of
-+     * stateless bean stubs are cached in this beanstalk.
-+     */
-+    public static final String STATELESS_BEANS_WARN_LIMIT = "cache.warn.limit.stateless";
-+
-+    /**
-+     * Warn limit for stateless session beans. A warning is generated when more than this many of
-+     * stateless bean stubs are cached in this beanstalk.
-+     */
-+    public static final String STATEFUL_BEANS_WARN_LIMIT = "cache.warn.limit.stateful";
-+
-+
-+    // -------------------- Internally used constants -------------------- //
-+
-+    /**
-+     * ServerContextInformation property name of the EnterpriseBeanstalkManager.
-+     */
-+    public static final String ENTERPRISE_BEANSTALK_MANAGER_PROP_NAME =
-+                                                       "__SYNAPSE.ENTERPRISE.BEANSTALK.MANAGER";
-+
-+    /**
-+     * ServerContextInformation property name of the EnterpriseBeanstalkManager configuration.
-+     */
-+    public static final String ENTERPRISE_BEANSTALK_CONFIG_PROP_NAME =
-+                                                       "__SYNAPSE.ENTERPRISE.BEANSTALK.CONFIG";
-+
-+    /**
-+     * Category name for JMX MBeans registered to monitor beanstalks.
-+     */
-+    public static final String ENTERPRISE_BEANSTALK_MBEAN_CATEGORY_NAME = "EnterpriseBeanstalk";
-+
-+}
-Index: java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkViewMBean.java
-===================================================================
---- java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkViewMBean.java	(nonexistent)
-+++ java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkViewMBean.java	(revision 1361639)
-@@ -0,0 +1,47 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+
-+package org.apache.synapse.commons.beanstalk.enterprise;
-+
-+import java.util.Map;
-+
-+/**
-+ * MBean interface that enables monitoring/managing enterprise beanstalks via JMX.
-+ */
-+public interface EnterpriseBeanstalkViewMBean {
-+
-+    // JMX Attributes
-+    public String getBeanstalkName();
-+
-+    public int getCachedStatelessStubCount();
-+
-+    public int getCachedStatefulStubCount();
-+
-+    public Map getStatelessStubCacheLastAccessTimes();
-+
-+    public Map getStatefulStubCacheLastAccessTimes();
-+
-+
-+    // JMX Operations
-+    public void cleanExpiredStubsNow() throws Exception;
-+
-+    public void removeStatelessStub(String className);
-+
-+    public void removeStatefulStub(String className, String sessionId);
-+}
-Index: java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/CacheEntry.java
-===================================================================
---- java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/CacheEntry.java	(nonexistent)
-+++ java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/CacheEntry.java	(revision 1361639)
-@@ -0,0 +1,52 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+
-+package org.apache.synapse.commons.beanstalk.enterprise;
-+
-+/**
-+ * CacheEntry records last access time of the EJB client stub it encapsulates.
-+ */
-+class CacheEntry {
-+
-+    private long lastAccessTime;
-+
-+    private final Object bean;
-+
-+    CacheEntry(Object bean) {
-+        this.lastAccessTime = System.currentTimeMillis();
-+        this.bean = bean;
-+    }
-+
-+    public synchronized long getLastAccessTime() {
-+        return lastAccessTime;
-+    }
-+
-+    public synchronized void setLastAccessTime(long lastAccessTime) {
-+        this.lastAccessTime = lastAccessTime;
-+    }
-+
-+    public synchronized void markLastAccessTime() {
-+        this.lastAccessTime = System.currentTimeMillis();
-+    }
-+
-+    public Object getBean() {
-+        return bean;
-+    }
-+
-+}
-Index: java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalk.java
-===================================================================
---- java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalk.java	(nonexistent)
-+++ java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalk.java	(revision 1361639)
-@@ -0,0 +1,341 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+
-+package org.apache.synapse.commons.beanstalk.enterprise;
-+
-+import org.apache.commons.logging.Log;
-+import org.apache.commons.logging.LogFactory;
-+import org.apache.synapse.commons.jmx.MBeanRegistrar;
-+
-+import javax.naming.InitialContext;
-+import javax.naming.NamingException;
-+import java.util.*;
-+import java.util.concurrent.ConcurrentHashMap;
-+import java.util.concurrent.ScheduledExecutorService;
-+import java.util.concurrent.ScheduledFuture;
-+import java.util.concurrent.TimeUnit;
-+
-+/**
-+ * An Enterprise Beanstalk is used to retrieve Enterprise JavaBean (EJB) client stubs. This class
-+ * implements Service Locator J2EE pattern and supports stateless and stateful session beans.
-+ * Enterprise beanstalks can be configured in synapse.properties file. Parameters of the JNDI
-+ * service to be looked up for EJBs should be provided with this configuration.
-+ * Beanstalks cache EJB client stubs to improve efficiency by omitting excessive JNDI
-+ * context creation and look ups. Cache timeout for both stateless and stateful session beans could
-+ * be configured independently.
-+ */
-+public class EnterpriseBeanstalk {
-+
-+    private static final Log log = LogFactory.getLog(EnterpriseBeanstalk.class);
-+
-+    /**
-+     * Name of the beanstalk
-+     */
-+    private String name;
-+
-+    /**
-+     * Properties used while initializing this beanstalk.
-+     */
-+    private Properties props;
-+
-+    /**
-+     * Executor that periodically runs the Cleaner.
-+     */
-+    private ScheduledExecutorService scheduler;
-+
-+    /**
-+     * Scheduled future that represents the scheduled Cleaner.
-+     */
-+    private ScheduledFuture<?> scheduledFuture;
-+
-+    /**
-+     * Cache timeout for stateless session bean stubs.
-+     */
-+    private int statelessBeanTimeoutMinutes = 30;
-+
-+    /**
-+     * Cache timeout for stateful session bean stubs.
-+     */
-+    private int statefulBeanTimeoutMinutes = 30;
-+
-+    /**
-+     * Warn limit for stateless session beans. A warning is generated when more than this many of
-+     * stateless bean stubs are cached by this beanstalk.
-+     */
-+    private int statelessBeanWarnLimit = Short.MAX_VALUE;
-+
-+    /**
-+     * Warn limit for stateful session beans. A warning is generated when more than this many of
-+     * stateful bean stubs are cached by this beanstalk.
-+     */
-+    private int statefulBeanWarnLimit = Short.MAX_VALUE;
-+
-+    /**
-+     * JNDI context constructed with the properties provided while initializing this beanstalk.
-+     */
-+    private InitialContext initialCtx;
-+
-+    /**
-+     * Stateless session bean stub cache.
-+     */
-+    private Map<String, CacheEntry> statelessBeans = new ConcurrentHashMap<String, CacheEntry>();
-+
-+    /**
-+     * Stateful session bean stub cache.
-+     */
-+    private Map<String, CacheEntry> statefulBeans = new ConcurrentHashMap<String, CacheEntry>();
-+
-+    /**
-+     * Constructs a new enterprise beanstalk with the given name and properties.
-+     * @param name Name of the enterprise beanstalk.
-+     * @param props Configuration properties. This should include properties of the JNDI service
-+     * to be looked up for EJBs.
-+     * @param scheduler ScheduledExecutorService for cleaning up timed-out stubs.
-+     */
-+    public EnterpriseBeanstalk(String name, Properties props, ScheduledExecutorService scheduler) {
-+        this.name = name;
-+        this.scheduler = scheduler;
-+        this.props = props;
-+    }
-+
-+    /**
-+     * Initialize the current beanstalk by creating the JNDI context, registering the MBean etc.
-+     */
-+    public void init() {
-+
-+        if (log.isDebugEnabled()) {
-+            log.debug("Initializing Beanstalk: " + name);
-+        }
-+
-+        // Initialize the JNDI context.
-+        try {
-+            initialCtx = new InitialContext(props);
-+        } catch (NamingException e) {
-+            log.error("Could not initialize JNDI context for the Enterprise Beanstalk " +
-+                    "named '" + name + "'.", e);
-+            return;
-+        }
-+
-+        // Read settings from the provided properties.
-+        if (props != null) {
-+            String value;
-+
-+            value = props.getProperty(EnterpriseBeanstalkConstants.STATELESS_BEANS_TIMEOUT);
-+            if (value != null) {
-+                statelessBeanTimeoutMinutes = Integer.parseInt(value);
-+            }
-+
-+            value = props.getProperty(EnterpriseBeanstalkConstants.STATEFUL_BEANS_TIMEOUT);
-+            if (value != null) {
-+                statefulBeanTimeoutMinutes = Integer.parseInt(value);
-+            }
-+
-+            value = props.getProperty(EnterpriseBeanstalkConstants.STATELESS_BEANS_WARN_LIMIT);
-+            if (value != null) {
-+                statelessBeanWarnLimit = Integer.parseInt(value);
-+            }
-+
-+            value = props.getProperty(EnterpriseBeanstalkConstants.STATEFUL_BEANS_WARN_LIMIT);
-+            if (value != null) {
-+                statefulBeanWarnLimit = Integer.parseInt(value);
-+            }
-+        }
-+
-+        // Schedule the cleaner that removes expired beans periodically.
-+        int minDelay = Math.min(statelessBeanTimeoutMinutes, statefulBeanTimeoutMinutes);
-+        scheduledFuture = scheduler.scheduleWithFixedDelay(
-+                            new Runnable() {
-+                                public void run() {
-+                                    removeExpiredBeans();
-+                                }
-+                            }, minDelay, minDelay, TimeUnit.MINUTES);
-+
-+        // Register the MBean for this beanstalk.
-+        MBeanRegistrar.getInstance().registerMBean(new EnterpriseBeanstalkView(this),
-+                EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_MBEAN_CATEGORY_NAME, name);
-+
-+        if (log.isDebugEnabled()) {
-+            log.debug("Successfully initialized Beanstalk: " + name);
-+        }
-+    }
-+
-+    /**
-+     * Destroys the beanstalk by performing clean up.
-+     */
-+    public void destroy() {
-+
-+        scheduledFuture.cancel(false);
-+
-+        MBeanRegistrar.getInstance().unRegisterMBean(
-+                EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_MBEAN_CATEGORY_NAME, name);
-+    }
-+
-+    /**
-+     * Returns the name of this beanstalk.
-+     *
-+     * @return Name of the beanstalk.
-+     */
-+    public String getName() {
-+        return name;
-+    }
-+
-+    /**
-+     * Returns a client stub for the EJB with given class name, session id and jndi name. If the
-+     * stub is already available in cache, it is retrieved from there. Otherwise, a JNDI lookup
-+     * is performed with the given JNDI name.
-+     *
-+     * @param className Fully qualified name of the remote interface of the session bean.
-+     * @param sessionId Session id for stateful beans. null for stateless ones.
-+     * @param jndiName JNDI name of the EJB. null could be used if the bean is already available in
-+     * the cache.
-+     * @return Retrieved EJB client stub. null if the EJB is not found.
-+     */
-+    public Object getEnterpriseBean(String className, String sessionId, String jndiName) {
-+        return sessionId == null ?
-+            findEjb(statelessBeans, className, sessionId, jndiName, statelessBeanWarnLimit) :
-+            findEjb(statefulBeans, className, sessionId, jndiName, statefulBeanWarnLimit);
-+    }
-+
-+    /**
-+     * Remove the specified client stub from cache. If the stub is not removed using this
-+     * method it will be automatically removed from the beanstalk after it times out.
-+     * @param className Fully qualified name of the remote interface of the session bean.
-+     * @param sessionId Session id for stateful session beans, null for stateless ones.
-+     * @return EJB client stub that was removed from the beanstalk.
-+     */
-+    public Object removeEnterpriseBean(String className, String sessionId) {
-+        return (sessionId == null) ?
-+                statelessBeans.remove(getMapKey(className, sessionId)) :
-+                statefulBeans.remove(getMapKey(className, sessionId));
-+    }
-+
-+    /**
-+     * Removes expired stateless and stateful bean stubs from cache. Timeouts are configurable.
-+     */
-+    public void removeExpiredBeans() {
-+        removeExpiredBeansFromMap(statelessBeans, statelessBeanTimeoutMinutes);
-+        removeExpiredBeansFromMap(statefulBeans, statefulBeanTimeoutMinutes);
-+    }
-+
-+    /**
-+     * Retrieves an EJB client stub from the cache, looks up in the JNDI service if it is not
-+     * available in the cache. If the bean is found from JNDI lookup, it is added to the cache.
-+     *
-+     * @param map Cache to search the stub in.
-+     * @param className Fully qualified name of the remote interface of the session bean.
-+     * @param sessionId Session id for stateful beans. null for stateless ones.
-+     * @param jndiName JNDI name of the EJB. null could be used if the bean is already available in
-+     * the cache.
-+     * @param warnLimit If this many of stubs are already available in the cache, a warning is
-+     * generated before adding a new stub to it.
-+     * @return Retrieved EJB client stub. null if the EJB is not found.
-+     */
-+    private Object findEjb(Map<String, CacheEntry> map, String className, String sessionId,
-+                           String jndiName, int warnLimit) {
-+
-+        CacheEntry entry = map.get(getMapKey(className, sessionId));
-+
-+        if (entry == null && jndiName != null) {
-+
-+            synchronized (this) {
-+                entry = map.get(getMapKey(className, sessionId));
-+                if (entry == null) {
-+                    Object ejb = lookupInJndi(jndiName);
-+                    if (ejb != null) {
-+                        map.put(getMapKey(className, sessionId), entry = new CacheEntry(ejb));
-+                        int size = map.size();
-+                        if (size > warnLimit) {
-+                            String type = sessionId == null ? "stateless" : "stateful";
-+                            log.warn("Warn limit reached for " + type + " beans. Currently there " +
-+                                    "are " + size + " " + type + " EJB stubs cached in '" + name +
-+                                    "' " + "beanstalk.");
-+                        }
-+                    }
-+                }
-+            }
-+
-+        }
-+
-+        if (entry == null) {
-+            return null;
-+        } else {
-+            entry.markLastAccessTime();
-+            return entry.getBean();
-+        }
-+
-+    }
-+
-+    /**
-+     * Looks up the given resource in the JNDI service.
-+     * @param jndiName JNDI name of the resource (EJB).
-+     * @return Resource retrieved from the JNDI lookup. null if no resource is found.
-+     */
-+    private Object lookupInJndi(String jndiName) {
-+        try {
-+            return initialCtx.lookup(jndiName);
-+        } catch (NamingException ex) {
-+            log.error("Lookup failed for JNDI name: " + jndiName, ex);
-+            return null;
-+        }
-+    }
-+
-+    /**
-+     * Remove stubs from the given map that have not been used for a time period longer than the
-+     * provided timeout.
-+     * @param map Bean stub cache.
-+     * @param timeoutInMinutes Expiry timeout.
-+     */
-+    private void removeExpiredBeansFromMap(Map<String, CacheEntry> map, int timeoutInMinutes) {
-+
-+        Iterator<Map.Entry<String, CacheEntry>> itr = map.entrySet().iterator();
-+
-+        while (itr.hasNext()) {
-+
-+            Map.Entry<String, CacheEntry> mapEntry = itr.next();
-+
-+            if (System.currentTimeMillis() - mapEntry.getValue().getLastAccessTime() >
-+                                                        timeoutInMinutes * 60L * 1000L) {
-+
-+                if (log.isDebugEnabled()) {
-+                    log.debug("Removing the timed-out EJB stub with key '" + mapEntry.getKey() +
-+                            "', from '" + name + "' beanstalk cache.");
-+                }
-+                itr.remove();
-+            }
-+        }
-+    }
-+
-+    /**
-+     * Derives the map key for this session bean.
-+     * @param className Fully qualified name of the remote interface of the EJB.
-+     * @param sessionId Session Id for stateful beans, null for stateless ones.
-+     * @return Map key derived from the given parameters.
-+     */
-+    private String getMapKey(String className, String sessionId) {
-+        return sessionId == null ? className : className + "-" + sessionId;
-+    }
-+
-+    Map<String, CacheEntry> getStatelessBeans() {
-+        return statelessBeans;
-+    }
-+
-+    Map<String, CacheEntry> getStatefulBeans() {
-+        return statefulBeans;
-+    }
-+}
-Index: java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkManager.java
-===================================================================
---- java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkManager.java	(nonexistent)
-+++ java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkManager.java	(revision 1361639)
-@@ -0,0 +1,150 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+
-+package org.apache.synapse.commons.beanstalk.enterprise;
-+
-+import org.apache.commons.logging.Log;
-+import org.apache.commons.logging.LogFactory;
-+import org.apache.synapse.commons.util.MiscellaneousUtil;
-+
-+import java.util.Iterator;
-+import java.util.Map;
-+import java.util.Properties;
-+import java.util.concurrent.ConcurrentHashMap;
-+import java.util.concurrent.Executors;
-+import java.util.concurrent.ScheduledExecutorService;
-+import java.util.concurrent.ThreadFactory;
-+
-+/**
-+ * Manages Enterprise Beanstalks configured in the Synapse Environment. Only one instance of this
-+ * class is created per Synapse environment.
-+ */
-+public class EnterpriseBeanstalkManager {
-+
-+    private final static Log log = LogFactory.getLog(EnterpriseBeanstalkManager.class);
-+
-+    /**
-+     * Stores all configured enterprise beanstalks.
-+     */
-+    private Map<String, EnterpriseBeanstalk> beanstalkMap = new ConcurrentHashMap<String, EnterpriseBeanstalk>();
-+
-+    /**
-+     * ScheduledExecutorService for cleaning up timed out client stubs in all beanstalks.
-+     */
-+    private ScheduledExecutorService scheduler;
-+
-+    /**
-+     * Initializes the beanstalk manager, which creates and initializes beanstalks defined in the
-+     * given Properties instance.
-+     * @param props Properties to read enterprise beanstalk configurations from. Usually, source of
-+     * this is synapse.properties file.
-+     */
-+    public void init(Properties props) {
-+
-+        if (props == null) {
-+            if (log.isDebugEnabled()) {
-+                log.debug("Enterprise Beanstalk properties cannot be found.");
-+            }
-+            return;
-+        }
-+
-+        String beanstalkNameList = MiscellaneousUtil.getProperty(props,
-+                EnterpriseBeanstalkConstants.SYNAPSE_BEANSTALK_PREFIX, null);
-+
-+        if (beanstalkNameList == null || "".equals(beanstalkNameList)) {
-+            if (log.isDebugEnabled()) {
-+                log.debug("No beanstalks defined for initialization.");
-+            }
-+            return;
-+        }
-+
-+        String[] beanstalkNames = beanstalkNameList.split(",");
-+        if (beanstalkNames == null || beanstalkNames.length == 0) {
-+            if (log.isDebugEnabled()) {
-+                log.debug("No beanstalk definitions found for initialization.");
-+            }
-+            return;
-+        }
-+
-+        scheduler = Executors.newSingleThreadScheduledExecutor(
-+                new ThreadFactory() {
-+                    public Thread newThread(Runnable r) {
-+                        return new Thread(r, "enterprise-beanstalk-cache-cleaner");
-+                    }
-+                }
-+        );
-+
-+        for (String beanstalkName : beanstalkNames) {
-+
-+            if (beanstalkName == null || beanstalkName.trim().length() == 0) {
-+                continue;
-+            }
-+
-+            String propertyPrefix = EnterpriseBeanstalkConstants.SYNAPSE_BEANSTALK_PREFIX + "." +
-+                    beanstalkName + ".";
-+            Properties currentBeanstalkProps = new Properties();
-+
-+            for (Map.Entry<Object, Object> entry : props.entrySet()) {
-+
-+                if (entry.getKey() instanceof String && entry.getValue() instanceof String) {
-+
-+                    String key = (String) entry.getKey();
-+                    if (key.startsWith(propertyPrefix)) {
-+                        currentBeanstalkProps.setProperty(
-+                                        key.replace(propertyPrefix, ""), (String) entry.getValue());
-+                    }
-+                }
-+            }
-+
-+            EnterpriseBeanstalk beanstalk =
-+                    new EnterpriseBeanstalk(beanstalkName, currentBeanstalkProps, scheduler);
-+            beanstalk.init();
-+
-+            beanstalkMap.put(beanstalkName, beanstalk);
-+        }
-+    }
-+
-+    /**
-+     * Returns the beanstalk with the given name, null if it's not found.
-+     * @param name Name of the beanstalk.
-+     * @return Beanstalk specified by the name, null if it's not found.
-+     */
-+    public EnterpriseBeanstalk getEnterpriseBeanstalk(String name) {
-+        return beanstalkMap.get(name);
-+    }
-+
-+    /**
-+     * Cleans up resources allocated by this BeanstalkManager.
-+     */
-+    public void destroy() {
-+
-+        Iterator<EnterpriseBeanstalk> it = beanstalkMap.values().iterator();
-+        while (it.hasNext()) {
-+            it.next().destroy();
-+            it.remove();
-+        }
-+
-+        if (scheduler != null && !scheduler.isShutdown()) {
-+            if (log.isDebugEnabled()) {
-+                log.debug("Shutting down enterprise beanstalk cache cleaner executor...");
-+            }
-+            scheduler.shutdownNow();
-+        }
-+    }
-+}
-Index: java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkView.java
-===================================================================
---- java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkView.java	(nonexistent)
-+++ java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkView.java	(revision 1361639)
-@@ -0,0 +1,76 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+
-+package org.apache.synapse.commons.beanstalk.enterprise;
-+
-+import java.util.Date;
-+import java.util.HashMap;
-+import java.util.Map;
-+
-+/**
-+ * MBean implementation class that enables monitoring/managing enterprise beanstalks via JMX.
-+ */
-+public class EnterpriseBeanstalkView implements EnterpriseBeanstalkViewMBean {
-+
-+    private EnterpriseBeanstalk beanstalk;
-+
-+    EnterpriseBeanstalkView(EnterpriseBeanstalk beanstalk) {
-+        this.beanstalk = beanstalk;
-+    }
-+
-+    public String getBeanstalkName() {
-+        return beanstalk.getName();
-+    }
-+
-+    public int getCachedStatelessStubCount() {
-+        return beanstalk.getStatelessBeans().size();
-+    }
-+
-+    public int getCachedStatefulStubCount() {
-+        return beanstalk.getStatefulBeans().size();
-+    }
-+
-+    public Map getStatelessStubCacheLastAccessTimes() {
-+        return getLastAccessTimesMap(beanstalk.getStatelessBeans());
-+    }
-+
-+    public Map getStatefulStubCacheLastAccessTimes() {
-+        return getLastAccessTimesMap(beanstalk.getStatefulBeans());
-+    }
-+
-+    private Map getLastAccessTimesMap(Map<String, CacheEntry> beanMap) {
-+        Map<String, Date> results = new HashMap<String, Date>();
-+        for (Map.Entry<String, CacheEntry> entry : beanMap.entrySet()) {
-+            results.put(entry.getKey(), new Date(entry.getValue().getLastAccessTime()));
-+        }
-+        return results;
-+    }
-+
-+    public void cleanExpiredStubsNow() throws Exception {
-+        beanstalk.removeExpiredBeans();
-+    }
-+
-+    public void removeStatelessStub(String className) {
-+        beanstalk.removeEnterpriseBean(className, null);
-+    }
-+
-+    public void removeStatefulStub(String className, String sessionId) {
-+        beanstalk.removeEnterpriseBean(className, sessionId);
-+    }
 +}
 -*-*-*-
-SYNAPSE-838: Introducing Bean and EJB mediators.
+Message: SYNAPSE-838: Introducing Bean and EJB mediators.
+
+-*-*-*-
+When: 2012-07-15 03:17:49 -0400 

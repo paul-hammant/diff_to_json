@@ -13,4 +13,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/util/PayloadHelper.jav
  
  	public static String getTextPayload(MessageContext mc) {
 -*-*-*-
-Fixing SYNAPSE-809
+Message: Fixing SYNAPSE-809
+-*-*-*-
+When: 2011-12-19 03:46:58 -0500 

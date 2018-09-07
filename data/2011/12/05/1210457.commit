@@ -40,13 +40,13 @@ Index: java/modules/core/src/test/java/org/apache/synapse/core/axis2/SOAPConvers
  
  package org.apache.synapse.core.axis2;
  
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MessageStoreMediatorFactory.java
+Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/DynamicLoadbalanceFaultHandler.java
 ===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/MessageStoreMediatorFactory.java	(revision 1210456)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/MessageStoreMediatorFactory.java	(revision 1210457)
-@@ -1,20 +1,22 @@
+--- java/modules/core/src/main/java/org/apache/synapse/endpoints/DynamicLoadbalanceFaultHandler.java	(revision 1210456)
++++ java/modules/core/src/main/java/org/apache/synapse/endpoints/DynamicLoadbalanceFaultHandler.java	(revision 1210457)
+@@ -1,25 +1,26 @@
  /*
--*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+-*  Copyright (c) 2005-2011, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 -*
 -*  WSO2 Inc. licenses this file to you under the Apache License,
 -*  Version 2.0 (the "License"); you may not use this file except
@@ -80,9 +80,14 @@ Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MessageStor
 + *  under the License.
 + */
 +
- package org.apache.synapse.config.xml;
+ package org.apache.synapse.endpoints;
  
- import org.apache.axiom.om.OMAttribute;
+ import org.apache.axis2.addressing.EndpointReference;
+ import org.apache.axis2.clustering.Member;
+-import org.apache.axis2.clustering.management.GroupManagementAgent;
+ import org.apache.synapse.FaultHandler;
+ 
+ /**
 Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/sampler/SamplingProcessorView.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/message/processors/sampler/SamplingProcessorView.java	(revision 1210456)
@@ -181,13 +186,13 @@ Index: java/modules/core/src/main/java/org/apache/synapse/mediators/store/Messag
  package org.apache.synapse.mediators.store;
  
  import org.apache.axis2.description.Parameter;
-Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/DynamicLoadbalanceFaultHandler.java
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MessageStoreMediatorFactory.java
 ===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/endpoints/DynamicLoadbalanceFaultHandler.java	(revision 1210456)
-+++ java/modules/core/src/main/java/org/apache/synapse/endpoints/DynamicLoadbalanceFaultHandler.java	(revision 1210457)
-@@ -1,25 +1,26 @@
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/MessageStoreMediatorFactory.java	(revision 1210456)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/MessageStoreMediatorFactory.java	(revision 1210457)
+@@ -1,20 +1,22 @@
  /*
--*  Copyright (c) 2005-2011, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+-*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 -*
 -*  WSO2 Inc. licenses this file to you under the Apache License,
 -*  Version 2.0 (the "License"); you may not use this file except
@@ -221,13 +226,10 @@ Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/DynamicLoadb
 + *  under the License.
 + */
 +
- package org.apache.synapse.endpoints;
+ package org.apache.synapse.config.xml;
  
- import org.apache.axis2.addressing.EndpointReference;
- import org.apache.axis2.clustering.Member;
--import org.apache.axis2.clustering.management.GroupManagementAgent;
- import org.apache.synapse.FaultHandler;
- 
- /**
+ import org.apache.axiom.om.OMAttribute;
 -*-*-*-
-License header updates
+Message: License header updates
+-*-*-*-
+When: 2011-12-05 08:32:28 -0500 

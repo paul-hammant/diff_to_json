@@ -1,3 +1,101 @@
+Index: java/modules/core/src/test/java/org/apache/synapse/TestMessageContextBuilder.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/TestMessageContextBuilder.java	(revision 1210651)
++++ java/modules/core/src/test/java/org/apache/synapse/TestMessageContextBuilder.java	(revision 1210652)
+@@ -20,7 +20,6 @@
+ package org.apache.synapse;
+ 
+ import java.io.File;
+-import java.io.FileInputStream;
+ import java.io.StringReader;
+ import java.net.MalformedURLException;
+ import java.net.URL;
+@@ -53,7 +52,7 @@
+     private final Map<String,Entry> entries = new HashMap<String,Entry>();
+     private boolean requireAxis2MessageContext;
+     private String contentString;
+-    private String contentFile;
++    private URL contentURL;
+     private boolean contentIsEnvelope;
+     private boolean addTextAroundBody;
+     
+@@ -67,15 +66,27 @@
+         contentIsEnvelope = false;
+         return this;
+     }
++
++    private TestMessageContextBuilder setContentFromFile(String path, boolean contentIsEnvelope) {
++        try {
++            contentURL = new File(path).toURL();
++        } catch (MalformedURLException ex) {
++            throw new Error(ex);
++        }
++        this.contentIsEnvelope = contentIsEnvelope;
++        return this;
++    }
+     
+     public TestMessageContextBuilder setBodyFromFile(String path) {
+-        this.contentFile = path;
+-        contentIsEnvelope = false;
+-        return this;
++        return setContentFromFile(path, false);
+     }
+     
+     public TestMessageContextBuilder setEnvelopeFromFile(String path) {
+-        this.contentFile = path;
++        return setContentFromFile(path, true);
++    }
++    
++    public TestMessageContextBuilder setEnvelope(URL url) {
++        contentURL = url;
+         contentIsEnvelope = true;
+         return this;
+     }
+@@ -132,8 +143,8 @@
+         XMLStreamReader parser = null;
+         if (contentString != null) {
+             parser = StAXUtils.createXMLStreamReader(new StringReader(contentString));
+-        } else if (contentFile != null) {
+-            parser = StAXUtils.createXMLStreamReader(new FileInputStream(contentFile));
++        } else if (contentURL != null) {
++            parser = StAXUtils.createXMLStreamReader(contentURL.openStream());
+         }
+         
+         SOAPEnvelope envelope;
+Index: java/modules/core/src/test/java/org/apache/synapse/mediators/builtin/ValidateMediatorTest.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/mediators/builtin/ValidateMediatorTest.java	(revision 1210651)
++++ java/modules/core/src/test/java/org/apache/synapse/mediators/builtin/ValidateMediatorTest.java	(revision 1210652)
+@@ -20,6 +20,8 @@
+ package org.apache.synapse.mediators.builtin;
+ 
+ import junit.framework.TestCase;
++
++import org.apache.axiom.om.OMXMLBuilderFactory;
+ import org.apache.commons.lang.mutable.MutableInt;
+ import org.apache.synapse.MessageContext;
+ import org.apache.synapse.TestMessageContextBuilder;
+@@ -400,5 +402,19 @@
+         return keyList;
+     }
+ 
+-
++    /**
++     * Regression test for SYNAPSE-501.
++     * 
++     * @throws Exception
++     */
++    public void testSynapse501() throws Exception {
++        ValidateMediatorFactory mf = new ValidateMediatorFactory();
++        ValidateMediator validate = (ValidateMediator)mf.createMediator(
++                OMXMLBuilderFactory.createOMBuilder(ValidateMediatorTest.class.getResourceAsStream("synapse-501-conf.xml")).getDocumentElement(),
++                new Properties());
++        MessageContext synCtx = new TestMessageContextBuilder()
++                .addEntry("validate_schema", ValidateMediatorTest.class.getResource("synapse-501.xsd"))
++                .setEnvelope(ValidateMediatorTest.class.getResource("synapse-501-soap.xml")).build();
++        test(validate, synCtx, false);
++    }
+ }
 Index: java/modules/core/src/test/resources/org/apache/synapse/mediators/builtin/synapse-501.xsd
 ===================================================================
 --- java/modules/core/src/test/resources/org/apache/synapse/mediators/builtin/synapse-501.xsd	(nonexistent)
@@ -91,103 +189,8 @@ Added: svn:eol-style
 ## -0,0 +1 ##
 +native
 \ No newline at end of property
-Index: java/modules/core/src/test/java/org/apache/synapse/mediators/builtin/ValidateMediatorTest.java
-===================================================================
---- java/modules/core/src/test/java/org/apache/synapse/mediators/builtin/ValidateMediatorTest.java	(revision 1210651)
-+++ java/modules/core/src/test/java/org/apache/synapse/mediators/builtin/ValidateMediatorTest.java	(revision 1210652)
-@@ -20,6 +20,8 @@
- package org.apache.synapse.mediators.builtin;
- 
- import junit.framework.TestCase;
-+
-+import org.apache.axiom.om.OMXMLBuilderFactory;
- import org.apache.commons.lang.mutable.MutableInt;
- import org.apache.synapse.MessageContext;
- import org.apache.synapse.TestMessageContextBuilder;
-@@ -400,5 +402,19 @@
-         return keyList;
-     }
- 
--
-+    /**
-+     * Regression test for SYNAPSE-501.
-+     * 
-+     * @throws Exception
-+     */
-+    public void testSynapse501() throws Exception {
-+        ValidateMediatorFactory mf = new ValidateMediatorFactory();
-+        ValidateMediator validate = (ValidateMediator)mf.createMediator(
-+                OMXMLBuilderFactory.createOMBuilder(ValidateMediatorTest.class.getResourceAsStream("synapse-501-conf.xml")).getDocumentElement(),
-+                new Properties());
-+        MessageContext synCtx = new TestMessageContextBuilder()
-+                .addEntry("validate_schema", ValidateMediatorTest.class.getResource("synapse-501.xsd"))
-+                .setEnvelope(ValidateMediatorTest.class.getResource("synapse-501-soap.xml")).build();
-+        test(validate, synCtx, false);
-+    }
- }
-Index: java/modules/core/src/test/java/org/apache/synapse/TestMessageContextBuilder.java
-===================================================================
---- java/modules/core/src/test/java/org/apache/synapse/TestMessageContextBuilder.java	(revision 1210651)
-+++ java/modules/core/src/test/java/org/apache/synapse/TestMessageContextBuilder.java	(revision 1210652)
-@@ -20,7 +20,6 @@
- package org.apache.synapse;
- 
- import java.io.File;
--import java.io.FileInputStream;
- import java.io.StringReader;
- import java.net.MalformedURLException;
- import java.net.URL;
-@@ -53,7 +52,7 @@
-     private final Map<String,Entry> entries = new HashMap<String,Entry>();
-     private boolean requireAxis2MessageContext;
-     private String contentString;
--    private String contentFile;
-+    private URL contentURL;
-     private boolean contentIsEnvelope;
-     private boolean addTextAroundBody;
-     
-@@ -67,15 +66,27 @@
-         contentIsEnvelope = false;
-         return this;
-     }
-+
-+    private TestMessageContextBuilder setContentFromFile(String path, boolean contentIsEnvelope) {
-+        try {
-+            contentURL = new File(path).toURL();
-+        } catch (MalformedURLException ex) {
-+            throw new Error(ex);
-+        }
-+        this.contentIsEnvelope = contentIsEnvelope;
-+        return this;
-+    }
-     
-     public TestMessageContextBuilder setBodyFromFile(String path) {
--        this.contentFile = path;
--        contentIsEnvelope = false;
--        return this;
-+        return setContentFromFile(path, false);
-     }
-     
-     public TestMessageContextBuilder setEnvelopeFromFile(String path) {
--        this.contentFile = path;
-+        return setContentFromFile(path, true);
-+    }
-+    
-+    public TestMessageContextBuilder setEnvelope(URL url) {
-+        contentURL = url;
-         contentIsEnvelope = true;
-         return this;
-     }
-@@ -132,8 +143,8 @@
-         XMLStreamReader parser = null;
-         if (contentString != null) {
-             parser = StAXUtils.createXMLStreamReader(new StringReader(contentString));
--        } else if (contentFile != null) {
--            parser = StAXUtils.createXMLStreamReader(new FileInputStream(contentFile));
-+        } else if (contentURL != null) {
-+            parser = StAXUtils.createXMLStreamReader(contentURL.openStream());
-         }
-         
-         SOAPEnvelope envelope;
 -*-*-*-
-Added a regression test for SYNAPSE-501 (which basically shows that the issue was fixed by an improvement in Axiom).
+Message: Added a regression test for SYNAPSE-501 (which basically shows that the issue was fixed by an improvement in Axiom).
+
+-*-*-*-
+When: 2011-12-05 16:41:37 -0500 

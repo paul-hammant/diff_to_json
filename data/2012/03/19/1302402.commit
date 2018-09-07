@@ -53,4 +53,6 @@ Index: java/modules/documentation/pom.xml
  		<descriptor>src/main/assembly/docs.xml</descriptor>
  	      </descriptors>
 -*-*-*-
-installing docs build to the repo
+Message: installing docs build to the repo
+-*-*-*-
+When: 2012-03-19 08:53:27 -0400 

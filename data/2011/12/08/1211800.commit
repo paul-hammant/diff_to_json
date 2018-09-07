@@ -305,67 +305,909 @@ Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framewo
 -
 -}
 \ No newline at end of file
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/MTOMSwASampleClient.java
+Index: java/modules/integration/src/test/resources/sample53.xml
 ===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/MTOMSwASampleClient.java	(revision 1211799)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/MTOMSwASampleClient.java	(revision 1211800)
-@@ -35,7 +35,7 @@
+--- java/modules/integration/src/test/resources/sample53.xml	(revision 1211799)
++++ java/modules/integration/src/test/resources/sample53.xml	(revision 1211800)
+@@ -10,23 +10,23 @@
+         <axis2Server id='1'>
+             <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
+             <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
+-	    <httpPort>9001</httpPort>
+-	    <httpsPort>9005</httpsPort>
++            <httpPort>9001</httpPort>
++            <httpsPort>9005</httpsPort>
+         </axis2Server>
+         <axis2Server id='2'>
+             <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
+             <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
+-	    <httpPort>9002</httpPort>
+-	    <httpsPort>9006</httpsPort>
++            <httpPort>9002</httpPort>
++            <httpsPort>9006</httpsPort>
+         </axis2Server>
+         <axis2Server id='3'>
+             <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
+             <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
+-	    <httpPort>9003</httpPort>
+-	    <httpsPort>9007</httpsPort>
++            <httpPort>9003</httpPort>
++            <httpsPort>9007</httpsPort>
+         </axis2Server>
+     </backEndServerConfig>
+     <clientConfig>
+-	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++        <clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
+     </clientConfig>
+ </synapseSample>
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/JMSBrokerController.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/JMSBrokerController.java	(revision 1211799)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/JMSBrokerController.java	(revision 1211800)
+@@ -22,6 +22,7 @@
+ import org.apache.activemq.broker.BrokerService;
  import org.apache.commons.logging.Log;
  import org.apache.commons.logging.LogFactory;
- import org.apache.synapse.samples.framework.SampleClientResult;
--import org.apache.synapse.samples.framework.SampleConfiguration;
-+import org.apache.synapse.samples.framework.config.Axis2ClientConfiguration;
++import org.apache.synapse.samples.framework.config.JMSBrokerConfiguration;
  
- import javax.activation.DataHandler;
- import javax.activation.FileDataSource;
-@@ -46,18 +46,15 @@
- import java.io.InputStream;
+ /**
+  * Responsible for starting up and shutting down
+@@ -32,11 +33,10 @@
+     private static final Log log = LogFactory.getLog(JMSBrokerController.class);
  
- public class MTOMSwASampleClient {
-+
-     private static final Log log = LogFactory.getLog(StockQuoteSampleClient.class);
--    ConfigurationContext configContext = null;
+     private String serverName;
+-    private SampleConfiguration.JMSBrokerSampleConfiguration configuration;
++    private JMSBrokerConfiguration configuration;
+     private BrokerService broker;
  
--    Options options;
-     SampleClientResult clientResult;
-     OMElement payload;
--    OMElement response;
-     ServiceClient serviceClient;
--    boolean completed;
--    SampleConfiguration.ClientSampleConfiguration configuration;
-+    Axis2ClientConfiguration configuration;
- 
--    public MTOMSwASampleClient(SampleConfiguration.ClientSampleConfiguration configuration) {
-+    public MTOMSwASampleClient(Axis2ClientConfiguration configuration) {
+-    public JMSBrokerController(String serverName,
+-                               SampleConfiguration.JMSBrokerSampleConfiguration configuration) {
++    public JMSBrokerController(String serverName, JMSBrokerConfiguration configuration) {
+         this.serverName = serverName;
          this.configuration = configuration;
      }
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample53.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample53.java	(revision 1211799)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample53.java	(revision 1211800)
+@@ -44,11 +44,12 @@
+         addUrl = "http://localhost:8280/services/LBService1";
+         log.info("Running test: Failover sending among 3 endpoints");
  
-@@ -113,11 +110,9 @@
-             dest.flush();
-             dest.close();
-             log.info("Saved response to file : " + tempFile.getAbsolutePath());
--
--            clientResult.setResponseReceived(true);
-+            clientResult.incrementResponseCount();
-         } catch (Exception e) {
-             log.error("Error invoking service", e);
--            clientResult.setResponseReceived(false);
-             clientResult.setException(e);
+-        new Thread(new Runnable() {
++        Thread t = new Thread(new Runnable() {
+             public void run() {
+-                result = client.sessionlessClient(addUrl, null, -1);
++                result = client.sessionlessClient(addUrl, null, 10000);
+             }
+-        }).start();
++        });
++        t.start();
+ 
+         for (int i = 0; i < 3; i++) {
+             try {
+@@ -60,25 +61,17 @@
          }
  
-@@ -183,11 +178,9 @@
-             fos.close();
+         try {
+-            Thread.sleep(2000);
++            t.join();
+         } catch (InterruptedException e) {
  
-             log.info("Saved response to file : " + tempFile.getAbsolutePath());
--
--            clientResult.setResponseReceived(true);
-+            clientResult.incrementResponseCount();
-         } catch (Exception e) {
-             log.error("Error invoking service", e);
--            clientResult.setResponseReceived(false);
-             clientResult.setException(e);
          }
  
+-        while (!result.isFinished()) {
+-            try {
+-                Thread.sleep(1000);
+-            } catch (InterruptedException e) {
+-            }
+-        }
+-
+         assertResponseReceived(result);
+         Exception resultEx = result.getException();
+         assertNotNull("Did not receive expected error", resultEx);
+         log.info("Got an error as expected: " + resultEx.getMessage());
+         assertTrue("Did not receive expected error", resultEx instanceof AxisFault);
+-        assertTrue("Did not receive expected error",
+-                resultEx.getMessage().indexOf(expectedError) != -1);
++        assertTrue("Did not receive expected error", resultEx.getMessage().contains(expectedError));
+     }
+ 
+ }
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample55.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample55.java	(revision 1211799)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample55.java	(revision 1211800)
+@@ -40,19 +40,20 @@
+     public void testSessionFullLBFailOver() {
+         final String addUrl = "http://localhost:8280/services/LBService1";
+         log.info("Running test: Failover sending among 3 endpoints");
+-        new Thread(new Runnable() {
++        Thread t = new Thread(new Runnable() {
+             public void run() {
+                 result = client.statefulClient(addUrl, null, 200);
+             }
+-        }).start();
++        });
++        t.start();
+ 
+         try {
+-            Thread.sleep(2000);
++            t.join();
+         } catch (InterruptedException e) {
+ 
+         }
++
+         getBackendServerControllers().get(0).stop();
+-
+         try {
+             Thread.sleep(2000);
+         } catch (InterruptedException e) {
+@@ -59,12 +60,6 @@
+ 
+         }
+ 
+-        while (!result.isFinished()) {
+-            try {
+-                Thread.sleep(1000);
+-            } catch (InterruptedException e) {
+-            }
+-        }
+         assertTrue("Did not receive a response", result.responseReceived());
+     }
+ }
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample57.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample57.java	(revision 1211799)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample57.java	(revision 1211800)
+@@ -45,43 +45,32 @@
+         } catch (InterruptedException e) {
+ 
+         }
+-        new Thread(new Runnable() {
++        Thread t = new Thread(new Runnable() {
+             public void run() {
+                 result = client.sessionlessClient(addUrl, null, 500);
+             }
+-        }).start();
++        });
++        t.start();
+ 
+         try {
+-            Thread.sleep(3000);
++            t.join();
+         } catch (InterruptedException e) {
+ 
+         }
+ 
+-        while (!result.isFinished()) {
+-            try {
+-                Thread.sleep(1000);
+-            } catch (InterruptedException e) {
+-            }
+-        }
+-
+-        new Thread(new Runnable() {
++        t = new Thread(new Runnable() {
+             public void run() {
+                 result = client.sessionlessClient(addUrl, null, 500);
+             }
+-        }).start();
++        });
++        t.start();
++
+         try {
+-            Thread.sleep(5000);
++            t.join();
+         } catch (InterruptedException e) {
+ 
+         }
+ 
+-        while (!result.isFinished()) {
+-            try {
+-                Thread.sleep(1000);
+-            } catch (InterruptedException e) {
+-            }
+-        }
+-
+         assertResponseReceived(result);
+     }
+ }
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseProcessController.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseProcessController.java	(revision 1211799)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseProcessController.java	(revision 1211800)
+@@ -22,6 +22,7 @@
+ import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.ServerConfigurationInformation;
+ import org.apache.synapse.ServerManager;
++import org.apache.synapse.samples.framework.config.SynapseServerConfiguration;
+ 
+ import java.util.concurrent.CountDownLatch;
+ 
+@@ -34,13 +35,13 @@
+     private static final Log log = LogFactory.getLog(SynapseProcessController.class);
+ 
+     private ServerThread serverThread;
+-    private SampleConfiguration.SynapseSampleConfiguration configuration;
++    private SynapseServerConfiguration configuration;
+     private ServerConfigurationInformation information;
+     private ServerManager manager;
+     private CountDownLatch cdLatch;
+     private Exception processException;
+ 
+-    public SynapseProcessController(SampleConfiguration.SynapseSampleConfiguration configuration) {
++    public SynapseProcessController(SynapseServerConfiguration configuration) {
+         this.configuration = configuration;
+         information = new ServerConfigurationInformation();
+         manager = new ServerManager();
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/Axis2ServerConfiguration.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/Axis2ServerConfiguration.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/Axis2ServerConfiguration.java	(revision 1211800)
+@@ -0,0 +1,77 @@
++/*
++*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
++*
++*  WSO2 Inc. licenses this file to you under the Apache License,
++*  Version 2.0 (the "License"); you may not use this file except
++*  in compliance with the License.
++*  You may obtain a copy of the License at
++*
++*    http://www.apache.org/licenses/LICENSE-2.0
++*
++* Unless required by applicable law or agreed to in writing,
++* software distributed under the License is distributed on an
++* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++* KIND, either express or implied.  See the License for the
++* specific language governing permissions and limitations
++* under the License.
++*/
++
++package org.apache.synapse.samples.framework.config;
++
++public class Axis2ServerConfiguration {
++
++    private String serverName;
++    private String axis2Repo;
++    private String axis2Xml;
++    private String httpPort;
++    private String httpsPort;
++    private boolean clusteringEnabled;
++
++    public String getServerName() {
++        return serverName;
++    }
++
++    public void setServerName(String serverName) {
++        this.serverName = serverName;
++    }
++
++    public String getAxis2Repo() {
++        return axis2Repo;
++    }
++
++    public void setAxis2Repo(String axis2Repo) {
++        this.axis2Repo = axis2Repo;
++    }
++
++    public String getAxis2Xml() {
++        return axis2Xml;
++    }
++
++    public void setAxis2Xml(String axis2Xml) {
++        this.axis2Xml = axis2Xml;
++    }
++
++    public String getHttpPort() {
++        return httpPort;
++    }
++
++    public void setHttpPort(String httpPort) {
++        this.httpPort = httpPort;
++    }
++
++    public String getHttpsPort() {
++        return httpsPort;
++    }
++
++    public void setHttpsPort(String httpsPort) {
++        this.httpsPort = httpsPort;
++    }
++
++    public boolean isClusteringEnabled() {
++        return clusteringEnabled;
++    }
++
++    public void setClusteringEnabled(boolean clusteringEnabled) {
++        this.clusteringEnabled = clusteringEnabled;
++    }
++}
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/JMSBrokerConfiguration.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/JMSBrokerConfiguration.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/JMSBrokerConfiguration.java	(revision 1211800)
+@@ -0,0 +1,50 @@
++/*
++*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
++*
++*  WSO2 Inc. licenses this file to you under the Apache License,
++*  Version 2.0 (the "License"); you may not use this file except
++*  in compliance with the License.
++*  You may obtain a copy of the License at
++*
++*    http://www.apache.org/licenses/LICENSE-2.0
++*
++* Unless required by applicable law or agreed to in writing,
++* software distributed under the License is distributed on an
++* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++* KIND, either express or implied.  See the License for the
++* specific language governing permissions and limitations
++* under the License.
++*/
++
++package org.apache.synapse.samples.framework.config;
++
++public class JMSBrokerConfiguration {
++
++    private String serverName;
++    private String providerURL;
++    private String initialNamingFactory;
++
++    public String getServerName() {
++        return serverName;
++    }
++
++    public void setServerName(String serverName) {
++        this.serverName = serverName;
++    }
++
++    public String getProviderURL() {
++        return providerURL;
++    }
++
++    public void setProviderURL(String providerURL) {
++        this.providerURL = providerURL;
++    }
++
++    public String getInitialNamingFactory() {
++        return initialNamingFactory;
++    }
++
++    public void setInitialNamingFactory(String initialNamingFactory) {
++        this.initialNamingFactory = initialNamingFactory;
++    }
++}
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/SampleConfiguration.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/SampleConfiguration.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/SampleConfiguration.java	(revision 1211800)
+@@ -0,0 +1,97 @@
++/*
++*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
++*
++*  WSO2 Inc. licenses this file to you under the Apache License,
++*  Version 2.0 (the "License"); you may not use this file except
++*  in compliance with the License.
++*  You may obtain a copy of the License at
++*
++*    http://www.apache.org/licenses/LICENSE-2.0
++*
++* Unless required by applicable law or agreed to in writing,
++* software distributed under the License is distributed on an
++* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++* KIND, either express or implied.  See the License for the
++* specific language governing permissions and limitations
++* under the License.
++*/
++
++package org.apache.synapse.samples.framework.config;
++
++import java.util.HashMap;
++import java.util.Set;
++
++public class SampleConfiguration {
++
++    private String sampleName;
++    private SynapseServerConfiguration synapseServerConfig;
++    private HashMap<String, Axis2ServerConfiguration> axis2ServerConfigs;
++    private HashMap<String, JMSBrokerConfiguration> jmsConfigs;
++    private HashMap<String, DerbyConfiguration> derbyConfigs;
++    private Axis2ClientConfiguration axis2ClientConfig;
++
++    public SampleConfiguration() {
++        this.synapseServerConfig = new SynapseServerConfiguration();
++        this.axis2ServerConfigs = new HashMap<String, Axis2ServerConfiguration>();
++        this.jmsConfigs = new HashMap<String, JMSBrokerConfiguration>();
++        this.derbyConfigs = new HashMap<String, DerbyConfiguration>();
++        this.axis2ClientConfig = new Axis2ClientConfiguration();
++    }
++
++    public String getSampleName() {
++        return sampleName;
++    }
++
++    public void setSampleName(String sampleName) {
++        this.sampleName = sampleName;
++    }
++
++    public Axis2ClientConfiguration getAxis2ClientConfig() {
++        return axis2ClientConfig;
++    }
++
++    public void setAxis2Client(Axis2ClientConfiguration axis2ClientConfig) {
++        this.axis2ClientConfig = axis2ClientConfig;
++    }
++
++    public SynapseServerConfiguration getSynapseServerConfig() {
++        return synapseServerConfig;
++    }
++
++    public void setSynapseServerConfig(SynapseServerConfiguration synapseServerConfig) {
++        this.synapseServerConfig = synapseServerConfig;
++    }
++
++    public void addNewAxis2Server(String name) {
++        axis2ServerConfigs.put(name, new Axis2ServerConfiguration());
++    }
++
++    public void addNewJMSBroker(String name) {
++        jmsConfigs.put(name, new JMSBrokerConfiguration());
++    }
++
++    public void addNewDerbyServer(String name) {
++        derbyConfigs.put(name, new DerbyConfiguration());
++    }
++
++    public Axis2ServerConfiguration getAxis2Config(String name) {
++        return axis2ServerConfigs.get(name);
++    }
++
++    public JMSBrokerConfiguration getJMSConfig(String name) {
++        return jmsConfigs.get(name);
++    }
++
++    public DerbyConfiguration getDerbyConfig(String name) {
++        return derbyConfigs.get(name);
++    }
++
++    public Set<String> getAxis2ServersList() {
++        return axis2ServerConfigs.keySet();
++    }
++
++    public int getBackEndServerCount() {
++        return axis2ServerConfigs.size() + jmsConfigs.size();
++    }
++
++}
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/Axis2ClientConfiguration.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/Axis2ClientConfiguration.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/Axis2ClientConfiguration.java	(revision 1211800)
+@@ -0,0 +1,50 @@
++/*
++*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
++*
++*  WSO2 Inc. licenses this file to you under the Apache License,
++*  Version 2.0 (the "License"); you may not use this file except
++*  in compliance with the License.
++*  You may obtain a copy of the License at
++*
++*    http://www.apache.org/licenses/LICENSE-2.0
++*
++* Unless required by applicable law or agreed to in writing,
++* software distributed under the License is distributed on an
++* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++* KIND, either express or implied.  See the License for the
++* specific language governing permissions and limitations
++* under the License.
++*/
++
++package org.apache.synapse.samples.framework.config;
++
++public class Axis2ClientConfiguration {
++
++    private String clientRepo;
++    private String fileName;
++    private String axis2Xml;
++
++    public String getClientRepo() {
++        return clientRepo;
++    }
++
++    public void setClientRepo(String clientRepo) {
++        this.clientRepo = clientRepo;
++    }
++
++    public String getFileName() {
++        return fileName;
++    }
++
++    public void setFileName(String fileName) {
++        this.fileName = fileName;
++    }
++
++    public String getAxis2Xml() {
++        return axis2Xml;
++    }
++
++    public void setAxis2Xml(String axis2Xml) {
++        this.axis2Xml = axis2Xml;
++    }
++}
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/DerbyConfiguration.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/DerbyConfiguration.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/DerbyConfiguration.java	(revision 1211800)
+@@ -0,0 +1,32 @@
++/*
++*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
++*
++*  WSO2 Inc. licenses this file to you under the Apache License,
++*  Version 2.0 (the "License"); you may not use this file except
++*  in compliance with the License.
++*  You may obtain a copy of the License at
++*
++*    http://www.apache.org/licenses/LICENSE-2.0
++*
++* Unless required by applicable law or agreed to in writing,
++* software distributed under the License is distributed on an
++* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++* KIND, either express or implied.  See the License for the
++* specific language governing permissions and limitations
++* under the License.
++*/
++
++package org.apache.synapse.samples.framework.config;
++
++public class DerbyConfiguration {
++
++    private String serverName;
++
++    public String getServerName() {
++        return serverName;
++    }
++
++    public void setServerName(String serverName) {
++        this.serverName = serverName;
++    }
++}
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/SynapseServerConfiguration.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/SynapseServerConfiguration.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/SynapseServerConfiguration.java	(revision 1211800)
+@@ -0,0 +1,77 @@
++/*
++*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
++*
++*  WSO2 Inc. licenses this file to you under the Apache License,
++*  Version 2.0 (the "License"); you may not use this file except
++*  in compliance with the License.
++*  You may obtain a copy of the License at
++*
++*    http://www.apache.org/licenses/LICENSE-2.0
++*
++* Unless required by applicable law or agreed to in writing,
++* software distributed under the License is distributed on an
++* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++* KIND, either express or implied.  See the License for the
++* specific language governing permissions and limitations
++* under the License.
++*/
++
++package org.apache.synapse.samples.framework.config;
++
++public class SynapseServerConfiguration {
++
++    private String serverName;
++    private String synapseHome;
++    private String axis2Repo;
++    private String axis2Xml;
++    private String synapseXml;
++    private boolean clusteringEnabled;
++
++    public String getServerName() {
++        return serverName;
++    }
++
++    public void setServerName(String serverName) {
++        this.serverName = serverName;
++    }
++
++    public String getSynapseHome() {
++        return synapseHome;
++    }
++
++    public void setSynapseHome(String synapseHome) {
++        this.synapseHome = synapseHome;
++    }
++
++    public String getAxis2Repo() {
++        return axis2Repo;
++    }
++
++    public void setAxis2Repo(String axis2Repo) {
++        this.axis2Repo = axis2Repo;
++    }
++
++    public String getAxis2Xml() {
++        return axis2Xml;
++    }
++
++    public void setAxis2Xml(String axis2Xml) {
++        this.axis2Xml = axis2Xml;
++    }
++
++    public String getSynapseXml() {
++        return synapseXml;
++    }
++
++    public void setSynapseXml(String synapseXml) {
++        this.synapseXml = synapseXml;
++    }
++
++    public boolean isClusteringEnabled() {
++        return clusteringEnabled;
++    }
++
++    public void setClusteringEnabled(boolean clusteringEnabled) {
++        this.clusteringEnabled = clusteringEnabled;
++    }
++}
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/Axis2BackEndServerController.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/Axis2BackEndServerController.java	(revision 1211799)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/Axis2BackEndServerController.java	(revision 1211800)
+@@ -8,6 +8,7 @@
+ import org.apache.axis2.engine.ListenerManager;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.samples.framework.config.Axis2ServerConfiguration;
+ 
+ import java.util.concurrent.CountDownLatch;
+ 
+@@ -23,12 +24,12 @@
+     private BackEndServerThread serverThread;
+     private ConfigurationContext configContext;
+     private ListenerManager listenerManager;
+-    private SampleConfiguration.Axis2SampleConfiguration configuration;
++    private Axis2ServerConfiguration configuration;
+     private CountDownLatch cdLatch;
+     private Exception processException;
+ 
+     public Axis2BackEndServerController(String serverName,
+-                                        SampleConfiguration.Axis2SampleConfiguration configuration) {
++                                        Axis2ServerConfiguration configuration) {
+         this.serverName = serverName;
+         this.configuration = configuration;
+         serverThread = new BackEndServerThread();
+@@ -88,7 +89,6 @@
+                 // setting System.setProperty does not work since this all servers are run on same jvm
+                 configContext.setProperty("server_name", serverName);
+ 
+-
+                 TransportInDescription httpTrsIn = configContext.getAxisConfiguration().
+                         getTransportsIn().get("http");
+                 String httpPort = configuration.getHttpPort();
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java	(revision 1211799)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java	(revision 1211800)
+@@ -29,6 +29,7 @@
+ import org.apache.synapse.samples.framework.clients.EventSampleClient;
+ import org.apache.synapse.samples.framework.clients.MTOMSwASampleClient;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
++import org.apache.synapse.samples.framework.config.SampleConfiguration;
+ 
+ import javax.xml.namespace.QName;
+ import java.io.File;
+@@ -83,7 +84,7 @@
+         assertTrue("Could not load client configuration settings for the sample " + sampleId,
+                 initClientConfigInfo());
+ 
+-        if (configuration.getSynapseConfig().isClusteringEnabled()) {
++        if (configuration.getSynapseServerConfig().isClusteringEnabled()) {
+             assertTrue("Could not properly configure clustering", configureClustering());
+         }
+ 
+@@ -216,35 +217,35 @@
+         Boolean clusteringEnabled = Boolean.parseBoolean(
+                 (String) synapseProperties.get(SampleConfigConstants.TAG_ENABLE_CLUSTERING));
+ 
+-        configuration.getSynapseConfig().setServerName("SynapseServerForSample" + sampleId);
++        configuration.getSynapseServerConfig().setServerName("SynapseServerForSample" + sampleId);
+ 
+         if (synapseXml == null) {
+             log.error("synapse config file must be specified for the sample");
+             return false;
+         } else {
+-            configuration.getSynapseConfig().setSynapseXml(synapseHome + synapseXml);
++            configuration.getSynapseServerConfig().setSynapseXml(synapseHome + synapseXml);
+         }
+ 
+         if (axis2Repo == null) {
+-            configuration.getSynapseConfig().setAxis2Repo(synapseHome +
++            configuration.getSynapseServerConfig().setAxis2Repo(synapseHome +
+                     SampleConfigConstants.DEFAULT_SYNAPSE_CONF_AXIS2_REPO);
+         } else {
+             log.info("Using Synapse Axis2 repository: " + axis2Repo);
+-            configuration.getSynapseConfig().setAxis2Repo(synapseHome + axis2Repo);
++            configuration.getSynapseServerConfig().setAxis2Repo(synapseHome + axis2Repo);
+         }
+ 
+         if (axis2Xml == null) {
+-            configuration.getSynapseConfig().setAxis2Xml(synapseHome +
++            configuration.getSynapseServerConfig().setAxis2Xml(synapseHome +
+                     SampleConfigConstants.DEFAULT_SYNAPSE_CONF_AXIS2_XML);
+         } else {
+             log.info("Using Synapse Axis2 XML: " + axis2Xml);
+-            configuration.getSynapseConfig().setAxis2Xml(synapseHome + axis2Xml);
++            configuration.getSynapseServerConfig().setAxis2Xml(synapseHome + axis2Xml);
+         }
+ 
+-        configuration.getSynapseConfig().setSynapseHome(synapseHome);
+-        configuration.getSynapseConfig().setClusteringEnabled(clusteringEnabled);
++        configuration.getSynapseServerConfig().setSynapseHome(synapseHome);
++        configuration.getSynapseServerConfig().setClusteringEnabled(clusteringEnabled);
+ 
+-        pc = new SynapseProcessController(configuration.getSynapseConfig());
++        pc = new SynapseProcessController(configuration.getSynapseServerConfig());
+         return true;
+     }
+ 
+@@ -255,10 +256,10 @@
+      */
+     private boolean initBackEndServersConfigInfo() {
+         OMElement bESConfigEle = null;
+-        Iterator itr_BEEle = sampleConfigElement.getChildrenWithLocalName(
++        Iterator itrBackEndElements = sampleConfigElement.getChildrenWithLocalName(
+                 SampleConfigConstants.TAG_BE_SERVER_CONF);
+-        while (itr_BEEle.hasNext()) {
+-            bESConfigEle = (OMElement) itr_BEEle.next();
++        while (itrBackEndElements.hasNext()) {
++            bESConfigEle = (OMElement) itrBackEndElements.next();
+         }
+         if (bESConfigEle == null) {
+             log.warn("No backend servers are defined");
+@@ -412,20 +413,20 @@
+                 SampleConfigConstants.TAG_CLIENT_CONF_AXIS2_XML);
+ 
+         if (clientRepo == null) {
+-            configuration.getClientConfig().setClientRepo(FilenameUtils.normalize(
++            configuration.getAxis2ClientConfig().setClientRepo(FilenameUtils.normalize(
+                     currentLocation + SampleConfigConstants.DEFAULT_CLIENT_CONF_REPO));
+         } else {
+             log.info("Using client Axis2 repository location: " + clientRepo);
+-            configuration.getClientConfig().setClientRepo(FilenameUtils.normalize(
++            configuration.getAxis2ClientConfig().setClientRepo(FilenameUtils.normalize(
+                     currentLocation + clientRepo));
+         }
+ 
+         if (clientAxis2Xml == null) {
+-            configuration.getClientConfig().setAxis2Xml(FilenameUtils.normalize(
++            configuration.getAxis2ClientConfig().setAxis2Xml(FilenameUtils.normalize(
+                     currentLocation + SampleConfigConstants.DEFAULT_CLIENT_CONF_AXIS2_XML));
+         } else {
+             log.info("Using client Axis2 XML: " + clientAxis2Xml);
+-            configuration.getClientConfig().setAxis2Xml(FilenameUtils.normalize(
++            configuration.getAxis2ClientConfig().setAxis2Xml(FilenameUtils.normalize(
+                     currentLocation + clientAxis2Xml));
+         }
+         return true;
+@@ -441,13 +442,13 @@
+             }
+             log.info(" Using the IP :" + ip);
+ 
+-            String synapseAxis2Xml = configuration.getSynapseConfig().getAxis2Xml();
++            String synapseAxis2Xml = configuration.getSynapseServerConfig().getAxis2Xml();
+             String axis2Config = FileUtils.readFileToString(new File(synapseAxis2Xml));
+             String modifiedSynapseAxis2 = SynapseTestUtils.replace(axis2Config, "${replace.me}", ip);
+             File tempSynapseAxis2 = File.createTempFile("axis2Syn-", "xml");
+             tempSynapseAxis2.deleteOnExit();
+             FileUtils.writeStringToFile(tempSynapseAxis2, modifiedSynapseAxis2);
+-            configuration.getSynapseConfig().setAxis2Xml(tempSynapseAxis2.getAbsolutePath());
++            configuration.getSynapseServerConfig().setAxis2Xml(tempSynapseAxis2.getAbsolutePath());
+ 
+             for (BackEndServerController controller : backendServerControllers) {
+                 String serverName = controller.getServerName();
+@@ -478,15 +479,15 @@
+     }
+ 
+     public StockQuoteSampleClient getStockQuoteClient() {
+-        return new StockQuoteSampleClient(configuration.getClientConfig());
++        return new StockQuoteSampleClient(configuration.getAxis2ClientConfig());
+     }
+ 
+     public EventSampleClient getEventSubscriberSampleClient() {
+-        return new EventSampleClient(configuration.getClientConfig());
++        return new EventSampleClient(configuration.getAxis2ClientConfig());
+     }
+ 
+     public MTOMSwASampleClient getMTOMSwASampleClient() {
+-        return new MTOMSwASampleClient(configuration.getClientConfig());
++        return new MTOMSwASampleClient(configuration.getAxis2ClientConfig());
+     }
+ 
+     protected void assertResponseReceived(SampleClientResult result) {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SampleClientResult.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SampleClientResult.java	(revision 1211799)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SampleClientResult.java	(revision 1211800)
+@@ -19,6 +19,7 @@
+ package org.apache.synapse.samples.framework;
+ 
+ import java.util.Properties;
++import java.util.concurrent.atomic.AtomicInteger;
+ 
+ /**
+  * Stores the results after executing a client
+@@ -25,13 +26,12 @@
+  */
+ public class SampleClientResult {
+ 
+-    private boolean responseReceived;
+-    private boolean isFinished;
++    private AtomicInteger responseCount = new AtomicInteger(0);
+     private Exception exception;
+     private Properties clientProperties = new Properties();
+ 
+-    public void setResponseReceived(boolean responseReceived) {
+-        this.responseReceived = responseReceived;
++    public void incrementResponseCount() {
++        responseCount.incrementAndGet();
+     }
+ 
+     public void setException(Exception exception) {
+@@ -39,7 +39,7 @@
+     }
+ 
+     public boolean responseReceived() {
+-        return responseReceived;
++        return responseCount.get() > 0;
+     }
+ 
+     public Exception getException() {
+@@ -46,14 +46,6 @@
+         return exception;
+     }
+ 
+-    public boolean isFinished() {
+-        return isFinished;
+-    }
+-
+-    public void setFinished(boolean finished) {
+-        isFinished = finished;
+-    }
+-
+     public void addProperty(String pName, String pValue){
+         clientProperties.setProperty(pName,pValue);
+     }
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/DerbyServerController.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/DerbyServerController.java	(revision 1211799)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/DerbyServerController.java	(revision 1211800)
+@@ -4,6 +4,7 @@
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+ import org.apache.derby.drda.NetworkServerControl;
++import org.apache.synapse.samples.framework.config.DerbyConfiguration;
+ 
+ import java.io.File;
+ import java.net.InetAddress;
+@@ -21,11 +22,10 @@
+     private static final Log log = LogFactory.getLog(DerbyServerController.class);
+ 
+     private String serverName;
+-    private SampleConfiguration.DerbyServerSampleConfiguration configuration;
++    private DerbyConfiguration configuration;
+     private NetworkServerControl server;
+ 
+-    public DerbyServerController(String serverName,
+-                                 SampleConfiguration.DerbyServerSampleConfiguration configuration) {
++    public DerbyServerController(String serverName, DerbyConfiguration configuration) {
+         this.serverName = serverName;
+         this.configuration = configuration;
+     }
 Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/EventSampleClient.java
 ===================================================================
 --- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/EventSampleClient.java	(revision 1211799)
@@ -895,908 +1737,68 @@ Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framewo
      }
  
      public boolean isCompleted() {
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/JMSBrokerController.java
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/MTOMSwASampleClient.java
 ===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/JMSBrokerController.java	(revision 1211799)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/JMSBrokerController.java	(revision 1211800)
-@@ -22,6 +22,7 @@
- import org.apache.activemq.broker.BrokerService;
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/MTOMSwASampleClient.java	(revision 1211799)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/MTOMSwASampleClient.java	(revision 1211800)
+@@ -35,7 +35,7 @@
  import org.apache.commons.logging.Log;
  import org.apache.commons.logging.LogFactory;
-+import org.apache.synapse.samples.framework.config.JMSBrokerConfiguration;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+-import org.apache.synapse.samples.framework.SampleConfiguration;
++import org.apache.synapse.samples.framework.config.Axis2ClientConfiguration;
  
- /**
-  * Responsible for starting up and shutting down
-@@ -32,11 +33,10 @@
-     private static final Log log = LogFactory.getLog(JMSBrokerController.class);
+ import javax.activation.DataHandler;
+ import javax.activation.FileDataSource;
+@@ -46,18 +46,15 @@
+ import java.io.InputStream;
  
-     private String serverName;
--    private SampleConfiguration.JMSBrokerSampleConfiguration configuration;
-+    private JMSBrokerConfiguration configuration;
-     private BrokerService broker;
+ public class MTOMSwASampleClient {
++
+     private static final Log log = LogFactory.getLog(StockQuoteSampleClient.class);
+-    ConfigurationContext configContext = null;
  
--    public JMSBrokerController(String serverName,
--                               SampleConfiguration.JMSBrokerSampleConfiguration configuration) {
-+    public JMSBrokerController(String serverName, JMSBrokerConfiguration configuration) {
-         this.serverName = serverName;
+-    Options options;
+     SampleClientResult clientResult;
+     OMElement payload;
+-    OMElement response;
+     ServiceClient serviceClient;
+-    boolean completed;
+-    SampleConfiguration.ClientSampleConfiguration configuration;
++    Axis2ClientConfiguration configuration;
+ 
+-    public MTOMSwASampleClient(SampleConfiguration.ClientSampleConfiguration configuration) {
++    public MTOMSwASampleClient(Axis2ClientConfiguration configuration) {
          this.configuration = configuration;
      }
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample53.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample53.java	(revision 1211799)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample53.java	(revision 1211800)
-@@ -44,11 +44,12 @@
-         addUrl = "http://localhost:8280/services/LBService1";
-         log.info("Running test: Failover sending among 3 endpoints");
  
--        new Thread(new Runnable() {
-+        Thread t = new Thread(new Runnable() {
-             public void run() {
--                result = client.sessionlessClient(addUrl, null, -1);
-+                result = client.sessionlessClient(addUrl, null, 10000);
-             }
--        }).start();
-+        });
-+        t.start();
- 
-         for (int i = 0; i < 3; i++) {
-             try {
-@@ -60,25 +61,17 @@
-         }
- 
-         try {
--            Thread.sleep(2000);
-+            t.join();
-         } catch (InterruptedException e) {
- 
-         }
- 
--        while (!result.isFinished()) {
--            try {
--                Thread.sleep(1000);
--            } catch (InterruptedException e) {
--            }
--        }
+@@ -113,11 +110,9 @@
+             dest.flush();
+             dest.close();
+             log.info("Saved response to file : " + tempFile.getAbsolutePath());
 -
-         assertResponseReceived(result);
-         Exception resultEx = result.getException();
-         assertNotNull("Did not receive expected error", resultEx);
-         log.info("Got an error as expected: " + resultEx.getMessage());
-         assertTrue("Did not receive expected error", resultEx instanceof AxisFault);
--        assertTrue("Did not receive expected error",
--                resultEx.getMessage().indexOf(expectedError) != -1);
-+        assertTrue("Did not receive expected error", resultEx.getMessage().contains(expectedError));
-     }
- 
- }
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample55.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample55.java	(revision 1211799)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample55.java	(revision 1211800)
-@@ -40,19 +40,20 @@
-     public void testSessionFullLBFailOver() {
-         final String addUrl = "http://localhost:8280/services/LBService1";
-         log.info("Running test: Failover sending among 3 endpoints");
--        new Thread(new Runnable() {
-+        Thread t = new Thread(new Runnable() {
-             public void run() {
-                 result = client.statefulClient(addUrl, null, 200);
-             }
--        }).start();
-+        });
-+        t.start();
- 
-         try {
--            Thread.sleep(2000);
-+            t.join();
-         } catch (InterruptedException e) {
- 
+-            clientResult.setResponseReceived(true);
++            clientResult.incrementResponseCount();
+         } catch (Exception e) {
+             log.error("Error invoking service", e);
+-            clientResult.setResponseReceived(false);
+             clientResult.setException(e);
          }
-+
-         getBackendServerControllers().get(0).stop();
+ 
+@@ -183,11 +178,9 @@
+             fos.close();
+ 
+             log.info("Saved response to file : " + tempFile.getAbsolutePath());
 -
-         try {
-             Thread.sleep(2000);
-         } catch (InterruptedException e) {
-@@ -59,12 +60,6 @@
- 
+-            clientResult.setResponseReceived(true);
++            clientResult.incrementResponseCount();
+         } catch (Exception e) {
+             log.error("Error invoking service", e);
+-            clientResult.setResponseReceived(false);
+             clientResult.setException(e);
          }
  
--        while (!result.isFinished()) {
--            try {
--                Thread.sleep(1000);
--            } catch (InterruptedException e) {
--            }
--        }
-         assertTrue("Did not receive a response", result.responseReceived());
-     }
- }
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample57.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample57.java	(revision 1211799)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample57.java	(revision 1211800)
-@@ -45,43 +45,32 @@
-         } catch (InterruptedException e) {
- 
-         }
--        new Thread(new Runnable() {
-+        Thread t = new Thread(new Runnable() {
-             public void run() {
-                 result = client.sessionlessClient(addUrl, null, 500);
-             }
--        }).start();
-+        });
-+        t.start();
- 
-         try {
--            Thread.sleep(3000);
-+            t.join();
-         } catch (InterruptedException e) {
- 
-         }
- 
--        while (!result.isFinished()) {
--            try {
--                Thread.sleep(1000);
--            } catch (InterruptedException e) {
--            }
--        }
--
--        new Thread(new Runnable() {
-+        t = new Thread(new Runnable() {
-             public void run() {
-                 result = client.sessionlessClient(addUrl, null, 500);
-             }
--        }).start();
-+        });
-+        t.start();
-+
-         try {
--            Thread.sleep(5000);
-+            t.join();
-         } catch (InterruptedException e) {
- 
-         }
- 
--        while (!result.isFinished()) {
--            try {
--                Thread.sleep(1000);
--            } catch (InterruptedException e) {
--            }
--        }
--
-         assertResponseReceived(result);
-     }
- }
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseProcessController.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseProcessController.java	(revision 1211799)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseProcessController.java	(revision 1211800)
-@@ -22,6 +22,7 @@
- import org.apache.commons.logging.LogFactory;
- import org.apache.synapse.ServerConfigurationInformation;
- import org.apache.synapse.ServerManager;
-+import org.apache.synapse.samples.framework.config.SynapseServerConfiguration;
- 
- import java.util.concurrent.CountDownLatch;
- 
-@@ -34,13 +35,13 @@
-     private static final Log log = LogFactory.getLog(SynapseProcessController.class);
- 
-     private ServerThread serverThread;
--    private SampleConfiguration.SynapseSampleConfiguration configuration;
-+    private SynapseServerConfiguration configuration;
-     private ServerConfigurationInformation information;
-     private ServerManager manager;
-     private CountDownLatch cdLatch;
-     private Exception processException;
- 
--    public SynapseProcessController(SampleConfiguration.SynapseSampleConfiguration configuration) {
-+    public SynapseProcessController(SynapseServerConfiguration configuration) {
-         this.configuration = configuration;
-         information = new ServerConfigurationInformation();
-         manager = new ServerManager();
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/SynapseServerConfiguration.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/SynapseServerConfiguration.java	(nonexistent)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/SynapseServerConfiguration.java	(revision 1211800)
-@@ -0,0 +1,77 @@
-+/*
-+*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-+*
-+*  WSO2 Inc. licenses this file to you under the Apache License,
-+*  Version 2.0 (the "License"); you may not use this file except
-+*  in compliance with the License.
-+*  You may obtain a copy of the License at
-+*
-+*    http://www.apache.org/licenses/LICENSE-2.0
-+*
-+* Unless required by applicable law or agreed to in writing,
-+* software distributed under the License is distributed on an
-+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+* KIND, either express or implied.  See the License for the
-+* specific language governing permissions and limitations
-+* under the License.
-+*/
-+
-+package org.apache.synapse.samples.framework.config;
-+
-+public class SynapseServerConfiguration {
-+
-+    private String serverName;
-+    private String synapseHome;
-+    private String axis2Repo;
-+    private String axis2Xml;
-+    private String synapseXml;
-+    private boolean clusteringEnabled;
-+
-+    public String getServerName() {
-+        return serverName;
-+    }
-+
-+    public void setServerName(String serverName) {
-+        this.serverName = serverName;
-+    }
-+
-+    public String getSynapseHome() {
-+        return synapseHome;
-+    }
-+
-+    public void setSynapseHome(String synapseHome) {
-+        this.synapseHome = synapseHome;
-+    }
-+
-+    public String getAxis2Repo() {
-+        return axis2Repo;
-+    }
-+
-+    public void setAxis2Repo(String axis2Repo) {
-+        this.axis2Repo = axis2Repo;
-+    }
-+
-+    public String getAxis2Xml() {
-+        return axis2Xml;
-+    }
-+
-+    public void setAxis2Xml(String axis2Xml) {
-+        this.axis2Xml = axis2Xml;
-+    }
-+
-+    public String getSynapseXml() {
-+        return synapseXml;
-+    }
-+
-+    public void setSynapseXml(String synapseXml) {
-+        this.synapseXml = synapseXml;
-+    }
-+
-+    public boolean isClusteringEnabled() {
-+        return clusteringEnabled;
-+    }
-+
-+    public void setClusteringEnabled(boolean clusteringEnabled) {
-+        this.clusteringEnabled = clusteringEnabled;
-+    }
-+}
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/Axis2ServerConfiguration.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/Axis2ServerConfiguration.java	(nonexistent)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/Axis2ServerConfiguration.java	(revision 1211800)
-@@ -0,0 +1,77 @@
-+/*
-+*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-+*
-+*  WSO2 Inc. licenses this file to you under the Apache License,
-+*  Version 2.0 (the "License"); you may not use this file except
-+*  in compliance with the License.
-+*  You may obtain a copy of the License at
-+*
-+*    http://www.apache.org/licenses/LICENSE-2.0
-+*
-+* Unless required by applicable law or agreed to in writing,
-+* software distributed under the License is distributed on an
-+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+* KIND, either express or implied.  See the License for the
-+* specific language governing permissions and limitations
-+* under the License.
-+*/
-+
-+package org.apache.synapse.samples.framework.config;
-+
-+public class Axis2ServerConfiguration {
-+
-+    private String serverName;
-+    private String axis2Repo;
-+    private String axis2Xml;
-+    private String httpPort;
-+    private String httpsPort;
-+    private boolean clusteringEnabled;
-+
-+    public String getServerName() {
-+        return serverName;
-+    }
-+
-+    public void setServerName(String serverName) {
-+        this.serverName = serverName;
-+    }
-+
-+    public String getAxis2Repo() {
-+        return axis2Repo;
-+    }
-+
-+    public void setAxis2Repo(String axis2Repo) {
-+        this.axis2Repo = axis2Repo;
-+    }
-+
-+    public String getAxis2Xml() {
-+        return axis2Xml;
-+    }
-+
-+    public void setAxis2Xml(String axis2Xml) {
-+        this.axis2Xml = axis2Xml;
-+    }
-+
-+    public String getHttpPort() {
-+        return httpPort;
-+    }
-+
-+    public void setHttpPort(String httpPort) {
-+        this.httpPort = httpPort;
-+    }
-+
-+    public String getHttpsPort() {
-+        return httpsPort;
-+    }
-+
-+    public void setHttpsPort(String httpsPort) {
-+        this.httpsPort = httpsPort;
-+    }
-+
-+    public boolean isClusteringEnabled() {
-+        return clusteringEnabled;
-+    }
-+
-+    public void setClusteringEnabled(boolean clusteringEnabled) {
-+        this.clusteringEnabled = clusteringEnabled;
-+    }
-+}
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/JMSBrokerConfiguration.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/JMSBrokerConfiguration.java	(nonexistent)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/JMSBrokerConfiguration.java	(revision 1211800)
-@@ -0,0 +1,50 @@
-+/*
-+*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-+*
-+*  WSO2 Inc. licenses this file to you under the Apache License,
-+*  Version 2.0 (the "License"); you may not use this file except
-+*  in compliance with the License.
-+*  You may obtain a copy of the License at
-+*
-+*    http://www.apache.org/licenses/LICENSE-2.0
-+*
-+* Unless required by applicable law or agreed to in writing,
-+* software distributed under the License is distributed on an
-+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+* KIND, either express or implied.  See the License for the
-+* specific language governing permissions and limitations
-+* under the License.
-+*/
-+
-+package org.apache.synapse.samples.framework.config;
-+
-+public class JMSBrokerConfiguration {
-+
-+    private String serverName;
-+    private String providerURL;
-+    private String initialNamingFactory;
-+
-+    public String getServerName() {
-+        return serverName;
-+    }
-+
-+    public void setServerName(String serverName) {
-+        this.serverName = serverName;
-+    }
-+
-+    public String getProviderURL() {
-+        return providerURL;
-+    }
-+
-+    public void setProviderURL(String providerURL) {
-+        this.providerURL = providerURL;
-+    }
-+
-+    public String getInitialNamingFactory() {
-+        return initialNamingFactory;
-+    }
-+
-+    public void setInitialNamingFactory(String initialNamingFactory) {
-+        this.initialNamingFactory = initialNamingFactory;
-+    }
-+}
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/SampleConfiguration.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/SampleConfiguration.java	(nonexistent)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/SampleConfiguration.java	(revision 1211800)
-@@ -0,0 +1,97 @@
-+/*
-+*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-+*
-+*  WSO2 Inc. licenses this file to you under the Apache License,
-+*  Version 2.0 (the "License"); you may not use this file except
-+*  in compliance with the License.
-+*  You may obtain a copy of the License at
-+*
-+*    http://www.apache.org/licenses/LICENSE-2.0
-+*
-+* Unless required by applicable law or agreed to in writing,
-+* software distributed under the License is distributed on an
-+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+* KIND, either express or implied.  See the License for the
-+* specific language governing permissions and limitations
-+* under the License.
-+*/
-+
-+package org.apache.synapse.samples.framework.config;
-+
-+import java.util.HashMap;
-+import java.util.Set;
-+
-+public class SampleConfiguration {
-+
-+    private String sampleName;
-+    private SynapseServerConfiguration synapseServerConfig;
-+    private HashMap<String, Axis2ServerConfiguration> axis2ServerConfigs;
-+    private HashMap<String, JMSBrokerConfiguration> jmsConfigs;
-+    private HashMap<String, DerbyConfiguration> derbyConfigs;
-+    private Axis2ClientConfiguration axis2ClientConfig;
-+
-+    public SampleConfiguration() {
-+        this.synapseServerConfig = new SynapseServerConfiguration();
-+        this.axis2ServerConfigs = new HashMap<String, Axis2ServerConfiguration>();
-+        this.jmsConfigs = new HashMap<String, JMSBrokerConfiguration>();
-+        this.derbyConfigs = new HashMap<String, DerbyConfiguration>();
-+        this.axis2ClientConfig = new Axis2ClientConfiguration();
-+    }
-+
-+    public String getSampleName() {
-+        return sampleName;
-+    }
-+
-+    public void setSampleName(String sampleName) {
-+        this.sampleName = sampleName;
-+    }
-+
-+    public Axis2ClientConfiguration getAxis2ClientConfig() {
-+        return axis2ClientConfig;
-+    }
-+
-+    public void setAxis2Client(Axis2ClientConfiguration axis2ClientConfig) {
-+        this.axis2ClientConfig = axis2ClientConfig;
-+    }
-+
-+    public SynapseServerConfiguration getSynapseServerConfig() {
-+        return synapseServerConfig;
-+    }
-+
-+    public void setSynapseServerConfig(SynapseServerConfiguration synapseServerConfig) {
-+        this.synapseServerConfig = synapseServerConfig;
-+    }
-+
-+    public void addNewAxis2Server(String name) {
-+        axis2ServerConfigs.put(name, new Axis2ServerConfiguration());
-+    }
-+
-+    public void addNewJMSBroker(String name) {
-+        jmsConfigs.put(name, new JMSBrokerConfiguration());
-+    }
-+
-+    public void addNewDerbyServer(String name) {
-+        derbyConfigs.put(name, new DerbyConfiguration());
-+    }
-+
-+    public Axis2ServerConfiguration getAxis2Config(String name) {
-+        return axis2ServerConfigs.get(name);
-+    }
-+
-+    public JMSBrokerConfiguration getJMSConfig(String name) {
-+        return jmsConfigs.get(name);
-+    }
-+
-+    public DerbyConfiguration getDerbyConfig(String name) {
-+        return derbyConfigs.get(name);
-+    }
-+
-+    public Set<String> getAxis2ServersList() {
-+        return axis2ServerConfigs.keySet();
-+    }
-+
-+    public int getBackEndServerCount() {
-+        return axis2ServerConfigs.size() + jmsConfigs.size();
-+    }
-+
-+}
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/Axis2ClientConfiguration.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/Axis2ClientConfiguration.java	(nonexistent)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/Axis2ClientConfiguration.java	(revision 1211800)
-@@ -0,0 +1,50 @@
-+/*
-+*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-+*
-+*  WSO2 Inc. licenses this file to you under the Apache License,
-+*  Version 2.0 (the "License"); you may not use this file except
-+*  in compliance with the License.
-+*  You may obtain a copy of the License at
-+*
-+*    http://www.apache.org/licenses/LICENSE-2.0
-+*
-+* Unless required by applicable law or agreed to in writing,
-+* software distributed under the License is distributed on an
-+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+* KIND, either express or implied.  See the License for the
-+* specific language governing permissions and limitations
-+* under the License.
-+*/
-+
-+package org.apache.synapse.samples.framework.config;
-+
-+public class Axis2ClientConfiguration {
-+
-+    private String clientRepo;
-+    private String fileName;
-+    private String axis2Xml;
-+
-+    public String getClientRepo() {
-+        return clientRepo;
-+    }
-+
-+    public void setClientRepo(String clientRepo) {
-+        this.clientRepo = clientRepo;
-+    }
-+
-+    public String getFileName() {
-+        return fileName;
-+    }
-+
-+    public void setFileName(String fileName) {
-+        this.fileName = fileName;
-+    }
-+
-+    public String getAxis2Xml() {
-+        return axis2Xml;
-+    }
-+
-+    public void setAxis2Xml(String axis2Xml) {
-+        this.axis2Xml = axis2Xml;
-+    }
-+}
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/DerbyConfiguration.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/DerbyConfiguration.java	(nonexistent)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/DerbyConfiguration.java	(revision 1211800)
-@@ -0,0 +1,32 @@
-+/*
-+*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-+*
-+*  WSO2 Inc. licenses this file to you under the Apache License,
-+*  Version 2.0 (the "License"); you may not use this file except
-+*  in compliance with the License.
-+*  You may obtain a copy of the License at
-+*
-+*    http://www.apache.org/licenses/LICENSE-2.0
-+*
-+* Unless required by applicable law or agreed to in writing,
-+* software distributed under the License is distributed on an
-+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+* KIND, either express or implied.  See the License for the
-+* specific language governing permissions and limitations
-+* under the License.
-+*/
-+
-+package org.apache.synapse.samples.framework.config;
-+
-+public class DerbyConfiguration {
-+
-+    private String serverName;
-+
-+    public String getServerName() {
-+        return serverName;
-+    }
-+
-+    public void setServerName(String serverName) {
-+        this.serverName = serverName;
-+    }
-+}
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/Axis2BackEndServerController.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/Axis2BackEndServerController.java	(revision 1211799)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/Axis2BackEndServerController.java	(revision 1211800)
-@@ -8,6 +8,7 @@
- import org.apache.axis2.engine.ListenerManager;
- import org.apache.commons.logging.Log;
- import org.apache.commons.logging.LogFactory;
-+import org.apache.synapse.samples.framework.config.Axis2ServerConfiguration;
- 
- import java.util.concurrent.CountDownLatch;
- 
-@@ -23,12 +24,12 @@
-     private BackEndServerThread serverThread;
-     private ConfigurationContext configContext;
-     private ListenerManager listenerManager;
--    private SampleConfiguration.Axis2SampleConfiguration configuration;
-+    private Axis2ServerConfiguration configuration;
-     private CountDownLatch cdLatch;
-     private Exception processException;
- 
-     public Axis2BackEndServerController(String serverName,
--                                        SampleConfiguration.Axis2SampleConfiguration configuration) {
-+                                        Axis2ServerConfiguration configuration) {
-         this.serverName = serverName;
-         this.configuration = configuration;
-         serverThread = new BackEndServerThread();
-@@ -88,7 +89,6 @@
-                 // setting System.setProperty does not work since this all servers are run on same jvm
-                 configContext.setProperty("server_name", serverName);
- 
--
-                 TransportInDescription httpTrsIn = configContext.getAxisConfiguration().
-                         getTransportsIn().get("http");
-                 String httpPort = configuration.getHttpPort();
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java	(revision 1211799)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java	(revision 1211800)
-@@ -29,6 +29,7 @@
- import org.apache.synapse.samples.framework.clients.EventSampleClient;
- import org.apache.synapse.samples.framework.clients.MTOMSwASampleClient;
- import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
-+import org.apache.synapse.samples.framework.config.SampleConfiguration;
- 
- import javax.xml.namespace.QName;
- import java.io.File;
-@@ -83,7 +84,7 @@
-         assertTrue("Could not load client configuration settings for the sample " + sampleId,
-                 initClientConfigInfo());
- 
--        if (configuration.getSynapseConfig().isClusteringEnabled()) {
-+        if (configuration.getSynapseServerConfig().isClusteringEnabled()) {
-             assertTrue("Could not properly configure clustering", configureClustering());
-         }
- 
-@@ -216,35 +217,35 @@
-         Boolean clusteringEnabled = Boolean.parseBoolean(
-                 (String) synapseProperties.get(SampleConfigConstants.TAG_ENABLE_CLUSTERING));
- 
--        configuration.getSynapseConfig().setServerName("SynapseServerForSample" + sampleId);
-+        configuration.getSynapseServerConfig().setServerName("SynapseServerForSample" + sampleId);
- 
-         if (synapseXml == null) {
-             log.error("synapse config file must be specified for the sample");
-             return false;
-         } else {
--            configuration.getSynapseConfig().setSynapseXml(synapseHome + synapseXml);
-+            configuration.getSynapseServerConfig().setSynapseXml(synapseHome + synapseXml);
-         }
- 
-         if (axis2Repo == null) {
--            configuration.getSynapseConfig().setAxis2Repo(synapseHome +
-+            configuration.getSynapseServerConfig().setAxis2Repo(synapseHome +
-                     SampleConfigConstants.DEFAULT_SYNAPSE_CONF_AXIS2_REPO);
-         } else {
-             log.info("Using Synapse Axis2 repository: " + axis2Repo);
--            configuration.getSynapseConfig().setAxis2Repo(synapseHome + axis2Repo);
-+            configuration.getSynapseServerConfig().setAxis2Repo(synapseHome + axis2Repo);
-         }
- 
-         if (axis2Xml == null) {
--            configuration.getSynapseConfig().setAxis2Xml(synapseHome +
-+            configuration.getSynapseServerConfig().setAxis2Xml(synapseHome +
-                     SampleConfigConstants.DEFAULT_SYNAPSE_CONF_AXIS2_XML);
-         } else {
-             log.info("Using Synapse Axis2 XML: " + axis2Xml);
--            configuration.getSynapseConfig().setAxis2Xml(synapseHome + axis2Xml);
-+            configuration.getSynapseServerConfig().setAxis2Xml(synapseHome + axis2Xml);
-         }
- 
--        configuration.getSynapseConfig().setSynapseHome(synapseHome);
--        configuration.getSynapseConfig().setClusteringEnabled(clusteringEnabled);
-+        configuration.getSynapseServerConfig().setSynapseHome(synapseHome);
-+        configuration.getSynapseServerConfig().setClusteringEnabled(clusteringEnabled);
- 
--        pc = new SynapseProcessController(configuration.getSynapseConfig());
-+        pc = new SynapseProcessController(configuration.getSynapseServerConfig());
-         return true;
-     }
- 
-@@ -255,10 +256,10 @@
-      */
-     private boolean initBackEndServersConfigInfo() {
-         OMElement bESConfigEle = null;
--        Iterator itr_BEEle = sampleConfigElement.getChildrenWithLocalName(
-+        Iterator itrBackEndElements = sampleConfigElement.getChildrenWithLocalName(
-                 SampleConfigConstants.TAG_BE_SERVER_CONF);
--        while (itr_BEEle.hasNext()) {
--            bESConfigEle = (OMElement) itr_BEEle.next();
-+        while (itrBackEndElements.hasNext()) {
-+            bESConfigEle = (OMElement) itrBackEndElements.next();
-         }
-         if (bESConfigEle == null) {
-             log.warn("No backend servers are defined");
-@@ -412,20 +413,20 @@
-                 SampleConfigConstants.TAG_CLIENT_CONF_AXIS2_XML);
- 
-         if (clientRepo == null) {
--            configuration.getClientConfig().setClientRepo(FilenameUtils.normalize(
-+            configuration.getAxis2ClientConfig().setClientRepo(FilenameUtils.normalize(
-                     currentLocation + SampleConfigConstants.DEFAULT_CLIENT_CONF_REPO));
-         } else {
-             log.info("Using client Axis2 repository location: " + clientRepo);
--            configuration.getClientConfig().setClientRepo(FilenameUtils.normalize(
-+            configuration.getAxis2ClientConfig().setClientRepo(FilenameUtils.normalize(
-                     currentLocation + clientRepo));
-         }
- 
-         if (clientAxis2Xml == null) {
--            configuration.getClientConfig().setAxis2Xml(FilenameUtils.normalize(
-+            configuration.getAxis2ClientConfig().setAxis2Xml(FilenameUtils.normalize(
-                     currentLocation + SampleConfigConstants.DEFAULT_CLIENT_CONF_AXIS2_XML));
-         } else {
-             log.info("Using client Axis2 XML: " + clientAxis2Xml);
--            configuration.getClientConfig().setAxis2Xml(FilenameUtils.normalize(
-+            configuration.getAxis2ClientConfig().setAxis2Xml(FilenameUtils.normalize(
-                     currentLocation + clientAxis2Xml));
-         }
-         return true;
-@@ -441,13 +442,13 @@
-             }
-             log.info(" Using the IP :" + ip);
- 
--            String synapseAxis2Xml = configuration.getSynapseConfig().getAxis2Xml();
-+            String synapseAxis2Xml = configuration.getSynapseServerConfig().getAxis2Xml();
-             String axis2Config = FileUtils.readFileToString(new File(synapseAxis2Xml));
-             String modifiedSynapseAxis2 = SynapseTestUtils.replace(axis2Config, "${replace.me}", ip);
-             File tempSynapseAxis2 = File.createTempFile("axis2Syn-", "xml");
-             tempSynapseAxis2.deleteOnExit();
-             FileUtils.writeStringToFile(tempSynapseAxis2, modifiedSynapseAxis2);
--            configuration.getSynapseConfig().setAxis2Xml(tempSynapseAxis2.getAbsolutePath());
-+            configuration.getSynapseServerConfig().setAxis2Xml(tempSynapseAxis2.getAbsolutePath());
- 
-             for (BackEndServerController controller : backendServerControllers) {
-                 String serverName = controller.getServerName();
-@@ -478,15 +479,15 @@
-     }
- 
-     public StockQuoteSampleClient getStockQuoteClient() {
--        return new StockQuoteSampleClient(configuration.getClientConfig());
-+        return new StockQuoteSampleClient(configuration.getAxis2ClientConfig());
-     }
- 
-     public EventSampleClient getEventSubscriberSampleClient() {
--        return new EventSampleClient(configuration.getClientConfig());
-+        return new EventSampleClient(configuration.getAxis2ClientConfig());
-     }
- 
-     public MTOMSwASampleClient getMTOMSwASampleClient() {
--        return new MTOMSwASampleClient(configuration.getClientConfig());
-+        return new MTOMSwASampleClient(configuration.getAxis2ClientConfig());
-     }
- 
-     protected void assertResponseReceived(SampleClientResult result) {
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SampleClientResult.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SampleClientResult.java	(revision 1211799)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SampleClientResult.java	(revision 1211800)
-@@ -19,6 +19,7 @@
- package org.apache.synapse.samples.framework;
- 
- import java.util.Properties;
-+import java.util.concurrent.atomic.AtomicInteger;
- 
- /**
-  * Stores the results after executing a client
-@@ -25,13 +26,12 @@
-  */
- public class SampleClientResult {
- 
--    private boolean responseReceived;
--    private boolean isFinished;
-+    private AtomicInteger responseCount = new AtomicInteger(0);
-     private Exception exception;
-     private Properties clientProperties = new Properties();
- 
--    public void setResponseReceived(boolean responseReceived) {
--        this.responseReceived = responseReceived;
-+    public void incrementResponseCount() {
-+        responseCount.incrementAndGet();
-     }
- 
-     public void setException(Exception exception) {
-@@ -39,7 +39,7 @@
-     }
- 
-     public boolean responseReceived() {
--        return responseReceived;
-+        return responseCount.get() > 0;
-     }
- 
-     public Exception getException() {
-@@ -46,14 +46,6 @@
-         return exception;
-     }
- 
--    public boolean isFinished() {
--        return isFinished;
--    }
--
--    public void setFinished(boolean finished) {
--        isFinished = finished;
--    }
--
-     public void addProperty(String pName, String pValue){
-         clientProperties.setProperty(pName,pValue);
-     }
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/DerbyServerController.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/DerbyServerController.java	(revision 1211799)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/DerbyServerController.java	(revision 1211800)
-@@ -4,6 +4,7 @@
- import org.apache.commons.logging.Log;
- import org.apache.commons.logging.LogFactory;
- import org.apache.derby.drda.NetworkServerControl;
-+import org.apache.synapse.samples.framework.config.DerbyConfiguration;
- 
- import java.io.File;
- import java.net.InetAddress;
-@@ -21,11 +22,10 @@
-     private static final Log log = LogFactory.getLog(DerbyServerController.class);
- 
-     private String serverName;
--    private SampleConfiguration.DerbyServerSampleConfiguration configuration;
-+    private DerbyConfiguration configuration;
-     private NetworkServerControl server;
- 
--    public DerbyServerController(String serverName,
--                                 SampleConfiguration.DerbyServerSampleConfiguration configuration) {
-+    public DerbyServerController(String serverName, DerbyConfiguration configuration) {
-         this.serverName = serverName;
-         this.configuration = configuration;
-     }
-Index: java/modules/integration/src/test/resources/sample53.xml
-===================================================================
---- java/modules/integration/src/test/resources/sample53.xml	(revision 1211799)
-+++ java/modules/integration/src/test/resources/sample53.xml	(revision 1211800)
-@@ -10,23 +10,23 @@
-         <axis2Server id='1'>
-             <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
-             <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
--	    <httpPort>9001</httpPort>
--	    <httpsPort>9005</httpsPort>
-+            <httpPort>9001</httpPort>
-+            <httpsPort>9005</httpsPort>
-         </axis2Server>
-         <axis2Server id='2'>
-             <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
-             <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
--	    <httpPort>9002</httpPort>
--	    <httpsPort>9006</httpsPort>
-+            <httpPort>9002</httpPort>
-+            <httpsPort>9006</httpsPort>
-         </axis2Server>
-         <axis2Server id='3'>
-             <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
-             <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
--	    <httpPort>9003</httpPort>
--	    <httpsPort>9007</httpsPort>
-+            <httpPort>9003</httpPort>
-+            <httpsPort>9007</httpsPort>
-         </axis2Server>
-     </backEndServerConfig>
-     <clientConfig>
--	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
-+        <clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
-     </clientConfig>
- </synapseSample>
 -*-*-*-
-Code refactoring
+Message: Code refactoring
+-*-*-*-
+When: 2011-12-08 05:10:18 -0500 

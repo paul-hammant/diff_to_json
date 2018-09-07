@@ -12,4 +12,6 @@ Index: java/pom.xml
              <version>${xalan.version}</version>
          </dependency>
 -*-*-*-
-Fixing test failure
+Message: Fixing test failure
+-*-*-*-
+When: 2011-12-19 00:27:32 -0500 

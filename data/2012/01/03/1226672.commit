@@ -455,4 +455,6 @@ Index: java/modules/transports/optional/fix/src/main/java/org/apache/synapse/tra
  
  }
 -*-*-*-
-Some improvements and control over how threads are handled by the FIX transport
+Message: Some improvements and control over how threads are handled by the FIX transport
+-*-*-*-
+When: 2012-01-03 01:44:07 -0500 

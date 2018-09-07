@@ -1,18 +1,3 @@
-Index: java/modules/core/src/main/java/org/apache/synapse/rest/dispatch/URLMappingHelper.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/rest/dispatch/URLMappingHelper.java	(revision 1338578)
-+++ java/modules/core/src/main/java/org/apache/synapse/rest/dispatch/URLMappingHelper.java	(revision 1338579)
-@@ -45,6 +45,10 @@
-         if (!"/".equals(url)) {
-             url = RESTUtils.trimTrailingSlashes(url);
-         }
-+        int index = url.indexOf('?');
-+        if (index != -1) {
-+            url = url.substring(0, index);
-+        }
-         return exactMatch != null && exactMatch.equals(url);
-     }
- 
 Index: java/modules/core/src/test/java/org/apache/synapse/rest/URLMappingBasedDispatcherTest.java
 ===================================================================
 --- java/modules/core/src/test/java/org/apache/synapse/rest/URLMappingBasedDispatcherTest.java	(revision 1338578)
@@ -32,5 +17,22 @@ Index: java/modules/core/src/test/java/org/apache/synapse/rest/URLMappingBasedDi
          synCtx = getMessageContext(synapseConfig, false, "/test/foo", "GET");
          handler.process(synCtx);
          assertNull(synCtx.getProperty(PROP_NAME));
+Index: java/modules/core/src/main/java/org/apache/synapse/rest/dispatch/URLMappingHelper.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/rest/dispatch/URLMappingHelper.java	(revision 1338578)
++++ java/modules/core/src/main/java/org/apache/synapse/rest/dispatch/URLMappingHelper.java	(revision 1338579)
+@@ -45,6 +45,10 @@
+         if (!"/".equals(url)) {
+             url = RESTUtils.trimTrailingSlashes(url);
+         }
++        int index = url.indexOf('?');
++        if (index != -1) {
++            url = url.substring(0, index);
++        }
+         return exactMatch != null && exactMatch.equals(url);
+     }
+ 
 -*-*-*-
-Supporting proper exact matches with query parameters
+Message: Supporting proper exact matches with query parameters
+-*-*-*-
+When: 2012-05-15 03:58:57 -0400 

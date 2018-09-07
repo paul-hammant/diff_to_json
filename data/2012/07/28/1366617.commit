@@ -15,4 +15,7 @@ Index: java/modules/core/src/main/java/org/apache/synapse/mediators/eip/splitter
  
              int msgCount = splitElements.size();
 -*-*-*-
-Some code simplifications using the new OMContainer#removeChildren() method.
+Message: Some code simplifications using the new OMContainer#removeChildren() method.
+
+-*-*-*-
+When: 2012-07-28 05:04:06 -0400 

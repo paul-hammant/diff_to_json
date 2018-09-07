@@ -36,4 +36,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/rest/API.java
          return context;
      }
 -*-*-*-
-committing patch for API versioning deployment
+Message: committing patch for API versioning deployment
+-*-*-*-
+When: 2012-03-22 10:57:08 -0400 

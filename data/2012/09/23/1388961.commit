@@ -1,3 +1,15 @@
+Index: java/repository/conf/sample/synapse_sample_50.xml
+===================================================================
+--- java/repository/conf/sample/synapse_sample_50.xml	(revision 1388960)
++++ java/repository/conf/sample/synapse_sample_50.xml	(revision 1388961)
+@@ -23,6 +23,7 @@
+ 
+     <sequence name="main">
+         <!-- filtering of messages with XPath and regex matches -->
++        <header name="Action" value="urn:getQuote"/>
+         <filter source="get-property('To')" regex=".*/StockQuote.*">
+             <then>
+                 <send>
 Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample50.xml
 ===================================================================
 --- java/modules/documentation/src/site/xdoc/userguide/samples/sample50.xml	(revision 1388960)
@@ -67,17 +79,8 @@ Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transpo
          OMOutputFormat format = BaseUtils.getOMOutputFormat(msgContext);
          
          try {
-Index: java/repository/conf/sample/synapse_sample_50.xml
-===================================================================
---- java/repository/conf/sample/synapse_sample_50.xml	(revision 1388960)
-+++ java/repository/conf/sample/synapse_sample_50.xml	(revision 1388961)
-@@ -23,6 +23,7 @@
- 
-     <sequence name="main">
-         <!-- filtering of messages with XPath and regex matches -->
-+        <header name="Action" value="urn:getQuote"/>
-         <filter source="get-property('To')" regex=".*/StockQuote.*">
-             <then>
-                 <send>
 -*-*-*-
-Applied Sagara's patches for SYNAPSE-910 and SYNAPSE-912 to make Synapse compatible with the latest Axis2 trunk.
+Message: Applied Sagara's patches for SYNAPSE-910 and SYNAPSE-912 to make Synapse compatible with the latest Axis2 trunk.
+
+-*-*-*-
+When: 2012-09-23 03:05:54 -0400 

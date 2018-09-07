@@ -27,4 +27,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/EndpointCont
                      if (log.isDebugEnabled()) {
                          log.debug("Endpoint : " + endpointName + " which is currently in timeout " +
 -*-*-*-
-fix SYNAPSE-820
+Message: fix SYNAPSE-820
+-*-*-*-
+When: 2011-12-06 03:23:19 -0500 

@@ -41,4 +41,6 @@ Index: java/pom.xml
              <dependency>
                  <groupId>xerces</groupId>
 -*-*-*-
-Excluding some transitive dependencies
+Message: Excluding some transitive dependencies
+-*-*-*-
+When: 2012-01-02 08:10:43 -0500 

@@ -31,4 +31,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/deployers/AbstractSyna
                  getSynapseConfiguration().getArtifactDeploymentStore();
  
 -*-*-*-
-Fixing a startup error
+Message: Fixing a startup error
+-*-*-*-
+When: 2011-12-06 05:04:36 -0500 

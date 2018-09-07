@@ -71,22 +71,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/ProxyServic
              } else {
                  warn(traceOn, "Exception encountered but no fault handler found - " +
                      "message dropped", synCtx);
-Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/ProxyService.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/core/axis2/ProxyService.java	(revision 1210452)
-+++ java/modules/core/src/main/java/org/apache/synapse/core/axis2/ProxyService.java	(revision 1210453)
-@@ -575,10 +575,8 @@
-                     proxyServiceGroup.addService(proxyService);
-                     axisCfg.addServiceGroup(proxyServiceGroup);
-                 } else {
--                    // First set the parent of the service - Otherwise there's an issue
--                    // generating endpoints
-+                    // Simply add the service to the existing group
-                     proxyService.setParent(axisCfg.getServiceGroup(serviceGroup));
--                    // Simply add the service to the existing group
-                     axisCfg.addServiceToExistingServiceGroup(proxyService, serviceGroup);
-                 }
-             }
 Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java	(revision 1210452)
@@ -342,5 +326,23 @@ Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2Flexib
          }
      }
  
+Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/ProxyService.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/core/axis2/ProxyService.java	(revision 1210452)
++++ java/modules/core/src/main/java/org/apache/synapse/core/axis2/ProxyService.java	(revision 1210453)
+@@ -575,10 +575,8 @@
+                     proxyServiceGroup.addService(proxyService);
+                     axisCfg.addServiceGroup(proxyServiceGroup);
+                 } else {
+-                    // First set the parent of the service - Otherwise there's an issue
+-                    // generating endpoints
++                    // Simply add the service to the existing group
+                     proxyService.setParent(axisCfg.getServiceGroup(serviceGroup));
+-                    // Simply add the service to the existing group
+                     axisCfg.addServiceToExistingServiceGroup(proxyService, serviceGroup);
+                 }
+             }
 -*-*-*-
-Fixing some issues with REST mediation
+Message: Fixing some issues with REST mediation
+-*-*-*-
+When: 2011-12-05 08:18:45 -0500 

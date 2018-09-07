@@ -64,6 +64,38 @@ Index: scratch/hiranya/website/src/site/xdoc/userguide/samples.xml
                      </ul>
                  </p>
              </subsection>
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample353.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples/sample353.xml	(revision 1215073)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples/sample353.xml	(revision 1215074)
+@@ -83,6 +83,11 @@
+             <subsection name="Pre-requisites">
+                 <p>
+                     <ul>
++                         <li>
++                           This sample uses Ruby so first setup support for this in Synapse as described at
++							<a href="setup/script.html#ruby">Configuring JRuby</a>
++							<br />
++                        </li>
+                         <li>
+                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                         </li>
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample354.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples/sample354.xml	(revision 1215073)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples/sample354.xml	(revision 1215074)
+@@ -71,6 +71,11 @@
+             <subsection name="Pre-requisites">
+                 <p>
+                     <ul>
++                     	<li>
++                           This sample uses Ruby so first setup support for this in Synapse as described at
++							<a href="setup/script.html#ruby">Configuring JRuby</a>
++							<br />
++                        </li>
+                         <li>
+                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                         </li>
 Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample440.xml
 ===================================================================
 --- scratch/hiranya/website/src/site/xdoc/userguide/samples/sample440.xml	(revision 1215073)
@@ -142,6 +174,19 @@ Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample255.xml
                          </li>
                          <li>
                              Create a new test directory in the FTP site.
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample256.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples/sample256.xml	(revision 1215073)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples/sample256.xml	(revision 1215074)
+@@ -85,7 +85,7 @@
+                         </li>
+                         <li>
+                             Enable the mail transport listener and mail transport sender for Synapse
+-                            (refer mail transport setup guide for more details)
++                            (refer  <a href="setup/mail.html#mailTransportSender"> Mail transport setup</a> guide for more details)
+                         </li>
+                         <li>
+                             Start Synapse using the configuration numbered 256 (repository/conf/sample/synapse_sample_256.xml)
 Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample652.xml
 ===================================================================
 --- scratch/hiranya/website/src/site/xdoc/userguide/samples/sample652.xml	(revision 1215073)
@@ -186,19 +231,6 @@ Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample652.xml
                          </li>
                          <li>
                              Start Synapse using the configuration numbered 652 (repository/conf/sample/synapse_sample_652.xml)
-Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample256.xml
-===================================================================
---- scratch/hiranya/website/src/site/xdoc/userguide/samples/sample256.xml	(revision 1215073)
-+++ scratch/hiranya/website/src/site/xdoc/userguide/samples/sample256.xml	(revision 1215074)
-@@ -85,7 +85,7 @@
-                         </li>
-                         <li>
-                             Enable the mail transport listener and mail transport sender for Synapse
--                            (refer mail transport setup guide for more details)
-+                            (refer  <a href="setup/mail.html#mailTransportSender"> Mail transport setup</a> guide for more details)
-                         </li>
-                         <li>
-                             Start Synapse using the configuration numbered 256 (repository/conf/sample/synapse_sample_256.xml)
 Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample14.xml
 ===================================================================
 --- scratch/hiranya/website/src/site/xdoc/userguide/samples/sample14.xml	(nonexistent)
@@ -291,72 +323,6 @@ Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample14.xml
 +		<p>
 +			<a href="../samples.html">Back to Catalog</a>
 +		</p>
-+	</body>
-+</document>
-\ No newline at end of file
-Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/mail.xml
-===================================================================
---- scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/mail.xml	(nonexistent)
-+++ scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/mail.xml	(revision 1215074)
-@@ -0,0 +1,60 @@
-+<?xml version="1.0" encoding="ISO-8859-1" ?>
-+<!-- ~ Licensed to the Apache Software Foundation (ASF) under one ~ or more 
-+	contributor license agreements. See the NOTICE file ~ distributed with this 
-+	work for additional information ~ regarding copyright ownership. The ASF 
-+	licenses this file ~ to you under the Apache License, Version 2.0 (the ~ 
-+	"License"); you may not use this file except in compliance ~ with the License. 
-+	You may obtain a copy of the License at ~ ~ http://www.apache.org/licenses/LICENSE-2.0 
-+	~ ~ Unless required by applicable law or agreed to in writing, ~ software 
-+	distributed under the License is distributed on an ~ * "AS IS" BASIS, WITHOUT 
-+	WARRANTIES OR CONDITIONS OF ANY ~ KIND, either express or implied. See the 
-+	License for the ~ specific language governing permissions and limitations 
-+	~ under the License. -->
-+
-+<document>
-+	<properties>
-+		<title>Apache Synapse - Script Setup Guide</title>
-+	</properties>
-+	<body>
-+
-+		<section name="Contents">
-+			<ul>
-+				<li>
-+					<a href="#mailTransportSender">Setting up Mail Transport Sender</a>
-+				</li>
-+				<li>
-+					<a href="#mailTransportReceiver">Setting up Mail Transport Receiver</a>
-+				</li>
-+			</ul>
-+		</section>
-+		<section name="Setting up Mail Transport Sender"
-+			id="mailTransportSender">
-+			<p>
-+			  To enable the mail transport sender for samples, you need to uncomment
-+			  the mail transport sender configuration in the
-+			  repository/conf/axis2.xml. Uncomment the mail transport sender sample
-+			  configuration and make sure it points to a valid SMTP configuration for
-+			  any actual scenarios. 
-+			  <div class="xmlConf">&lt;transportSender name=&quot;mailto&quot; class=&quot;org.apache.synapse.transport.mail.MailTransportSender&quot;&gt;
-+        &lt;parameter name=&quot;mail.smtp.host&quot;&gt;smtp.gmail.com&lt;/parameter&gt;
-+        &lt;parameter name=&quot;mail.smtp.port&quot;&gt;587&lt;/parameter&gt;
-+        &lt;parameter name=&quot;mail.smtp.starttls.enable&quot;&gt;true&lt;/parameter&gt;
-+        &lt;parameter name=&quot;mail.smtp.auth&quot;&gt;true&lt;/parameter&gt;
-+        &lt;parameter name=&quot;mail.smtp.user&quot;&gt;synapse.demo.0&lt;/parameter&gt;
-+        &lt;parameter name=&quot;mail.smtp.password&quot;&gt;mailpassword&lt;/parameter&gt;
-+        &lt;parameter name=&quot;mail.smtp.from&quot;&gt;synapse.demo.0@gmail.com&lt;/parameter&gt;
-+&lt;/transportSender&gt;</div>
-+			</p>
-+		</section>
-+		<section name="Setting up Mail Transport Receiver"
-+			id="mailTransportReceiver">
-+			<p>
-+		     To enable the mail transport receiver for samples, you need to
-+		     uncomment the mail transport receiver configuration in the
-+			 configuration. Note: you need to provide correct parameters for a valid
-+			 mail account at service level.
-+			</p>
-+			<div class="xmlConf">&lt;transportReceiver name=&quot;mailto&quot; class=&quot;org.apache.axis2.transport.mail.MailTransportListener&quot;&gt;&lt;/transportReceiver&gt;</div>
-+		</section>
 +	</body>
 +</document>
 \ No newline at end of file
@@ -564,6 +530,72 @@ Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/jms.xml
 +</section>
 +     </body>
  </document>
+\ No newline at end of file
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/mail.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/mail.xml	(nonexistent)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/mail.xml	(revision 1215074)
+@@ -0,0 +1,60 @@
++<?xml version="1.0" encoding="ISO-8859-1" ?>
++<!-- ~ Licensed to the Apache Software Foundation (ASF) under one ~ or more 
++	contributor license agreements. See the NOTICE file ~ distributed with this 
++	work for additional information ~ regarding copyright ownership. The ASF 
++	licenses this file ~ to you under the Apache License, Version 2.0 (the ~ 
++	"License"); you may not use this file except in compliance ~ with the License. 
++	You may obtain a copy of the License at ~ ~ http://www.apache.org/licenses/LICENSE-2.0 
++	~ ~ Unless required by applicable law or agreed to in writing, ~ software 
++	distributed under the License is distributed on an ~ * "AS IS" BASIS, WITHOUT 
++	WARRANTIES OR CONDITIONS OF ANY ~ KIND, either express or implied. See the 
++	License for the ~ specific language governing permissions and limitations 
++	~ under the License. -->
++
++<document>
++	<properties>
++		<title>Apache Synapse - Script Setup Guide</title>
++	</properties>
++	<body>
++
++		<section name="Contents">
++			<ul>
++				<li>
++					<a href="#mailTransportSender">Setting up Mail Transport Sender</a>
++				</li>
++				<li>
++					<a href="#mailTransportReceiver">Setting up Mail Transport Receiver</a>
++				</li>
++			</ul>
++		</section>
++		<section name="Setting up Mail Transport Sender"
++			id="mailTransportSender">
++			<p>
++			  To enable the mail transport sender for samples, you need to uncomment
++			  the mail transport sender configuration in the
++			  repository/conf/axis2.xml. Uncomment the mail transport sender sample
++			  configuration and make sure it points to a valid SMTP configuration for
++			  any actual scenarios. 
++			  <div class="xmlConf">&lt;transportSender name=&quot;mailto&quot; class=&quot;org.apache.synapse.transport.mail.MailTransportSender&quot;&gt;
++        &lt;parameter name=&quot;mail.smtp.host&quot;&gt;smtp.gmail.com&lt;/parameter&gt;
++        &lt;parameter name=&quot;mail.smtp.port&quot;&gt;587&lt;/parameter&gt;
++        &lt;parameter name=&quot;mail.smtp.starttls.enable&quot;&gt;true&lt;/parameter&gt;
++        &lt;parameter name=&quot;mail.smtp.auth&quot;&gt;true&lt;/parameter&gt;
++        &lt;parameter name=&quot;mail.smtp.user&quot;&gt;synapse.demo.0&lt;/parameter&gt;
++        &lt;parameter name=&quot;mail.smtp.password&quot;&gt;mailpassword&lt;/parameter&gt;
++        &lt;parameter name=&quot;mail.smtp.from&quot;&gt;synapse.demo.0@gmail.com&lt;/parameter&gt;
++&lt;/transportSender&gt;</div>
++			</p>
++		</section>
++		<section name="Setting up Mail Transport Receiver"
++			id="mailTransportReceiver">
++			<p>
++		     To enable the mail transport receiver for samples, you need to
++		     uncomment the mail transport receiver configuration in the
++			 configuration. Note: you need to provide correct parameters for a valid
++			 mail account at service level.
++			</p>
++			<div class="xmlConf">&lt;transportReceiver name=&quot;mailto&quot; class=&quot;org.apache.axis2.transport.mail.MailTransportListener&quot;&gt;&lt;/transportReceiver&gt;</div>
++		</section>
++	</body>
++</document>
 \ No newline at end of file
 Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample101.xml
 ===================================================================
@@ -894,37 +926,7 @@ Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample381.xml
                              how to run ActiveMQ.)
                          </li>
                          <li>
-Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample353.xml
-===================================================================
---- scratch/hiranya/website/src/site/xdoc/userguide/samples/sample353.xml	(revision 1215073)
-+++ scratch/hiranya/website/src/site/xdoc/userguide/samples/sample353.xml	(revision 1215074)
-@@ -83,6 +83,11 @@
-             <subsection name="Pre-requisites">
-                 <p>
-                     <ul>
-+                         <li>
-+                           This sample uses Ruby so first setup support for this in Synapse as described at
-+							<a href="setup/script.html#ruby">Configuring JRuby</a>
-+							<br />
-+                        </li>
-                         <li>
-                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
-                         </li>
-Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample354.xml
-===================================================================
---- scratch/hiranya/website/src/site/xdoc/userguide/samples/sample354.xml	(revision 1215073)
-+++ scratch/hiranya/website/src/site/xdoc/userguide/samples/sample354.xml	(revision 1215074)
-@@ -71,6 +71,11 @@
-             <subsection name="Pre-requisites">
-                 <p>
-                     <ul>
-+                     	<li>
-+                           This sample uses Ruby so first setup support for this in Synapse as described at
-+							<a href="setup/script.html#ruby">Configuring JRuby</a>
-+							<br />
-+                        </li>
-                         <li>
-                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
-                         </li>
 -*-*-*-
-Updating new documentation - Thanks Dushan for helping me out with these edits
+Message: Updating new documentation - Thanks Dushan for helping me out with these edits
+-*-*-*-
+When: 2011-12-16 04:43:06 -0500 

@@ -27,4 +27,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/rest/API.java
          return versionStrategy.getVersion();
      }
 -*-*-*-
-committing patch for API serialization
+Message: committing patch for API serialization
+-*-*-*-
+When: 2012-03-23 07:17:21 -0400 

@@ -34,4 +34,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/JmxAdapter.java
  
          if (jmxInformation.isRemoteSSL()) {
 -*-*-*-
-Fixing SYNAPSE-585 and removing an unnecessary warning
+Message: Fixing SYNAPSE-585 and removing an unnecessary warning
+-*-*-*-
+When: 2011-12-19 06:18:09 -0500 

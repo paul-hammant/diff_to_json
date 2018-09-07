@@ -150,4 +150,6 @@ Index: java/modules/extensions/pom.xml
  
              <plugin>
 -*-*-*-
-Adding the throttle mediator test - Made some changes to match a few changes done in wso2 throttle core
+Message: Adding the throttle mediator test - Made some changes to match a few changes done in wso2 throttle core
+-*-*-*-
+When: 2011-12-24 07:09:47 -0500 

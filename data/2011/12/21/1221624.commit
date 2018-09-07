@@ -1,16 +1,3 @@
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessConstants.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessConstants.java	(revision 1221623)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessConstants.java	(revision 1221624)
-@@ -39,7 +39,7 @@
-     /**
-      * The directory in which log files are created.
-      */
--    public static String DIRECTORY = "repository/logs";
-+    public static String DIRECTORY = "logs";
- 
-     /**
-      * Gives the format of the date to be appended to the name of the access log file.
 Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/LoggingNHttpClientConnection.java
 ===================================================================
 --- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/LoggingNHttpClientConnection.java	(revision 1221623)
@@ -51,6 +38,19 @@ Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/trans
              return message;
          }
  
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessConstants.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessConstants.java	(revision 1221623)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessConstants.java	(revision 1221624)
+@@ -39,7 +39,7 @@
+     /**
+      * The directory in which log files are created.
+      */
+-    public static String DIRECTORY = "repository/logs";
++    public static String DIRECTORY = "logs";
+ 
+     /**
+      * Gives the format of the date to be appended to the name of the access log file.
 Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/LoggingUtils.java
 ===================================================================
 --- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/LoggingUtils.java	(revision 1221623)
@@ -109,4 +109,6 @@ Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/trans
          }
  
 -*-*-*-
-Patch for SYNAPSE-781, Fixed some test failures and updated the log file location
+Message: Patch for SYNAPSE-781, Fixed some test failures and updated the log file location
+-*-*-*-
+When: 2011-12-21 01:09:35 -0500 

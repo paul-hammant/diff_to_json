@@ -31,4 +31,6 @@ Index: java/pom.xml
                      <links>
                          <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
 -*-*-*-
-Upgrading javadoc plugin to latest stable - This fixes the last build break at Jenkins
+Message: Upgrading javadoc plugin to latest stable - This fixes the last build break at Jenkins
+-*-*-*-
+When: 2011-12-26 06:59:01 -0500 

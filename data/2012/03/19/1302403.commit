@@ -1,20 +1,21 @@
-Index: java/modules/distribution/pom.xml
+Index: java/pom.xml
 ===================================================================
---- java/modules/distribution/pom.xml	(revision 1302402)
-+++ java/modules/distribution/pom.xml	(revision 1302403)
-@@ -71,6 +71,12 @@
-             <groupId>org.apache.synapse</groupId>
-             <artifactId>synapse-fix-transport</artifactId>
-         </dependency>
-+	<dependency>
-+            <groupId>org.apache.synapse</groupId>
-+            <artifactId>synapse-documentation</artifactId>
-+	    <type>zip</type>
-+	    <classifier>docs</classifier>
-+        </dependency>
- 
-         <!-- Wrapper jars -->
-         <dependency>
+--- java/pom.xml	(revision 1302402)
++++ java/pom.xml	(revision 1302403)
+@@ -350,6 +350,13 @@
+                 <artifactId>synapse-core</artifactId>
+                 <version>${project.version}</version>
+             </dependency>
++	    <dependency>
++                <groupId>org.apache.synapse</groupId>
++                <artifactId>synapse-documentation</artifactId>
++                <version>${project.version}</version>
++		<type>zip</type>
++		<classifier>docs</classifier>
++            </dependency>
+             <dependency>
+                 <groupId>org.apache.synapse</groupId>
+                 <artifactId>synapse-core</artifactId>
 Index: java/modules/distribution/src/main/assembly/bin.xml
 ===================================================================
 --- java/modules/distribution/src/main/assembly/bin.xml	(revision 1302402)
@@ -83,23 +84,24 @@ Index: java/modules/distribution/src/main/assembly/bin.xml
          <dependencySet>
              <useProjectArtifact>false</useProjectArtifact>
              <outputDirectory>synapse-${synapse.version}/lib/patches</outputDirectory>
-Index: java/pom.xml
+Index: java/modules/distribution/pom.xml
 ===================================================================
---- java/pom.xml	(revision 1302402)
-+++ java/pom.xml	(revision 1302403)
-@@ -350,6 +350,13 @@
-                 <artifactId>synapse-core</artifactId>
-                 <version>${project.version}</version>
-             </dependency>
-+	    <dependency>
-+                <groupId>org.apache.synapse</groupId>
-+                <artifactId>synapse-documentation</artifactId>
-+                <version>${project.version}</version>
-+		<type>zip</type>
-+		<classifier>docs</classifier>
-+            </dependency>
-             <dependency>
-                 <groupId>org.apache.synapse</groupId>
-                 <artifactId>synapse-core</artifactId>
+--- java/modules/distribution/pom.xml	(revision 1302402)
++++ java/modules/distribution/pom.xml	(revision 1302403)
+@@ -71,6 +71,12 @@
+             <groupId>org.apache.synapse</groupId>
+             <artifactId>synapse-fix-transport</artifactId>
+         </dependency>
++	<dependency>
++            <groupId>org.apache.synapse</groupId>
++            <artifactId>synapse-documentation</artifactId>
++	    <type>zip</type>
++	    <classifier>docs</classifier>
++        </dependency>
+ 
+         <!-- Wrapper jars -->
+         <dependency>
 -*-*-*-
-Adding docs distro as a dependency
+Message: Adding docs distro as a dependency
+-*-*-*-
+When: 2012-03-19 08:53:58 -0400 

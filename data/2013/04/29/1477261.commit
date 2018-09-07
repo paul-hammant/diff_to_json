@@ -12,4 +12,7 @@ Index: java/pom.xml
                  <updatePolicy>never</updatePolicy>
              </releases>
 -*-*-*-
-Fixed build problems (with Maven != 3.0.4) caused by broken third party repository.
+Message: Fixed build problems (with Maven != 3.0.4) caused by broken third party repository.
+
+-*-*-*-
+When: 2013-04-29 14:35:25 -0400 

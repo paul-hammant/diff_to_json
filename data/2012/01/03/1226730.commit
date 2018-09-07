@@ -135,4 +135,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMedi
          if (mediator.getRequestXPath() != null) {
              SynapseXPathSerializer.serializeXPath(mediator.getRequestXPath(), source, "xpath");
 -*-*-*-
-Making the callout mediator capable of passing on the headers
+Message: Making the callout mediator capable of passing on the headers
+-*-*-*-
+When: 2012-01-03 05:39:24 -0500 

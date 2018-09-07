@@ -15,4 +15,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/for
  
                          try {
 -*-*-*-
-Fixing SYNAPSE-829
+Message: Fixing SYNAPSE-829
+-*-*-*-
+When: 2011-12-19 03:00:22 -0500 

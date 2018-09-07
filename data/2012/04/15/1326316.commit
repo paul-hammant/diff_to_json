@@ -19,4 +19,7 @@ Index: java/modules/core/src/main/java/org/apache/synapse/mediators/transform/Pa
          }
  
 -*-*-*-
-Fixing java.util.ConcurrentModificationException caused by wrong usage of Axiom API
+Message: Fixing java.util.ConcurrentModificationException caused by wrong usage of Axiom API
+
+-*-*-*-
+When: 2012-04-15 08:16:36 -0400 

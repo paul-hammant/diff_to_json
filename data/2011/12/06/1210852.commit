@@ -1,3 +1,45 @@
+Index: java/modules/packaging/package-archetype/src/main/resources/archetype-resources/repository/conf/axis2.xml
+===================================================================
+--- java/modules/packaging/package-archetype/src/main/resources/archetype-resources/repository/conf/axis2.xml	(revision 1210851)
++++ java/modules/packaging/package-archetype/src/main/resources/archetype-resources/repository/conf/axis2.xml	(revision 1210852)
+@@ -302,7 +302,7 @@
+     <!--                  Clustering                       -->
+     <!-- ================================================= -->
+     <!-- Configure the following for preparing Synapse to a clustered environment -->
+-    <cluster class="org.apache.axis2.clustering.tribes.TribesClusterManager" enable="false">
++    <clustering class="org.apache.axis2.clustering.tribes.TribesClusterManager" enable="false">
+ 
+         <!--
+            This parameter indicates whther the cluster has to be automatically initalized
+@@ -393,14 +393,15 @@
+         </members>
+ 
+         <!--
+-        Enable the load balancer entry if you need to run this node as a load balancer.
+-        Multiple application domains with different LoadBalanceEventHandler implementations
++        Enable the groupManagement entry if you need to run this node as a cluster manager.
++        Multiple application domains with different GroupManagementAgent implementations
+         can be defined in this section.
+         -->
+-        <loadBalancer enable="false">
++        <groupManagement enable="false">
+             <applicationDomain name="apache.axis2.app.domain"
++                               description="Axis2 group"
+                                handler="org.apache.axis2.clustering.DefaultLoadBalanceEventHandler"/>
+-        </loadBalancer>
++        </groupManagement>
+             
+         <!--
+            This interface is responsible for handling context replication. The property changes in
+@@ -432,7 +433,7 @@
+                 </context>
+             </replication>
+         </contextManager>
+-    </cluster>
++    </clustering>
+ 
+     <!-- ================================================= -->
+     <!-- Phases  -->
 Index: java/repository/conf/sample/resources/misc/server/axis2.xml
 ===================================================================
 --- java/repository/conf/sample/resources/misc/server/axis2.xml	(revision 1210851)
@@ -84,47 +126,7 @@ Index: java/repository/conf/axis2.xml
  
      <!-- ================================================= -->
      <!-- Phases  -->
-Index: java/modules/packaging/package-archetype/src/main/resources/archetype-resources/repository/conf/axis2.xml
-===================================================================
---- java/modules/packaging/package-archetype/src/main/resources/archetype-resources/repository/conf/axis2.xml	(revision 1210851)
-+++ java/modules/packaging/package-archetype/src/main/resources/archetype-resources/repository/conf/axis2.xml	(revision 1210852)
-@@ -302,7 +302,7 @@
-     <!--                  Clustering                       -->
-     <!-- ================================================= -->
-     <!-- Configure the following for preparing Synapse to a clustered environment -->
--    <cluster class="org.apache.axis2.clustering.tribes.TribesClusterManager" enable="false">
-+    <clustering class="org.apache.axis2.clustering.tribes.TribesClusterManager" enable="false">
- 
-         <!--
-            This parameter indicates whther the cluster has to be automatically initalized
-@@ -393,14 +393,15 @@
-         </members>
- 
-         <!--
--        Enable the load balancer entry if you need to run this node as a load balancer.
--        Multiple application domains with different LoadBalanceEventHandler implementations
-+        Enable the groupManagement entry if you need to run this node as a cluster manager.
-+        Multiple application domains with different GroupManagementAgent implementations
-         can be defined in this section.
-         -->
--        <loadBalancer enable="false">
-+        <groupManagement enable="false">
-             <applicationDomain name="apache.axis2.app.domain"
-+                               description="Axis2 group"
-                                handler="org.apache.axis2.clustering.DefaultLoadBalanceEventHandler"/>
--        </loadBalancer>
-+        </groupManagement>
-             
-         <!--
-            This interface is responsible for handling context replication. The property changes in
-@@ -432,7 +433,7 @@
-                 </context>
-             </replication>
-         </contextManager>
--    </cluster>
-+    </clustering>
- 
-     <!-- ================================================= -->
-     <!-- Phases  -->
 -*-*-*-
-Updated clustering confguration to be inline with the clustering implementation in the trunk
+Message: Updated clustering confguration to be inline with the clustering implementation in the trunk
+-*-*-*-
+When: 2011-12-06 05:29:41 -0500 

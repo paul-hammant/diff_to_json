@@ -1,3 +1,45 @@
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1381202)
++++ java/pom.xml	(revision 1381203)
+@@ -493,6 +493,11 @@
+                     </exclusion>
+                 </exclusions>
+             </dependency>
++            <dependency>
++                <groupId>org.apache.axis2</groupId>
++                <artifactId>axis2-jaxws</artifactId>
++                <version>${axis2.version}</version>
++            </dependency>
+ 
+             <!-- Apache Rampart -->
+             <dependency>
+Index: java/repository/conf/sample-server-wrapper.conf
+===================================================================
+--- java/repository/conf/sample-server-wrapper.conf	(revision 1381202)
++++ java/repository/conf/sample-server-wrapper.conf	(revision 1381203)
+@@ -20,6 +20,7 @@
+ wrapper.java.classpath.3=../../lib
+ wrapper.java.classpath.4=../../repository/conf
+ wrapper.java.classpath.5=../../lib/*.jar
++wrapper.java.classpath.6=lib/*.jar
+ 
+ # Java Library Path (location of Wrapper.DLL or libwrapper.so)
+ wrapper.java.library.path.1=../../lib
+Index: java/repository/conf/sample/resources/misc/server/axis2.xml
+===================================================================
+--- java/repository/conf/sample/resources/misc/server/axis2.xml	(revision 1381202)
++++ java/repository/conf/sample/resources/misc/server/axis2.xml	(revision 1381203)
+@@ -80,6 +80,9 @@
+         <serviceBuilderExtension name ="jwsbuilderExt" class="org.apache.axis2.jaxws.framework.JAXWSServiceBuilderExtension"/>
+         <serviceBuilderExtension name ="wsdlbuilderExt" class="org.apache.axis2.deployment.WSDLServiceBuilderExtension"/>
+     </deployer>
++    
++    <deployer extension=".jar" directory="servicejars"
++              class="org.apache.axis2.jaxws.framework.JAXWSDeployer"/>
+ 
+     <!-- Following parameter will set the host name for the epr-->
+     <!--<parameter name="hostname" locked="true">myhost.com</parameter>-->
 Index: java/modules/samples/src/main/scripts/axis2Server/axis2server.sh
 ===================================================================
 --- java/modules/samples/src/main/scripts/axis2Server/axis2server.sh	(revision 1381202)
@@ -65,47 +107,8 @@ Index: java/modules/distribution/pom.xml
      </dependencies>
  
      <repositories>
-Index: java/pom.xml
-===================================================================
---- java/pom.xml	(revision 1381202)
-+++ java/pom.xml	(revision 1381203)
-@@ -493,6 +493,11 @@
-                     </exclusion>
-                 </exclusions>
-             </dependency>
-+            <dependency>
-+                <groupId>org.apache.axis2</groupId>
-+                <artifactId>axis2-jaxws</artifactId>
-+                <version>${axis2.version}</version>
-+            </dependency>
- 
-             <!-- Apache Rampart -->
-             <dependency>
-Index: java/repository/conf/sample-server-wrapper.conf
-===================================================================
---- java/repository/conf/sample-server-wrapper.conf	(revision 1381202)
-+++ java/repository/conf/sample-server-wrapper.conf	(revision 1381203)
-@@ -20,6 +20,7 @@
- wrapper.java.classpath.3=../../lib
- wrapper.java.classpath.4=../../repository/conf
- wrapper.java.classpath.5=../../lib/*.jar
-+wrapper.java.classpath.6=lib/*.jar
- 
- # Java Library Path (location of Wrapper.DLL or libwrapper.so)
- wrapper.java.library.path.1=../../lib
-Index: java/repository/conf/sample/resources/misc/server/axis2.xml
-===================================================================
---- java/repository/conf/sample/resources/misc/server/axis2.xml	(revision 1381202)
-+++ java/repository/conf/sample/resources/misc/server/axis2.xml	(revision 1381203)
-@@ -80,6 +80,9 @@
-         <serviceBuilderExtension name ="jwsbuilderExt" class="org.apache.axis2.jaxws.framework.JAXWSServiceBuilderExtension"/>
-         <serviceBuilderExtension name ="wsdlbuilderExt" class="org.apache.axis2.deployment.WSDLServiceBuilderExtension"/>
-     </deployer>
-+    
-+    <deployer extension=".jar" directory="servicejars"
-+              class="org.apache.axis2.jaxws.framework.JAXWSDeployer"/>
- 
-     <!-- Following parameter will set the host name for the epr-->
-     <!--<parameter name="hostname" locked="true">myhost.com</parameter>-->
 -*-*-*-
-Changed the configuration of the Axis2 sample server packaged with the distribution such that one can readily deploy JAX-WS services on it.
+Message: Changed the configuration of the Axis2 sample server packaged with the distribution such that one can readily deploy JAX-WS services on it.
+
+-*-*-*-
+When: 2012-09-05 10:42:53 -0400 

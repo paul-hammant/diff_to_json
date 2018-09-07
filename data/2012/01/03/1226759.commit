@@ -11,4 +11,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/message/store/Abstract
  
      public void setDescription(String description) {
 -*-*-*-
-Unregistering message store MBeans
+Message: Unregistering message store MBeans
+-*-*-*-
+When: 2012-01-03 07:37:20 -0500 
