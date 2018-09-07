@@ -1,15 +1,3 @@
-Index: java/modules/core/src/main/java/org/apache/synapse/message/store/InMemoryMessageStore.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/message/store/InMemoryMessageStore.java	(revision 1210450)
-+++ java/modules/core/src/main/java/org/apache/synapse/message/store/InMemoryMessageStore.java	(revision 1210451)
-@@ -44,6 +44,7 @@
-         lock.lock();
-         try {
-             if (messageContext != null) {
-+                messageContext.getEnvelope().build();
-                 messageList.put(messageContext.getMessageID(), messageContext);
-                 /** Notify observers */
-                 notifyMessageAddition(messageContext.getMessageID());
 Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ScheduledMessageForwardingProcessor.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ScheduledMessageForwardingProcessor.java	(revision 1210450)
@@ -41,7 +29,21 @@ Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/Sch
      }
 +
  }
+Index: java/modules/core/src/main/java/org/apache/synapse/message/store/InMemoryMessageStore.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/message/store/InMemoryMessageStore.java	(revision 1210450)
++++ java/modules/core/src/main/java/org/apache/synapse/message/store/InMemoryMessageStore.java	(revision 1210451)
+@@ -44,6 +44,7 @@
+         lock.lock();
+         try {
+             if (messageContext != null) {
++                messageContext.getEnvelope().build();
+                 messageList.put(messageContext.getMessageID(), messageContext);
+                 /** Notify observers */
+                 notifyMessageAddition(messageContext.getMessageID());
 -*-*-*-
 Message: Fixing an issue with persisting messages in a message store
 -*-*-*-
 When: 2011-12-05 08:14:12 -0500 
+-*-*-*-
+Who: hiranya

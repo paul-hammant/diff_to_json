@@ -1,0 +1,236 @@
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/api/PassThroughNHttpGetProcessor.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/api/PassThroughNHttpGetProcessor.java	(revision 1503063)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/api/PassThroughNHttpGetProcessor.java	(revision 1503064)
+@@ -102,14 +102,10 @@
+ 		}
+ 
+ 		if (isServiceListBlocked(uri)) {
+-			response.setStatusCode(HttpStatus.SC_FORBIDDEN);
+-			sourceHandler.commitResponseHideExceptions(conn, response);
+-            closeOutputStream(os);
++            sendResponseAndFinish(response, HttpStatus.SC_FORBIDDEN, conn, os, msgContext);
+ 		} else if (uri.equals("/favicon.ico")) {
+-			response.setStatusCode(HttpStatus.SC_MOVED_PERMANENTLY);
+ 			response.addHeader(LOCATION, "http://ws.apache.org/favicon.ico");
+-			sourceHandler.commitResponseHideExceptions(conn, response);
+-            closeOutputStream(os);
++            sendResponseAndFinish(response, HttpStatus.SC_MOVED_PERMANENTLY, conn, os, msgContext);
+ 		} else if (serviceName != null && parameters.containsKey("wsdl")) {
+ 			generateWsdl(response, msgContext, conn, os, serviceName, parameters);
+ 		} else if (serviceName != null && parameters.containsKey("wsdl2")) {
+@@ -121,6 +117,26 @@
+ 		}
+ 	}
+ 
++    private void sendResponseAndFinish(HttpResponse response, int status,
++                                       NHttpServerConnection conn, OutputStream os,
++                                       MessageContext msgContext) {
++        response.setStatusCode(status);
++        SourceContext.updateState(conn, ProtocolState.GET_REQUEST_COMPLETE);
++        sourceHandler.commitResponseHideExceptions(conn, response);
++        closeOutputStream(os);
++        msgContext.setProperty(PassThroughConstants.GET_REQUEST_HANDLED, true);
++    }
++
++    private void sendResponseAndFinish(HttpResponse response, byte[] data,
++                                       NHttpServerConnection conn, OutputStream os,
++                                       MessageContext msgContext) throws IOException {
++        SourceContext.updateState(conn, ProtocolState.GET_REQUEST_COMPLETE);
++        sourceHandler.commitResponseHideExceptions(conn, response);
++        os.write(data);
++        closeOutputStream(os);
++        msgContext.setProperty(PassThroughConstants.GET_REQUEST_HANDLED, true);
++    }
++
+ 	private void closeOutputStream(OutputStream os) {
+ 		try {
+ 			os.flush();
+@@ -161,12 +177,10 @@
+ 					// here the parameter value should be the wsdl file name
+ 					service.printUserWSDL(baos, parameterValue);
+ 				}
+-				SourceContext.updateState(conn, ProtocolState.WSDL_XSD_RESPONSE_DONE);
+-				response.addHeader(CONTENT_TYPE, TEXT_XML);
+-				sourceHandler.commitResponseHideExceptions(conn, response);
+-				os.write(baos.toByteArray());
+-				closeOutputStream(os);
+ 
++                response.addHeader(CONTENT_TYPE, TEXT_XML);
++                sendResponseAndFinish(response, baos.toByteArray(), conn, os, msgContext);
++
+ 			} catch (Exception e) {
+ 				handleBrowserException(response, conn, os,
+ 						"Error generating ?wsdl output for service : "
+@@ -209,11 +223,7 @@
+ 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+ 				service.printWSDL2(baos, getIpAddress());
+ 				response.addHeader(CONTENT_TYPE, TEXT_XML);
+-				SourceContext.updateState(conn, ProtocolState.WSDL_XSD_RESPONSE_DONE);
+-				sourceHandler.commitResponseHideExceptions(conn, response);
+-				os.write(baos.toByteArray());
+-				closeOutputStream(os);
+-
++                sendResponseAndFinish(response, baos.toByteArray(), conn, os, msgContext);
+ 			} catch (Exception e) {
+ 				handleBrowserException(response, conn, os,
+ 						"Error generating ?wsdl2 output for service : "
+@@ -280,7 +290,7 @@
+ 	 *
+ 	 * @param response
+ 	 *            HttpResponse
+-	 * @param messageCtx
++	 * @param msgContext
+ 	 *            Current MessageContext
+ 	 * @param conn
+ 	 *            NHttpServerConnection
+@@ -292,7 +302,7 @@
+ 	 *            url parameters
+ 	 */
+ 	protected void generateXsd(HttpResponse response,
+-			MessageContext messageCtx, NHttpServerConnection conn,
++			MessageContext msgContext, NHttpServerConnection conn,
+ 			OutputStream os, String serviceName,
+ 			Map<String, String> parameters) {
+ 		if (parameters.get("xsd") == null || "".equals(parameters.get("xsd"))) {
+@@ -303,11 +313,7 @@
+ 					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+ 					service.printSchema(baos);
+ 					response.addHeader(CONTENT_TYPE, TEXT_XML);
+-					SourceContext.updateState(conn, ProtocolState.WSDL_XSD_RESPONSE_DONE);
+-					sourceHandler.commitResponseHideExceptions(conn, response);
+-					os.write(baos.toByteArray());
+-					closeOutputStream(os);
+-
++                    sendResponseAndFinish(response, baos.toByteArray(), conn, os, msgContext);
+ 				} catch (Exception e) {
+ 					handleBrowserException(response, conn, os,
+ 							"Error generating ?xsd output for service : "
+@@ -314,8 +320,7 @@
+ 									+ serviceName, e);
+ 				}
+ 			} else {
+-				messageCtx.setProperty(PassThroughConstants.REST_GET_DELETE_INVOKE,
+-						true);
++				msgContext.setProperty(PassThroughConstants.REST_GET_DELETE_INVOKE, true);
+ 			}
+ 
+ 		} else {
+@@ -347,6 +352,7 @@
+ 								response);
+ 						os.write(baos.toByteArray());
+ 						closeOutputStream(os);
++                        msgContext.setProperty(PassThroughConstants.GET_REQUEST_HANDLED, true);
+ 					} catch (Exception e) {
+ 						handleBrowserException(response, conn, os,
+ 								"Error generating named ?xsd output for service : "
+@@ -357,10 +363,10 @@
+ 					// no schema available by that name - send 404
+ 					response.setStatusCode(HttpStatus.SC_NOT_FOUND);
+ 					closeOutputStream(os);
++                    msgContext.setProperty(PassThroughConstants.GET_REQUEST_HANDLED, true);
+ 				}
+ 			} else {
+-				messageCtx.setProperty(PassThroughConstants.REST_GET_DELETE_INVOKE,
+-						true);
++				msgContext.setProperty(PassThroughConstants.REST_GET_DELETE_INVOKE, true);
+ 			}
+ 		}
+ 	}
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughConstants.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughConstants.java	(revision 1503063)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughConstants.java	(revision 1503064)
+@@ -124,6 +124,6 @@
+ 	
+ 	public static final String FORCE_PASS_THROUGH_BUILDER = "force.passthrough.builder";
+ 	
+-	public static final String WSDL_GEN_HANDLED = "WSDL_GEN_HANDLED";
++	public static final String GET_REQUEST_HANDLED = "GET_REQUEST_HANDLED";
+ 
+ }
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java	(revision 1503063)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java	(revision 1503064)
+@@ -83,7 +83,7 @@
+                     System.currentTimeMillis());
+         	 
+             if (!SourceContext.assertState(conn, ProtocolState.REQUEST_READY) &&
+-                    !SourceContext.assertState(conn, ProtocolState.WSDL_XSD_RESPONSE_DONE)) {
++                    !SourceContext.assertState(conn, ProtocolState.GET_REQUEST_COMPLETE)) {
+                 handleInvalidState(conn, "Request received");
+                 return;
+             }
+@@ -192,7 +192,7 @@
+             ProtocolState protocolState = SourceContext.getState(conn);
+             
+             //special case to handle WSDLs
+-            if(protocolState == ProtocolState.WSDL_XSD_RESPONSE_DONE){
++            if(protocolState == ProtocolState.GET_REQUEST_COMPLETE){
+             	// we need to shut down if the shutdown flag is set
+             	 HttpContext context = conn.getContext();
+             	 ContentOutputBuffer outBuf = (ContentOutputBuffer) context.getAttribute(
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ServerWorker.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ServerWorker.java	(revision 1503063)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ServerWorker.java	(revision 1503064)
+@@ -184,9 +184,9 @@
+ 		} 
+ 		
+ 		//need special case to handle REST
+-		boolean restHandle =false;
++		boolean restHandle = false;
+ 		if (msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE) != null &&
+-                (Boolean)msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE)){
++                (Boolean) msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE)){
+ 			msgContext.setProperty(HTTPConstants.HTTP_METHOD, method);
+ 	        msgContext.setServerSide(true);
+ 	        msgContext.setDoingREST(true);
+@@ -196,13 +196,13 @@
+ 			restHandle = true;
+ 		}
+ 		
+-		//if WSDL done then moved out rather than hand over to entity handle methods.
++		// If WSDL generation is done then move out rather than hand over to
++		// entity handle methods.
+ 		SourceContext info = (SourceContext) request.getConnection().getContext().
+                 getAttribute(SourceContext.CONNECTION_INFORMATION);
+-		if (info != null &&
+-		    info.getState().equals(ProtocolState.WSDL_XSD_RESPONSE_DONE) ||
+-		    (msgContext.getProperty(PassThroughConstants.WSDL_GEN_HANDLED) != null &&
+-                    Boolean.TRUE.equals((msgContext.getProperty(PassThroughConstants.WSDL_GEN_HANDLED))))) {
++        Object getHandled = msgContext.getProperty(PassThroughConstants.GET_REQUEST_HANDLED);
++		if ((info != null && info.getState().equals(ProtocolState.GET_REQUEST_COMPLETE)) ||
++                Boolean.TRUE.equals(getHandled)) {
+ 			return;
+ 		}
+ 		
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ProtocolState.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ProtocolState.java	(revision 1503063)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ProtocolState.java	(revision 1503064)
+@@ -35,7 +35,7 @@
+     REQUEST_DONE,
+     /** The connection is reading the response headers */
+     RESPONSE_HEAD,
+-    /** The connection si reading the response body */
++    /** The connection is reading the response body */
+     RESPONSE_BODY,
+     /** The response is completed */
+     RESPONSE_DONE,
+@@ -43,6 +43,6 @@
+     CLOSING,
+     /** The connection is closed */
+     CLOSED,
+-    /** WSDL response has been sent */
+-    WSDL_XSD_RESPONSE_DONE
++    /** GET request has been responded to */
++    GET_REQUEST_COMPLETE
+ }
+-*-*-*-
+Message: Fixing a race condition in the new GET handler. Code refactoring and cleanup.
+-*-*-*-
+When: 2013-07-14 17:30:22 -0400 
+-*-*-*-
+Who: hiranya

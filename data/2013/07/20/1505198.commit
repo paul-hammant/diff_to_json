@@ -1,0 +1,28 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseXMLConfigurationFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseXMLConfigurationFactory.java	(revision 1505197)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseXMLConfigurationFactory.java	(revision 1505198)
+@@ -216,7 +216,7 @@
+             return mediator;
+         } else {
+             String msg = "Invalid mediation template definition without a name";
+-            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_SEQUENCES, msg);
++            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_TEMPLATES, msg);
+         }
+         return null;
+     }
+@@ -239,7 +239,7 @@
+             return endpoint;
+         } else {
+             String msg = "Invalid endpoint definition without a name";
+-            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_SEQUENCES, msg);
++            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_EP, msg);
+         }
+         return null;
+     }
+-*-*-*-
+Message: Applying patch for SYNAPSE-942. Incorrect error handling logic for templates and endpoints.
+-*-*-*-
+When: 2013-07-20 16:21:35 -0400 
+-*-*-*-
+Who: hiranya

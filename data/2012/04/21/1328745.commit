@@ -1,3 +1,16 @@
+Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/FileObjectDataSource.java
+===================================================================
+--- java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/FileObjectDataSource.java	(revision 1328744)
++++ java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/FileObjectDataSource.java	(revision 1328745)
+@@ -18,7 +18,7 @@
+ */
+ package org.apache.synapse.transport.vfs;
+ 
+-import org.apache.axiom.attachments.SizeAwareDataSource;
++import org.apache.axiom.ext.activation.SizeAwareDataSource;
+ import org.apache.commons.vfs2.FileObject;
+ import org.apache.commons.vfs2.FileSystemException;
+ 
 Index: java/modules/core/src/main/java/org/apache/synapse/eventing/managers/DefaultInMemorySubscriptionManager.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/eventing/managers/DefaultInMemorySubscriptionManager.java	(revision 1328744)
@@ -19,21 +32,10 @@ Index: java/modules/core/src/main/java/org/apache/synapse/eventing/managers/Defa
          }
          store.put(subscription.getId(), subscription);
          return subscription.getId();
-Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/FileObjectDataSource.java
-===================================================================
---- java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/FileObjectDataSource.java	(revision 1328744)
-+++ java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/FileObjectDataSource.java	(revision 1328745)
-@@ -18,7 +18,7 @@
- */
- package org.apache.synapse.transport.vfs;
- 
--import org.apache.axiom.attachments.SizeAwareDataSource;
-+import org.apache.axiom.ext.activation.SizeAwareDataSource;
- import org.apache.commons.vfs2.FileObject;
- import org.apache.commons.vfs2.FileSystemException;
- 
 -*-*-*-
 Message: Eliminated a couple of references to deprecated classes so that we don't need to add a dependency to axiom-compat.
 
 -*-*-*-
 When: 2012-04-21 18:50:22 -0400 
+-*-*-*-
+Who: veithen

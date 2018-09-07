@@ -24,3 +24,5 @@ Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framewo
 Message: Commenting out 2 failing tests - Need to patch the JDK on Jenkins builder before we can enable these
 -*-*-*-
 When: 2011-12-27 04:39:05 -0500 
+-*-*-*-
+Who: hiranya

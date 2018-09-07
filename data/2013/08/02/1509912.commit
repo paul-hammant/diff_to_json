@@ -1,0 +1,244 @@
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/jmx/MBeanRegistrar.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/jmx/MBeanRegistrar.java	(revision 1509911)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/jmx/MBeanRegistrar.java	(nonexistent)
+@@ -1,102 +0,0 @@
+-/*
+- *  Licensed to the Apache Software Foundation (ASF) under one
+- *  or more contributor license agreements.  See the NOTICE file
+- *  distributed with this work for additional information
+- *  regarding copyright ownership.  The ASF licenses this file
+- *  to you under the Apache License, Version 2.0 (the
+- *  "License"); you may not use this file except in compliance
+- *  with the License.  You may obtain a copy of the License at
+- *
+- *   http://www.apache.org/licenses/LICENSE-2.0
+- *
+- *  Unless required by applicable law or agreed to in writing,
+- *  software distributed under the License is distributed on an
+- *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+- *  KIND, either express or implied.  See the License for the
+- *  specific language governing permissions and limitations
+- *  under the License.
+- */
+-
+-package org.apache.synapse.transport.passthru.jmx;
+-
+-import org.apache.axis2.AxisFault;
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+-
+-import javax.management.MBeanServer;
+-import javax.management.ObjectName;
+-import java.lang.management.ManagementFactory;
+-import java.util.Set;
+-
+-public class MBeanRegistrar {
+-
+-    private static final MBeanRegistrar ourInstance = new MBeanRegistrar();
+-    private static final Log log = LogFactory.getLog(MBeanRegistrar.class);
+-
+-    public static MBeanRegistrar getInstance() {
+-        return ourInstance;
+-    }
+-
+-    private MBeanRegistrar() {
+-    }
+-
+-    public void registerMBean(Object mBeanInstance, String category, String id) throws AxisFault {
+-        assertNull(mBeanInstance, "MBean instance is null");
+-        assertNull(category, "MBean instance category is null");
+-        assertNull(id, "MBean instance name is null");
+-        try {
+-            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+-            ObjectName name = new ObjectName(getObjectName(category, id));
+-            Set set = mbs.queryNames(name, null);
+-            if (set != null && set.isEmpty()) {
+-                mbs.registerMBean(mBeanInstance, name);
+-            } else {
+-                mbs.unregisterMBean(name);
+-                mbs.registerMBean(mBeanInstance, name);
+-            }
+-        } catch (Exception e) {
+-            log.warn("Error registering a MBean with name ' " + id +
+-                    " ' and category name ' " + category + "' for JMX management", e);
+-        }
+-    }
+-
+-    public void unRegisterMBean(String category, String id) {
+-        try {
+-            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+-            ObjectName objName = new ObjectName(getObjectName(category, id));
+-            if (mbs.isRegistered(objName)) {
+-                mbs.unregisterMBean(objName);
+-            }
+-        } catch (Exception e) {
+-            log.warn("Error un-registering a  MBean with name ' " + id +
+-                    " ' and category name ' " + category + "' for JMX management", e);
+-        }
+-    }
+-
+-    private String getObjectName(String category, String id) {
+-
+-        String jmxAgentName = System.getProperty("jmx.agent.name");
+-        if (jmxAgentName == null || "".equals(jmxAgentName)) {
+-            jmxAgentName = "org.apache.synapse";
+-        }
+-        return jmxAgentName + ":Type=" + category + ",Name=" + id;
+-    }
+-
+-    private void assertNull(String name, String msg) throws AxisFault {
+-        if (name == null || "".equals(name)) {
+-            handleException(msg);
+-        }
+-    }
+-
+-    private void assertNull(Object object, String msg) throws AxisFault {
+-        if (object == null) {
+-            handleException(msg);
+-        }
+-    }
+-
+-    private static void handleException(String msg) throws AxisFault {
+-        log.error(msg);
+-        throw new AxisFault(msg);
+-    }
+-
+-}
+\ No newline at end of file
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpListener.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpListener.java	(revision 1509911)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpListener.java	(revision 1509912)
+@@ -45,8 +45,8 @@
+ import org.apache.http.nio.reactor.ListenerEndpoint;
+ import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
+ import org.apache.http.params.HttpParams;
++import org.apache.synapse.commons.jmx.MBeanRegistrar;
+ import org.apache.synapse.transport.passthru.config.SourceConfiguration;
+-import org.apache.synapse.transport.passthru.jmx.MBeanRegistrar;
+ import org.apache.synapse.transport.passthru.jmx.PassThroughTransportMetricsCollector;
+ import org.apache.synapse.transport.passthru.jmx.TransportView;
+ 
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java	(revision 1509911)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java	(revision 1509912)
+@@ -50,6 +50,7 @@
+ import org.apache.http.nio.reactor.IOReactorExceptionHandler;
+ import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
+ import org.apache.http.params.HttpParams;
++import org.apache.synapse.commons.jmx.MBeanRegistrar;
+ import org.apache.synapse.transport.nhttp.NhttpConstants;
+ import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
+ import org.apache.synapse.transport.nhttp.util.NhttpUtil;
+@@ -56,7 +57,6 @@
+ import org.apache.synapse.transport.passthru.config.SourceConfiguration;
+ import org.apache.synapse.transport.passthru.config.TargetConfiguration;
+ import org.apache.synapse.transport.passthru.connections.TargetConnections;
+-import org.apache.synapse.transport.passthru.jmx.MBeanRegistrar;
+ import org.apache.synapse.transport.passthru.jmx.PassThroughTransportMetricsCollector;
+ import org.apache.synapse.transport.passthru.jmx.TransportView;
+ import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/jmx/LatencyView.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/jmx/LatencyView.java	(revision 1509911)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/jmx/LatencyView.java	(revision 1509912)
+@@ -20,6 +20,7 @@
+ package org.apache.synapse.transport.passthru.jmx;
+ 
+ import org.apache.axis2.AxisFault;
++import org.apache.synapse.commons.jmx.MBeanRegistrar;
+ 
+ import java.util.Calendar;
+ import java.util.Date;
+@@ -101,13 +102,21 @@
+         scheduler.scheduleAtFixedRate(new LongTermDataCollector(), LARGE_DATA_COLLECTION_PERIOD,
+                 LARGE_DATA_COLLECTION_PERIOD, TimeUnit.SECONDS);
+ 
+-        MBeanRegistrar.getInstance().registerMBean(this, NHTTP_LATENCY_VIEW, name);
+-
++        boolean registered = false;
++        try {
++            registered = MBeanRegistrar.getInstance().registerMBean(this, NHTTP_LATENCY_VIEW, name);
++        } finally {
++            if (!registered) {
++                scheduler.shutdownNow();
++            }
++        }
+     }
+ 
+     public void destroy() {
+         MBeanRegistrar.getInstance().unRegisterMBean(NHTTP_LATENCY_VIEW, name);
+-        scheduler.shutdownNow();
++        if (!scheduler.isShutdown()) {
++            scheduler.shutdownNow();
++        }
+     }
+ 
+     /**
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/jmx/ConnectionsView.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/jmx/ConnectionsView.java	(revision 1509911)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/jmx/ConnectionsView.java	(revision 1509912)
+@@ -20,6 +20,7 @@
+ package org.apache.synapse.transport.passthru.jmx;
+ 
+ import org.apache.axis2.AxisFault;
++import org.apache.synapse.commons.jmx.MBeanRegistrar;
+ 
+ import java.util.*;
+ import java.util.concurrent.Executors;
+@@ -104,13 +105,22 @@
+         scheduler.scheduleAtFixedRate(longTermCollector, LONG_DATA_COLLECTION_PERIOD,
+                 LONG_DATA_COLLECTION_PERIOD, TimeUnit.SECONDS);
+ 
+-        MBeanRegistrar.getInstance().registerMBean(this, PASS_THROUGH_CONNECTIONS, name);
++        boolean registered = false;
++        try {
++            registered = MBeanRegistrar.getInstance().registerMBean(this, PASS_THROUGH_CONNECTIONS, name);
++        } finally {
++            if (!registered) {
++                scheduler.shutdownNow();
++            }
++        }
+ 
+     }
+ 
+     public void destroy() {
+         MBeanRegistrar.getInstance().unRegisterMBean(PASS_THROUGH_CONNECTIONS, name);
+-        scheduler.shutdownNow();
++        if (!scheduler.isShutdown()) {
++            scheduler.shutdownNow();
++        }
+     }
+ 
+     private void initCounters(AtomicInteger[] counters) {
+@@ -230,8 +240,8 @@
+         Integer[] array = shortTermDataQueue.toArray(new Integer[shortTermDataQueue.size()]);
+ 
+         if (n > array.length) {
+-            for (int i = 0; i < array.length; i++) {
+-                sum += array[i];
++            for (Integer anArray : array) {
++                sum += anArray;
+             }
+         } else {
+             for (int i = 0; i < n; i++) {
+@@ -254,8 +264,8 @@
+         Integer[] array = longTermDataQueue.toArray(new Integer[longTermDataQueue.size()]);
+ 
+         if (samples > array.length) {
+-            for (int i = 0; i < array.length; i++) {
+-                sum += array[i];
++            for (Integer anArray : array) {
++                sum += anArray;
+             }
+         } else {
+             for (int i = 0; i < samples; i++) {
+-*-*-*-
+Message: Removing the redundant MBeanRegistrar in pass thru transport - Changed the transport to use the registrat in Synapse commons like the nhttp transport.
+-*-*-*-
+When: 2013-08-02 19:28:09 -0400 
+-*-*-*-
+Who: hiranya

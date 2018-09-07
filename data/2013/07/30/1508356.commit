@@ -1,0 +1,59 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/Value.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/Value.java	(revision 1508355)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/Value.java	(revision 1508356)
+@@ -188,7 +188,32 @@
+     public boolean hasExprTypeKey() {
+         return keyValue != null && keyValue.startsWith("{") && keyValue.endsWith("}");
+     }
++    
++    public boolean hasPropertyEvaluateExpr(){
++    	return keyValue != null && keyValue.contains("get-property");
++    }
+ 
++    public Object evalutePropertyExpression(MessageContext synCtx) {
++        SynapseXPath expr = null;
++        try {
++            expr = new SynapseXPath(this.keyValue.substring(1, keyValue.length() - 1));
++            for (OMNamespace aNamespaceList : namespaceList) {
++                expr.addNamespace(aNamespaceList);
++            }
++
++            String result = expr.stringValueOf(synCtx);
++            SynapseXPath expression = new SynapseXPath(result);
++            for (OMNamespace aNamespaceList : namespaceList) {
++                expression.addNamespace(aNamespaceList);
++            }
++            return expression;
++        } catch (Exception e) {
++            handleException("Can not evaluate escaped expression : " + expr.toString());
++        }
++        return this.expression;
++
++    }
++
+     public void setNamespaces(OMElement elem){
+         Iterator namespaces = elem.getNamespacesInScope();
+         while (namespaces.hasNext()){
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/template/TemplateContext.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/template/TemplateContext.java	(revision 1508355)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/template/TemplateContext.java	(revision 1508356)
+@@ -91,6 +91,11 @@
+         if (expression != null) {
+             if (expression.getExpression() != null) {
+                 if(expression.hasExprTypeKey()){
++                	if(expression.hasPropertyEvaluateExpr()){
++                		//TODO:evalute the string expression get the value
++                		//String evaluatedPath ="{//m0:getQuote/m0:request}";
++                		return expression.evalutePropertyExpression(synCtx);
++                	}
+                     return expression.getExpression();
+                 } else {
+                     return expression.evaluateValue(synCtx);
+-*-*-*-
+Message: fixing https://issues.apache.org/jira/browse/SYNAPSE-924
+-*-*-*-
+When: 2013-07-30 05:27:10 -0400 
+-*-*-*-
+Who: uswick

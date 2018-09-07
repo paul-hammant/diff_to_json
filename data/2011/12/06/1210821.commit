@@ -30,3 +30,5 @@ Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/EndpointCont
 Message: fix SYNAPSE-820
 -*-*-*-
 When: 2011-12-06 03:23:19 -0500 
+-*-*-*-
+Who: charith

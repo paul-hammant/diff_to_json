@@ -1,0 +1,217 @@
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/RelayUtils.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/RelayUtils.java	(revision 1503084)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/RelayUtils.java	(revision 1503085)
+@@ -76,12 +76,11 @@
+         buildMessage(msgCtx, false);
+     }
+ 
+-    public static void buildMessage(MessageContext messageContext, boolean earlyBuild) throws IOException,
+-            XMLStreamException {
++    public static void buildMessage(MessageContext messageContext,
++                                    boolean earlyBuild) throws IOException, XMLStreamException {
+ 
+         final Pipe pipe = (Pipe) messageContext.getProperty(PassThroughConstants.PASS_THROUGH_PIPE);
+-		if (pipe != null && forcePTBuild &&
+-                !PassThroughTransportUtils.builderInvoked(messageContext)) {
++		if (pipe != null && forcePTBuild && !PassThroughTransportUtils.builderInvoked(messageContext)) {
+ 			InputStream in = pipe.getInputStream();
+         	buildMessage(messageContext, earlyBuild, in);
+             return;
+@@ -121,7 +120,7 @@
+         }
+     }
+ 
+-	public static void buildMessage(MessageContext messageContext,
++	private static void buildMessage(MessageContext messageContext,
+                                     boolean earlyBuild, InputStream in) throws IOException {
+ 
+ 	    BufferedInputStream bufferedInputStream = (BufferedInputStream) messageContext.getProperty(
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/HttpResponse.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/HttpResponse.java	(revision 1503084)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/HttpResponse.java	(revision 1503085)
+@@ -1,3 +1,22 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
+ package org.apache.synapse.samples.framework.clients;
+ 
+ import org.apache.axiom.om.OMElement;
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/BasicHttpClient.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/BasicHttpClient.java	(revision 1503084)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/BasicHttpClient.java	(revision 1503085)
+@@ -1,6 +1,24 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
+ package org.apache.synapse.samples.framework.clients;
+ 
+-import org.apache.http.HttpEntity;
+ import org.apache.http.client.HttpClient;
+ import org.apache.http.client.methods.HttpGet;
+ import org.apache.http.client.methods.HttpPost;
+@@ -9,8 +27,19 @@
+ 
+ import java.io.ByteArrayInputStream;
+ 
++/**
++ * A simple HTTP client that enables making HTTP requests. Useful for testing
++ * RESTful invocations on Synapse.
++ */
+ public class BasicHttpClient {
+ 
++    /**
++     * Make a HTTP GET request on the specified URL.
++     *
++     * @param url A valid HTTP URL
++     * @return A HttpResponse object
++     * @throws Exception If an error occurs while making the HTTP call
++     */
+     public HttpResponse doGet(String url) throws Exception {
+         HttpClient client = new DefaultHttpClient();
+         try {
+@@ -21,6 +50,15 @@
+         }
+     }
+ 
++    /**
++     * Make a HTTP POST request on the specified URL.
++     *
++     * @param url A valid HTTP URL
++     * @param payload An array of bytes to be posted to the URL (message body)
++     * @param contentType Content type of the message body
++     * @return A HttpResponse object
++     * @throws Exception If an error occurs while making the HTTP call
++     */
+     public HttpResponse doPost(String url, byte[] payload, String contentType) throws Exception {
+         HttpClient client = new DefaultHttpClient();
+         try {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/rest/Sample800.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/rest/Sample800.java	(revision 1503084)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/rest/Sample800.java	(revision 1503085)
+@@ -1,3 +1,22 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
+ package org.apache.synapse.samples.framework.tests.rest;
+ 
+ import org.apache.axiom.om.OMElement;
+Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2Sender.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2Sender.java	(revision 1503084)
++++ java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2Sender.java	(revision 1503085)
+@@ -146,7 +146,7 @@
+                 messageContext.getEnvelope().getOrCreateHeader();
+             }
+ 
+-            Axis2FlexibleMEPClient.clearSecurtityProperties(messageContext.getOptions());
++            Axis2FlexibleMEPClient.clearSecurityProperties(messageContext.getOptions());
+ 
+            // report stats for any component at response sending check point
+             StatisticsReporter.reportForAllOnResponseSent(smc);
+Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java	(revision 1503084)
++++ java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java	(revision 1503085)
+@@ -326,21 +326,21 @@
+         ConfigurationContext axisCfgCtx = axisOutMsgCtx.getConfigurationContext();
+         AxisConfiguration axisCfg       = axisCfgCtx.getAxisConfiguration();
+ 
+-        AxisService anoymousService =
++        AxisService anonymousService =
+             AnonymousServiceFactory.getAnonymousService(synapseOutMessageContext.getConfiguration(),
+                     axisCfg, wsAddressingEnabled, wsRMEnabled, wsSecurityEnabled);
+         // mark the anon services created to be used in the client side of synapse as hidden
+         // from the server side of synapse point of view
+-        anoymousService.getParent().addParameter(SynapseConstants.HIDDEN_SERVICE_PARAM, "true");
++        anonymousService.getParent().addParameter(SynapseConstants.HIDDEN_SERVICE_PARAM, "true");
+         ServiceGroupContext sgc = new ServiceGroupContext(
+-                        axisCfgCtx, (AxisServiceGroup) anoymousService.getParent());
+-        ServiceContext serviceCtx = sgc.getServiceContext(anoymousService);
++                        axisCfgCtx, (AxisServiceGroup) anonymousService.getParent());
++        ServiceContext serviceCtx = sgc.getServiceContext(anonymousService);
+ 
+         boolean outOnlyMessage = "true".equals(synapseOutMessageContext.getProperty(
+                 SynapseConstants.OUT_ONLY));
+ 
+         // get a reference to the DYNAMIC operation of the Anonymous Axis2 service
+-        AxisOperation axisAnonymousOperation = anoymousService.getOperation(
++        AxisOperation axisAnonymousOperation = anonymousService.getOperation(
+                 outOnlyMessage ?
+                         new QName(AnonymousServiceFactory.OUT_ONLY_OPERATION) :
+                         new QName(AnonymousServiceFactory.OUT_IN_OPERATION));
+@@ -358,7 +358,7 @@
+                     RMAssertionBuilder builder = new RMAssertionBuilder();
+                     SandeshaPolicyBean sandeshaPolicyBean = (SandeshaPolicyBean) builder.build(policyOMElement, null);
+                     Parameter policyParam = new Parameter(Sandesha2Constants.SANDESHA_PROPERTY_BEAN, sandeshaPolicyBean);
+-                    anoymousService.addParameter(policyParam);
++                    anonymousService.addParameter(policyParam);
+                 }
+             }
+         }
+@@ -468,7 +468,7 @@
+         return newMC;
+     }
+ 
+-    public static void clearSecurtityProperties(Options options) {
++    public static void clearSecurityProperties(Options options) {
+ 
+         Options current = options;
+         while (current != null && current.getProperty(SynapseConstants.RAMPART_POLICY) != null) {
+-*-*-*-
+Message: Some refactoring and cleanup
+-*-*-*-
+When: 2013-07-14 20:00:49 -0400 
+-*-*-*-
+Who: hiranya

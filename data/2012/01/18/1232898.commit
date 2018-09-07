@@ -1,3 +1,25 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/eip/aggregator/AggregateMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/eip/aggregator/AggregateMediator.java	(revision 1232897)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/eip/aggregator/AggregateMediator.java	(revision 1232898)
+@@ -135,7 +135,7 @@
+             Aggregate aggregate = null;
+             String correlationIdName = (id != null ? EIPConstants.AGGREGATE_CORRELATION + "." + id :
+                     EIPConstants.AGGREGATE_CORRELATION);
+-            // if a correlateExpression is provided and there is a coresponding
++            // if a correlateExpression is provided and there is a corresponding
+             // element in the current message prepare to correlate the messages on that
+             if (correlateExpression != null
+                     && correlateExpression.evaluate(synCtx) != null) {
+@@ -180,7 +180,7 @@
+                 }
+ 
+             } else if (synCtx.getProperty(correlationIdName) != null) {
+-                // if the correlattion cannot be found using the correlateExpression then
++                // if the correlation cannot be found using the correlateExpression then
+                 // try the default which is through the AGGREGATE_CORRELATION message property
+                 // which is the unique original message id of a split or iterate operation and
+                 // which thus can be used to uniquely group messages into aggregates
 Index: java/modules/core/src/main/java/org/apache/synapse/mediators/GetPropertyFunction.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/mediators/GetPropertyFunction.java	(revision 1232897)
@@ -35,28 +57,19 @@ Index: java/modules/core/src/main/java/org/apache/synapse/mediators/GetPropertyF
                              }
                          } else {
                              omText.getText();
-Index: java/modules/core/src/main/java/org/apache/synapse/mediators/eip/aggregator/AggregateMediator.java
+Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/TemplateEndpoint.java
 ===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/mediators/eip/aggregator/AggregateMediator.java	(revision 1232897)
-+++ java/modules/core/src/main/java/org/apache/synapse/mediators/eip/aggregator/AggregateMediator.java	(revision 1232898)
-@@ -135,7 +135,7 @@
-             Aggregate aggregate = null;
-             String correlationIdName = (id != null ? EIPConstants.AGGREGATE_CORRELATION + "." + id :
-                     EIPConstants.AGGREGATE_CORRELATION);
--            // if a correlateExpression is provided and there is a coresponding
-+            // if a correlateExpression is provided and there is a corresponding
-             // element in the current message prepare to correlate the messages on that
-             if (correlateExpression != null
-                     && correlateExpression.evaluate(synCtx) != null) {
-@@ -180,7 +180,7 @@
-                 }
- 
-             } else if (synCtx.getProperty(correlationIdName) != null) {
--                // if the correlattion cannot be found using the correlateExpression then
-+                // if the correlation cannot be found using the correlateExpression then
-                 // try the default which is through the AGGREGATE_CORRELATION message property
-                 // which is the unique original message id of a split or iterate operation and
-                 // which thus can be used to uniquely group messages into aggregates
+--- java/modules/core/src/main/java/org/apache/synapse/endpoints/TemplateEndpoint.java	(revision 1232897)
++++ java/modules/core/src/main/java/org/apache/synapse/endpoints/TemplateEndpoint.java	(revision 1232898)
+@@ -119,7 +119,7 @@
+                 // this endpoint is static -->
+                 // since template-endpoint is static, should ONLY be loaded at initialization to prevent
+                 // reloading every single time this endpoint is executed..
+-                // incase tempalate config has changed this endpoint should be redeployed
++                // in case template config has changed this endpoint should be redeployed
+                 reLoad = false;
+             }
+         }
 Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MultiXMLConfigurationBuilder.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/config/xml/MultiXMLConfigurationBuilder.java	(revision 1232897)
@@ -133,19 +146,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseXMLC
      }
  
      private static void handleException(String msg) {
-Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/TemplateEndpoint.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/endpoints/TemplateEndpoint.java	(revision 1232897)
-+++ java/modules/core/src/main/java/org/apache/synapse/endpoints/TemplateEndpoint.java	(revision 1232898)
-@@ -119,7 +119,7 @@
-                 // this endpoint is static -->
-                 // since template-endpoint is static, should ONLY be loaded at initialization to prevent
-                 // reloading every single time this endpoint is executed..
--                // incase tempalate config has changed this endpoint should be redeployed
-+                // in case template config has changed this endpoint should be redeployed
-                 reLoad = false;
-             }
-         }
 Index: java/modules/core/pom.xml
 ===================================================================
 --- java/modules/core/pom.xml	(revision 1232897)
@@ -166,3 +166,5 @@ Index: java/modules/core/pom.xml
 Message: Some refactoring and building REST APIs at startup
 -*-*-*-
 When: 2012-01-18 09:22:49 -0500 
+-*-*-*-
+Who: hiranya

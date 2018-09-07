@@ -1,143 +1,41 @@
-Index: java/modules/experimental/pom.xml
+Index: java/modules/transports/pom.xml
 ===================================================================
---- java/modules/experimental/pom.xml	(revision 1224696)
-+++ java/modules/experimental/pom.xml	(revision 1224697)
-@@ -42,7 +42,6 @@
-             <plugin>
-                 <groupId>org.apache.felix</groupId>
-                 <artifactId>maven-bundle-plugin</artifactId>
--                <version>1.4.0</version>
-                 <extensions>true</extensions>
-                 <configuration>
-                     <instructions>
-Index: java/modules/securevault/pom.xml
-===================================================================
---- java/modules/securevault/pom.xml	(revision 1224696)
-+++ java/modules/securevault/pom.xml	(revision 1224697)
-@@ -23,15 +23,13 @@
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-     <modelVersion>4.0.0</modelVersion>
--    <!-- TODO: shouldn't this be a Synapse specific parent-POM??? -->
-     <parent>
--        <groupId>org.apache</groupId>
--        <artifactId>apache</artifactId>
--        <version>7</version>
-+        <groupId>org.apache.synapse</groupId>
-+        <artifactId>Apache-Synapse</artifactId>
-+        <version>2.1.0-SNAPSHOT</version>
-+        <relativePath>../../pom.xml</relativePath>
-     </parent>
--    <groupId>org.apache.synapse</groupId>
-     <artifactId>synapse-securevault</artifactId>
--    <version>2.1.0-SNAPSHOT</version>
-     <name>Apache Synapse - Secure vault</name>
-     <description>Apache Synapse - Secure vault</description>
-     <packaging>bundle</packaging>
-@@ -38,23 +36,14 @@
-     <build>
-         <plugins>
-             <plugin>
--                <groupId>org.apache.maven.plugins</groupId>
-                 <artifactId>maven-compiler-plugin</artifactId>
--                <version>2.0</version>
--                <configuration>
--                    <source>1.5</source>
--                    <target>1.5</target>
--                </configuration>
-             </plugin>
-             <plugin>
--                <groupId>org.apache.maven.plugins</groupId>
-                 <artifactId>maven-surefire-plugin</artifactId>
--                <version>2.2</version>
-             </plugin>
-             <plugin>
-                 <groupId>org.apache.felix</groupId>
-                 <artifactId>maven-bundle-plugin</artifactId>
--                <version>1.4.0</version>
-                 <extensions>true</extensions>
-                 <configuration>
-                     <instructions>
-@@ -77,80 +66,35 @@
+--- java/modules/transports/pom.xml	(revision 1224696)
++++ java/modules/transports/pom.xml	(revision 1224697)
+@@ -43,16 +43,6 @@
+         <module>optional/fix</module>
+     </modules>
+ 
+-    <dependencyManagement>
+-        <dependencies>
+-            <dependency>
+-                <groupId>org.aspectj</groupId>
+-                <artifactId>aspectjweaver</artifactId>
+-                <version>${aspectj.version}</version>
+-            </dependency>
+-        </dependencies>
+-    </dependencyManagement>
+-
+     <dependencies>
          <dependency>
-             <groupId>org.apache.ws.commons.axiom</groupId>
-             <artifactId>axiom-api</artifactId>
--            <version>${axiom.version}</version>
-         </dependency>
-         <dependency>
-             <groupId>org.apache.ws.commons.axiom</groupId>
-             <artifactId>axiom-impl</artifactId>
--            <version>${axiom.version}</version>
-         </dependency>
-         <dependency>
-             <groupId>log4j</groupId>
-             <artifactId>log4j</artifactId>
--            <version>${log4j.version}</version>
-         </dependency>
-         <dependency>
-             <groupId>jline</groupId>
-             <artifactId>jline</artifactId>
--            <version>${jline.version}</version>
-         </dependency>
--        <!-- direct dependencies for 3rd party JARs / Util JARs -->
-         <dependency>
--            <groupId>commons-logging</groupId>
--            <artifactId>commons-logging</artifactId>
--            <version>${commons.logging.version}</version>
--            <exclusions>
--                <exclusion>
--                    <groupId>javax.servlet</groupId>
--                    <artifactId>servlet-api</artifactId>
--                </exclusion>
--                <exclusion>
--                    <groupId>logkit</groupId>
--                    <artifactId>logkit</artifactId>
--                </exclusion>
--                <exclusion>
--                    <groupId>javax.servlet</groupId>
--                    <artifactId>servlet-api</artifactId>
--                </exclusion>
--                <exclusion>
--                    <groupId>avalon-framework</groupId>
--                    <artifactId>avalon-framework</artifactId>
--                </exclusion>
--            </exclusions>
--        </dependency>
--        <dependency>
-             <groupId>junit</groupId>
-             <artifactId>junit</artifactId>
--            <version>${junit.version}</version>
-             <scope>test</scope>
-         </dependency>
-         <dependency>
-             <groupId>commons-cli</groupId>
-             <artifactId>commons-cli</artifactId>
--            <version>${commons-cli.version}</version>
+             <groupId>org.apache.synapse</groupId>
+@@ -68,17 +58,10 @@
+             <groupId>org.apache.axis2</groupId>
+             <artifactId>axis2-transport-base</artifactId>
          </dependency>
 -
          <dependency>
-             <groupId>commons-io</groupId>
-             <artifactId>commons-io</artifactId>
--            <version>${commons_io.version}</version>
+             <groupId>org.apache.axis2</groupId>
+             <artifactId>axis2-transport-testkit</artifactId>
+-            <version>${axis2.transport.version}</version>
+-            <scope>test</scope>
          </dependency>
-         <dependency>
-             <groupId>commons-codec</groupId>
-             <artifactId>commons-codec</artifactId>
--            <version>${commons-codec.version}</version>
-         </dependency>
--
      </dependencies>
+ 
 -    <properties>
--        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
--        <axiom.version>1.2.9</axiom.version>
--        <commons.logging.version>1.1.1</commons.logging.version>
--        <junit.version>3.8.2</junit.version>
--        <log4j.version>1.2.14</log4j.version>
--        <commons-cli.version>1.0</commons-cli.version>
--        <jline.version>0.9.94</jline.version>
--        <commons_io.version>2.0</commons_io.version>
--        <commons-codec.version>1.2</commons-codec.version>
+-        <aspectj.version>1.6.1</aspectj.version>
 -    </properties>
+-
  </project>
 Index: java/pom.xml
 ===================================================================
@@ -1157,548 +1055,19 @@ Index: java/pom.xml
          </developer>
          <developer>
              <name>Paul Fremantle</name>
-Index: java/repository/conf/sample/synapse_sample_371.xml
+Index: java/modules/integration/src/test/resources/test-log4j.properties
 ===================================================================
---- java/repository/conf/sample/synapse_sample_371.xml	(revision 1224696)
-+++ java/repository/conf/sample/synapse_sample_371.xml	(revision 1224697)
-@@ -38,7 +38,6 @@
-                                         <throttle:ProhibitTimePeriod wsp:Optional="true">10000
-                                         </throttle:ProhibitTimePeriod>
-                                     </wsp:All>
--                                    <throttle:IsAllow>true</throttle:IsAllow>
-                                 </wsp:ExactlyOne>
-                             </wsp:All>
-                             <wsp:All>
-@@ -51,7 +50,6 @@
-                                         <throttle:ProhibitTimePeriod wsp:Optional="true">10
-                                         </throttle:ProhibitTimePeriod>
-                                     </wsp:All>
--                                    <throttle:IsAllow>true</throttle:IsAllow>
-                                 </wsp:ExactlyOne>
-                             </wsp:All>
-                             <wsp:All>
-@@ -62,7 +60,6 @@
-                                         <throttle:UnitTime>600000</throttle:UnitTime>
-                                         <throttle:ProhibitTimePeriod wsp:Optional="true"/>
-                                     </wsp:All>
--                                    <throttle:IsAllow>true</throttle:IsAllow>
-                                 </wsp:ExactlyOne>
-                             </wsp:All>
-                             <wsp:All>
-@@ -73,7 +70,6 @@
-                                         <throttle:UnitTime>500000</throttle:UnitTime>
-                                         <throttle:ProhibitTimePeriod wsp:Optional="true"/>
-                                     </wsp:All>
--                                    <throttle:IsAllow>true</throttle:IsAllow>
-                                 </wsp:ExactlyOne>
-                             </wsp:All>
-                         </throttle:ThrottleAssertion>
-Index: java/modules/commons/pom.xml
-===================================================================
---- java/modules/commons/pom.xml	(revision 1224696)
-+++ java/modules/commons/pom.xml	(revision 1224697)
-@@ -33,23 +33,18 @@
-     <groupId>org.apache.synapse</groupId>
-     <artifactId>synapse-commons</artifactId>
-     
--    <name>Apache Synapse - Commons classes</name>
--    <description>Apache Synapse - Commons classes</description>
-+    <name>Apache Synapse - Commons</name>
-+    <description>Apache Synapse - Common Utilities</description>
-     <packaging>bundle</packaging>
- 
-     <build>
-         <plugins>
--
-             <plugin>
--                <groupId>org.apache.maven.plugins</groupId>
-                 <artifactId>maven-surefire-plugin</artifactId>
--                <version>2.2</version>
-             </plugin>
--
-             <plugin>
-                 <groupId>org.apache.felix</groupId>
-                 <artifactId>maven-bundle-plugin</artifactId>
--                <version>1.4.0</version>
-                 <extensions>true</extensions>
-                 <configuration>
-                     <instructions>
-@@ -66,7 +61,6 @@
-                     </instructions>
-                 </configuration>
-             </plugin>
--
-         </plugins>
-     </build>
- 
-@@ -74,17 +68,26 @@
-         <dependency>
-           <groupId>javax.activation</groupId>
-           <artifactId>activation</artifactId>
--          <version>1.1</version>
-         </dependency>
-         <dependency>
-           <groupId>org.apache.axis2</groupId>
-           <artifactId>axis2-transport-base</artifactId>
--          <version>${axis2.transport.version}</version>
-         </dependency>
-         <dependency>
-           <groupId>org.apache.synapse</groupId>
-           <artifactId>synapse-securevault</artifactId>
--          <version>2.1.0-SNAPSHOT</version>
-         </dependency>
-+        <dependency>
-+            <groupId>commons-pool</groupId>
-+            <artifactId>commons-pool</artifactId>
-+        </dependency>
-+        <dependency>
-+            <groupId>commons-dbcp</groupId>
-+            <artifactId>commons-dbcp</artifactId>
-+        </dependency>
-+        <dependency>
-+            <groupId>xmlunit</groupId>
-+            <artifactId>xmlunit</artifactId>
-+        </dependency>
-     </dependencies>
- </project>
-Index: java/modules/handler/pom.xml
-===================================================================
---- java/modules/handler/pom.xml	(revision 1224696)
-+++ java/modules/handler/pom.xml	(revision 1224697)
-@@ -38,13 +38,10 @@
-     <packaging>bundle</packaging>
- 
-     <build>
--
-         <plugins>
--
-             <plugin>
-                 <groupId>org.apache.felix</groupId>
-                 <artifactId>maven-bundle-plugin</artifactId>
--                <version>1.4.0</version>
-                 <extensions>true</extensions>
-                 <configuration>
-                     <instructions>
-@@ -62,11 +59,9 @@
-                     </instructions>
-                 </configuration>
-             </plugin>
--
-             <plugin>
-                 <groupId>org.apache.maven.plugins</groupId>
-                 <artifactId>maven-antrun-plugin</artifactId>
--                <version>1.1</version>
-                 <executions>
-                     <execution>
-                         <id>mar</id>
-@@ -83,11 +78,9 @@
-                     </execution>
-                 </executions>
-             </plugin>
--
-             <plugin>
-                 <groupId>org.codehaus.mojo</groupId>
-                 <artifactId>build-helper-maven-plugin</artifactId>
--                <version>1.0</version>
-                 <executions>
-                     <execution>
-                         <id>mar</id>
-Index: java/modules/distribution/src/main/assembly/bin.xml
-===================================================================
---- java/modules/distribution/src/main/assembly/bin.xml	(revision 1224696)
-+++ java/modules/distribution/src/main/assembly/bin.xml	(revision 1224697)
-@@ -237,21 +237,13 @@
-                 <exclude>org.apache.axis2:addressing:mar</exclude>
-                 <exclude>org.apache.rampart:rampart:mar</exclude>
-                 <exclude>org.apache.sandesha2:sandesha2:mar</exclude>
--                <exclude>org.apache.ant:ant:jar</exclude>
--                <exclude>org.apache.ant:ant-launcher:jar</exclude>
-                 <exclude>javax.servlet:servlet-api:jar</exclude>
-                 <exclude>xml-apis:xml-apis:jar</exclude>
-                 <exclude>xerces:xercesImpl:jar</exclude>
--		<exclude>org.apache.xerces:xercesImpl</exclude>
--		<exclude>org.apache.xerces:xml-apis</exclude>
--                <exclude>junit:junit:jar</exclude>
--                <exclude>org.apache.mina:mina-core:jar</exclude>
--                <exclude>org.slf4j:slf4j-api:jar</exclude>
--                <exclude>org.slf4j:slf4j-jdk14:jar</exclude>
--                <exclude>org.slf4j:jcl-over-slf4j:jar</exclude>
--                <exclude>org.slf4j:log4j-over-slf4j:jar</exclude>
--                <exclude>com.oopsconsultancy:xmltask:jar</exclude>
--		<exclude>xalan:xalan:jar</exclude>
-+                <exclude>org.apache.xerces:xercesImpl</exclude> <!-- Find the source of this -->
-+                <exclude>org.apache.xerces:xml-apis</exclude>
-+		        <exclude>xalan:xalan:jar</exclude>
-+                <exclude>quickfixj:quickfixj-all:jar</exclude>
-             </excludes>
-         </dependencySet>
-         <dependencySet>
-@@ -266,7 +258,6 @@
-             <useProjectArtifact>false</useProjectArtifact>
-             <outputDirectory>synapse-${synapse.version}/lib/endorsed</outputDirectory>
-             <includes>
--                <include>xml-apis:xml-apis:jar</include>
-                 <include>xerces:xercesImpl:jar</include>
-             </includes>
-         </dependencySet>
-Index: java/modules/distribution/pom.xml
-===================================================================
---- java/modules/distribution/pom.xml	(revision 1224696)
-+++ java/modules/distribution/pom.xml	(revision 1224697)
-@@ -38,30 +38,37 @@
-     <dependencies>
-         <dependency>
-             <groupId>org.apache.synapse</groupId>
-+            <artifactId>synapse-core</artifactId>
-+        </dependency>
-+        <dependency>
-+            <groupId>org.apache.synapse</groupId>
-+            <artifactId>synapse-commons</artifactId>
-+        </dependency>
-+        <dependency>
-+            <groupId>org.apache.synapse</groupId>
-             <artifactId>synapse-extensions</artifactId>
--            <version>${pom.version}</version>
-         </dependency>
-         <dependency>
-             <groupId>org.apache.synapse</groupId>
-             <artifactId>synapse-samples</artifactId>
--            <version>${pom.version}</version>
-         </dependency>
-         <dependency>
-             <groupId>org.apache.synapse</groupId>
-             <artifactId>synapse-experimental</artifactId>
--            <version>${pom.version}</version>
-         </dependency>
-         <dependency>
-             <groupId>org.apache.synapse</groupId>
-             <artifactId>synapse-config-migrator</artifactId>
--            <version>${pom.version}</version>
-         </dependency>
-+        <dependency>
-+            <groupId>org.apache.synapse</groupId>
-+            <artifactId>synapse-fix-transport</artifactId>
-+        </dependency>
- 
-         <!-- Wrapper jars -->
-         <dependency>
-             <groupId>wrapper</groupId>
-             <artifactId>wrapper</artifactId>
--            <version>${wrapper.version}</version>
-         </dependency>
- 
-         <!-- The distribution is configured for log4j. Normally, log4j should not
-@@ -75,57 +82,21 @@
-         <dependency>
-             <groupId>org.apache.rampart</groupId>
-             <artifactId>rampart</artifactId>
--            <version>${rampart.version}</version>
--            <exclusions>
--                <exclusion>
--                    <groupId>org.apache.woden</groupId>
--                    <artifactId>woden-api</artifactId>
--                </exclusion>
--                <exclusion>
--                    <groupId>xalan</groupId>
--                    <artifactId>xalan</artifactId>
--                </exclusion>
--            </exclusions>
-             <type>mar</type>
-         </dependency>
-         <dependency>
-             <groupId>org.apache.sandesha2</groupId>
-             <artifactId>sandesha2</artifactId>
--            <version>${sandesha2.version}</version>
--            <exclusions>
--                <exclusion>
--                    <groupId>org.apache.axis2</groupId>
--                    <artifactId>axis2</artifactId>
--                </exclusion>
--            </exclusions>
-             <type>mar</type>
-         </dependency>
-         <dependency>
-             <groupId>org.apache.sandesha2</groupId>
-             <artifactId>sandesha2-policy</artifactId>
--            <version>${sandesha2.version}</version>
--            <exclusions>
--                <exclusion>
--                    <groupId>org.apache.axis2</groupId>
--                    <artifactId>axis2</artifactId>
--                </exclusion>
--            </exclusions>
-         </dependency>
-         <dependency>
-             <groupId>org.apache.axis2</groupId>
-             <artifactId>addressing</artifactId>
--            <version>${addressing.version}</version>
-             <type>mar</type>
--            <exclusions>
--                <exclusion>
--                    <groupId>org.apache.geronimo.specs</groupId>
--                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
--                </exclusion>
--                <exclusion>
--                    <groupId>org.apache.geronimo.specs</groupId>
--                    <artifactId>geronimo-activation_1.1_spec</artifactId>
--                </exclusion>
--            </exclusions>
-         </dependency>
-         
-         <!-- Because of a design flaw in Axis2 (see AXIS2-4265), axis2-codegen is required
-@@ -159,10 +130,17 @@
-         <dependency>
-             <groupId>org.apache.synapse</groupId>
-             <artifactId>synapse-patches</artifactId>
--            <version>${pom.version}</version>
-             <classifier>jars</classifier>
-             <type>zip</type>
-         </dependency>
-+        <dependency>
-+            <groupId>org.apache.woden</groupId>
-+            <artifactId>woden-api</artifactId>
-+        </dependency>
-+        <!--dependency>
-+            <groupId>xerces</groupId>
-+            <artifactId>xercesImpl</artifactId>
-+        </dependency-->
-     </dependencies>
- 
-     <repositories>
-@@ -183,9 +161,7 @@
-     <build>
-         <plugins>
-             <plugin>
--                <groupId>org.apache.maven.plugins</groupId>
-                 <artifactId>maven-assembly-plugin</artifactId>
--                <version>2.2-beta-2</version>
-                 <executions>
-                     <execution>
-                         <id>distribution-package</id>
-Index: java/modules/transports/optional/fix/pom.xml
-===================================================================
---- java/modules/transports/optional/fix/pom.xml	(revision 1224696)
-+++ java/modules/transports/optional/fix/pom.xml	(revision 1224697)
-@@ -41,7 +41,6 @@
-             <plugin>
-                 <groupId>org.apache.felix</groupId>
-                 <artifactId>maven-bundle-plugin</artifactId>
--                <version>1.4.0</version>
-                 <extensions>true</extensions>
-                 <configuration>
-                     <instructions>
-@@ -107,17 +106,11 @@
-         <dependency>
-             <groupId>quickfixj</groupId>
-             <artifactId>quickfixj-all</artifactId>
--            <version>${qfj.version}</version>
-         </dependency>
-         <dependency>
--            <groupId>org.apache.synapse</groupId>
--            <artifactId>synapse-core</artifactId>
--            <scope>test</scope>            
-+            <groupId>xmlunit</groupId>
-+            <artifactId>xmlunit</artifactId>
-         </dependency>
-     </dependencies>
- 
--    <properties>
--        <qfj.version>1.4.0</qfj.version>
--    </properties>
--
- </project>
-Index: java/modules/transports/core/nhttp/pom.xml
-===================================================================
---- java/modules/transports/core/nhttp/pom.xml	(revision 1224696)
-+++ java/modules/transports/core/nhttp/pom.xml	(revision 1224697)
-@@ -41,7 +41,6 @@
-             <plugin>
-                 <groupId>org.apache.felix</groupId>
-                 <artifactId>maven-bundle-plugin</artifactId>
--                <version>1.4.0</version>
-                 <extensions>true</extensions>
-                 <configuration>
-                     <instructions>
-@@ -60,7 +59,6 @@
-             <plugin>
-                 <groupId>org.apache.maven.plugins</groupId>
-                 <artifactId>maven-dependency-plugin</artifactId>
--                <version>2.0</version>
-                 <executions>
-                     <execution>
-                         <id>copy</id>
-@@ -84,7 +82,6 @@
-             <plugin>
-                 <groupId>org.apache.maven.plugins</groupId>
-                 <artifactId>maven-surefire-plugin</artifactId>
--                <version>2.3</version>
-                 <configuration>
-                     <systemProperties>
-                         <property>
-@@ -134,12 +131,10 @@
-         <dependency>
-             <groupId>org.apache.httpcomponents</groupId>
-             <artifactId>httpcore</artifactId>
--            <version>${httpcore.nio.version}</version>
-         </dependency>
-         <dependency>
-             <groupId>org.apache.httpcomponents</groupId>
-             <artifactId>httpcore-nio</artifactId>
--            <version>${httpcore.nio.version}</version>
-         </dependency>
-         <!-- The HTTP NIO transport depends on a few methods from the blocking HTTP transport,
-              so we need to add this as an explicit dependency. -->
-@@ -153,8 +148,4 @@
-         </dependency>
-     </dependencies>
- 
--    <properties>
--        <httpcore.nio.version>4.1</httpcore.nio.version>
--    </properties>
--
- </project>
-Index: java/modules/transports/core/pipe/pom.xml
-===================================================================
---- java/modules/transports/core/pipe/pom.xml	(revision 1224696)
-+++ java/modules/transports/core/pipe/pom.xml	(revision 1224697)
-@@ -41,7 +41,6 @@
-             <plugin>
-                 <groupId>org.apache.felix</groupId>
-                 <artifactId>maven-bundle-plugin</artifactId>
--                <version>1.4.0</version>
-                 <extensions>true</extensions>
-                 <configuration>
-                     <instructions>
-@@ -58,6 +57,4 @@
-         </plugins>
-     </build>
- 
--    <dependencies>
--    </dependencies>
- </project>
-\ No newline at end of file
-Index: java/modules/transports/core/vfs/pom.xml
-===================================================================
---- java/modules/transports/core/vfs/pom.xml	(revision 1224696)
-+++ java/modules/transports/core/vfs/pom.xml	(revision 1224697)
-@@ -41,7 +41,6 @@
-             <plugin>
-                 <groupId>org.apache.felix</groupId>
-                 <artifactId>maven-bundle-plugin</artifactId>
--                <version>1.4.0</version>
-                 <extensions>true</extensions>
-                 <configuration>
-                     <instructions>
-@@ -62,7 +61,6 @@
-             <plugin>
-                 <groupId>org.apache.maven.plugins</groupId>
-                 <artifactId>maven-dependency-plugin</artifactId>
--                <version>2.0</version>
-                 <executions>
-                     <execution>
-                         <id>copy</id>
-@@ -86,7 +84,6 @@
-             <plugin>
-                 <groupId>org.apache.maven.plugins</groupId>
-                 <artifactId>maven-surefire-plugin</artifactId>
--                <version>2.3</version>
-                 <configuration>
-                     <systemProperties>
-                         <property>
-@@ -111,7 +108,6 @@
-                 <plugins>
-                     <plugin>
-                         <artifactId>maven-assembly-plugin</artifactId>
--                        <version>2.2-beta-2</version>
-                         <configuration>
-                             <descriptors>
-                                 <descriptor>src/main/assembly/testkit-logs.xml</descriptor>
-@@ -136,44 +132,18 @@
-         <dependency>
-             <groupId>org.apache.commons</groupId>
-             <artifactId>commons-vfs2</artifactId>
--            <version>${commons.vfs.version}</version>
-         </dependency>
-         <dependency>
--            <groupId>org.apache.mina</groupId>
--            <artifactId>mina-core</artifactId>
--            <version>${mina.version}</version>
--        </dependency>
--        <dependency>
--            <groupId>org.slf4j</groupId>
--            <artifactId>slf4j-api</artifactId>
--            <version>${slf4j.version}</version>
--        </dependency>
--
--        <dependency>
-             <groupId>de.schlichtherle.io</groupId>
-             <artifactId>truezip</artifactId>
--            <version>${truezip.version}</version>
--            <optional>true</optional>
-         </dependency>
-         <dependency>
--            <groupId>commons-net</groupId>
--            <artifactId>commons-net</artifactId>
--            <version>${commons.net.version}</version>
--        </dependency>
--        <dependency>
-             <groupId>com.jcraft</groupId>
-             <artifactId>jsch</artifactId>
--            <version>${jsch.version}</version>
-         </dependency>
-         <dependency>
--            <groupId>oro</groupId>
--            <artifactId>oro</artifactId>
--            <version>${oro.version}</version>
-+            <groupId>commons-net</groupId>
-+            <artifactId>commons-net</artifactId>
-         </dependency>
--        <dependency>
--            <groupId>commons-io</groupId>
--            <artifactId>commons-io</artifactId>
--            <version>${commons_io.version}</version>
--        </dependency>
-     </dependencies>
- </project>
-Index: java/modules/transports/pom.xml
-===================================================================
---- java/modules/transports/pom.xml	(revision 1224696)
-+++ java/modules/transports/pom.xml	(revision 1224697)
-@@ -43,16 +43,6 @@
-         <module>optional/fix</module>
-     </modules>
- 
--    <dependencyManagement>
--        <dependencies>
--            <dependency>
--                <groupId>org.aspectj</groupId>
--                <artifactId>aspectjweaver</artifactId>
--                <version>${aspectj.version}</version>
--            </dependency>
--        </dependencies>
--    </dependencyManagement>
--
-     <dependencies>
-         <dependency>
-             <groupId>org.apache.synapse</groupId>
-@@ -68,17 +58,10 @@
-             <groupId>org.apache.axis2</groupId>
-             <artifactId>axis2-transport-base</artifactId>
-         </dependency>
--
-         <dependency>
-             <groupId>org.apache.axis2</groupId>
-             <artifactId>axis2-transport-testkit</artifactId>
--            <version>${axis2.transport.version}</version>
--            <scope>test</scope>
-         </dependency>
-     </dependencies>
- 
--    <properties>
--        <aspectj.version>1.6.1</aspectj.version>
--    </properties>
--
- </project>
+--- java/modules/integration/src/test/resources/test-log4j.properties	(revision 1224696)
++++ java/modules/integration/src/test/resources/test-log4j.properties	(revision 1224697)
+@@ -42,7 +42,7 @@
+ # The standard log file that may be set upto DEBUG/TRACE for general purpose logging
+ # Logs information at startup/initialization etc. and also could be used as the developer log
+ log4j.appender.LOG_APPENDER=org.apache.log4j.RollingFileAppender
+-log4j.appender.LOG_APPENDER.File=sampleAutomationLogs/synapse-${timeStamp}.log
++log4j.appender.LOG_APPENDER.File=modules/integration/target/sampleAutomationLogs/synapse-${timeStamp}.log
+ log4j.appender.LOG_APPENDER.MaxFileSize=1000KB
+ log4j.appender.LOG_APPENDER.MaxBackupIndex=10
+ log4j.appender.LOG_APPENDER.layout=org.apache.log4j.PatternLayout
 Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
 ===================================================================
 --- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1224696)
@@ -1716,19 +1085,6 @@ Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framewo
          sampleClassRepo.put("380", Sample380.class);
          sampleClassRepo.put("390", Sample390.class);
          sampleClassRepo.put("391", Sample391.class);
-Index: java/modules/integration/src/test/resources/test-log4j.properties
-===================================================================
---- java/modules/integration/src/test/resources/test-log4j.properties	(revision 1224696)
-+++ java/modules/integration/src/test/resources/test-log4j.properties	(revision 1224697)
-@@ -42,7 +42,7 @@
- # The standard log file that may be set upto DEBUG/TRACE for general purpose logging
- # Logs information at startup/initialization etc. and also could be used as the developer log
- log4j.appender.LOG_APPENDER=org.apache.log4j.RollingFileAppender
--log4j.appender.LOG_APPENDER.File=sampleAutomationLogs/synapse-${timeStamp}.log
-+log4j.appender.LOG_APPENDER.File=modules/integration/target/sampleAutomationLogs/synapse-${timeStamp}.log
- log4j.appender.LOG_APPENDER.MaxFileSize=1000KB
- log4j.appender.LOG_APPENDER.MaxBackupIndex=10
- log4j.appender.LOG_APPENDER.layout=org.apache.log4j.PatternLayout
 Index: java/modules/integration/pom.xml
 ===================================================================
 --- java/modules/integration/pom.xml	(revision 1224696)
@@ -2103,19 +1459,6 @@ Index: java/modules/patches/pom.xml
          </dependency>
      </dependencies>
  </project>
-Index: java/modules/core/src/test/java/org/apache/synapse/mediators/AbstractMediatorTestCase.java
-===================================================================
---- java/modules/core/src/test/java/org/apache/synapse/mediators/AbstractMediatorTestCase.java	(revision 1224696)
-+++ java/modules/core/src/test/java/org/apache/synapse/mediators/AbstractMediatorTestCase.java	(revision 1224697)
-@@ -29,7 +29,7 @@
- import javax.xml.stream.XMLStreamException;
- import java.io.StringReader;
- 
--public class AbstractMediatorTestCase extends TestCase {
-+public abstract class AbstractMediatorTestCase extends TestCase {
- 
-     protected static OMElement createOMElement(String xml) {
-         return SynapseConfigUtils.stringToOM(xml);
 Index: java/modules/core/src/test/java/org/apache/synapse/mediators/eip/AbstractSplitMediatorTestCase.java
 ===================================================================
 --- java/modules/core/src/test/java/org/apache/synapse/mediators/eip/AbstractSplitMediatorTestCase.java	(revision 1224696)
@@ -2129,6 +1472,19 @@ Index: java/modules/core/src/test/java/org/apache/synapse/mediators/eip/Abstract
  
      SplitTestHelperMediator helperMediator;
      MessageContext testCtx;
+Index: java/modules/core/src/test/java/org/apache/synapse/mediators/AbstractMediatorTestCase.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/mediators/AbstractMediatorTestCase.java	(revision 1224696)
++++ java/modules/core/src/test/java/org/apache/synapse/mediators/AbstractMediatorTestCase.java	(revision 1224697)
+@@ -29,7 +29,7 @@
+ import javax.xml.stream.XMLStreamException;
+ import java.io.StringReader;
+ 
+-public class AbstractMediatorTestCase extends TestCase {
++public abstract class AbstractMediatorTestCase extends TestCase {
+ 
+     protected static OMElement createOMElement(String xml) {
+         return SynapseConfigUtils.stringToOM(xml);
 Index: java/modules/core/pom.xml
 ===================================================================
 --- java/modules/core/pom.xml	(revision 1224696)
@@ -2354,6 +1710,18 @@ Index: java/modules/xar-maven-plugin/pom.xml
              </plugin>
          </plugins>
      </build>
+Index: java/modules/experimental/pom.xml
+===================================================================
+--- java/modules/experimental/pom.xml	(revision 1224696)
++++ java/modules/experimental/pom.xml	(revision 1224697)
+@@ -42,7 +42,6 @@
+             <plugin>
+                 <groupId>org.apache.felix</groupId>
+                 <artifactId>maven-bundle-plugin</artifactId>
+-                <version>1.4.0</version>
+                 <extensions>true</extensions>
+                 <configuration>
+                     <instructions>
 Index: java/modules/extensions/pom.xml
 ===================================================================
 --- java/modules/extensions/pom.xml	(revision 1224696)
@@ -2619,6 +1987,135 @@ Index: java/modules/extensions/pom.xml
 -    </properties>
 +
  </project>
+Index: java/modules/securevault/pom.xml
+===================================================================
+--- java/modules/securevault/pom.xml	(revision 1224696)
++++ java/modules/securevault/pom.xml	(revision 1224697)
+@@ -23,15 +23,13 @@
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+-    <!-- TODO: shouldn't this be a Synapse specific parent-POM??? -->
+     <parent>
+-        <groupId>org.apache</groupId>
+-        <artifactId>apache</artifactId>
+-        <version>7</version>
++        <groupId>org.apache.synapse</groupId>
++        <artifactId>Apache-Synapse</artifactId>
++        <version>2.1.0-SNAPSHOT</version>
++        <relativePath>../../pom.xml</relativePath>
+     </parent>
+-    <groupId>org.apache.synapse</groupId>
+     <artifactId>synapse-securevault</artifactId>
+-    <version>2.1.0-SNAPSHOT</version>
+     <name>Apache Synapse - Secure vault</name>
+     <description>Apache Synapse - Secure vault</description>
+     <packaging>bundle</packaging>
+@@ -38,23 +36,14 @@
+     <build>
+         <plugins>
+             <plugin>
+-                <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-compiler-plugin</artifactId>
+-                <version>2.0</version>
+-                <configuration>
+-                    <source>1.5</source>
+-                    <target>1.5</target>
+-                </configuration>
+             </plugin>
+             <plugin>
+-                <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-surefire-plugin</artifactId>
+-                <version>2.2</version>
+             </plugin>
+             <plugin>
+                 <groupId>org.apache.felix</groupId>
+                 <artifactId>maven-bundle-plugin</artifactId>
+-                <version>1.4.0</version>
+                 <extensions>true</extensions>
+                 <configuration>
+                     <instructions>
+@@ -77,80 +66,35 @@
+         <dependency>
+             <groupId>org.apache.ws.commons.axiom</groupId>
+             <artifactId>axiom-api</artifactId>
+-            <version>${axiom.version}</version>
+         </dependency>
+         <dependency>
+             <groupId>org.apache.ws.commons.axiom</groupId>
+             <artifactId>axiom-impl</artifactId>
+-            <version>${axiom.version}</version>
+         </dependency>
+         <dependency>
+             <groupId>log4j</groupId>
+             <artifactId>log4j</artifactId>
+-            <version>${log4j.version}</version>
+         </dependency>
+         <dependency>
+             <groupId>jline</groupId>
+             <artifactId>jline</artifactId>
+-            <version>${jline.version}</version>
+         </dependency>
+-        <!-- direct dependencies for 3rd party JARs / Util JARs -->
+         <dependency>
+-            <groupId>commons-logging</groupId>
+-            <artifactId>commons-logging</artifactId>
+-            <version>${commons.logging.version}</version>
+-            <exclusions>
+-                <exclusion>
+-                    <groupId>javax.servlet</groupId>
+-                    <artifactId>servlet-api</artifactId>
+-                </exclusion>
+-                <exclusion>
+-                    <groupId>logkit</groupId>
+-                    <artifactId>logkit</artifactId>
+-                </exclusion>
+-                <exclusion>
+-                    <groupId>javax.servlet</groupId>
+-                    <artifactId>servlet-api</artifactId>
+-                </exclusion>
+-                <exclusion>
+-                    <groupId>avalon-framework</groupId>
+-                    <artifactId>avalon-framework</artifactId>
+-                </exclusion>
+-            </exclusions>
+-        </dependency>
+-        <dependency>
+             <groupId>junit</groupId>
+             <artifactId>junit</artifactId>
+-            <version>${junit.version}</version>
+             <scope>test</scope>
+         </dependency>
+         <dependency>
+             <groupId>commons-cli</groupId>
+             <artifactId>commons-cli</artifactId>
+-            <version>${commons-cli.version}</version>
+         </dependency>
+-
+         <dependency>
+             <groupId>commons-io</groupId>
+             <artifactId>commons-io</artifactId>
+-            <version>${commons_io.version}</version>
+         </dependency>
+         <dependency>
+             <groupId>commons-codec</groupId>
+             <artifactId>commons-codec</artifactId>
+-            <version>${commons-codec.version}</version>
+         </dependency>
+-
+     </dependencies>
+-    <properties>
+-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+-        <axiom.version>1.2.9</axiom.version>
+-        <commons.logging.version>1.1.1</commons.logging.version>
+-        <junit.version>3.8.2</junit.version>
+-        <log4j.version>1.2.14</log4j.version>
+-        <commons-cli.version>1.0</commons-cli.version>
+-        <jline.version>0.9.94</jline.version>
+-        <commons_io.version>2.0</commons_io.version>
+-        <commons-codec.version>1.2</commons-codec.version>
+-    </properties>
+ </project>
 Index: java/modules/samples/pom.xml
 ===================================================================
 --- java/modules/samples/pom.xml	(revision 1224696)
@@ -2676,6 +2173,509 @@ Index: java/modules/samples/pom.xml
              <exclusions>
                  <exclusion>
                      <groupId>org.apache.woden</groupId>
+Index: java/modules/commons/pom.xml
+===================================================================
+--- java/modules/commons/pom.xml	(revision 1224696)
++++ java/modules/commons/pom.xml	(revision 1224697)
+@@ -33,23 +33,18 @@
+     <groupId>org.apache.synapse</groupId>
+     <artifactId>synapse-commons</artifactId>
+     
+-    <name>Apache Synapse - Commons classes</name>
+-    <description>Apache Synapse - Commons classes</description>
++    <name>Apache Synapse - Commons</name>
++    <description>Apache Synapse - Common Utilities</description>
+     <packaging>bundle</packaging>
+ 
+     <build>
+         <plugins>
+-
+             <plugin>
+-                <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-surefire-plugin</artifactId>
+-                <version>2.2</version>
+             </plugin>
+-
+             <plugin>
+                 <groupId>org.apache.felix</groupId>
+                 <artifactId>maven-bundle-plugin</artifactId>
+-                <version>1.4.0</version>
+                 <extensions>true</extensions>
+                 <configuration>
+                     <instructions>
+@@ -66,7 +61,6 @@
+                     </instructions>
+                 </configuration>
+             </plugin>
+-
+         </plugins>
+     </build>
+ 
+@@ -74,17 +68,26 @@
+         <dependency>
+           <groupId>javax.activation</groupId>
+           <artifactId>activation</artifactId>
+-          <version>1.1</version>
+         </dependency>
+         <dependency>
+           <groupId>org.apache.axis2</groupId>
+           <artifactId>axis2-transport-base</artifactId>
+-          <version>${axis2.transport.version}</version>
+         </dependency>
+         <dependency>
+           <groupId>org.apache.synapse</groupId>
+           <artifactId>synapse-securevault</artifactId>
+-          <version>2.1.0-SNAPSHOT</version>
+         </dependency>
++        <dependency>
++            <groupId>commons-pool</groupId>
++            <artifactId>commons-pool</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>commons-dbcp</groupId>
++            <artifactId>commons-dbcp</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>xmlunit</groupId>
++            <artifactId>xmlunit</artifactId>
++        </dependency>
+     </dependencies>
+ </project>
+Index: java/modules/handler/pom.xml
+===================================================================
+--- java/modules/handler/pom.xml	(revision 1224696)
++++ java/modules/handler/pom.xml	(revision 1224697)
+@@ -38,13 +38,10 @@
+     <packaging>bundle</packaging>
+ 
+     <build>
+-
+         <plugins>
+-
+             <plugin>
+                 <groupId>org.apache.felix</groupId>
+                 <artifactId>maven-bundle-plugin</artifactId>
+-                <version>1.4.0</version>
+                 <extensions>true</extensions>
+                 <configuration>
+                     <instructions>
+@@ -62,11 +59,9 @@
+                     </instructions>
+                 </configuration>
+             </plugin>
+-
+             <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-antrun-plugin</artifactId>
+-                <version>1.1</version>
+                 <executions>
+                     <execution>
+                         <id>mar</id>
+@@ -83,11 +78,9 @@
+                     </execution>
+                 </executions>
+             </plugin>
+-
+             <plugin>
+                 <groupId>org.codehaus.mojo</groupId>
+                 <artifactId>build-helper-maven-plugin</artifactId>
+-                <version>1.0</version>
+                 <executions>
+                     <execution>
+                         <id>mar</id>
+Index: java/modules/distribution/src/main/assembly/bin.xml
+===================================================================
+--- java/modules/distribution/src/main/assembly/bin.xml	(revision 1224696)
++++ java/modules/distribution/src/main/assembly/bin.xml	(revision 1224697)
+@@ -237,21 +237,13 @@
+                 <exclude>org.apache.axis2:addressing:mar</exclude>
+                 <exclude>org.apache.rampart:rampart:mar</exclude>
+                 <exclude>org.apache.sandesha2:sandesha2:mar</exclude>
+-                <exclude>org.apache.ant:ant:jar</exclude>
+-                <exclude>org.apache.ant:ant-launcher:jar</exclude>
+                 <exclude>javax.servlet:servlet-api:jar</exclude>
+                 <exclude>xml-apis:xml-apis:jar</exclude>
+                 <exclude>xerces:xercesImpl:jar</exclude>
+-		<exclude>org.apache.xerces:xercesImpl</exclude>
+-		<exclude>org.apache.xerces:xml-apis</exclude>
+-                <exclude>junit:junit:jar</exclude>
+-                <exclude>org.apache.mina:mina-core:jar</exclude>
+-                <exclude>org.slf4j:slf4j-api:jar</exclude>
+-                <exclude>org.slf4j:slf4j-jdk14:jar</exclude>
+-                <exclude>org.slf4j:jcl-over-slf4j:jar</exclude>
+-                <exclude>org.slf4j:log4j-over-slf4j:jar</exclude>
+-                <exclude>com.oopsconsultancy:xmltask:jar</exclude>
+-		<exclude>xalan:xalan:jar</exclude>
++                <exclude>org.apache.xerces:xercesImpl</exclude> <!-- Find the source of this -->
++                <exclude>org.apache.xerces:xml-apis</exclude>
++		        <exclude>xalan:xalan:jar</exclude>
++                <exclude>quickfixj:quickfixj-all:jar</exclude>
+             </excludes>
+         </dependencySet>
+         <dependencySet>
+@@ -266,7 +258,6 @@
+             <useProjectArtifact>false</useProjectArtifact>
+             <outputDirectory>synapse-${synapse.version}/lib/endorsed</outputDirectory>
+             <includes>
+-                <include>xml-apis:xml-apis:jar</include>
+                 <include>xerces:xercesImpl:jar</include>
+             </includes>
+         </dependencySet>
+Index: java/modules/distribution/pom.xml
+===================================================================
+--- java/modules/distribution/pom.xml	(revision 1224696)
++++ java/modules/distribution/pom.xml	(revision 1224697)
+@@ -38,30 +38,37 @@
+     <dependencies>
+         <dependency>
+             <groupId>org.apache.synapse</groupId>
++            <artifactId>synapse-core</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>org.apache.synapse</groupId>
++            <artifactId>synapse-commons</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>org.apache.synapse</groupId>
+             <artifactId>synapse-extensions</artifactId>
+-            <version>${pom.version}</version>
+         </dependency>
+         <dependency>
+             <groupId>org.apache.synapse</groupId>
+             <artifactId>synapse-samples</artifactId>
+-            <version>${pom.version}</version>
+         </dependency>
+         <dependency>
+             <groupId>org.apache.synapse</groupId>
+             <artifactId>synapse-experimental</artifactId>
+-            <version>${pom.version}</version>
+         </dependency>
+         <dependency>
+             <groupId>org.apache.synapse</groupId>
+             <artifactId>synapse-config-migrator</artifactId>
+-            <version>${pom.version}</version>
+         </dependency>
++        <dependency>
++            <groupId>org.apache.synapse</groupId>
++            <artifactId>synapse-fix-transport</artifactId>
++        </dependency>
+ 
+         <!-- Wrapper jars -->
+         <dependency>
+             <groupId>wrapper</groupId>
+             <artifactId>wrapper</artifactId>
+-            <version>${wrapper.version}</version>
+         </dependency>
+ 
+         <!-- The distribution is configured for log4j. Normally, log4j should not
+@@ -75,57 +82,21 @@
+         <dependency>
+             <groupId>org.apache.rampart</groupId>
+             <artifactId>rampart</artifactId>
+-            <version>${rampart.version}</version>
+-            <exclusions>
+-                <exclusion>
+-                    <groupId>org.apache.woden</groupId>
+-                    <artifactId>woden-api</artifactId>
+-                </exclusion>
+-                <exclusion>
+-                    <groupId>xalan</groupId>
+-                    <artifactId>xalan</artifactId>
+-                </exclusion>
+-            </exclusions>
+             <type>mar</type>
+         </dependency>
+         <dependency>
+             <groupId>org.apache.sandesha2</groupId>
+             <artifactId>sandesha2</artifactId>
+-            <version>${sandesha2.version}</version>
+-            <exclusions>
+-                <exclusion>
+-                    <groupId>org.apache.axis2</groupId>
+-                    <artifactId>axis2</artifactId>
+-                </exclusion>
+-            </exclusions>
+             <type>mar</type>
+         </dependency>
+         <dependency>
+             <groupId>org.apache.sandesha2</groupId>
+             <artifactId>sandesha2-policy</artifactId>
+-            <version>${sandesha2.version}</version>
+-            <exclusions>
+-                <exclusion>
+-                    <groupId>org.apache.axis2</groupId>
+-                    <artifactId>axis2</artifactId>
+-                </exclusion>
+-            </exclusions>
+         </dependency>
+         <dependency>
+             <groupId>org.apache.axis2</groupId>
+             <artifactId>addressing</artifactId>
+-            <version>${addressing.version}</version>
+             <type>mar</type>
+-            <exclusions>
+-                <exclusion>
+-                    <groupId>org.apache.geronimo.specs</groupId>
+-                    <artifactId>geronimo-javamail_1.4_spec</artifactId>
+-                </exclusion>
+-                <exclusion>
+-                    <groupId>org.apache.geronimo.specs</groupId>
+-                    <artifactId>geronimo-activation_1.1_spec</artifactId>
+-                </exclusion>
+-            </exclusions>
+         </dependency>
+         
+         <!-- Because of a design flaw in Axis2 (see AXIS2-4265), axis2-codegen is required
+@@ -159,10 +130,17 @@
+         <dependency>
+             <groupId>org.apache.synapse</groupId>
+             <artifactId>synapse-patches</artifactId>
+-            <version>${pom.version}</version>
+             <classifier>jars</classifier>
+             <type>zip</type>
+         </dependency>
++        <dependency>
++            <groupId>org.apache.woden</groupId>
++            <artifactId>woden-api</artifactId>
++        </dependency>
++        <!--dependency>
++            <groupId>xerces</groupId>
++            <artifactId>xercesImpl</artifactId>
++        </dependency-->
+     </dependencies>
+ 
+     <repositories>
+@@ -183,9 +161,7 @@
+     <build>
+         <plugins>
+             <plugin>
+-                <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-assembly-plugin</artifactId>
+-                <version>2.2-beta-2</version>
+                 <executions>
+                     <execution>
+                         <id>distribution-package</id>
+Index: java/modules/transports/core/nhttp/pom.xml
+===================================================================
+--- java/modules/transports/core/nhttp/pom.xml	(revision 1224696)
++++ java/modules/transports/core/nhttp/pom.xml	(revision 1224697)
+@@ -41,7 +41,6 @@
+             <plugin>
+                 <groupId>org.apache.felix</groupId>
+                 <artifactId>maven-bundle-plugin</artifactId>
+-                <version>1.4.0</version>
+                 <extensions>true</extensions>
+                 <configuration>
+                     <instructions>
+@@ -60,7 +59,6 @@
+             <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-dependency-plugin</artifactId>
+-                <version>2.0</version>
+                 <executions>
+                     <execution>
+                         <id>copy</id>
+@@ -84,7 +82,6 @@
+             <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-surefire-plugin</artifactId>
+-                <version>2.3</version>
+                 <configuration>
+                     <systemProperties>
+                         <property>
+@@ -134,12 +131,10 @@
+         <dependency>
+             <groupId>org.apache.httpcomponents</groupId>
+             <artifactId>httpcore</artifactId>
+-            <version>${httpcore.nio.version}</version>
+         </dependency>
+         <dependency>
+             <groupId>org.apache.httpcomponents</groupId>
+             <artifactId>httpcore-nio</artifactId>
+-            <version>${httpcore.nio.version}</version>
+         </dependency>
+         <!-- The HTTP NIO transport depends on a few methods from the blocking HTTP transport,
+              so we need to add this as an explicit dependency. -->
+@@ -153,8 +148,4 @@
+         </dependency>
+     </dependencies>
+ 
+-    <properties>
+-        <httpcore.nio.version>4.1</httpcore.nio.version>
+-    </properties>
+-
+ </project>
+Index: java/modules/transports/core/pipe/pom.xml
+===================================================================
+--- java/modules/transports/core/pipe/pom.xml	(revision 1224696)
++++ java/modules/transports/core/pipe/pom.xml	(revision 1224697)
+@@ -41,7 +41,6 @@
+             <plugin>
+                 <groupId>org.apache.felix</groupId>
+                 <artifactId>maven-bundle-plugin</artifactId>
+-                <version>1.4.0</version>
+                 <extensions>true</extensions>
+                 <configuration>
+                     <instructions>
+@@ -58,6 +57,4 @@
+         </plugins>
+     </build>
+ 
+-    <dependencies>
+-    </dependencies>
+ </project>
+\ No newline at end of file
+Index: java/modules/transports/core/vfs/pom.xml
+===================================================================
+--- java/modules/transports/core/vfs/pom.xml	(revision 1224696)
++++ java/modules/transports/core/vfs/pom.xml	(revision 1224697)
+@@ -41,7 +41,6 @@
+             <plugin>
+                 <groupId>org.apache.felix</groupId>
+                 <artifactId>maven-bundle-plugin</artifactId>
+-                <version>1.4.0</version>
+                 <extensions>true</extensions>
+                 <configuration>
+                     <instructions>
+@@ -62,7 +61,6 @@
+             <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-dependency-plugin</artifactId>
+-                <version>2.0</version>
+                 <executions>
+                     <execution>
+                         <id>copy</id>
+@@ -86,7 +84,6 @@
+             <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-surefire-plugin</artifactId>
+-                <version>2.3</version>
+                 <configuration>
+                     <systemProperties>
+                         <property>
+@@ -111,7 +108,6 @@
+                 <plugins>
+                     <plugin>
+                         <artifactId>maven-assembly-plugin</artifactId>
+-                        <version>2.2-beta-2</version>
+                         <configuration>
+                             <descriptors>
+                                 <descriptor>src/main/assembly/testkit-logs.xml</descriptor>
+@@ -136,44 +132,18 @@
+         <dependency>
+             <groupId>org.apache.commons</groupId>
+             <artifactId>commons-vfs2</artifactId>
+-            <version>${commons.vfs.version}</version>
+         </dependency>
+         <dependency>
+-            <groupId>org.apache.mina</groupId>
+-            <artifactId>mina-core</artifactId>
+-            <version>${mina.version}</version>
+-        </dependency>
+-        <dependency>
+-            <groupId>org.slf4j</groupId>
+-            <artifactId>slf4j-api</artifactId>
+-            <version>${slf4j.version}</version>
+-        </dependency>
+-
+-        <dependency>
+             <groupId>de.schlichtherle.io</groupId>
+             <artifactId>truezip</artifactId>
+-            <version>${truezip.version}</version>
+-            <optional>true</optional>
+         </dependency>
+         <dependency>
+-            <groupId>commons-net</groupId>
+-            <artifactId>commons-net</artifactId>
+-            <version>${commons.net.version}</version>
+-        </dependency>
+-        <dependency>
+             <groupId>com.jcraft</groupId>
+             <artifactId>jsch</artifactId>
+-            <version>${jsch.version}</version>
+         </dependency>
+         <dependency>
+-            <groupId>oro</groupId>
+-            <artifactId>oro</artifactId>
+-            <version>${oro.version}</version>
++            <groupId>commons-net</groupId>
++            <artifactId>commons-net</artifactId>
+         </dependency>
+-        <dependency>
+-            <groupId>commons-io</groupId>
+-            <artifactId>commons-io</artifactId>
+-            <version>${commons_io.version}</version>
+-        </dependency>
+     </dependencies>
+ </project>
+Index: java/modules/transports/optional/fix/pom.xml
+===================================================================
+--- java/modules/transports/optional/fix/pom.xml	(revision 1224696)
++++ java/modules/transports/optional/fix/pom.xml	(revision 1224697)
+@@ -41,7 +41,6 @@
+             <plugin>
+                 <groupId>org.apache.felix</groupId>
+                 <artifactId>maven-bundle-plugin</artifactId>
+-                <version>1.4.0</version>
+                 <extensions>true</extensions>
+                 <configuration>
+                     <instructions>
+@@ -107,17 +106,11 @@
+         <dependency>
+             <groupId>quickfixj</groupId>
+             <artifactId>quickfixj-all</artifactId>
+-            <version>${qfj.version}</version>
+         </dependency>
+         <dependency>
+-            <groupId>org.apache.synapse</groupId>
+-            <artifactId>synapse-core</artifactId>
+-            <scope>test</scope>            
++            <groupId>xmlunit</groupId>
++            <artifactId>xmlunit</artifactId>
+         </dependency>
+     </dependencies>
+ 
+-    <properties>
+-        <qfj.version>1.4.0</qfj.version>
+-    </properties>
+-
+ </project>
+Index: java/repository/conf/sample/synapse_sample_371.xml
+===================================================================
+--- java/repository/conf/sample/synapse_sample_371.xml	(revision 1224696)
++++ java/repository/conf/sample/synapse_sample_371.xml	(revision 1224697)
+@@ -38,7 +38,6 @@
+                                         <throttle:ProhibitTimePeriod wsp:Optional="true">10000
+                                         </throttle:ProhibitTimePeriod>
+                                     </wsp:All>
+-                                    <throttle:IsAllow>true</throttle:IsAllow>
+                                 </wsp:ExactlyOne>
+                             </wsp:All>
+                             <wsp:All>
+@@ -51,7 +50,6 @@
+                                         <throttle:ProhibitTimePeriod wsp:Optional="true">10
+                                         </throttle:ProhibitTimePeriod>
+                                     </wsp:All>
+-                                    <throttle:IsAllow>true</throttle:IsAllow>
+                                 </wsp:ExactlyOne>
+                             </wsp:All>
+                             <wsp:All>
+@@ -62,7 +60,6 @@
+                                         <throttle:UnitTime>600000</throttle:UnitTime>
+                                         <throttle:ProhibitTimePeriod wsp:Optional="true"/>
+                                     </wsp:All>
+-                                    <throttle:IsAllow>true</throttle:IsAllow>
+                                 </wsp:ExactlyOne>
+                             </wsp:All>
+                             <wsp:All>
+@@ -73,7 +70,6 @@
+                                         <throttle:UnitTime>500000</throttle:UnitTime>
+                                         <throttle:ProhibitTimePeriod wsp:Optional="true"/>
+                                     </wsp:All>
+-                                    <throttle:IsAllow>true</throttle:IsAllow>
+                                 </wsp:ExactlyOne>
+                             </wsp:All>
+                         </throttle:ThrottleAssertion>
 -*-*-*-
 Message: POM cleanup
 1. Removed unneccessary dependencies (bcel, groovy, jlex etc)
@@ -2690,3 +2690,5 @@ Message: POM cleanup
 
 -*-*-*-
 When: 2011-12-26 03:51:29 -0500 
+-*-*-*-
+Who: hiranya

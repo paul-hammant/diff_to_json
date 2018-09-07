@@ -119,63 +119,38 @@ Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample440.xml
 -    </body>
 -</document>
 \ No newline at end of file
-Index: scratch/hiranya/website/src/site/xdoc/userguide/samples.xml
+Index: scratch/hiranya/website/src/site/site.xml
 ===================================================================
---- scratch/hiranya/website/src/site/xdoc/userguide/samples.xml	(revision 1222291)
-+++ scratch/hiranya/website/src/site/xdoc/userguide/samples.xml	(revision 1222292)
-@@ -86,6 +86,9 @@
-                         <li><a href="samples/sample153.html">Sample 153: Routing the messages without processing the security headers</a></li>
-                         <li><a href="samples/sample154.html">Sample 154: Load Balancing with proxy services</a></li>
-                         <li><a href="samples/sample155.html">Sample 155: Dual channel invocation on client side and server side</a></li>
-+                        <li><a href="samples/sample156.html">Sample 156: Service integration with specifying the receiving sequence</a></li>
-+                        <li><a href="samples/sample157.html">Sample 157: Conditional router mediator for implementing complex routing scenarios</a></li>
-+                        <li><a href="samples/sample158.html">Sample 158: Exposing a SOAP service over JSON</a></li>
-                     </ul>
-                 </p>
-             </subsection>
-@@ -241,14 +244,6 @@
-                     </ul>
-                 </p>
-             </subsection>
--            <subsection name="Mediating JSON Messages">
--                <p>
--                    <ul>
--                        <!-- This sample should be renamed -->
--                        <li><a href="#Sample440">Sample 440: Exposing a SOAP service over JSON</a></li>
--                    </ul>
--                </p>
--            </subsection>
-             <subsection name="REST API">
-                 <p>
-                     <ul>
-Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample800.xml
-===================================================================
---- scratch/hiranya/website/src/site/xdoc/userguide/samples/sample800.xml	(revision 1222291)
-+++ scratch/hiranya/website/src/site/xdoc/userguide/samples/sample800.xml	(revision 1222292)
-@@ -24,8 +24,7 @@
-     </properties>
-     <body>
-         <section name="Sample 800: Introduction to REST API">
--            <div class="xmlConf">&lt;!-- An empty flat synapse configuration shipped with the WSO2 ESB --&gt;
--&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
-+            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
- 
-     &lt;!-- You can add any flat sequences, endpoints, etc.. to this synapse.xml file if you do
-     *not* want to keep the artifacts in several files --&gt;
-Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/script.xml
-===================================================================
---- scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/script.xml	(revision 1222291)
-+++ scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/script.xml	(revision 1222292)
-@@ -78,6 +78,9 @@
- 						<a class="externalLink" href="http://jettison.codehaus.org/Download">jettison.jar</a>
- 					</li>
- 				</ul>
-+                <p>
-+                    Jettison 1.1 is recommended.
-+                </p>
- 				<p>
-       			Having deployed the necessary libraries you should now register the JSON message
-       			builder and formatter with Synapse. Open up 'repository/conf/axis2.xml' file
+--- scratch/hiranya/website/src/site/site.xml	(revision 1222291)
++++ scratch/hiranya/website/src/site/site.xml	(revision 1222292)
+@@ -39,14 +39,15 @@
+             <item name="Installation Guide" href="userguide/installation.html"/>
+             <item name="Quick Start Guide" href="userguide/quick_start.html"/>
+             <item name="Samples Setup Guide" href="userguide/samples/setup/index.html"/>
+-            <item name="Extending Synapse" href="userguide/extending.html"/>
+             <item name="Samples Catalog" href="userguide/samples.html"/>
+             <item name="Configuration Language" href="userguide/config.html"/>
++            <item name="Mediators Catalog" href="userguide/mediators.html"/>
++            <item name="Transports Catalog" href="userguide/transports.html"/>
++            <item name="Extending Synapse" href="userguide/extending.html"/>
+             <item name="Upgrading" href="userguide/upgrading.html"/>
+             <item name="Deployment" href="userguide/deployment.html"/>
+-            <item name="Transport" href="userguide/transports.html"/>
+             <item name="Javadocs" href="apidocs/"/>
+-            <item name="FAQ" href="apidocs/"/>
++            <item name="FAQ" href="userguide/faq.html"/>
+         </menu>
+         <menu name="Developer Resources">
+             <item name="Developer Guide " href="developer-guide.html"/>
+@@ -55,7 +56,7 @@
+             <item name="How to Contribute"/>
+         </menu>
+         <menu name="Project Details">
+-            <item name="Overview" href="project-details.html"/>
++            <item name="Overview" href="project-info.html"/>
+             <item name="Mailing Lists" href="mail-lists.html"/>
+             <item name="Source Repository" href="source-repository.html"/>
+             <item name="Issue Tracking" href="issue-tracking.html"/>
 Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample156.xml
 ===================================================================
 --- scratch/hiranya/website/src/site/xdoc/userguide/samples/sample156.xml	(nonexistent)
@@ -645,6 +620,34 @@ Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample158.xml
 +    </body>
 +</document>
 \ No newline at end of file
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample800.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples/sample800.xml	(revision 1222291)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples/sample800.xml	(revision 1222292)
+@@ -24,8 +24,7 @@
+     </properties>
+     <body>
+         <section name="Sample 800: Introduction to REST API">
+-            <div class="xmlConf">&lt;!-- An empty flat synapse configuration shipped with the WSO2 ESB --&gt;
+-&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
++            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+ 
+     &lt;!-- You can add any flat sequences, endpoints, etc.. to this synapse.xml file if you do
+     *not* want to keep the artifacts in several files --&gt;
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/script.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/script.xml	(revision 1222291)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/script.xml	(revision 1222292)
+@@ -78,6 +78,9 @@
+ 						<a class="externalLink" href="http://jettison.codehaus.org/Download">jettison.jar</a>
+ 					</li>
+ 				</ul>
++                <p>
++                    Jettison 1.1 is recommended.
++                </p>
+ 				<p>
+       			Having deployed the necessary libraries you should now register the JSON message
+       			builder and formatter with Synapse. Open up 'repository/conf/axis2.xml' file
 Index: scratch/hiranya/website/src/site/xdoc/userguide/mediators.xml
 ===================================================================
 --- scratch/hiranya/website/src/site/xdoc/userguide/mediators.xml	(revision 1222291)
@@ -675,6 +678,35 @@ Index: scratch/hiranya/website/src/site/xdoc/userguide/transports.xml
  			<p>
                  The Synapse project has developed a set of transport implementations that provide
                  protocol support and/or features that go beyond what is provided out of the box by
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples.xml	(revision 1222291)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples.xml	(revision 1222292)
+@@ -86,6 +86,9 @@
+                         <li><a href="samples/sample153.html">Sample 153: Routing the messages without processing the security headers</a></li>
+                         <li><a href="samples/sample154.html">Sample 154: Load Balancing with proxy services</a></li>
+                         <li><a href="samples/sample155.html">Sample 155: Dual channel invocation on client side and server side</a></li>
++                        <li><a href="samples/sample156.html">Sample 156: Service integration with specifying the receiving sequence</a></li>
++                        <li><a href="samples/sample157.html">Sample 157: Conditional router mediator for implementing complex routing scenarios</a></li>
++                        <li><a href="samples/sample158.html">Sample 158: Exposing a SOAP service over JSON</a></li>
+                     </ul>
+                 </p>
+             </subsection>
+@@ -241,14 +244,6 @@
+                     </ul>
+                 </p>
+             </subsection>
+-            <subsection name="Mediating JSON Messages">
+-                <p>
+-                    <ul>
+-                        <!-- This sample should be renamed -->
+-                        <li><a href="#Sample440">Sample 440: Exposing a SOAP service over JSON</a></li>
+-                    </ul>
+-                </p>
+-            </subsection>
+             <subsection name="REST API">
+                 <p>
+                     <ul>
 Index: scratch/hiranya/website/src/site/xdoc/download.xml
 ===================================================================
 --- scratch/hiranya/website/src/site/xdoc/download.xml	(revision 1222291)
@@ -730,39 +762,9 @@ Index: scratch/hiranya/website/src/site/xdoc/download.xml
              </table>
          </section>
      </body>
-Index: scratch/hiranya/website/src/site/site.xml
-===================================================================
---- scratch/hiranya/website/src/site/site.xml	(revision 1222291)
-+++ scratch/hiranya/website/src/site/site.xml	(revision 1222292)
-@@ -39,14 +39,15 @@
-             <item name="Installation Guide" href="userguide/installation.html"/>
-             <item name="Quick Start Guide" href="userguide/quick_start.html"/>
-             <item name="Samples Setup Guide" href="userguide/samples/setup/index.html"/>
--            <item name="Extending Synapse" href="userguide/extending.html"/>
-             <item name="Samples Catalog" href="userguide/samples.html"/>
-             <item name="Configuration Language" href="userguide/config.html"/>
-+            <item name="Mediators Catalog" href="userguide/mediators.html"/>
-+            <item name="Transports Catalog" href="userguide/transports.html"/>
-+            <item name="Extending Synapse" href="userguide/extending.html"/>
-             <item name="Upgrading" href="userguide/upgrading.html"/>
-             <item name="Deployment" href="userguide/deployment.html"/>
--            <item name="Transport" href="userguide/transports.html"/>
-             <item name="Javadocs" href="apidocs/"/>
--            <item name="FAQ" href="apidocs/"/>
-+            <item name="FAQ" href="userguide/faq.html"/>
-         </menu>
-         <menu name="Developer Resources">
-             <item name="Developer Guide " href="developer-guide.html"/>
-@@ -55,7 +56,7 @@
-             <item name="How to Contribute"/>
-         </menu>
-         <menu name="Project Details">
--            <item name="Overview" href="project-details.html"/>
-+            <item name="Overview" href="project-info.html"/>
-             <item name="Mailing Lists" href="mail-lists.html"/>
-             <item name="Source Repository" href="source-repository.html"/>
-             <item name="Issue Tracking" href="issue-tracking.html"/>
 -*-*-*-
 Message: Documentation update
 -*-*-*-
 When: 2011-12-22 10:51:46 -0500 
+-*-*-*-
+Who: hiranya

@@ -79,6 +79,32 @@ Added: svn:executable
 ## -0,0 +1 ##
 +*
 \ No newline at end of property
+Index: java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/register_user.xml
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/register_user.xml	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/register_user.xml	(revision 1329742)
+@@ -0,0 +1,14 @@
++<template xmlns="http://ws.apache.org/ns/synapse" name="register_user">
++        <parameter name="oauth.consumerKey"/>
++        <parameter name="oauth.consumerSecret"/>
++        <parameter name="oauth.accessToken"/>
++        <parameter name="oauth.accessTokenSecret"/>
++        <parameter name="profile.id"/>
++        <sequence>
++            	<log level="full">
++			<property name="Linkedin sample operation" expression="$func:profile.id" />
++		</log>
++		<!--use a Log mediator just for testing for the Test Lib -->
++		<class name="org.apache.synapse.mediators.builtin.LogMediator" />
++        </sequence>
++    </template>	
+
+Property changes on: java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/register_user.xml
+___________________________________________________________________
+Added: svn:executable
+## -0,0 +1 ##
++*
+\ No newline at end of property
 Index: java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/post_status.xml
 ===================================================================
 --- java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/post_status.xml	(nonexistent)
@@ -182,73 +208,6 @@ Added: svn:executable
 ## -0,0 +1 ##
 +*
 \ No newline at end of property
-Index: java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/register_user.xml
-===================================================================
---- java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/register_user.xml	(nonexistent)
-+++ java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/register_user.xml	(revision 1329742)
-@@ -0,0 +1,14 @@
-+<template xmlns="http://ws.apache.org/ns/synapse" name="register_user">
-+        <parameter name="oauth.consumerKey"/>
-+        <parameter name="oauth.consumerSecret"/>
-+        <parameter name="oauth.accessToken"/>
-+        <parameter name="oauth.accessTokenSecret"/>
-+        <parameter name="profile.id"/>
-+        <sequence>
-+            	<log level="full">
-+			<property name="Linkedin sample operation" expression="$func:profile.id" />
-+		</log>
-+		<!--use a Log mediator just for testing for the Test Lib -->
-+		<class name="org.apache.synapse.mediators.builtin.LogMediator" />
-+        </sequence>
-+    </template>	
-
-Property changes on: java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/register_user.xml
-___________________________________________________________________
-Added: svn:executable
-## -0,0 +1 ##
-+*
-\ No newline at end of property
-Index: java/modules/core/src/test/java/org/apache/synapse/libraries/util/LibDeployerUtilsTest.java
-===================================================================
---- java/modules/core/src/test/java/org/apache/synapse/libraries/util/LibDeployerUtilsTest.java	(revision 1329741)
-+++ java/modules/core/src/test/java/org/apache/synapse/libraries/util/LibDeployerUtilsTest.java	(revision 1329742)
-@@ -18,11 +18,10 @@
-  */
- package org.apache.synapse.libraries.util;
- 
--import junit.framework.TestCase;
-+import org.apache.synapse.libraries.AbstractLibTestCase;
- import org.apache.synapse.libraries.model.Library;
- 
- import javax.xml.namespace.QName;
--import java.net.URL;
- 
- /**
-  * Created by IntelliJ IDEA.
-@@ -31,14 +30,12 @@
-  * Time: 4:54 PM
-  * To change this template use File | Settings | File Templates.
-  */
--public abstract class LibDeployerUtilsTest extends TestCase {
-+public class LibDeployerUtilsTest extends AbstractLibTestCase {
- 
--/*
-     String path;
- 
-     public void setUp() {
--        URL resource = LibDeployerUtilsTest.class.getResource("/synapse-libraries/SynapseTestLibrary.zip");
--        path = resource.getPath();
-+        path = getResourcePath();
-     }
- 
-     public void testCreateSynapseLibrary() {
-@@ -49,6 +46,5 @@
-         assertEquals("org.apache.synapse.linkedin", library.getPackage());
-         assertEquals("synapse library for Linkedin", library.getDescription());
-     }
--*/
- 
- }
 Index: java/modules/core/src/test/java/org/apache/synapse/libraries/LibImportTest.java
 ===================================================================
 --- java/modules/core/src/test/java/org/apache/synapse/libraries/LibImportTest.java	(revision 1329741)
@@ -358,6 +317,47 @@ Index: java/modules/core/src/test/java/org/apache/synapse/libraries/AbstractLibT
 +        return path;
 +    }
 +}
+Index: java/modules/core/src/test/java/org/apache/synapse/libraries/util/LibDeployerUtilsTest.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/libraries/util/LibDeployerUtilsTest.java	(revision 1329741)
++++ java/modules/core/src/test/java/org/apache/synapse/libraries/util/LibDeployerUtilsTest.java	(revision 1329742)
+@@ -18,11 +18,10 @@
+  */
+ package org.apache.synapse.libraries.util;
+ 
+-import junit.framework.TestCase;
++import org.apache.synapse.libraries.AbstractLibTestCase;
+ import org.apache.synapse.libraries.model.Library;
+ 
+ import javax.xml.namespace.QName;
+-import java.net.URL;
+ 
+ /**
+  * Created by IntelliJ IDEA.
+@@ -31,14 +30,12 @@
+  * Time: 4:54 PM
+  * To change this template use File | Settings | File Templates.
+  */
+-public abstract class LibDeployerUtilsTest extends TestCase {
++public class LibDeployerUtilsTest extends AbstractLibTestCase {
+ 
+-/*
+     String path;
+ 
+     public void setUp() {
+-        URL resource = LibDeployerUtilsTest.class.getResource("/synapse-libraries/SynapseTestLibrary.zip");
+-        path = resource.getPath();
++        path = getResourcePath();
+     }
+ 
+     public void testCreateSynapseLibrary() {
+@@ -49,6 +46,5 @@
+         assertEquals("org.apache.synapse.linkedin", library.getPackage());
+         assertEquals("synapse library for Linkedin", library.getDescription());
+     }
+-*/
+ 
+ }
 Index: java/modules/core/pom.xml
 ===================================================================
 --- java/modules/core/pom.xml	(revision 1329741)
@@ -427,3 +427,5 @@ Index: java/modules/core/pom.xml
 Message: fixing synapse tests cases for Synapse libraries
 -*-*-*-
 When: 2012-04-24 10:35:29 -0400 
+-*-*-*-
+Who: uswick

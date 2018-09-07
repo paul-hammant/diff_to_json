@@ -1,3 +1,57 @@
+Index: scratch/hiranya/website/src/site/site.xml
+===================================================================
+--- scratch/hiranya/website/src/site/site.xml	(revision 1222212)
++++ scratch/hiranya/website/src/site/site.xml	(revision 1222213)
+@@ -36,12 +36,14 @@
+             <item name="Installation Guide" href="userguide/installation.html"/>
+             <item name="Quick Start Guide" href="userguide/quick_start.html"/>
+             <item name="Samples Setup Guide" href="userguide/samples/setup/index.html"/>
+-            <item name="Extending the Service Bus" href="userguide/extending.html"/>
++            <item name="Extending Synapse" href="userguide/extending.html"/>
+             <item name="Samples Catalog" href="userguide/samples.html"/>
+             <item name="Configuration Language" href="userguide/config.html"/>
+             <item name="Upgrading" href="userguide/upgrading.html"/>
+             <item name="Deployment" href="userguide/deployment.html"/>
+             <item name="Transport" href="userguide/transports.html"/>
++            <item name="Javadocs" href="apidocs/"/>
++            <item name="FAQ" href="apidocs/"/>
+         </menu>
+         <menu name="Developer Resources">
+             <item name="Checkout the Source"/>
+Index: scratch/hiranya/website/src/site/xdoc/userguide/extending.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/extending.xml	(revision 1222212)
++++ scratch/hiranya/website/src/site/xdoc/userguide/extending.xml	(revision 1222213)
+@@ -21,11 +21,11 @@
+ 
+ <document>
+ 	<properties>
+-		<title>Apache Synapse - Extending the Service Bus</title>
++		<title>Apache Synapse - Extending Synapse</title>
+ 	</properties>
+ 	<body>
+ 			<div id="contentBox">
+-				   <section name="Apache Synapse ESB - Extending the Service Bus">
++				   <section name="Apache Synapse ESB - Extending Synapse">
+ 					<p>
+ 						Apache Synapse provides a number of extension points so that
+ 						users can plug-in custom developed code to extend the
+@@ -69,7 +69,6 @@
+ 							Interface
+ 						</a>
+ 					</h4>
+-					<p></p>
+ 					<div class="xmlConf">package org.apache.synapse;
+ 
+ import ...
+@@ -365,7 +364,6 @@
+      */
+     public QName getTagQName();
+ }</div>
+-					<p></p>
+ 					<h4>
+ 						<a class="externalLink"
+ 							href="http://svn.apache.org/viewvc/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializer.java?view=markup">The
 Index: scratch/hiranya/website/src/site/xdoc/userguide/transports.xml
 ===================================================================
 --- scratch/hiranya/website/src/site/xdoc/userguide/transports.xml	(revision 1222212)
@@ -189,61 +243,9 @@ Index: scratch/hiranya/website/src/site/xdoc/userguide/history.xml
      <body>
          <section name="History of Synapse">
              <p>
-Index: scratch/hiranya/website/src/site/xdoc/userguide/extending.xml
-===================================================================
---- scratch/hiranya/website/src/site/xdoc/userguide/extending.xml	(revision 1222212)
-+++ scratch/hiranya/website/src/site/xdoc/userguide/extending.xml	(revision 1222213)
-@@ -21,11 +21,11 @@
- 
- <document>
- 	<properties>
--		<title>Apache Synapse - Extending the Service Bus</title>
-+		<title>Apache Synapse - Extending Synapse</title>
- 	</properties>
- 	<body>
- 			<div id="contentBox">
--				   <section name="Apache Synapse ESB - Extending the Service Bus">
-+				   <section name="Apache Synapse ESB - Extending Synapse">
- 					<p>
- 						Apache Synapse provides a number of extension points so that
- 						users can plug-in custom developed code to extend the
-@@ -69,7 +69,6 @@
- 							Interface
- 						</a>
- 					</h4>
--					<p></p>
- 					<div class="xmlConf">package org.apache.synapse;
- 
- import ...
-@@ -365,7 +364,6 @@
-      */
-     public QName getTagQName();
- }</div>
--					<p></p>
- 					<h4>
- 						<a class="externalLink"
- 							href="http://svn.apache.org/viewvc/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializer.java?view=markup">The
-Index: scratch/hiranya/website/src/site/site.xml
-===================================================================
---- scratch/hiranya/website/src/site/site.xml	(revision 1222212)
-+++ scratch/hiranya/website/src/site/site.xml	(revision 1222213)
-@@ -36,12 +36,14 @@
-             <item name="Installation Guide" href="userguide/installation.html"/>
-             <item name="Quick Start Guide" href="userguide/quick_start.html"/>
-             <item name="Samples Setup Guide" href="userguide/samples/setup/index.html"/>
--            <item name="Extending the Service Bus" href="userguide/extending.html"/>
-+            <item name="Extending Synapse" href="userguide/extending.html"/>
-             <item name="Samples Catalog" href="userguide/samples.html"/>
-             <item name="Configuration Language" href="userguide/config.html"/>
-             <item name="Upgrading" href="userguide/upgrading.html"/>
-             <item name="Deployment" href="userguide/deployment.html"/>
-             <item name="Transport" href="userguide/transports.html"/>
-+            <item name="Javadocs" href="apidocs/"/>
-+            <item name="FAQ" href="apidocs/"/>
-         </menu>
-         <menu name="Developer Resources">
-             <item name="Checkout the Source"/>
 -*-*-*-
 Message: Site updates
 -*-*-*-
 When: 2011-12-22 08:14:20 -0500 
+-*-*-*-
+Who: hiranya

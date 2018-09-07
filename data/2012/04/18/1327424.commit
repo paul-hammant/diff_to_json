@@ -15,3 +15,5 @@ Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/AbstractEndp
 Message: fixed SYNAPSE-845
 -*-*-*-
 When: 2012-04-18 04:33:11 -0400 
+-*-*-*-
+Who: miyuru

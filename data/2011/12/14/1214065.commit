@@ -15,3 +15,5 @@ Index: java/modules/core/src/main/java/org/apache/synapse/deployers/ProxyService
 Message: committing patch for https://issues.apache.org/jira/browse/SYNAPSE-828
 -*-*-*-
 When: 2011-12-14 01:19:24 -0500 
+-*-*-*-
+Who: uswick

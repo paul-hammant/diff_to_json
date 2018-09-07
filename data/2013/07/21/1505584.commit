@@ -1,0 +1,1675 @@
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample13.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample13.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample13.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.message;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample13 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample13.class);
+     private StockQuoteSampleClient client;
+ 
+     public Sample13() {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample430.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample430.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample430.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.advanced;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample430 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample430.class);
+     SampleClientResult result;
+     StockQuoteSampleClient client;
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample450.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample450.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample450.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.advanced;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample450 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample450.class);
+     SampleClientResult result;
+     StockQuoteSampleClient client;
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample4.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample4.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample4.java	(revision 1505584)
+@@ -16,11 +16,10 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.message;
+ 
+ import org.apache.axis2.AxisFault;
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -27,8 +26,6 @@
+ 
+ public class Sample4 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample4.class);
+-
+     private StockQuoteSampleClient client;
+ 
+     public Sample4() {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample6.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample6.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample6.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.message;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,8 +25,6 @@
+ 
+ public class Sample6 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample6.class);
+-
+     private StockQuoteSampleClient client;
+ 
+     public Sample6() {
+@@ -35,7 +32,6 @@
+         client = getStockQuoteClient();
+     }
+ 
+-
+     public void testManipulatingHeadersAndFiltering() {
+         String trpUrl = "http://localhost:8280/";
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample8.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample8.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample8.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.message;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,8 +25,6 @@
+ 
+ public class Sample8 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample8.class);
+-
+     private StockQuoteSampleClient client;
+ 
+     public Sample8() {
+@@ -40,7 +37,7 @@
+         String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
+         String trpUrl = "http://localhost:8280/";
+ 
+-        log.info("Running test: Introduction to static and dynamic registry resources, and using XSLT transformations  ");
++        log.info("Running test: Introduction to static and dynamic registry resources, and using XSLT transformations");
+         SampleClientResult result = client.requestCustomQuote(addUrl, trpUrl, null, "IBM");
+         assertResponseReceived(result);
+     }
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample10.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample10.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample10.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.message;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample10 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample10.class);
+     private StockQuoteSampleClient client;
+ 
+     public Sample10() {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample12.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample12.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample12.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.message;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample12 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample12.class);
+     private StockQuoteSampleClient client;
+ 
+     public Sample12() {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample16.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample16.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample16.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.message;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample16 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample16.class);
+     private StockQuoteSampleClient client;
+ 
+     public Sample16() {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample350.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample350.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample350.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.advanced;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample350 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample350.class);
+     SampleClientResult result;
+     StockQuoteSampleClient client;
+ 
+@@ -35,7 +33,6 @@
+         client = getStockQuoteClient();
+     }
+ 
+-
+     public void testScriptMediationWithJS() {
+         String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
+         String trpUrl = "http://localhost:8280/";
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java	(revision 1505584)
+@@ -47,7 +47,7 @@
+  */
+ public abstract class SynapseTestCase extends TestCase {
+ 
+-    private static final Log log = LogFactory.getLog(SynapseTestCase.class);
++    protected final Log log = LogFactory.getLog(this.getClass());
+ 
+     private SampleConfiguration configuration;
+     private String sampleDescriptor;
+@@ -59,8 +59,10 @@
+     private String currentLocation;
+ 
+     protected SynapseTestCase(int sampleId) {
++        if (log.isDebugEnabled()) {
++            log.debug("Creating SynapseTestCase for test " + sampleId);
++        }
+         this.sampleId = sampleId;
+-        log.info("Creating Synapse TestCase for test " + sampleId);
+         currentLocation = System.getProperty("user.dir") + File.separator;
+         sampleDescriptor = "/sample" + sampleId + ".xml";
+         configuration = new SampleConfiguration();
+@@ -71,7 +73,7 @@
+ 
+     /**
+      * Executed before this test case. That means, this will be executed before each test.
+-     * Loads all configuration info. and starts the servers.
++     * Loads all configuration info and starts the servers.
+      */
+     public void setUp() {
+         assertTrue("Could not load the global descriptor file for sample " + sampleId,
+@@ -78,6 +80,16 @@
+                 loadDescriptorInfoFile());
+         assertTrue("There are errors in global descriptor file for sample " + sampleId,
+                 processDescriptorFile());
++
++        // Print a short intro to the console, so the console output is more readable
++        String title = "Sample " + sampleId + ": " + configuration.getSampleName();
++        String underline = "";
++        for (int i = 0; i < title.length(); i++) {
++            underline += "=";
++        }
++        System.out.println("\n\n" + title);
++        System.out.println(underline);
++
+         assertTrue("Could not load synapse configuration settings for the sample " + sampleId,
+                 initSynapseConfigInfo());
+         assertTrue("Could not load axis2 configuration settings for the sample " + sampleId,
+@@ -115,7 +127,7 @@
+      */
+     private void doCleanup() {
+         if (pc != null) {
+-            log.info("Stopping Synapse");
++            log.debug("Stopping Synapse");
+             pc.stopProcess();
+         }
+ 
+@@ -149,7 +161,9 @@
+      * @return true if the configuration was loaded successfully
+      */
+     private boolean loadDescriptorInfoFile() {
+-        log.info("Reading sample descriptor file from " + sampleDescriptor);
++        if (log.isDebugEnabled()) {
++            log.debug("Reading sample descriptor file from " + sampleDescriptor);
++        }
+         sampleConfigElement = null;
+         try {
+             InputStream in = this.getClass().getResourceAsStream(sampleDescriptor);
+@@ -209,7 +223,7 @@
+             OMElement ele = (OMElement) itr.next();
+             synapseProperties.setProperty(ele.getLocalName(), ele.getText());
+         }
+-        log.info("Initializing Configuration information for synapse server...");
++        log.debug("Initializing configuration information for synapse server...");
+         String synapseHome = currentLocation;
+ 
+         String synapseXml = synapseProperties.getProperty(SampleConfigConstants.TAG_SYNAPSE_CONF_XML);
+@@ -231,7 +245,9 @@
+             configuration.getSynapseServerConfig().setAxis2Repo(synapseHome +
+                     SampleConfigConstants.DEFAULT_SYNAPSE_CONF_AXIS2_REPO);
+         } else {
+-            log.info("Using Synapse Axis2 repository: " + axis2Repo);
++            if (log.isDebugEnabled()) {
++                log.debug("Using Synapse Axis2 repository: " + axis2Repo);
++            }
+             configuration.getSynapseServerConfig().setAxis2Repo(synapseHome + axis2Repo);
+         }
+ 
+@@ -239,7 +255,9 @@
+             configuration.getSynapseServerConfig().setAxis2Xml(synapseHome +
+                     SampleConfigConstants.DEFAULT_SYNAPSE_CONF_AXIS2_XML);
+         } else {
+-            log.info("Using Synapse Axis2 XML: " + axis2Xml);
++            if (log.isDebugEnabled()) {
++                log.debug("Using Synapse Axis2 XML: " + axis2Xml);
++            }
+             configuration.getSynapseServerConfig().setAxis2Xml(synapseHome + axis2Xml);
+         }
+ 
+@@ -266,7 +284,7 @@
+             log.warn("No backend servers are defined");
+             return false;
+         }
+-        log.info("Initializing Configuration information for backend servers...");
++        log.debug("Initializing configuration information for backend servers...");
+ 
+         // Processing JMS servers
+         Properties jmsProperties = new Properties();
+@@ -391,8 +409,8 @@
+         return true;
+     }
+ 
+-    /*
+-     * reads and stores client specific configuration information from descriptor
++    /**
++     * Reads and stores client specific configuration information from descriptor
+      */
+     private boolean initClientConfigInfo() {
+         Properties clientProperties = new Properties();
+@@ -412,7 +430,7 @@
+             clientProperties.setProperty(ele.getLocalName(), ele.getText());
+         }
+ 
+-        log.info("Initializing Configuration information for clients...");
++        log.debug("Initializing configuration information for clients...");
+         String clientRepo = clientProperties.getProperty(
+                 SampleConfigConstants.TAG_CLIENT_CONF_REPO);
+         String clientAxis2Xml = clientProperties.getProperty(
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample51.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample51.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample51.java	(revision 1505584)
+@@ -16,11 +16,10 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.endpoint;
+ 
+ import org.apache.commons.io.FilenameUtils;
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.MTOMSwASampleClient;
+@@ -29,8 +28,6 @@
+ 
+ public class Sample51 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample51.class);
+-
+     private MTOMSwASampleClient client;
+ 
+     public Sample51() {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample52.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample52.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample52.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.endpoint;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,8 +25,6 @@
+ 
+ public class Sample52 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample52.class);
+-
+     private StockQuoteSampleClient client;
+ 
+     public Sample52() {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample53.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample53.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample53.java	(revision 1505584)
+@@ -16,11 +16,10 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.endpoint;
+ 
+ import org.apache.axis2.AxisFault;
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -27,8 +26,6 @@
+ 
+ public class Sample53 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample53.class);
+-
+     private SampleClientResult result;
+     private StockQuoteSampleClient client;
+     private String addUrl;
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample54.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample54.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample54.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.endpoint;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,8 +25,6 @@
+ 
+ public class Sample54 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample54.class);
+-
+     private StockQuoteSampleClient client;
+ 
+     public Sample54() {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample55.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample55.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample55.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.endpoint;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,8 +25,6 @@
+ 
+ public class Sample55 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample55.class);
+-
+     private SampleClientResult result;
+     private StockQuoteSampleClient client;
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample56.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample56.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample56.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.endpoint;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,8 +25,6 @@
+ 
+ public class Sample56 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample56.class);
+-
+     private StockQuoteSampleClient client;
+ 
+     public Sample56() {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample57.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample57.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample57.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.endpoint;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,8 +25,6 @@
+ 
+ public class Sample57 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample57.class);
+-
+     private SampleClientResult result;
+     private StockQuoteSampleClient client;
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample58.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample58.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample58.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.endpoint;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,18 +25,14 @@
+ 
+ public class Sample58 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample58.class);
+-
+     private SampleClientResult result;
+     private StockQuoteSampleClient client;
+ 
+-
+     public Sample58() {
+         super(58);
+         client = getStockQuoteClient();
+     }
+ 
+-
+     public void testStaticLB() {
+         final String addUrl = "http://localhost:8280/services/LBService1";
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample59.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample59.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample59.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.endpoint;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,8 +25,6 @@
+ 
+ public class Sample59 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample59.class);
+-
+     private StockQuoteSampleClient client;
+ 
+     public Sample59() {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample50.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample50.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample50.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.endpoint;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,8 +25,6 @@
+ 
+ public class Sample50 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample50.class);
+-
+     private StockQuoteSampleClient client;
+ 
+     public Sample50() {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample150.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample150.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample150.java	(revision 1505584)
+@@ -16,11 +16,10 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.proxy;
+ 
+ import org.apache.axiom.om.OMElement;
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.http.HttpStatus;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+@@ -30,8 +29,6 @@
+ 
+ public class Sample150 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample150.class);
+-
+     private StockQuoteSampleClient client;
+ 
+     public Sample150() {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample151.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample151.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample151.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.proxy;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,8 +25,6 @@
+ 
+ public class Sample151 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample151.class);
+-
+     private StockQuoteSampleClient client;
+ 
+     public Sample151() {
+@@ -35,7 +32,6 @@
+         client = getStockQuoteClient();
+     }
+ 
+-
+     public void testCustomSequencesEndpointsWithProxy() {
+         String addUrl = "http://localhost:8280/services/StockQuoteProxy1";
+         String addUrl2 = "http://localhost:8280/services/StockQuoteProxy2";
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample152.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample152.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample152.java	(revision 1505584)
+@@ -16,11 +16,10 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.proxy;
+ 
+ import org.apache.commons.io.FilenameUtils;
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -27,8 +26,6 @@
+ 
+ public class Sample152 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample152.class);
+-
+     private StockQuoteSampleClient client;
+ 
+     public Sample152() {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample153.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample153.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample153.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.proxy;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,8 +25,6 @@
+ 
+ public class Sample153 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample153.class);
+-
+     private StockQuoteSampleClient client;
+ 
+     public Sample153() {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample154.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample154.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample154.java	(revision 1505584)
+@@ -16,22 +16,16 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.proxy;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+ 
+-import java.util.concurrent.CountDownLatch;
+-
+ public class Sample154 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample154.class);
+-
+     private StockQuoteSampleClient client;
+-    CountDownLatch latch;
+ 
+     public Sample154() {
+         super(154);
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample155.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample155.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample155.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.proxy;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,8 +25,6 @@
+ 
+ public class Sample155 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample155.class);
+-
+     private StockQuoteSampleClient client;
+ 
+     public Sample155() {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample156.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample156.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample156.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.proxy;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,8 +25,6 @@
+ 
+ public class Sample156 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample156.class);
+-
+     private StockQuoteSampleClient client;
+ 
+     public Sample156() {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample157.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample157.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample157.java	(revision 1505584)
+@@ -18,8 +18,6 @@
+  */
+ package org.apache.synapse.samples.framework.tests.proxy;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.http.HttpEntity;
+ import org.apache.http.HttpHeaders;
+ import org.apache.http.HttpResponse;
+@@ -35,8 +33,6 @@
+ 
+ public class Sample157 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample157.class);
+-
+     private String requestXml;
+     private HttpClient httpclient;
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/qos/Sample100.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/qos/Sample100.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/qos/Sample100.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.qos;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample100 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample100.class);
+     SampleClientResult result;
+     StockQuoteSampleClient client;
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/qos/Sample101.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/qos/Sample101.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/qos/Sample101.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.qos;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample101 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample101.class);
+     SampleClientResult result;
+     StockQuoteSampleClient client;
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample0.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample0.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample0.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.message;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,8 +25,6 @@
+ 
+ public class Sample0 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample0.class);
+-
+     private StockQuoteSampleClient client;
+ 
+     public Sample0() {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample1.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample1.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample1.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.message;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,8 +25,6 @@
+ 
+ public class Sample1 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample1.class);
+-
+     private StockQuoteSampleClient client;
+ 
+     public Sample1() {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample2.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample2.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample2.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.message;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,8 +25,6 @@
+ 
+ public class Sample2 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample2.class);
+-
+     private StockQuoteSampleClient client;
+ 
+     public Sample2() {
+@@ -35,7 +32,6 @@
+         client = getStockQuoteClient();
+     }
+ 
+-
+     public void testCBR() {
+         String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
+         String trpUrl = "http://localhost:8280";
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample3.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample3.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample3.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.message;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,8 +25,6 @@
+ 
+ public class Sample3 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample3.class);
+-
+     private StockQuoteSampleClient client;
+ 
+     public Sample3() {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample5.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample5.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample5.java	(revision 1505584)
+@@ -20,8 +20,6 @@
+ package org.apache.synapse.samples.framework.tests.message;
+ 
+ import org.apache.axis2.AxisFault;
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -28,8 +26,6 @@
+ 
+ public class Sample5 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample5.class);
+-
+     private StockQuoteSampleClient client;
+ 
+     public Sample5() {
+@@ -51,7 +47,8 @@
+         assertNotNull("Did not receive expected error", resultEx);
+         log.info("Got an error as expected: " + resultEx.getMessage());
+         assertTrue("Did not receive expected error", resultEx instanceof AxisFault);
+-        assertTrue("Did not receive expected error", resultEx.getMessage().indexOf(expectedError_MSFT)!=-1);
++        assertTrue("Did not receive expected error",
++                resultEx.getMessage().indexOf(expectedError_MSFT) != -1);
+ 
+         result = client.requestStandardQuote(addUrl, trpUrl, null, "SUN" ,null);
+         assertFalse("Must not get a response", result.responseReceived());
+@@ -59,7 +56,8 @@
+         assertNotNull("Did not receive expected error", resultEx);
+         log.info("Got an error as expected: " + resultEx.getMessage());
+         assertTrue("Did not receive expected error", resultEx instanceof AxisFault);
+-        assertTrue("Did not receive expected error", resultEx.getMessage().indexOf(expectedError_SUN)!=-1);
++        assertTrue("Did not receive expected error",
++                resultEx.getMessage().indexOf(expectedError_SUN) != -1);
+ 
+         result = client.requestStandardQuote(addUrl, trpUrl, null, "IBM" ,null);
+         assertFalse("Must not get a response", result.responseReceived());
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample7.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample7.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample7.java	(revision 1505584)
+@@ -16,11 +16,10 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.message;
+ 
+ import org.apache.axis2.AxisFault;
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -27,8 +26,6 @@
+ 
+ public class Sample7 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample7.class);
+-
+     private StockQuoteSampleClient client;
+ 
+     public Sample7() {
+@@ -49,7 +46,8 @@
+         assertNotNull("Did not receive expected error", resultEx);
+         log.info("Got an error as expected: " + resultEx.getMessage());
+         assertTrue("Did not receive expected error", resultEx instanceof AxisFault);
+-        assertTrue("Did not receive expected error", resultEx.getMessage().indexOf(expectedError)!=-1);
++        assertTrue("Did not receive expected error",
++                resultEx.getMessage().indexOf(expectedError) != -1);
+ 
+     }
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample9.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample9.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample9.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.message;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,8 +25,6 @@
+ 
+ public class Sample9 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample9.class);
+-
+     private StockQuoteSampleClient client;
+ 
+     public Sample9() {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample11.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample11.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample11.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.message;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample11 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample11.class);
+     StockQuoteSampleClient client;
+ 
+     public Sample11() {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample15.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample15.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample15.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.message;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample15 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample15.class);
+     private StockQuoteSampleClient client;
+ 
+     public Sample15() {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample431.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample431.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample431.java	(revision 1505584)
+@@ -18,8 +18,6 @@
+  */
+ package org.apache.synapse.samples.framework.tests.advanced;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +24,6 @@
+ 
+ public class Sample431 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample431.class);
+     SampleClientResult result;
+     StockQuoteSampleClient client;
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample460.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample460.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample460.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.advanced;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample460 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample460.class);
+     SampleClientResult result;
+     StockQuoteSampleClient client;
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample360.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample360.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample360.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.advanced;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample360 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample360.class);
+     SampleClientResult result;
+     StockQuoteSampleClient client;
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample351.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample351.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample351.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.advanced;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample351 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample351.class);
+     SampleClientResult result;
+     StockQuoteSampleClient client;
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample352.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample352.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample352.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.advanced;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample352 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample352.class);
+     SampleClientResult result;
+     StockQuoteSampleClient client;
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample370.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample370.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample370.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.advanced;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample370 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample370.class);
+     SampleClientResult result;
+     StockQuoteSampleClient client;
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample380.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample380.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample380.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.advanced;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample380 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample380.class);
+     SampleClientResult result;
+     StockQuoteSampleClient client;
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample354.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample354.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample354.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.advanced;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample354 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample354.class);
+     SampleClientResult result;
+     StockQuoteSampleClient client;
+ 
+@@ -35,7 +33,6 @@
+         client = getStockQuoteClient();
+     }
+ 
+-
+     public void testScriptMediationWithInLineRuby() {
+         String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
+         String trpUrl = "http://localhost:8280/";
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample361.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample361.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample361.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.advanced;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample361 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample361.class);
+     SampleClientResult result;
+     StockQuoteSampleClient client;
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample371.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample371.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample371.java	(revision 1505584)
+@@ -16,11 +16,10 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.advanced;
+ 
+ import org.apache.axis2.AxisFault;
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -27,7 +26,6 @@
+ 
+ public class Sample371 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample371.class);
+     SampleClientResult result;
+     StockQuoteSampleClient client;
+ 
+@@ -36,7 +34,6 @@
+         client = getStockQuoteClient();
+     }
+ 
+-
+     public void testRestrictedThrottling() {
+         String addUrl = "http://localhost:8280/";
+         String expectedError = "Access Denied";
+@@ -54,7 +51,8 @@
+         assertNotNull("Did not receive expected error", resultEx);
+         log.info("Got an error as expected: " + resultEx.getMessage());
+         assertTrue("Did not receive expected error", resultEx instanceof AxisFault);
+-        assertTrue("Did not receive expected error", resultEx.getMessage().indexOf(expectedError) != -1);
++        assertTrue("Did not receive expected error",
++                resultEx.getMessage().indexOf(expectedError) != -1);
+ 
+     }
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample372.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample372.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample372.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.advanced;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample372 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample372.class);
+     SampleClientResult result;
+     StockQuoteSampleClient client;
+ 
+@@ -35,8 +33,7 @@
+         client = getStockQuoteClient();
+     }
+ 
+-
+-    public void testConcAndRRBthrottling() {
++    public void testConcurrencyAndRateThrottling() {
+         String addUrl = "http://localhost:8280/services/StockQuoteProxy";
+ 
+         log.info("Running test: concurrency throttling and request rate based throttling");
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample362.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample362.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample362.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.advanced;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample362 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample362.class);
+     SampleClientResult result;
+     StockQuoteSampleClient client;
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample390.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample390.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample390.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.advanced;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample390 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample390.class);
+     SampleClientResult result;
+     StockQuoteSampleClient client;
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample420.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample420.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample420.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.advanced;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample420 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample420.class);
+     SampleClientResult result;
+     StockQuoteSampleClient client;
+ 
+@@ -35,7 +33,6 @@
+         client = getStockQuoteClient();
+     }
+ 
+-
+     public void testCache() {
+         String trpUrl = "http://localhost:8280/";
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample451.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample451.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample451.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.advanced;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample451 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample451.class);
+     SampleClientResult result;
+     StockQuoteSampleClient client;
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample353.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample353.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample353.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.advanced;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample353 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample353.class);
+     SampleClientResult result;
+     StockQuoteSampleClient client;
+ 
+@@ -35,7 +33,6 @@
+         client = getStockQuoteClient();
+     }
+ 
+-
+     public void testScriptMediationWithRuby() {
+         String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
+         String trpUrl = "http://localhost:8280/";
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample452.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample452.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample452.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.advanced;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample452 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample452.class);
+     SampleClientResult result;
+     StockQuoteSampleClient client;
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample391.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample391.java	(revision 1505583)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample391.java	(revision 1505584)
+@@ -16,10 +16,9 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.samples.framework.tests.advanced;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.SampleClientResult;
+ import org.apache.synapse.samples.framework.SynapseTestCase;
+ import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
+@@ -26,7 +25,6 @@
+ 
+ public class Sample391 extends SynapseTestCase {
+ 
+-    private static final Log log = LogFactory.getLog(Sample391.class);
+     SampleClientResult result;
+     StockQuoteSampleClient client;
+ 
+@@ -35,7 +33,6 @@
+         client = getStockQuoteClient();
+     }
+ 
+-
+     public void testExternalXQuery() {
+         String addUrl = "http://localhost:8280/services/StockQuoteProxy";
+ 
+-*-*-*-
+Message: Cleaned up the logging related code in the integration test suite.
+-*-*-*-
+When: 2013-07-21 22:50:24 -0400 
+-*-*-*-
+Who: hiranya

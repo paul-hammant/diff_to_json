@@ -32,3 +32,5 @@ Index: java/modules/core/src/main/java/org/apache/synapse/rest/API.java
 Message: Life cycle support for Synapse API handlers
 -*-*-*-
 When: 2012-06-05 05:23:23 -0400 
+-*-*-*-
+Who: hiranya

@@ -1,36 +1,3 @@
-Index: java/modules/core/src/main/java/org/apache/synapse/mediators/store/MessageStoreMediator.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/mediators/store/MessageStoreMediator.java	(revision 1210453)
-+++ java/modules/core/src/main/java/org/apache/synapse/mediators/store/MessageStoreMediator.java	(revision 1210454)
-@@ -78,8 +78,6 @@
- 
-                 }
- 
--                // Ensure that the message is fully read
--                synCtx.getEnvelope().buildWithAttachments();
-                 messageStore.offer(synCtx);
- 
-                 // with the nio transport, this causes the listener not to write a 202
-Index: java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/EnrichMediator.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/EnrichMediator.java	(revision 1210453)
-+++ java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/EnrichMediator.java	(revision 1210454)
-@@ -29,12 +29,12 @@
- /**
-  * Syntax for EnrichMediator
-  * <p/>
-- * <xmlStore>
-+ * <enrich>
-  * <source [clone=true | false] type=[custom|envelope|body|property] xpath="" property=""/>
-  * <target [replace=true | false] type=[custom|envelope|body|property] xpath="" property=""/>
-- * </xmlStore>
-+ * </enrich>
-  * <p/>
-- * This mediator will first get an OMELement from the source. Then put it to the current message
-+ * This mediator will first get an OMElement from the source. Then put it to the current message
-  * according to the target element.
-  * <p/>
-  * Both target and source can specify a type. These are the types supported
 Index: java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/Source.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/Source.java	(revision 1210453)
@@ -58,6 +25,66 @@ Index: java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/S
   * reference will be stored.
   * <p/>
   * In case of property a OMElement is stored in a property and it will be fetched.
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/EnrichMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/EnrichMediator.java	(revision 1210453)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/EnrichMediator.java	(revision 1210454)
+@@ -29,12 +29,12 @@
+ /**
+  * Syntax for EnrichMediator
+  * <p/>
+- * <xmlStore>
++ * <enrich>
+  * <source [clone=true | false] type=[custom|envelope|body|property] xpath="" property=""/>
+  * <target [replace=true | false] type=[custom|envelope|body|property] xpath="" property=""/>
+- * </xmlStore>
++ * </enrich>
+  * <p/>
+- * This mediator will first get an OMELement from the source. Then put it to the current message
++ * This mediator will first get an OMElement from the source. Then put it to the current message
+  * according to the target element.
+  * <p/>
+  * Both target and source can specify a type. These are the types supported
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/template/InvokeMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/template/InvokeMediator.java	(revision 1210453)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/template/InvokeMediator.java	(revision 1210454)
+@@ -63,9 +63,10 @@
+                 synLog.traceTrace("Message : " + synCtx.getEnvelope());
+             }
+         }
+-        populateParameters(synCtx);
++
+         //get the target function template and invoke by passing populated parameters
+         Mediator mediator = synCtx.getSequenceTemplate(targetTemplate);
++        populateParameters(synCtx, ((TemplateMediator)mediator).getName());
+         if (mediator != null && mediator instanceof TemplateMediator) {
+             return mediator.mediate(synCtx);
+         }
+@@ -73,10 +74,11 @@
+     }
+ 
+     /**
+-     * poplulate declared parameters on temp synapse properties
++     * populate declared parameters on temp synapse properties
+      * @param synCtx
++     * @param templateQualifiedName
+      */
+-    private void populateParameters(MessageContext synCtx) {
++    private void populateParameters(MessageContext synCtx, String templateQualifiedName) {
+         Iterator<String> params = pName2ExpressionMap.keySet().iterator();
+         while (params.hasNext()) {
+             String parameter = params.next();
+@@ -83,7 +85,8 @@
+             if (!"".equals(parameter)) {
+                 Value expression = pName2ExpressionMap.get(parameter);
+                 if (expression != null) {
+-                    EIPUtils.createSynapseEIPTemplateProperty(synCtx, targetTemplate, parameter, expression);
++                    EIPUtils.createSynapseEIPTemplateProperty(synCtx, templateQualifiedName,
++                            parameter, expression);
+                 }
+             }
+         }
 Index: java/modules/core/src/main/java/org/apache/synapse/mediators/transform/Argument.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/mediators/transform/Argument.java	(nonexistent)
@@ -107,46 +134,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/mediators/transform/Ar
 +        this.expression = expression;
 +    }
 +}
-Index: java/modules/core/src/main/java/org/apache/synapse/mediators/template/InvokeMediator.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/mediators/template/InvokeMediator.java	(revision 1210453)
-+++ java/modules/core/src/main/java/org/apache/synapse/mediators/template/InvokeMediator.java	(revision 1210454)
-@@ -63,9 +63,10 @@
-                 synLog.traceTrace("Message : " + synCtx.getEnvelope());
-             }
-         }
--        populateParameters(synCtx);
-+
-         //get the target function template and invoke by passing populated parameters
-         Mediator mediator = synCtx.getSequenceTemplate(targetTemplate);
-+        populateParameters(synCtx, ((TemplateMediator)mediator).getName());
-         if (mediator != null && mediator instanceof TemplateMediator) {
-             return mediator.mediate(synCtx);
-         }
-@@ -73,10 +74,11 @@
-     }
- 
-     /**
--     * poplulate declared parameters on temp synapse properties
-+     * populate declared parameters on temp synapse properties
-      * @param synCtx
-+     * @param templateQualifiedName
-      */
--    private void populateParameters(MessageContext synCtx) {
-+    private void populateParameters(MessageContext synCtx, String templateQualifiedName) {
-         Iterator<String> params = pName2ExpressionMap.keySet().iterator();
-         while (params.hasNext()) {
-             String parameter = params.next();
-@@ -83,7 +85,8 @@
-             if (!"".equals(parameter)) {
-                 Value expression = pName2ExpressionMap.get(parameter);
-                 if (expression != null) {
--                    EIPUtils.createSynapseEIPTemplateProperty(synCtx, targetTemplate, parameter, expression);
-+                    EIPUtils.createSynapseEIPTemplateProperty(synCtx, templateQualifiedName,
-+                            parameter, expression);
-                 }
-             }
-         }
 Index: java/modules/core/src/main/java/org/apache/synapse/mediators/eip/splitter/CloneMediator.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/mediators/eip/splitter/CloneMediator.java	(revision 1210453)
@@ -288,7 +275,22 @@ Index: java/modules/core/src/main/java/org/apache/synapse/mediators/db/AbstractD
                      break;
                  }
                  // skip CLOB, BLOB, ARRAY, DISTINCT, STRUCT, REF, JAVA_OBJECT
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/store/MessageStoreMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/store/MessageStoreMediator.java	(revision 1210453)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/store/MessageStoreMediator.java	(revision 1210454)
+@@ -78,8 +78,6 @@
+ 
+                 }
+ 
+-                // Ensure that the message is fully read
+-                synCtx.getEnvelope().buildWithAttachments();
+                 messageStore.offer(synCtx);
+ 
+                 // with the nio transport, this causes the listener not to write a 202
 -*-*-*-
 Message: Fixing some minor issues with clone mediator, DB mediators and InvokeMediator
 -*-*-*-
 When: 2011-12-05 08:20:26 -0500 
+-*-*-*-
+Who: hiranya

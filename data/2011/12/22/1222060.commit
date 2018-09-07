@@ -1,3 +1,18 @@
+Index: scratch/hiranya/website/src/site/resources/images/synapse-logo.png
+===================================================================
+Cannot display: file marked as a binary type.
+svn:mime-type = application/octet-stream
+Index: scratch/hiranya/website/src/site/resources/images/synapse-logo.png
+===================================================================
+--- scratch/hiranya/website/src/site/resources/images/synapse-logo.png	(nonexistent)
++++ scratch/hiranya/website/src/site/resources/images/synapse-logo.png	(revision 1222060)
+
+Property changes on: scratch/hiranya/website/src/site/resources/images/synapse-logo.png
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++application/octet-stream
+\ No newline at end of property
 Index: scratch/hiranya/website/src/site/resources/images/page-back.png
 ===================================================================
 Cannot display: file marked as a binary type.
@@ -23,21 +38,6 @@ Index: scratch/hiranya/website/src/site/resources/images/footer-back.png
 +++ scratch/hiranya/website/src/site/resources/images/footer-back.png	(revision 1222060)
 
 Property changes on: scratch/hiranya/website/src/site/resources/images/footer-back.png
-___________________________________________________________________
-Added: svn:mime-type
-## -0,0 +1 ##
-+application/octet-stream
-\ No newline at end of property
-Index: scratch/hiranya/website/src/site/resources/images/synapse-logo.png
-===================================================================
-Cannot display: file marked as a binary type.
-svn:mime-type = application/octet-stream
-Index: scratch/hiranya/website/src/site/resources/images/synapse-logo.png
-===================================================================
---- scratch/hiranya/website/src/site/resources/images/synapse-logo.png	(nonexistent)
-+++ scratch/hiranya/website/src/site/resources/images/synapse-logo.png	(revision 1222060)
-
-Property changes on: scratch/hiranya/website/src/site/resources/images/synapse-logo.png
 ___________________________________________________________________
 Added: svn:mime-type
 ## -0,0 +1 ##
@@ -218,21 +218,6 @@ Index: scratch/hiranya/website/src/site/resources/css/site.css
 -}
 +}
 \ No newline at end of file
-Index: scratch/hiranya/website/src/site/xdoc/userguide/config.xml
-===================================================================
---- scratch/hiranya/website/src/site/xdoc/userguide/config.xml	(revision 1222059)
-+++ scratch/hiranya/website/src/site/xdoc/userguide/config.xml	(revision 1222060)
-@@ -448,7 +448,9 @@
-             <p>
-                 Synapse ESB is configured using an XML based configuration language. This is a
-                 Domain Specific Language (DSL) created and maintained by the Synapse community.
--                The language is designed to be simple, intuitive and easy to learn.
-+                The language is designed to be simple, intuitive and easy to learn. All XML
-+                elements (tags) in this language must be namespace qualified with the namespace
-+                URL <strong>http://ws.apache.org/ns/synapse</strong>.
-             </p>
-             <p>
-                 As stated earlier, the synapse.xml file can be used to define all kinds of artifacts.
 Index: scratch/hiranya/website/src/site/xdoc/userguide/mediators.xml
 ===================================================================
 --- scratch/hiranya/website/src/site/xdoc/userguide/mediators.xml	(nonexistent)
@@ -294,7 +279,24 @@ Index: scratch/hiranya/website/src/site/xdoc/userguide/mediators.xml
 +    </body>
 +</document>
 \ No newline at end of file
+Index: scratch/hiranya/website/src/site/xdoc/userguide/config.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/config.xml	(revision 1222059)
++++ scratch/hiranya/website/src/site/xdoc/userguide/config.xml	(revision 1222060)
+@@ -448,7 +448,9 @@
+             <p>
+                 Synapse ESB is configured using an XML based configuration language. This is a
+                 Domain Specific Language (DSL) created and maintained by the Synapse community.
+-                The language is designed to be simple, intuitive and easy to learn.
++                The language is designed to be simple, intuitive and easy to learn. All XML
++                elements (tags) in this language must be namespace qualified with the namespace
++                URL <strong>http://ws.apache.org/ns/synapse</strong>.
+             </p>
+             <p>
+                 As stated earlier, the synapse.xml file can be used to define all kinds of artifacts.
 -*-*-*-
 Message: More documentation updates and styling
 -*-*-*-
 When: 2011-12-22 01:17:45 -0500 
+-*-*-*-
+Who: hiranya

@@ -1,0 +1,24 @@
+Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSOutTransportInfo.java
+===================================================================
+--- java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSOutTransportInfo.java	(revision 1505081)
++++ java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSOutTransportInfo.java	(revision 1505082)
+@@ -53,12 +53,7 @@
+     VFSOutTransportInfo(String outFileURI, boolean fileLocking) {
+         
+         if (outFileURI.startsWith(VFSConstants.VFS_PREFIX)) {
+-            int qIndex = outFileURI.indexOf("?");
+-            if (qIndex < 0) {
+-                this.outFileURI = outFileURI.substring(VFSConstants.VFS_PREFIX.length());
+-            } else {
+-                this.outFileURI = outFileURI.substring(VFSConstants.VFS_PREFIX.length(), qIndex);
+-            }
++            this.outFileURI = outFileURI.substring(VFSConstants.VFS_PREFIX.length());
+         } else {
+             this.outFileURI = outFileURI;
+         }
+-*-*-*-
+Message: Reverting the fix for SYNAPSE-872 due to a possible regression
+-*-*-*-
+When: 2013-07-19 23:08:38 -0400 
+-*-*-*-
+Who: hiranya

@@ -15,3 +15,5 @@ Index: java/modules/core/src/main/java/org/apache/synapse/eventing/builders/Resp
 Message: Eliminated a dependency on the bug described in AXIOM-422; the children of a SOAPHeaderBlock should be plain OMElements, not SOAPHeaderBlocks.
 -*-*-*-
 When: 2012-05-15 16:57:03 -0400 
+-*-*-*-
+Who: veithen

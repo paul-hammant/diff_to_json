@@ -93,318 +93,136 @@ Index: java/modules/core/pom.xml
                              </tasks>
                          </configuration>
                          <goals>
-Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/eip_systemManagement/artifact.xml
+Index: java/modules/core/src/test/java/org/apache/synapse/libraries/eip/AbstractEipLibTestCase.java
 ===================================================================
---- java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/eip_systemManagement/artifact.xml	(revision 1395448)
-+++ java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/eip_systemManagement/artifact.xml	(revision 1395449)
-@@ -1,11 +0,0 @@
--<?xml version="1.0" encoding="UTF-8"?>
--<artifact name="systemManagement" type="synapse/template">
--
--    <subArtifacts>
--        <artifact name="splitter">
--            <file>template_splitter.xml</file>
--            <description>Splitter library function</description>
--        </artifact>
--    </subArtifacts>
--
--</artifact>
-\ No newline at end of file
-Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/eip_systemManagement/template_splitter.xml
+--- java/modules/core/src/test/java/org/apache/synapse/libraries/eip/AbstractEipLibTestCase.java	(revision 1395448)
++++ java/modules/core/src/test/java/org/apache/synapse/libraries/eip/AbstractEipLibTestCase.java	(revision 1395449)
+@@ -15,7 +15,7 @@
+     protected String getResourcePath() {
+         try {
+             if (path == null) {
+-                path = new File("./target/test_repos/synapse/synapse-libraries/synapse-eip-lib.zip").getAbsolutePath();
++                path = new File("./target/test_repos/synapse/synapse-libraries/synapse-eiptest-lib.zip").getAbsolutePath();
+             }
+         } catch (Exception e) {
+             return null;
+Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_systemManagement/template_wire_tap.xml
 ===================================================================
---- java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/eip_systemManagement/template_splitter.xml	(revision 1395448)
-+++ java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/eip_systemManagement/template_splitter.xml	(revision 1395449)
-@@ -1,20 +0,0 @@
--<template xmlns="http://ws.apache.org/ns/synapse" name="splitter">
--    <parameter name="iterate_exp"/>
--    <parameter name="endpoint_uri"/>
--    <parameter name="attach_path" default="{{//original}}" optional="true"/>
--    <parameter name="sequence_ref"/>
--    <sequence>
--        <property name="ItrExp" expression="$func:iterate_exp" />
--        <property name="EndPUri" expression="$func:endpoint_uri" />
--        <property name="AttachPath" expression="$func:attach_path" />
--        <property name="SRef" expression="$func:sequence_ref" />
--        <property name="Endpoint_1" expression="get-property('To')" />
--        <header name="To" expression="$func:endpoint_uri"/>
--        <iterate xmlns:ns="http://org.apache.synapse/xsd" continueParent="true" preservePayload="true" attachPath="$func:attach_path" expression="$func:iterate_exp">
--            <target>
--              <sequence key="{$func:sequence_ref}"/>
--            </target>
--        </iterate>
--        <property name="Endpoint_2" expression="get-property('To')" />
--    </sequence>
--</template>
-Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/artifacts.xml
-===================================================================
---- java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/artifacts.xml	(revision 1395448)
-+++ java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/artifacts.xml	(revision 1395449)
-@@ -1,7 +0,0 @@
--<?xml version="1.0" encoding="UTF-8"?>
--<artifacts>
--    <artifact name="EipLibrary" package="synapse.lang.eip" >
--        <dependency artifact="systemManagement" />
--        <description>eip synapse library</description>
--    </artifact>
--</artifacts>
-Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eiptest-lib/eip_systemManagement/template_splitter.xml
-===================================================================
---- java/modules/core/src/test/resources/synapse-libraries/synapse-eiptest-lib/eip_systemManagement/template_splitter.xml	(nonexistent)
-+++ java/modules/core/src/test/resources/synapse-libraries/synapse-eiptest-lib/eip_systemManagement/template_splitter.xml	(revision 1395449)
-@@ -0,0 +1,20 @@
-+<template xmlns="http://ws.apache.org/ns/synapse" name="splitter">
-+    <parameter name="iterate_exp"/>
-+    <parameter name="endpoint_uri"/>
-+    <parameter name="attach_path" default="{{//original}}" optional="true"/>
-+    <parameter name="sequence_ref"/>
-+    <sequence>
-+        <property name="ItrExp" expression="$func:iterate_exp" />
-+        <property name="EndPUri" expression="$func:endpoint_uri" />
-+        <property name="AttachPath" expression="$func:attach_path" />
-+        <property name="SRef" expression="$func:sequence_ref" />
-+        <property name="Endpoint_1" expression="get-property('To')" />
-+        <header name="To" expression="$func:endpoint_uri"/>
-+        <iterate xmlns:ns="http://org.apache.synapse/xsd" continueParent="true" preservePayload="true" attachPath="$func:attach_path" expression="$func:iterate_exp">
-+            <target>
-+              <sequence key="{$func:sequence_ref}"/>
-+            </target>
-+        </iterate>
-+        <property name="Endpoint_2" expression="get-property('To')" />
-+    </sequence>
-+</template>
-Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eiptest-lib/eip_systemManagement/artifact.xml
-===================================================================
---- java/modules/core/src/test/resources/synapse-libraries/synapse-eiptest-lib/eip_systemManagement/artifact.xml	(nonexistent)
-+++ java/modules/core/src/test/resources/synapse-libraries/synapse-eiptest-lib/eip_systemManagement/artifact.xml	(revision 1395449)
-@@ -0,0 +1,11 @@
+--- java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_systemManagement/template_wire_tap.xml	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_systemManagement/template_wire_tap.xml	(revision 1395449)
+@@ -0,0 +1,41 @@
 +<?xml version="1.0" encoding="UTF-8"?>
++        <!--
++  ~  Licensed to the Apache Software Foundation (ASF) under one
++  ~  or more contributor license agreements.  See the NOTICE file
++  ~  distributed with this work for additional information
++  ~  regarding copyright ownership.  The ASF licenses this file
++  ~  to you under the Apache License, Version 2.0 (the
++  ~  "License"); you may not use this file except in compliance
++  ~  with the License.  You may obtain a copy of the License at
++  ~
++  ~   http://www.apache.org/licenses/LICENSE-2.0
++  ~
++  ~  Unless required by applicable law or agreed to in writing,
++  ~  software distributed under the License is distributed on an
++  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++  ~  KIND, either express or implied.  See the License for the
++  ~  specific language governing permissions and limitations
++  ~  under the License.
++  -->
++
++<!-- Wire Tap eip library function template shipped with the Apache Synapse -->
++<template xmlns="http://ws.apache.org/ns/synapse" name="wire_tap">
++        <parameter name="destination_uri"/>
++        <parameter name="wiretap_uri"/>
++        <sequence>
++            <clone>
++                <target>
++                    <sequence>
++                        <header name="To" expression="$func:wiretap_uri"/>
++                        <send/>
++                    </sequence>
++                </target>
++                <target>
++                    <sequence>
++                        <header name="To" expression="$func:destination_uri"/>
++                        <send/>
++                    </sequence>
++                </target>
++            </clone>
++        </sequence>
++</template>
+\ No newline at end of file
+Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_systemManagement/artifact.xml
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_systemManagement/artifact.xml	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_systemManagement/artifact.xml	(revision 1395449)
+@@ -0,0 +1,31 @@
++<?xml version="1.0" encoding="UTF-8"?>
++        <!--
++  ~  Licensed to the Apache Software Foundation (ASF) under one
++  ~  or more contributor license agreements.  See the NOTICE file
++  ~  distributed with this work for additional information
++  ~  regarding copyright ownership.  The ASF licenses this file
++  ~  to you under the Apache License, Version 2.0 (the
++  ~  "License"); you may not use this file except in compliance
++  ~  with the License.  You may obtain a copy of the License at
++  ~
++  ~   http://www.apache.org/licenses/LICENSE-2.0
++  ~
++  ~  Unless required by applicable law or agreed to in writing,
++  ~  software distributed under the License is distributed on an
++  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++  ~  KIND, either express or implied.  See the License for the
++  ~  specific language governing permissions and limitations
++  ~  under the License.
++  -->
++
++<!-- System management sub artifact of EIP library shipped with the Apache Synapse -->
 +<artifact name="systemManagement" type="synapse/template">
 +
 +    <subArtifacts>
-+        <artifact name="splitter">
-+            <file>template_splitter.xml</file>
-+            <description>Splitter library function</description>
++        <artifact name="wire_tap">
++            <file>template_wire_tap.xml</file>
++            <description>Wire Tap eip library function</description>
 +        </artifact>
 +    </subArtifacts>
 +
 +</artifact>
 \ No newline at end of file
-Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eiptest-lib/artifacts.xml
+Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/artifacts.xml
 ===================================================================
---- java/modules/core/src/test/resources/synapse-libraries/synapse-eiptest-lib/artifacts.xml	(nonexistent)
-+++ java/modules/core/src/test/resources/synapse-libraries/synapse-eiptest-lib/artifacts.xml	(revision 1395449)
-@@ -0,0 +1,7 @@
+--- java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/artifacts.xml	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/artifacts.xml	(revision 1395449)
+@@ -0,0 +1,28 @@
 +<?xml version="1.0" encoding="UTF-8"?>
++                <!--
++  ~  Licensed to the Apache Software Foundation (ASF) under one
++  ~  or more contributor license agreements.  See the NOTICE file
++  ~  distributed with this work for additional information
++  ~  regarding copyright ownership.  The ASF licenses this file
++  ~  to you under the Apache License, Version 2.0 (the
++  ~  "License"); you may not use this file except in compliance
++  ~  with the License.  You may obtain a copy of the License at
++  ~
++  ~   http://www.apache.org/licenses/LICENSE-2.0
++  ~
++  ~  Unless required by applicable law or agreed to in writing,
++  ~  software distributed under the License is distributed on an
++  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++  ~  KIND, either express or implied.  See the License for the
++  ~  specific language governing permissions and limitations
++  ~  under the License.
++  -->
++
++<!-- Root artifact of EIP library shipped with the Apache Synapse -->
 +<artifacts>
 +    <artifact name="EipLibrary" package="synapse.lang.eip" >
 +        <dependency artifact="systemManagement" />
++        <dependency artifact="messageRouting" />
 +        <description>eip synapse library</description>
 +    </artifact>
 +</artifacts>
-Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/artifact.xml
-===================================================================
---- java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/artifact.xml	(nonexistent)
-+++ java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/artifact.xml	(revision 1395449)
-@@ -0,0 +1,59 @@
-+<?xml version="1.0" encoding="UTF-8"?>
-+        <!--
-+  ~  Licensed to the Apache Software Foundation (ASF) under one
-+  ~  or more contributor license agreements.  See the NOTICE file
-+  ~  distributed with this work for additional information
-+  ~  regarding copyright ownership.  The ASF licenses this file
-+  ~  to you under the Apache License, Version 2.0 (the
-+  ~  "License"); you may not use this file except in compliance
-+  ~  with the License.  You may obtain a copy of the License at
-+  ~
-+  ~   http://www.apache.org/licenses/LICENSE-2.0
-+  ~
-+  ~  Unless required by applicable law or agreed to in writing,
-+  ~  software distributed under the License is distributed on an
-+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+  ~  KIND, either express or implied.  See the License for the
-+  ~  specific language governing permissions and limitations
-+  ~  under the License.
-+  -->
-+
-+<!-- Message routing sub artifact of EIP library shipped with the Apache Synapse -->
-+<artifact name="messageRouting" type="synapse/template">
-+
-+    <subArtifacts>
-+        <artifact name="recipient_list">
-+            <file>template_recipient_list.xml</file>
-+            <description>Recipient List eip library function</description>
-+        </artifact>
-+        <artifact name="callout_block">
-+            <file>template_callout_block.xml</file>
-+            <description>Callout Block eip library function</description>
-+        </artifact>
-+         <artifact name="scatter_gather">
-+            <file>template_scatter_gather.xml</file>
-+            <description>Scatter-Gather eip library function</description>
-+        </artifact>
-+         <artifact name="dynamic_router">
-+            <file>template_dynamic_router.xml</file>
-+            <description>Dynamic Router eip library function</description>
-+        </artifact>
-+         <artifact name="content_based_router">
-+            <file>template_content_based_router.xml</file>
-+            <description>Content Based Router eip library function</description>
-+        </artifact>
-+        <artifact name="splitter">
-+            <file>template_splitter.xml</file>
-+            <description>Splitter library function</description>
-+        </artifact>
-+        <artifact name="aggregator">
-+            <file>template_aggregator.xml</file>
-+            <description>Aggregator library function</description>
-+        </artifact>
-+        <artifact name="splitter_aggregator">
-+            <file>template_splitter_aggregator.xml</file>
-+            <description>Splitter_Aggregator library function</description>
-+        </artifact>
-+    </subArtifacts>
-+
-+</artifact>
-\ No newline at end of file
-Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/template_aggregator.xml
-===================================================================
---- java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/template_aggregator.xml	(nonexistent)
-+++ java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/template_aggregator.xml	(revision 1395449)
-@@ -0,0 +1,43 @@
-+<?xml version="1.0" encoding="UTF-8"?>
-+        <!--
-+  ~  Licensed to the Apache Software Foundation (ASF) under one
-+  ~  or more contributor license agreements.  See the NOTICE file
-+  ~  distributed with this work for additional information
-+  ~  regarding copyright ownership.  The ASF licenses this file
-+  ~  to you under the Apache License, Version 2.0 (the
-+  ~  "License"); you may not use this file except in compliance
-+  ~  with the License.  You may obtain a copy of the License at
-+  ~
-+  ~   http://www.apache.org/licenses/LICENSE-2.0
-+  ~
-+  ~  Unless required by applicable law or agreed to in writing,
-+  ~  software distributed under the License is distributed on an
-+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+  ~  KIND, either express or implied.  See the License for the
-+  ~  specific language governing permissions and limitations
-+  ~  under the License.
-+  -->
-+
-+<!--Aggregator eip library function template shipped with the Apache Synapse -->
-+<template xmlns="http://ws.apache.org/ns/synapse" name="aggregator">
-+    <parameter name="aggregator_exp"/>
-+    <parameter name="oncomplete_seq_enabled" default="false" optional="true"/>
-+    <parameter name="sequence_ref" optional="true"/>
-+    <sequence>
-+        <aggregate>
-+            <completeCondition>
-+                <messageCount min="-1" max="-1"/>
-+            </completeCondition>
-+            <onComplete expression="$func:aggregator_exp">
-+                <filter xpath="$func:oncomplete_seq_enabled='true'">
-+                    <then>
-+                        <sequence key="{$func:sequence_ref}"/>
-+                    </then>
-+                    <else>
-+                        <send/>
-+                    </else>
-+                </filter>
-+            </onComplete>
-+        </aggregate>
-+    </sequence>
-+</template>
-\ No newline at end of file
-Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/template_dynamic_router.xml
-===================================================================
---- java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/template_dynamic_router.xml	(nonexistent)
-+++ java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/template_dynamic_router.xml	(revision 1395449)
-@@ -0,0 +1,27 @@
-+<?xml version="1.0" encoding="UTF-8"?>
-+        <!--
-+  ~  Licensed to the Apache Software Foundation (ASF) under one
-+  ~  or more contributor license agreements.  See the NOTICE file
-+  ~  distributed with this work for additional information
-+  ~  regarding copyright ownership.  The ASF licenses this file
-+  ~  to you under the Apache License, Version 2.0 (the
-+  ~  "License"); you may not use this file except in compliance
-+  ~  with the License.  You may obtain a copy of the License at
-+  ~
-+  ~   http://www.apache.org/licenses/LICENSE-2.0
-+  ~
-+  ~  Unless required by applicable law or agreed to in writing,
-+  ~  software distributed under the License is distributed on an
-+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+  ~  KIND, either express or implied.  See the License for the
-+  ~  specific language governing permissions and limitations
-+  ~  under the License.
-+  -->
-+
-+<!-- Dynamic Router eip library function template shipped with the Apache Synapse -->
-+<template xmlns="http://ws.apache.org/ns/synapse" name="dynamic_router">
-+    <parameter name="conditions"/>
-+    <sequence>
-+        <class name="org.apache.synapse.libraries.eip.DynamicRouterMediator"/>
-+    </sequence>
-+</template>
-\ No newline at end of file
-Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/template_splitter.xml
-===================================================================
---- java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/template_splitter.xml	(nonexistent)
-+++ java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/template_splitter.xml	(revision 1395449)
-@@ -0,0 +1,52 @@
-+<?xml version="1.0" encoding="UTF-8"?>
-+        <!--
-+  ~  Licensed to the Apache Software Foundation (ASF) under one
-+  ~  or more contributor license agreements.  See the NOTICE file
-+  ~  distributed with this work for additional information
-+  ~  regarding copyright ownership.  The ASF licenses this file
-+  ~  to you under the Apache License, Version 2.0 (the
-+  ~  "License"); you may not use this file except in compliance
-+  ~  with the License.  You may obtain a copy of the License at
-+  ~
-+  ~   http://www.apache.org/licenses/LICENSE-2.0
-+  ~
-+  ~  Unless required by applicable law or agreed to in writing,
-+  ~  software distributed under the License is distributed on an
-+  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+  ~  KIND, either express or implied.  See the License for the
-+  ~  specific language governing permissions and limitations
-+  ~  under the License.
-+  -->
-+
-+<!-- Splitter eip library function template shipped with the Apache Synapse -->
-+<template xmlns="http://ws.apache.org/ns/synapse" name="splitter">
-+    <parameter name="iterate_exp"/>
-+    <parameter name="attach_path" optional="true"/>
-+    <parameter name="endpoint_uri"/>
-+    <parameter name="attach_path_enabled" default="false" optional="true"/>
-+    <sequence>
-+        <filter xpath="$func:attach_path_enabled='true'">
-+            <then>
-+                <iterate xmlns:ns="http://org.apache.synapse/xsd" preservePayload="true" attachPath="$func:attach_path"
-+                         expression="$func:iterate_exp">
-+                    <target>
-+                        <sequence>
-+                            <header name="To" expression="$func:endpoint_uri"/>
-+                            <send/>
-+                        </sequence>
-+                    </target>
-+                </iterate>
-+            </then>
-+            <else>
-+                <iterate xmlns:ns="http://org.apache.synapse/xsd" expression="$func:iterate_exp">
-+                    <target>
-+                        <sequence>
-+                            <header name="To" expression="$func:endpoint_uri"/>
-+                            <send/>
-+                        </sequence>
-+                    </target>
-+                </iterate>
-+            </else>
-+        </filter>
-+    </sequence>
-+</template>
 Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/template_content_based_router.xml
 ===================================================================
 --- java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/template_content_based_router.xml	(nonexistent)
@@ -655,11 +473,11 @@ Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-li
 +        </out>
 +    </sequence>
 +</template>
-Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_systemManagement/artifact.xml
+Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/artifact.xml
 ===================================================================
---- java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_systemManagement/artifact.xml	(nonexistent)
-+++ java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_systemManagement/artifact.xml	(revision 1395449)
-@@ -0,0 +1,31 @@
+--- java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/artifact.xml	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/artifact.xml	(revision 1395449)
+@@ -0,0 +1,59 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +        <!--
 +  ~  Licensed to the Apache Software Foundation (ASF) under one
@@ -680,23 +498,51 @@ Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-li
 +  ~  under the License.
 +  -->
 +
-+<!-- System management sub artifact of EIP library shipped with the Apache Synapse -->
-+<artifact name="systemManagement" type="synapse/template">
++<!-- Message routing sub artifact of EIP library shipped with the Apache Synapse -->
++<artifact name="messageRouting" type="synapse/template">
 +
 +    <subArtifacts>
-+        <artifact name="wire_tap">
-+            <file>template_wire_tap.xml</file>
-+            <description>Wire Tap eip library function</description>
++        <artifact name="recipient_list">
++            <file>template_recipient_list.xml</file>
++            <description>Recipient List eip library function</description>
++        </artifact>
++        <artifact name="callout_block">
++            <file>template_callout_block.xml</file>
++            <description>Callout Block eip library function</description>
++        </artifact>
++         <artifact name="scatter_gather">
++            <file>template_scatter_gather.xml</file>
++            <description>Scatter-Gather eip library function</description>
++        </artifact>
++         <artifact name="dynamic_router">
++            <file>template_dynamic_router.xml</file>
++            <description>Dynamic Router eip library function</description>
++        </artifact>
++         <artifact name="content_based_router">
++            <file>template_content_based_router.xml</file>
++            <description>Content Based Router eip library function</description>
++        </artifact>
++        <artifact name="splitter">
++            <file>template_splitter.xml</file>
++            <description>Splitter library function</description>
++        </artifact>
++        <artifact name="aggregator">
++            <file>template_aggregator.xml</file>
++            <description>Aggregator library function</description>
++        </artifact>
++        <artifact name="splitter_aggregator">
++            <file>template_splitter_aggregator.xml</file>
++            <description>Splitter_Aggregator library function</description>
 +        </artifact>
 +    </subArtifacts>
 +
 +</artifact>
 \ No newline at end of file
-Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_systemManagement/template_wire_tap.xml
+Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/template_aggregator.xml
 ===================================================================
---- java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_systemManagement/template_wire_tap.xml	(nonexistent)
-+++ java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_systemManagement/template_wire_tap.xml	(revision 1395449)
-@@ -0,0 +1,41 @@
+--- java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/template_aggregator.xml	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/template_aggregator.xml	(revision 1395449)
+@@ -0,0 +1,43 @@
 +<?xml version="1.0" encoding="UTF-8"?>
 +        <!--
 +  ~  Licensed to the Apache Software Foundation (ASF) under one
@@ -717,35 +563,37 @@ Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-li
 +  ~  under the License.
 +  -->
 +
-+<!-- Wire Tap eip library function template shipped with the Apache Synapse -->
-+<template xmlns="http://ws.apache.org/ns/synapse" name="wire_tap">
-+        <parameter name="destination_uri"/>
-+        <parameter name="wiretap_uri"/>
-+        <sequence>
-+            <clone>
-+                <target>
-+                    <sequence>
-+                        <header name="To" expression="$func:wiretap_uri"/>
++<!--Aggregator eip library function template shipped with the Apache Synapse -->
++<template xmlns="http://ws.apache.org/ns/synapse" name="aggregator">
++    <parameter name="aggregator_exp"/>
++    <parameter name="oncomplete_seq_enabled" default="false" optional="true"/>
++    <parameter name="sequence_ref" optional="true"/>
++    <sequence>
++        <aggregate>
++            <completeCondition>
++                <messageCount min="-1" max="-1"/>
++            </completeCondition>
++            <onComplete expression="$func:aggregator_exp">
++                <filter xpath="$func:oncomplete_seq_enabled='true'">
++                    <then>
++                        <sequence key="{$func:sequence_ref}"/>
++                    </then>
++                    <else>
 +                        <send/>
-+                    </sequence>
-+                </target>
-+                <target>
-+                    <sequence>
-+                        <header name="To" expression="$func:destination_uri"/>
-+                        <send/>
-+                    </sequence>
-+                </target>
-+            </clone>
-+        </sequence>
++                    </else>
++                </filter>
++            </onComplete>
++        </aggregate>
++    </sequence>
 +</template>
 \ No newline at end of file
-Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/artifacts.xml
+Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/template_dynamic_router.xml
 ===================================================================
---- java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/artifacts.xml	(nonexistent)
-+++ java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/artifacts.xml	(revision 1395449)
-@@ -0,0 +1,28 @@
+--- java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/template_dynamic_router.xml	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/template_dynamic_router.xml	(revision 1395449)
+@@ -0,0 +1,27 @@
 +<?xml version="1.0" encoding="UTF-8"?>
-+                <!--
++        <!--
 +  ~  Licensed to the Apache Software Foundation (ASF) under one
 +  ~  or more contributor license agreements.  See the NOTICE file
 +  ~  distributed with this work for additional information
@@ -764,14 +612,71 @@ Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-li
 +  ~  under the License.
 +  -->
 +
-+<!-- Root artifact of EIP library shipped with the Apache Synapse -->
-+<artifacts>
-+    <artifact name="EipLibrary" package="synapse.lang.eip" >
-+        <dependency artifact="systemManagement" />
-+        <dependency artifact="messageRouting" />
-+        <description>eip synapse library</description>
-+    </artifact>
-+</artifacts>
++<!-- Dynamic Router eip library function template shipped with the Apache Synapse -->
++<template xmlns="http://ws.apache.org/ns/synapse" name="dynamic_router">
++    <parameter name="conditions"/>
++    <sequence>
++        <class name="org.apache.synapse.libraries.eip.DynamicRouterMediator"/>
++    </sequence>
++</template>
+\ No newline at end of file
+Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/template_splitter.xml
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/template_splitter.xml	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/synapse-eipcore-lib/eip_messageRouting/template_splitter.xml	(revision 1395449)
+@@ -0,0 +1,52 @@
++<?xml version="1.0" encoding="UTF-8"?>
++        <!--
++  ~  Licensed to the Apache Software Foundation (ASF) under one
++  ~  or more contributor license agreements.  See the NOTICE file
++  ~  distributed with this work for additional information
++  ~  regarding copyright ownership.  The ASF licenses this file
++  ~  to you under the Apache License, Version 2.0 (the
++  ~  "License"); you may not use this file except in compliance
++  ~  with the License.  You may obtain a copy of the License at
++  ~
++  ~   http://www.apache.org/licenses/LICENSE-2.0
++  ~
++  ~  Unless required by applicable law or agreed to in writing,
++  ~  software distributed under the License is distributed on an
++  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++  ~  KIND, either express or implied.  See the License for the
++  ~  specific language governing permissions and limitations
++  ~  under the License.
++  -->
++
++<!-- Splitter eip library function template shipped with the Apache Synapse -->
++<template xmlns="http://ws.apache.org/ns/synapse" name="splitter">
++    <parameter name="iterate_exp"/>
++    <parameter name="attach_path" optional="true"/>
++    <parameter name="endpoint_uri"/>
++    <parameter name="attach_path_enabled" default="false" optional="true"/>
++    <sequence>
++        <filter xpath="$func:attach_path_enabled='true'">
++            <then>
++                <iterate xmlns:ns="http://org.apache.synapse/xsd" preservePayload="true" attachPath="$func:attach_path"
++                         expression="$func:iterate_exp">
++                    <target>
++                        <sequence>
++                            <header name="To" expression="$func:endpoint_uri"/>
++                            <send/>
++                        </sequence>
++                    </target>
++                </iterate>
++            </then>
++            <else>
++                <iterate xmlns:ns="http://org.apache.synapse/xsd" expression="$func:iterate_exp">
++                    <target>
++                        <sequence>
++                            <header name="To" expression="$func:endpoint_uri"/>
++                            <send/>
++                        </sequence>
++                    </target>
++                </iterate>
++            </else>
++        </filter>
++    </sequence>
++</template>
 Index: java/modules/core/src/test/resources/synapse-libraries/assembly/assemble-eipcore-lib.xml
 ===================================================================
 --- java/modules/core/src/test/resources/synapse-libraries/assembly/assemble-eipcore-lib.xml	(nonexistent)
@@ -826,19 +731,114 @@ Index: java/modules/core/src/test/resources/synapse-libraries/assembly/assemble-
 +    
 +    
 +</assembly>
-Index: java/modules/core/src/test/java/org/apache/synapse/libraries/eip/AbstractEipLibTestCase.java
+Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/eip_systemManagement/artifact.xml
 ===================================================================
---- java/modules/core/src/test/java/org/apache/synapse/libraries/eip/AbstractEipLibTestCase.java	(revision 1395448)
-+++ java/modules/core/src/test/java/org/apache/synapse/libraries/eip/AbstractEipLibTestCase.java	(revision 1395449)
-@@ -15,7 +15,7 @@
-     protected String getResourcePath() {
-         try {
-             if (path == null) {
--                path = new File("./target/test_repos/synapse/synapse-libraries/synapse-eip-lib.zip").getAbsolutePath();
-+                path = new File("./target/test_repos/synapse/synapse-libraries/synapse-eiptest-lib.zip").getAbsolutePath();
-             }
-         } catch (Exception e) {
-             return null;
+--- java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/eip_systemManagement/artifact.xml	(revision 1395448)
++++ java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/eip_systemManagement/artifact.xml	(revision 1395449)
+@@ -1,11 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<artifact name="systemManagement" type="synapse/template">
+-
+-    <subArtifacts>
+-        <artifact name="splitter">
+-            <file>template_splitter.xml</file>
+-            <description>Splitter library function</description>
+-        </artifact>
+-    </subArtifacts>
+-
+-</artifact>
+\ No newline at end of file
+Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/eip_systemManagement/template_splitter.xml
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/eip_systemManagement/template_splitter.xml	(revision 1395448)
++++ java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/eip_systemManagement/template_splitter.xml	(revision 1395449)
+@@ -1,20 +0,0 @@
+-<template xmlns="http://ws.apache.org/ns/synapse" name="splitter">
+-    <parameter name="iterate_exp"/>
+-    <parameter name="endpoint_uri"/>
+-    <parameter name="attach_path" default="{{//original}}" optional="true"/>
+-    <parameter name="sequence_ref"/>
+-    <sequence>
+-        <property name="ItrExp" expression="$func:iterate_exp" />
+-        <property name="EndPUri" expression="$func:endpoint_uri" />
+-        <property name="AttachPath" expression="$func:attach_path" />
+-        <property name="SRef" expression="$func:sequence_ref" />
+-        <property name="Endpoint_1" expression="get-property('To')" />
+-        <header name="To" expression="$func:endpoint_uri"/>
+-        <iterate xmlns:ns="http://org.apache.synapse/xsd" continueParent="true" preservePayload="true" attachPath="$func:attach_path" expression="$func:iterate_exp">
+-            <target>
+-              <sequence key="{$func:sequence_ref}"/>
+-            </target>
+-        </iterate>
+-        <property name="Endpoint_2" expression="get-property('To')" />
+-    </sequence>
+-</template>
+Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/artifacts.xml
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/artifacts.xml	(revision 1395448)
++++ java/modules/core/src/test/resources/synapse-libraries/synapse-eip-lib/artifacts.xml	(revision 1395449)
+@@ -1,7 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<artifacts>
+-    <artifact name="EipLibrary" package="synapse.lang.eip" >
+-        <dependency artifact="systemManagement" />
+-        <description>eip synapse library</description>
+-    </artifact>
+-</artifacts>
+Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eiptest-lib/eip_systemManagement/template_splitter.xml
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/synapse-eiptest-lib/eip_systemManagement/template_splitter.xml	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/synapse-eiptest-lib/eip_systemManagement/template_splitter.xml	(revision 1395449)
+@@ -0,0 +1,20 @@
++<template xmlns="http://ws.apache.org/ns/synapse" name="splitter">
++    <parameter name="iterate_exp"/>
++    <parameter name="endpoint_uri"/>
++    <parameter name="attach_path" default="{{//original}}" optional="true"/>
++    <parameter name="sequence_ref"/>
++    <sequence>
++        <property name="ItrExp" expression="$func:iterate_exp" />
++        <property name="EndPUri" expression="$func:endpoint_uri" />
++        <property name="AttachPath" expression="$func:attach_path" />
++        <property name="SRef" expression="$func:sequence_ref" />
++        <property name="Endpoint_1" expression="get-property('To')" />
++        <header name="To" expression="$func:endpoint_uri"/>
++        <iterate xmlns:ns="http://org.apache.synapse/xsd" continueParent="true" preservePayload="true" attachPath="$func:attach_path" expression="$func:iterate_exp">
++            <target>
++              <sequence key="{$func:sequence_ref}"/>
++            </target>
++        </iterate>
++        <property name="Endpoint_2" expression="get-property('To')" />
++    </sequence>
++</template>
+Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eiptest-lib/eip_systemManagement/artifact.xml
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/synapse-eiptest-lib/eip_systemManagement/artifact.xml	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/synapse-eiptest-lib/eip_systemManagement/artifact.xml	(revision 1395449)
+@@ -0,0 +1,11 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<artifact name="systemManagement" type="synapse/template">
++
++    <subArtifacts>
++        <artifact name="splitter">
++            <file>template_splitter.xml</file>
++            <description>Splitter library function</description>
++        </artifact>
++    </subArtifacts>
++
++</artifact>
+\ No newline at end of file
+Index: java/modules/core/src/test/resources/synapse-libraries/synapse-eiptest-lib/artifacts.xml
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/synapse-eiptest-lib/artifacts.xml	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/synapse-eiptest-lib/artifacts.xml	(revision 1395449)
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<artifacts>
++    <artifact name="EipLibrary" package="synapse.lang.eip" >
++        <dependency artifact="systemManagement" />
++        <description>eip synapse library</description>
++    </artifact>
++</artifacts>
 Index: java/modules/core/src/main/java/org/apache/synapse/libraries/eip/DynamicRouterMediator.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/libraries/eip/DynamicRouterMediator.java	(nonexistent)
@@ -1751,3 +1751,5 @@ Index: java/modules/core/src/main/java/org/apache/synapse/libraries/eip/CalloutB
 Message: committing patch https://issues.apache.org/jira/browse/SYNAPSE-745 for libarary based EIP patterns
 -*-*-*-
 When: 2012-10-08 00:24:21 -0400 
+-*-*-*-
+Who: uswick

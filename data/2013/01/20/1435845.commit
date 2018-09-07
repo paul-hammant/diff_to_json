@@ -24,6 +24,60 @@ Index: java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/Sc
          OMElement element = xmlHelper.toOMElement(content);
          // We can't add the element directly to the SOAPHeader. Instead, we need to copy the
          // information over to a SOAPHeaderBlock.
+Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java	(revision 1435844)
++++ java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java	(revision 1435845)
+@@ -19,9 +19,7 @@
+ 
+ package org.apache.synapse.core.axis2;
+ 
+-import org.apache.axiom.om.OMAbstractFactory;
+ import org.apache.axiom.om.OMElement;
+-import org.apache.axiom.soap.SOAPFactory;
+ import org.apache.axis2.AxisFault;
+ import org.apache.axis2.Constants;
+ import org.apache.axis2.addressing.AddressingConstants;
+@@ -383,11 +381,7 @@
+                 }
+             }
+             // temporary workaround for https://issues.apache.org/jira/browse/WSCOMMONS-197
+-            if (axisOutMsgCtx.getEnvelope().getHeader() == null) {
+-                SOAPFactory fac = axisOutMsgCtx.isSOAP11() ?
+-                        OMAbstractFactory.getSOAP11Factory() : OMAbstractFactory.getSOAP12Factory();
+-                fac.createSOAPHeader(axisOutMsgCtx.getEnvelope());
+-            }
++            axisOutMsgCtx.getEnvelope().getOrCreateHeader();
+         }
+ 
+         OperationClient mepClient = axisAnonymousOperation.createClient(serviceCtx, clientOptions);
+Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2Sender.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2Sender.java	(revision 1435844)
++++ java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2Sender.java	(revision 1435845)
+@@ -19,8 +19,6 @@
+ 
+ package org.apache.synapse.core.axis2;
+ 
+-import org.apache.axiom.om.OMAbstractFactory;
+-import org.apache.axiom.soap.SOAPFactory;
+ import org.apache.axiom.util.UIDGenerator;
+ import org.apache.axis2.AxisFault;
+ import org.apache.axis2.Constants;
+@@ -144,11 +142,8 @@
+             }
+ 
+             // temporary workaround for https://issues.apache.org/jira/browse/WSCOMMONS-197
+-            if (messageContext.isEngaged(SynapseConstants.SECURITY_MODULE_NAME) &&
+-                messageContext.getEnvelope().getHeader() == null) {
+-                SOAPFactory fac = messageContext.isSOAP11() ?
+-                    OMAbstractFactory.getSOAP11Factory() : OMAbstractFactory.getSOAP12Factory();
+-                fac.createSOAPHeader(messageContext.getEnvelope());
++            if (messageContext.isEngaged(SynapseConstants.SECURITY_MODULE_NAME)) {
++                messageContext.getEnvelope().getOrCreateHeader();
+             }
+ 
+             Axis2FlexibleMEPClient.clearSecurtityProperties(messageContext.getOptions());
 Index: java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/Source.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/Source.java	(revision 1435844)
@@ -76,61 +130,9 @@ Index: java/modules/core/src/main/java/org/apache/synapse/mediators/transform/He
          SOAPHeaderBlock hb = header.addHeaderBlock(qName.getLocalPart(),
                  fac.createOMNamespace(qName.getNamespaceURI(), qName.getPrefix()));
          hb.setText(value);
-Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2Sender.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2Sender.java	(revision 1435844)
-+++ java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2Sender.java	(revision 1435845)
-@@ -19,8 +19,6 @@
- 
- package org.apache.synapse.core.axis2;
- 
--import org.apache.axiom.om.OMAbstractFactory;
--import org.apache.axiom.soap.SOAPFactory;
- import org.apache.axiom.util.UIDGenerator;
- import org.apache.axis2.AxisFault;
- import org.apache.axis2.Constants;
-@@ -144,11 +142,8 @@
-             }
- 
-             // temporary workaround for https://issues.apache.org/jira/browse/WSCOMMONS-197
--            if (messageContext.isEngaged(SynapseConstants.SECURITY_MODULE_NAME) &&
--                messageContext.getEnvelope().getHeader() == null) {
--                SOAPFactory fac = messageContext.isSOAP11() ?
--                    OMAbstractFactory.getSOAP11Factory() : OMAbstractFactory.getSOAP12Factory();
--                fac.createSOAPHeader(messageContext.getEnvelope());
-+            if (messageContext.isEngaged(SynapseConstants.SECURITY_MODULE_NAME)) {
-+                messageContext.getEnvelope().getOrCreateHeader();
-             }
- 
-             Axis2FlexibleMEPClient.clearSecurtityProperties(messageContext.getOptions());
-Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java	(revision 1435844)
-+++ java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java	(revision 1435845)
-@@ -19,9 +19,7 @@
- 
- package org.apache.synapse.core.axis2;
- 
--import org.apache.axiom.om.OMAbstractFactory;
- import org.apache.axiom.om.OMElement;
--import org.apache.axiom.soap.SOAPFactory;
- import org.apache.axis2.AxisFault;
- import org.apache.axis2.Constants;
- import org.apache.axis2.addressing.AddressingConstants;
-@@ -383,11 +381,7 @@
-                 }
-             }
-             // temporary workaround for https://issues.apache.org/jira/browse/WSCOMMONS-197
--            if (axisOutMsgCtx.getEnvelope().getHeader() == null) {
--                SOAPFactory fac = axisOutMsgCtx.isSOAP11() ?
--                        OMAbstractFactory.getSOAP11Factory() : OMAbstractFactory.getSOAP12Factory();
--                fac.createSOAPHeader(axisOutMsgCtx.getEnvelope());
--            }
-+            axisOutMsgCtx.getEnvelope().getOrCreateHeader();
-         }
- 
-         OperationClient mepClient = axisAnonymousOperation.createClient(serviceCtx, clientOptions);
 -*-*-*-
 Message: Use the new SOAPEnvelope#getOrCreateHeader() method where appropriate.
 -*-*-*-
 When: 2013-01-20 09:06:32 -0500 
+-*-*-*-
+Who: veithen

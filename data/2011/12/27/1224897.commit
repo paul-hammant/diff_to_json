@@ -14,32 +14,6 @@ Index: java/src/site/resources/archetype-catalog.xml
          </archetype>
      </archetypes>
  </archetype-catalog>
-Index: java/modules/experimental/pom.xml
-===================================================================
---- java/modules/experimental/pom.xml	(revision 1224896)
-+++ java/modules/experimental/pom.xml	(revision 1224897)
-@@ -26,7 +26,7 @@
-     <parent>
-         <groupId>org.apache.synapse</groupId>
-         <artifactId>Apache-Synapse</artifactId>
--        <version>2.1.0-SNAPSHOT</version>
-+        <version>2.2.0-SNAPSHOT</version>
-         <relativePath>../../pom.xml</relativePath>
-     </parent>
- 
-Index: java/modules/extensions/pom.xml
-===================================================================
---- java/modules/extensions/pom.xml	(revision 1224896)
-+++ java/modules/extensions/pom.xml	(revision 1224897)
-@@ -26,7 +26,7 @@
-     <parent>
-         <groupId>org.apache.synapse</groupId>
-         <artifactId>Apache-Synapse</artifactId>
--        <version>2.1.0-SNAPSHOT</version>
-+        <version>2.2.0-SNAPSHOT</version>
-         <relativePath>../../pom.xml</relativePath>
-     </parent>
- 
 Index: java/modules/securevault/pom.xml
 ===================================================================
 --- java/modules/securevault/pom.xml	(revision 1224896)
@@ -305,6 +279,32 @@ Index: java/modules/xar-maven-plugin/pom.xml
          <relativePath>../../pom.xml</relativePath>
      </parent>
  
+Index: java/modules/experimental/pom.xml
+===================================================================
+--- java/modules/experimental/pom.xml	(revision 1224896)
++++ java/modules/experimental/pom.xml	(revision 1224897)
+@@ -26,7 +26,7 @@
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>2.1.0-SNAPSHOT</version>
++        <version>2.2.0-SNAPSHOT</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+Index: java/modules/extensions/pom.xml
+===================================================================
+--- java/modules/extensions/pom.xml	(revision 1224896)
++++ java/modules/extensions/pom.xml	(revision 1224897)
+@@ -26,7 +26,7 @@
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>2.1.0-SNAPSHOT</version>
++        <version>2.2.0-SNAPSHOT</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
 Index: java/pom.xml
 ===================================================================
 --- java/pom.xml	(revision 1224896)
@@ -331,3 +331,5 @@ Index: java/pom.xml
 Message: Changing the version in the trunk
 -*-*-*-
 When: 2011-12-27 06:28:23 -0500 
+-*-*-*-
+Who: hiranya

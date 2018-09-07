@@ -1,106 +1,3 @@
-Index: java/modules/core/src/main/java/org/apache/synapse/deployers/SynapseArtifactDeploymentStore.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/deployers/SynapseArtifactDeploymentStore.java	(revision 1210451)
-+++ java/modules/core/src/main/java/org/apache/synapse/deployers/SynapseArtifactDeploymentStore.java	(revision 1210452)
-@@ -24,10 +24,8 @@
- import org.apache.commons.logging.LogFactory;
- 
- import java.io.File;
--import java.util.ArrayList;
--import java.util.HashMap;
--import java.util.List;
--import java.util.Map;
-+import java.io.IOException;
-+import java.util.*;
- 
- /**
-  * Keeps track of the artifacts deployed with files inside the synapse repository</p>
-@@ -41,6 +39,7 @@
-  * @see org.apache.synapse.config.xml.MultiXMLConfigurationBuilder
-  */
- public final class SynapseArtifactDeploymentStore {
-+
-     /** Keeps track of the deployed artifacts in the synapse environment */
-     private Map<String, String> fileName2ArtifactName = new HashMap<String, String>();
- 
-@@ -48,10 +47,10 @@
-     private Map<String, String> updatingArtifacts = new HashMap<String, String>();
- 
-     /** Keeps track of the restored artifacts in the synapse environment in a particular instance */
--    private List<String> restoredFiles = new ArrayList<String>();
-+    private Set<String> restoredFiles = new HashSet<String>();
- 
-     /** Keeps track of the backed up artifacts in the synapse environment in a particular instance */
--    private List<String> backedUpFiles = new ArrayList<String>();
-+    private Set<String> backedUpFiles = new HashSet<String>();
-    
-     private static final Log log = LogFactory.getLog(SynapseArtifactDeploymentStore.class);
- 
-@@ -228,6 +227,14 @@
-     }
- 
-     public static String getNormalizedAbsolutePath(String fileName) {
--        return FilenameUtils.normalize(new File(fileName).getAbsolutePath());
-+        String path;
-+        File file = new File(fileName);
-+        try {
-+            path = file.getCanonicalPath();
-+        } catch (IOException e) {
-+            log.warn("Error while computing the canonical path of file: " + fileName);
-+            path = file.getAbsolutePath();
-+        }
-+        return FilenameUtils.normalize(path);
-     }
- }
-Index: java/modules/core/src/main/java/org/apache/synapse/deployers/TemplateDeployer.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/deployers/TemplateDeployer.java	(revision 1210451)
-+++ java/modules/core/src/main/java/org/apache/synapse/deployers/TemplateDeployer.java	(revision 1210452)
-@@ -138,7 +138,7 @@
-                         getEndpointTemplate(existingArtifactName);
- 
-                 if (existingArtifactName.equals(tm.getName())) {
--                    getSynapseConfiguration().updateEndpointTemplate(tm.getName(), existingSt);
-+                    getSynapseConfiguration().updateEndpointTemplate(tm.getName(), tm);
-                 } else {
-                     getSynapseConfiguration().addEndpointTemplate(tm.getName(), tm);
-                     getSynapseConfiguration().removeEndpointTemplate(existingSt.getName());
-@@ -171,7 +171,7 @@
-                                 getSequenceTemplate(existingArtifactName);
- 
-                         if (existingArtifactName.equals(tm.getName())) {
--                            getSynapseConfiguration().updateSequenceTemplate(tm.getName(), existingSt);
-+                            getSynapseConfiguration().updateSequenceTemplate(tm.getName(), tm);
-                         } else {
-                             getSynapseConfiguration().addSequenceTemplate(tm.getName(), tm);
-                             getSynapseConfiguration().removeSequenceTemplate(existingSt.getName());
-@@ -206,10 +206,10 @@
-             try {
-                 st = getSynapseConfiguration().getEndpointTemplate(artifactName);
-             } catch (SynapseException e) {
--                //could not locate an endpoint template for this particular un-delpoyment. This name refers
--                //probably to a sequence tempalte. Thus if  throws a Synapse exception with following message
-+                //could not locate an endpoint template for this particular un-deployment. This name refers
-+                //probably to a sequence template. Thus if  throws a Synapse exception with following message
-                 //catch n log that and continue this process for undeployment of a sequence template
--                if (e.getMessage().indexOf("Cannot locate an either local or remote enrty for key") != -1) {
-+                if (e.getMessage().indexOf("Cannot locate an either local or remote entry for key") != -1) {
-                     if (log.isDebugEnabled()) {
-                         log.debug("Undeploying template is not of endpoint type. Undeployer will now check " +
-                                   "for sequence template for the key: " + artifactName);
-Index: java/modules/core/src/main/java/org/apache/synapse/deployers/ExtensionDeployer.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/deployers/ExtensionDeployer.java	(revision 1210451)
-+++ java/modules/core/src/main/java/org/apache/synapse/deployers/ExtensionDeployer.java	(revision 1210452)
-@@ -151,7 +151,7 @@
-                 = new BufferedReader(new InputStreamReader(servicesURL.openStream()));
-             try {
-                 String className;
--                while ((className = in.readLine()) != null) {
-+                while ((className = in.readLine()) != null && (!className.trim().equals(""))) {
-                     log.info("Loading the " + providerClassName + " implementation: " + className);
-                     try {
-                         Class<? extends T> clazz
 Index: java/modules/core/src/main/java/org/apache/synapse/deployers/PriorityExecutorDeployer.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/deployers/PriorityExecutorDeployer.java	(revision 1210451)
@@ -349,7 +246,112 @@ Index: java/modules/core/src/main/java/org/apache/synapse/deployers/AbstractSyna
          SynapseArtifactDeploymentStore deploymentStore =
                  getSynapseConfiguration().getArtifactDeploymentStore();
  
+Index: java/modules/core/src/main/java/org/apache/synapse/deployers/SynapseArtifactDeploymentStore.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/deployers/SynapseArtifactDeploymentStore.java	(revision 1210451)
++++ java/modules/core/src/main/java/org/apache/synapse/deployers/SynapseArtifactDeploymentStore.java	(revision 1210452)
+@@ -24,10 +24,8 @@
+ import org.apache.commons.logging.LogFactory;
+ 
+ import java.io.File;
+-import java.util.ArrayList;
+-import java.util.HashMap;
+-import java.util.List;
+-import java.util.Map;
++import java.io.IOException;
++import java.util.*;
+ 
+ /**
+  * Keeps track of the artifacts deployed with files inside the synapse repository</p>
+@@ -41,6 +39,7 @@
+  * @see org.apache.synapse.config.xml.MultiXMLConfigurationBuilder
+  */
+ public final class SynapseArtifactDeploymentStore {
++
+     /** Keeps track of the deployed artifacts in the synapse environment */
+     private Map<String, String> fileName2ArtifactName = new HashMap<String, String>();
+ 
+@@ -48,10 +47,10 @@
+     private Map<String, String> updatingArtifacts = new HashMap<String, String>();
+ 
+     /** Keeps track of the restored artifacts in the synapse environment in a particular instance */
+-    private List<String> restoredFiles = new ArrayList<String>();
++    private Set<String> restoredFiles = new HashSet<String>();
+ 
+     /** Keeps track of the backed up artifacts in the synapse environment in a particular instance */
+-    private List<String> backedUpFiles = new ArrayList<String>();
++    private Set<String> backedUpFiles = new HashSet<String>();
+    
+     private static final Log log = LogFactory.getLog(SynapseArtifactDeploymentStore.class);
+ 
+@@ -228,6 +227,14 @@
+     }
+ 
+     public static String getNormalizedAbsolutePath(String fileName) {
+-        return FilenameUtils.normalize(new File(fileName).getAbsolutePath());
++        String path;
++        File file = new File(fileName);
++        try {
++            path = file.getCanonicalPath();
++        } catch (IOException e) {
++            log.warn("Error while computing the canonical path of file: " + fileName);
++            path = file.getAbsolutePath();
++        }
++        return FilenameUtils.normalize(path);
+     }
+ }
+Index: java/modules/core/src/main/java/org/apache/synapse/deployers/TemplateDeployer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/deployers/TemplateDeployer.java	(revision 1210451)
++++ java/modules/core/src/main/java/org/apache/synapse/deployers/TemplateDeployer.java	(revision 1210452)
+@@ -138,7 +138,7 @@
+                         getEndpointTemplate(existingArtifactName);
+ 
+                 if (existingArtifactName.equals(tm.getName())) {
+-                    getSynapseConfiguration().updateEndpointTemplate(tm.getName(), existingSt);
++                    getSynapseConfiguration().updateEndpointTemplate(tm.getName(), tm);
+                 } else {
+                     getSynapseConfiguration().addEndpointTemplate(tm.getName(), tm);
+                     getSynapseConfiguration().removeEndpointTemplate(existingSt.getName());
+@@ -171,7 +171,7 @@
+                                 getSequenceTemplate(existingArtifactName);
+ 
+                         if (existingArtifactName.equals(tm.getName())) {
+-                            getSynapseConfiguration().updateSequenceTemplate(tm.getName(), existingSt);
++                            getSynapseConfiguration().updateSequenceTemplate(tm.getName(), tm);
+                         } else {
+                             getSynapseConfiguration().addSequenceTemplate(tm.getName(), tm);
+                             getSynapseConfiguration().removeSequenceTemplate(existingSt.getName());
+@@ -206,10 +206,10 @@
+             try {
+                 st = getSynapseConfiguration().getEndpointTemplate(artifactName);
+             } catch (SynapseException e) {
+-                //could not locate an endpoint template for this particular un-delpoyment. This name refers
+-                //probably to a sequence tempalte. Thus if  throws a Synapse exception with following message
++                //could not locate an endpoint template for this particular un-deployment. This name refers
++                //probably to a sequence template. Thus if  throws a Synapse exception with following message
+                 //catch n log that and continue this process for undeployment of a sequence template
+-                if (e.getMessage().indexOf("Cannot locate an either local or remote enrty for key") != -1) {
++                if (e.getMessage().indexOf("Cannot locate an either local or remote entry for key") != -1) {
+                     if (log.isDebugEnabled()) {
+                         log.debug("Undeploying template is not of endpoint type. Undeployer will now check " +
+                                   "for sequence template for the key: " + artifactName);
+Index: java/modules/core/src/main/java/org/apache/synapse/deployers/ExtensionDeployer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/deployers/ExtensionDeployer.java	(revision 1210451)
++++ java/modules/core/src/main/java/org/apache/synapse/deployers/ExtensionDeployer.java	(revision 1210452)
+@@ -151,7 +151,7 @@
+                 = new BufferedReader(new InputStreamReader(servicesURL.openStream()));
+             try {
+                 String className;
+-                while ((className = in.readLine()) != null) {
++                while ((className = in.readLine()) != null && (!className.trim().equals(""))) {
+                     log.info("Loading the " + providerClassName + " implementation: " + className);
+                     try {
+                         Class<? extends T> clazz
 -*-*-*-
 Message: Fixing a few typos and minor issues with the deployers
 -*-*-*-
 When: 2011-12-05 08:16:19 -0500 
+-*-*-*-
+Who: hiranya

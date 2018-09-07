@@ -100,3 +100,5 @@ Index: java/modules/war/pom.xml
 Message: Fixing the war module to use the new docs module
 -*-*-*-
 When: 2012-03-20 00:55:39 -0400 
+-*-*-*-
+Who: hiranya

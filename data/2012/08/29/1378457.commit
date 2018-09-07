@@ -15,3 +15,5 @@ Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transpo
 Message: Masked the password in the file URL in log.
 -*-*-*-
 When: 2012-08-29 02:53:21 -0400 
+-*-*-*-
+Who: rajikak

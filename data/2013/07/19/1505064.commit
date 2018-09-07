@@ -1,0 +1,215 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/transform/HeaderMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/transform/HeaderMediator.java	(revision 1505063)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/transform/HeaderMediator.java	(revision 1505064)
+@@ -33,6 +33,7 @@
+ import org.apache.synapse.util.xpath.SynapseXPath;
+ 
+ import javax.xml.namespace.QName;
++import java.util.ArrayList;
+ import java.util.List;
+ 
+ /**
+@@ -53,6 +54,8 @@
+     private String value = null;
+     /** Set the header (ACTION_SET) or remove it (ACTION_REMOVE). Defaults to ACTION_SET */
+     private int action = ACTION_SET;
++    /** Optional embedded XML content of the header element */
++    private List<OMElement> embeddedXmlContent = new ArrayList<OMElement>();
+     /** An expression which should be evaluated, and the result set as the header value */
+     private SynapseXPath expression = null;
+ 
+@@ -83,7 +86,7 @@
+                 synLog.traceOrDebug("Set SOAP header : " + qName + " to : " + value);
+             }
+ 
+-            if (qName.getNamespaceURI() == null || "".equals(qName.getNamespaceURI())) {
++            if (!isImplicit() && (qName.getNamespaceURI() == null || "".equals(qName.getNamespaceURI()))) {
+ 
+                 // is this a "well known" Synapse header?
+                 if (SynapseConstants.HEADER_TO.equals(qName.getLocalPart())) {
+@@ -160,9 +163,15 @@
+         }
+         SOAPFactory fac = (SOAPFactory) env.getOMFactory();
+         SOAPHeader header = env.getOrCreateHeader();
+-        SOAPHeaderBlock hb = header.addHeaderBlock(qName.getLocalPart(),
+-                fac.createOMNamespace(qName.getNamespaceURI(), qName.getPrefix()));
+-        hb.setText(value);
++        if (!isImplicit()) {
++            SOAPHeaderBlock hb = header.addHeaderBlock(qName.getLocalPart(),
++                    fac.createOMNamespace(qName.getNamespaceURI(), qName.getPrefix()));
++            hb.setText(value);
++        } else if (hasEmbeddedXml()) {
++            for (OMElement e : embeddedXmlContent) {
++                header.addChild(e);
++            }
++        }
+     }
+ 
+     private void removeFromHeaderList(List headersList) {
+@@ -184,6 +193,24 @@
+         }
+     }
+ 
++    public List<OMElement> getEmbeddedXml() {
++        return embeddedXmlContent;
++    }
++
++    public void addEmbeddedXml(OMElement element) {
++        if (element != null && !embeddedXmlContent.contains(element)) {
++            embeddedXmlContent.add(element);
++        }
++    }
++
++    public boolean hasEmbeddedXml() {
++        return !embeddedXmlContent.isEmpty();
++    }
++
++    public boolean isImplicit() {
++        return getQName() == null;
++    }
++
+     public int getAction() {
+         return action;
+     }
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/HeaderMediatorSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/HeaderMediatorSerializer.java	(revision 1505063)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/HeaderMediatorSerializer.java	(revision 1505064)
+@@ -36,6 +36,7 @@
+ 
+         if (!(m instanceof HeaderMediator)) {
+             handleException("Unsupported mediator passed in for serialization : " + m.getType());
++            return null;
+         }
+ 
+         HeaderMediator mediator = (HeaderMediator) m;
+@@ -75,6 +76,11 @@
+             }
+         }
+ 
++        if (mediator.hasEmbeddedXml()) {
++            for (OMElement e : mediator.getEmbeddedXml()) {
++                header.addChild(e);
++            }
++        }
+         return header;
+     }
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/HeaderMediatorFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/HeaderMediatorFactory.java	(revision 1505063)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/HeaderMediatorFactory.java	(revision 1505064)
+@@ -28,6 +28,7 @@
+ import org.jaxen.JaxenException;
+ 
+ import javax.xml.namespace.QName;
++import java.util.Iterator;
+ import java.util.Properties;
+ 
+ /**
+@@ -57,9 +58,11 @@
+         OMAttribute action = elem.getAttribute(ATT_ACTION);
+ 
+         if (name == null || name.getAttributeValue() == null) {
+-            String msg = "A valid name attribute is required for the header mediator";
+-            log.error(msg);
+-            throw new SynapseException(msg);
++            if (elem.getChildElements() == null || !elem.getChildElements().hasNext()) {
++                String msg = "A valid name attribute is required for the header mediator";
++                log.error(msg);
++                throw new SynapseException(msg);
++            }
+         } else {
+             String nameAtt = name.getAttributeValue();
+             int colonPos = nameAtt.indexOf(":");
+@@ -101,7 +104,7 @@
+         }
+ 
+         if (headerMediator.getAction() == HeaderMediator.ACTION_SET &&
+-            value == null && exprn == null) {
++                value == null && exprn == null && !headerMediator.isImplicit()) {
+             handleException("A 'value' or 'expression' attribute is required for a [set] " +
+                     "header mediator");
+         }
+@@ -115,8 +118,17 @@
+             } catch (JaxenException je) {
+                 handleException("Invalid XPath expression : " + exprn.getAttributeValue());
+             }
++        } else if (headerMediator.isImplicit()) { // we have an implicit, non standard header
++            Iterator i = elem.getChildElements();
++            if (i == null) {
++                handleException("A non standard header with both value and expression null must " +
++                        "contain an embedded XML definition.");
++                return null;
++            }
++            while (i.hasNext()) {
++                headerMediator.addEmbeddedXml((OMElement) i.next());
++            }
+         }
+-
+         return headerMediator;
+     }
+ 
+Index: java/modules/core/src/test/java/org/apache/synapse/mediators/transform/HeaderMediatorTest.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/mediators/transform/HeaderMediatorTest.java	(revision 1505063)
++++ java/modules/core/src/test/java/org/apache/synapse/mediators/transform/HeaderMediatorTest.java	(revision 1505064)
+@@ -20,12 +20,16 @@
+ package org.apache.synapse.mediators.transform;
+ 
+ import junit.framework.TestCase;
++import org.apache.axiom.om.OMElement;
++import org.apache.axiom.om.util.AXIOMUtil;
+ import org.apache.synapse.MessageContext;
+ import org.apache.synapse.SynapseConstants;
++import org.apache.synapse.config.xml.HeaderMediatorFactory;
+ import org.apache.synapse.mediators.TestUtils;
+ import org.apache.synapse.util.xpath.SynapseXPath;
+ 
+ import javax.xml.namespace.QName;
++import java.util.Properties;
+ 
+ public class HeaderMediatorTest extends TestCase {
+ 
+@@ -86,4 +90,34 @@
+             // This is expected
+         }
+     }
++
++    public void testEmbeddedXml() throws Exception {
++        String simpleHeader = "<header name=\"m:simpleHeader\" value=\"Simple Header\" xmlns:m=\"http://org.synapse.example\"/>";
++        String complexHeader = "<header><m:complexHeader xmlns:m=\"http://org.synapse.example\"><property key=\"k1\" value=\"v1\"/><property key=\"k2\" value=\"v2\"/></m:complexHeader></header>";
++        String removeHeader = "<header name=\"m:complexHeader\" action=\"remove\" xmlns:m=\"http://org.synapse.example\"/>";
++
++        HeaderMediatorFactory fac = new HeaderMediatorFactory();
++        // Adding headers.
++        MessageContext synCtx = TestUtils.getTestContext("<empty/>");
++        HeaderMediator headerMediator = (HeaderMediator) fac.createMediator(
++                AXIOMUtil.stringToOM(simpleHeader), new Properties());
++        headerMediator.mediate(synCtx);
++        OMElement result = synCtx.getEnvelope().getHeader().getFirstElement();
++        assertEquals("simpleHeader", result.getLocalName());
++
++        headerMediator = (HeaderMediator) fac.createMediator(
++                AXIOMUtil.stringToOM(complexHeader), new Properties());
++        headerMediator.mediate(synCtx);
++        result = synCtx.getEnvelope().getHeader().getFirstChildWithName(
++                new QName("http://org.synapse.example", "complexHeader"));
++        assertNotNull(result);
++
++        // Removing headers.
++        headerMediator = (HeaderMediator) fac.createMediator(
++                AXIOMUtil.stringToOM(removeHeader), new Properties());
++        headerMediator.mediate(synCtx);
++        result = synCtx.getEnvelope().getHeader().getFirstChildWithName(
++                new QName("http://org.synapse.example", "complexHeader"));
++        assertNull(result);
++    }
+ }
+-*-*-*-
+Message: Applying the patch for SYNAPSE-841. Adding support for complex XML blocks in the header mediator.
+-*-*-*-
+When: 2013-07-19 19:30:23 -0400 
+-*-*-*-
+Who: hiranya

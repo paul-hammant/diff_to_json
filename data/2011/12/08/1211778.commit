@@ -1,3 +1,16 @@
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample59.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample59.java	(revision 1211777)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample59.java	(revision 1211778)
+@@ -41,7 +41,7 @@
+ 
+         log.info("Running test: Weighted load balancing between 3 endpoints");
+         result = client.sessionlessClient(addUrl,null, 100);
+-        assertTrue("Client did not get run successfully ", result.gotResponse());
++        assertTrue("Client did not run successfully ", result.gotResponse());
+     }
+ 
+ 
 Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample50.java
 ===================================================================
 --- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample50.java	(revision 1211777)
@@ -54,19 +67,6 @@ Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framewo
  
          log.info("Running test: Smart Client mode");
          result = client.requestStandardQuote(addUrl, null, null, "IBM" ,null);
--        assertTrue("Client did not get run successfully ", result.gotResponse());
-+        assertTrue("Client did not run successfully ", result.gotResponse());
-     }
- 
- 
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample59.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample59.java	(revision 1211777)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/endpoint/Sample59.java	(revision 1211778)
-@@ -41,7 +41,7 @@
- 
-         log.info("Running test: Weighted load balancing between 3 endpoints");
-         result = client.sessionlessClient(addUrl,null, 100);
 -        assertTrue("Client did not get run successfully ", result.gotResponse());
 +        assertTrue("Client did not run successfully ", result.gotResponse());
      }
@@ -257,3 +257,5 @@ Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framewo
 Message: Log messages updated
 -*-*-*-
 When: 2011-12-08 03:05:30 -0500 
+-*-*-*-
+Who: hiranya

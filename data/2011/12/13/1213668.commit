@@ -35,8 +35,10 @@ Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/ServiceLoad
          return null;
      }
 -*-*-*-
-Message: Dispatch *.foo.com sort of request hosts to clusters mapped to foo.com
+Message: Dispatch *.foo.com sort of request hosts to clusters mapped to foo.com 
 
 
 -*-*-*-
 When: 2011-12-13 07:56:15 -0500 
+-*-*-*-
+Who: azeez

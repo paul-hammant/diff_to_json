@@ -42,3 +42,5 @@ Index: java/modules/core/src/main/java/org/apache/synapse/deployers/AbstractSyna
 Message: Updating some log statements
 -*-*-*-
 When: 2011-12-06 05:12:12 -0500 
+-*-*-*-
+Who: hiranya

@@ -1,49 +1,3 @@
-Index: java/modules/integration/src/test/resources/sample100.xml
-===================================================================
---- java/modules/integration/src/test/resources/sample100.xml	(nonexistent)
-+++ java/modules/integration/src/test/resources/sample100.xml	(revision 1211825)
-@@ -0,0 +1,18 @@
-+<synapseSample>
-+    <sampleID>100</sampleID>
-+    <sampleName>Using WS-Security for outgoing messages</sampleName>
-+    <synapseConfig>
-+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
-+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
-+        <synapseXml>repository/conf/sample/synapse_sample_100.xml</synapseXml>
-+    </synapseConfig>
-+    <backEndServerConfig>
-+        <axis2Server id='0'>
-+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
-+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
-+        </axis2Server>
-+    </backEndServerConfig>
-+    <clientConfig>
-+	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
-+    </clientConfig>
-+</synapseSample>
-Index: java/modules/integration/src/test/resources/sample101.xml
-===================================================================
---- java/modules/integration/src/test/resources/sample101.xml	(nonexistent)
-+++ java/modules/integration/src/test/resources/sample101.xml	(revision 1211825)
-@@ -0,0 +1,18 @@
-+<synapseSample>
-+    <sampleID>101</sampleID>
-+    <sampleName>Reliable message exchange between Synapse and the back-end server using WS-ReliableMessaging</sampleName>
-+    <synapseConfig>
-+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
-+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
-+        <synapseXml>repository/conf/sample/synapse_sample_101.xml</synapseXml>
-+    </synapseConfig>
-+    <backEndServerConfig>
-+        <axis2Server id='0'>
-+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
-+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
-+        </axis2Server>
-+    </backEndServerConfig>
-+    <clientConfig>
-+	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
-+    </clientConfig>
-+</synapseSample>
 Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
 ===================================================================
 --- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1211824)
@@ -195,7 +149,55 @@ Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framewo
 +    }
 +
 +}
+Index: java/modules/integration/src/test/resources/sample100.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample100.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample100.xml	(revision 1211825)
+@@ -0,0 +1,18 @@
++<synapseSample>
++    <sampleID>100</sampleID>
++    <sampleName>Using WS-Security for outgoing messages</sampleName>
++    <synapseConfig>
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>repository/conf/sample/synapse_sample_100.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+Index: java/modules/integration/src/test/resources/sample101.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample101.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample101.xml	(revision 1211825)
+@@ -0,0 +1,18 @@
++<synapseSample>
++    <sampleID>101</sampleID>
++    <sampleName>Reliable message exchange between Synapse and the back-end server using WS-ReliableMessaging</sampleName>
++    <synapseConfig>
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>repository/conf/sample/synapse_sample_101.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
 -*-*-*-
 Message: Adding qos samples
 -*-*-*-
 When: 2011-12-08 06:01:42 -0500 
+-*-*-*-
+Who: hiranya

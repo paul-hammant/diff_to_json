@@ -1,0 +1,19 @@
+Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTask.java
+===================================================================
+--- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTask.java	(revision 1509544)
++++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTask.java	(revision 1509545)
+@@ -531,7 +531,7 @@
+                     try {
+                         available.acquire();
+                     } catch (InterruptedException ie) {
+-                        log.error("The blocking semaphore received an interrupted", e);
++                        log.error("The blocking semaphore was interrupted", e);
+                         Thread.currentThread().interrupt();
+                         return;
+                     }
+-*-*-*-
+Message: fixed wording.
+-*-*-*-
+When: 2013-08-02 01:05:45 -0400 
+-*-*-*-
+Who: rajikak

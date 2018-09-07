@@ -1,0 +1,37 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/aspects/statistics/StatisticsRecord.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/aspects/statistics/StatisticsRecord.java	(revision 1505056)
++++ java/modules/core/src/main/java/org/apache/synapse/aspects/statistics/StatisticsRecord.java	(revision 1505057)
+@@ -23,6 +23,8 @@
+ import java.util.ArrayList;
+ import java.util.Iterator;
+ import java.util.List;
++import java.util.Queue;
++import java.util.concurrent.ConcurrentLinkedQueue;
+ 
+ /**
+  * Holds a record for statistics for current message
+@@ -31,7 +33,7 @@
+ public class StatisticsRecord {
+ 
+     private String id;
+-    private final List<StatisticsLog> statisticsLogs = new ArrayList<StatisticsLog>();
++    private final Queue<StatisticsLog> statisticsLogs = new ConcurrentLinkedQueue<StatisticsLog>();
+     private String clientIP;
+     private String clientHost;
+     private ComponentType owner;
+@@ -118,7 +120,7 @@
+     }
+ 
+     public String toString() {
+-        return new StringBuffer()
++        return new StringBuilder()
+                 .append("[Message id : ").append(id).append(" ]")
+                 .append("[Remote  IP : ").append(clientIP).append(" ]")
+                 .append("[Remote host : ").append(clientHost).append(" ]")
+-*-*-*-
+Message: Fixing SYNAPSE-853 - Concurrency issue in endpoint stat collection. Used a ConcurrentLinkedQueue instead of the ArrayList to collect stat logs in a thread safe manner.
+-*-*-*-
+When: 2013-07-19 18:32:40 -0400 
+-*-*-*-
+Who: hiranya

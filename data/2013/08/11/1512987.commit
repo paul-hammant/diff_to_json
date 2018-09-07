@@ -1,0 +1,143 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/CalloutMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/CalloutMediator.java	(revision 1512986)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/CalloutMediator.java	(revision 1512987)
+@@ -44,7 +44,7 @@
+ import java.util.List;
+ 
+ /**
+- * <callout serviceURL="string" [action="string"][passHeaders="true|false"]>
++ * <callout [serviceURL="string"] [action="string"][passHeaders="true|false"]>
+  *      <configuration [axis2xml="string"] [repository="string"]/>?
+  *      <source xpath="expression" | key="string"> <!-- key can be a MC property or entry key -->
+  *      <target xpath="expression" | key="string"/>
+@@ -109,7 +109,13 @@
+                 sc.engageModule(SynapseConstants.SECURITY_MODULE_NAME);
+             }
+ 
+-            options.setTo(new EndpointReference(serviceURL));
++            if (serviceURL != null) {
++                options.setTo(new EndpointReference(serviceURL));
++            } else if (synCtx.getTo() != null && synCtx.getTo().getAddress() != null) {
++                options.setTo(new EndpointReference(synCtx.getTo().getAddress()));
++            } else {
++                handleException("Service URL or 'To' header is required", synCtx);
++            }
+ 
+             if (action != null) {
+                 options.setAction(action);
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorFactory.java	(revision 1512986)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorFactory.java	(revision 1512987)
+@@ -34,12 +34,11 @@
+  * Factory for {@link CalloutMediator} instances.
+  * 
+  * <pre>
+- * &lt;callout serviceURL="string" [action="string"][passHeaders="true|false"]&gt;
++ * &lt;callout [serviceURL="string"] [action="string"][passHeaders="true|false"]&gt;
+  *      &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
+  *      &lt;source xpath="expression" | key="string"&gt;
+  *      &lt;target xpath="expression" | key="string"/&gt;
+  *      &lt;enableSec policy="string" | outboundPolicy="String" | inboundPolicy="String" /&gt;?
+- *      &lt;enableSec policy="string" /&gt;?
+  * &lt;/callout&gt;
+  * </pre>
+  */
+@@ -81,8 +80,6 @@
+ 
+         if (attServiceURL != null) {
+             callout.setServiceURL(attServiceURL.getAttributeValue());
+-        } else {
+-            handleException("The 'serviceURL' attribute is required for the Callout mediator");
+         }
+ 
+         if (attAction != null) {
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorSerializer.java	(revision 1512986)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorSerializer.java	(revision 1512987)
+@@ -25,7 +25,7 @@
+ 
+ /**
+  * <pre>
+- * &lt;callout serviceURL="string" [action="string"][passHeaders="true|false"]&gt;
++ * &lt;callout [serviceURL="string"] [action="string"][passHeaders="true|false"]&gt;
+  *      &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
+  *      &lt;source xpath="expression" | key="string"&gt;
+  *      &lt;target xpath="expression" | key="string"/&gt;
+@@ -46,7 +46,9 @@
+         OMElement callout = fac.createOMElement("callout", synNS);
+         saveTracingState(callout, mediator);
+ 
+-        callout.addAttribute(fac.createOMAttribute("serviceURL", nullNS, mediator.getServiceURL()));
++        if (mediator.getServiceURL() != null) {
++            callout.addAttribute(fac.createOMAttribute("serviceURL", nullNS, mediator.getServiceURL()));
++        }
+         if (mediator.getAction() != null) {
+             callout.addAttribute(fac.createOMAttribute("action", nullNS, mediator.getAction()));
+         }
+Index: java/modules/core/src/test/java/org/apache/synapse/config/xml/CalloutMediatorSerializationTest.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/config/xml/CalloutMediatorSerializationTest.java	(revision 1512986)
++++ java/modules/core/src/test/java/org/apache/synapse/config/xml/CalloutMediatorSerializationTest.java	(revision 1512987)
+@@ -90,5 +90,18 @@
+             assertTrue(serialization(inputXml, calloutMediatorSerializer));
+     }
+ 
++    public void testCalloutMediatorSerializationScenarioFive() {
++        String inputXml = "<callout xmlns=\"http://ws.apache.org/ns/synapse\" " +
++                "action=\"urn:getQuote\"><source xmlns:s11=\"http://schemas.xmlsoap.org/" +
++                "soap/envelope/\" xmlns:s12=\"http://www.w3.org/2003/05/soap-envelope\" " +
++                "xpath=\"s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]\"/>" +
++                "<target xmlns:s11=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
++                "xmlns:s12=\"http://www.w3.org/2003/05/soap-envelope\" xpath=\"s11:Body/" +
++                "child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]\"/>" +
++                "<enableSec outboundPolicy=\"out_sec_policy\" inboundPolicy=\"in_sec_policy\"/></callout>";
++        assertTrue(serialization(inputXml, calloutMediatorFactory, calloutMediatorSerializer));
++        assertTrue(serialization(inputXml, calloutMediatorSerializer));
++    }
++
+ }
+ 
+Index: java/modules/documentation/src/site/xdoc/userguide/mediators.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/mediators.xml	(revision 1512986)
++++ java/modules/documentation/src/site/xdoc/userguide/mediators.xml	(revision 1512987)
+@@ -812,10 +812,11 @@
+                     current message, or the name of a key/property using which the response would be
+                     attached to the current message context as a property.
+                 </p>
+-                <div class="xmlConf">&lt;callout serviceURL="string" [action="string"]&gt;
++                <div class="xmlConf">&lt;callout [serviceURL="string"] [action="string"]&gt;
+     &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
+     &lt;source xpath="expression" | key="string"&gt;
+     &lt;target xpath="expression" | key="string"/&gt;
++    &lt;enableSec policy="string" | outboundPolicy="String" | inboundPolicy="String" /&gt;?
+ &lt;/callout&gt;</div>
+                 <p>
+                     Since the callout mediator performs a blocking call, it cannot use the default
+@@ -826,9 +827,15 @@
+                 </p>
+                 <p>
+                     To invoke secured services, Callout mediator can be configured to enable WS-Security
+-                    using the enableSec element. Security policy should be specified using the policy
+-                    attribute which may point to a registry key or a local entry.
++                    using the enableSec element. Security policy should be specified using the 'policy'
++                    attribute which may point to a registry key or a local entry. You can also specify
++                    two different policies for inbound and outbound messages (flows). This is done by
++                    using the 'inboundPolicy' and 'outboundPolicy' attributes.
+                 </p>
++                <p>
++                    When the 'serviceURL' attribute is not present, the 'To' header on the request
++                    is used as the target endpoint.
++                </p>
+             </subsection>
+             <subsection name="Clone Mediator" id="Clone">
+                 <p>
+-*-*-*-
+Message: Making it possible to send requests using the To header in the callout mediator. Patch applied from SYNAPSE-965
+-*-*-*-
+When: 2013-08-11 14:47:16 -0400 
+-*-*-*-
+Who: hiranya

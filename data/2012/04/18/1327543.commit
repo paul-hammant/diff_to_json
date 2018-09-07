@@ -1,3 +1,18 @@
+Index: java/modules/core/src/test/resources/synapse-libraries/SynapseTestLibrary.zip
+===================================================================
+Cannot display: file marked as a binary type.
+svn:mime-type = application/octet-stream
+Index: java/modules/core/src/test/resources/synapse-libraries/SynapseTestLibrary.zip
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/SynapseTestLibrary.zip	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/SynapseTestLibrary.zip	(revision 1327543)
+
+Property changes on: java/modules/core/src/test/resources/synapse-libraries/SynapseTestLibrary.zip
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++application/octet-stream
+\ No newline at end of property
 Index: java/modules/core/src/test/java/org/apache/synapse/libraries/util/LibDeployerUtilsTest.java
 ===================================================================
 --- java/modules/core/src/test/java/org/apache/synapse/libraries/util/LibDeployerUtilsTest.java	(nonexistent)
@@ -161,22 +176,9 @@ Index: java/modules/core/src/test/java/org/apache/synapse/libraries/LibImportTes
 +    }
 +
 +}
-Index: java/modules/core/src/test/resources/synapse-libraries/SynapseTestLibrary.zip
-===================================================================
-Cannot display: file marked as a binary type.
-svn:mime-type = application/octet-stream
-Index: java/modules/core/src/test/resources/synapse-libraries/SynapseTestLibrary.zip
-===================================================================
---- java/modules/core/src/test/resources/synapse-libraries/SynapseTestLibrary.zip	(nonexistent)
-+++ java/modules/core/src/test/resources/synapse-libraries/SynapseTestLibrary.zip	(revision 1327543)
-
-Property changes on: java/modules/core/src/test/resources/synapse-libraries/SynapseTestLibrary.zip
-___________________________________________________________________
-Added: svn:mime-type
-## -0,0 +1 ##
-+application/octet-stream
-\ No newline at end of property
 -*-*-*-
 Message: committing patch for https://issues.apache.org/jira/browse/SYNAPSE-862
 -*-*-*-
 When: 2012-04-18 11:23:07 -0400 
+-*-*-*-
+Who: uswick

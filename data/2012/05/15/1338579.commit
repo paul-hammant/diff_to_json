@@ -36,3 +36,5 @@ Index: java/modules/core/src/main/java/org/apache/synapse/rest/dispatch/URLMappi
 Message: Supporting proper exact matches with query parameters
 -*-*-*-
 When: 2012-05-15 03:58:57 -0400 
+-*-*-*-
+Who: hiranya

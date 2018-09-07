@@ -1,0 +1,60 @@
+Index: java/modules/samples/src/main/java/samples/userguide/RabbitMQAMQPClient.java
+===================================================================
+--- java/modules/samples/src/main/java/samples/userguide/RabbitMQAMQPClient.java	(revision 1508639)
++++ java/modules/samples/src/main/java/samples/userguide/RabbitMQAMQPClient.java	(revision 1508640)
+@@ -64,7 +64,6 @@
+         Channel channel = null;
+         try {
+             connection = factory.newConnection();
+-
+             channel = connection.createChannel();
+ 
+             if (mode == null) {
+Index: java/modules/documentation/src/site/xdoc/userguide/samples.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples.xml	(revision 1508639)
++++ java/modules/documentation/src/site/xdoc/userguide/samples.xml	(revision 1508640)
+@@ -120,6 +120,7 @@
+                         <li><a href="samples/sample264.html">Sample 264: Request-response invocations with the JMS transport</a></li>
+                         <li><a href="samples/sample265.html">Sample 265: Switching from TCP to HTTP/S</a></li>
+                         <li><a href="samples/sample266.html">Sample 266: Switching from UDP to HTTP/S</a></li>
++                        <li><a href="samples/sample269.html">Sample 269: AMQP transport-consumer proxy</a></li>
+                     </ul>
+                 </p>
+             </subsection>
+Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample269.xml
+===================================================================
+Cannot display: file marked as a binary type.
+svn:mime-type = application/xml
+Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample269.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples/sample269.xml	(nonexistent)
++++ java/modules/documentation/src/site/xdoc/userguide/samples/sample269.xml	(revision 1508640)
+
+Property changes on: java/modules/documentation/src/site/xdoc/userguide/samples/sample269.xml
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++application/xml
+\ No newline at end of property
+Index: java/repository/conf/sample/synapse_sample_269.xml
+===================================================================
+Cannot display: file marked as a binary type.
+svn:mime-type = application/xml
+Index: java/repository/conf/sample/synapse_sample_269.xml
+===================================================================
+--- java/repository/conf/sample/synapse_sample_269.xml	(nonexistent)
++++ java/repository/conf/sample/synapse_sample_269.xml	(revision 1508640)
+
+Property changes on: java/repository/conf/sample/synapse_sample_269.xml
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++application/xml
+\ No newline at end of property
+-*-*-*-
+Message: added sample 269.
+-*-*-*-
+When: 2013-07-30 17:35:27 -0400 
+-*-*-*-
+Who: rajikak

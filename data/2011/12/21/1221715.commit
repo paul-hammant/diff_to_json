@@ -1,3 +1,15 @@
+Index: scratch/hiranya/website/src/site/site.xml
+===================================================================
+--- scratch/hiranya/website/src/site/site.xml	(revision 1221714)
++++ scratch/hiranya/website/src/site/site.xml	(revision 1221715)
+@@ -33,6 +33,7 @@
+             <item name="License" href="http://www.apache.org/licenses/LICENSE-2.0"/>
+         </menu>
+         <menu name="Documentation">
++            <item name="Installation Guide" href="userguide/installation.html"/>
+             <item name="Quick Start Guide" href="userguide/quick_start.html"/>
+             <item name="Samples Setup Guide" href="userguide/samples/setup/index.html"/>
+             <item name="Extending the Service Bus" href="userguide/extending.html"/>
 Index: scratch/hiranya/website/src/site/xdoc/userguide/installation.xml
 ===================================================================
 --- scratch/hiranya/website/src/site/xdoc/userguide/installation.xml	(nonexistent)
@@ -248,19 +260,9 @@ Index: scratch/hiranya/website/src/site/xdoc/userguide/installation.xml
 +        </section>
 +    </body>
 +</document>
-Index: scratch/hiranya/website/src/site/site.xml
-===================================================================
---- scratch/hiranya/website/src/site/site.xml	(revision 1221714)
-+++ scratch/hiranya/website/src/site/site.xml	(revision 1221715)
-@@ -33,6 +33,7 @@
-             <item name="License" href="http://www.apache.org/licenses/LICENSE-2.0"/>
-         </menu>
-         <menu name="Documentation">
-+            <item name="Installation Guide" href="userguide/installation.html"/>
-             <item name="Quick Start Guide" href="userguide/quick_start.html"/>
-             <item name="Samples Setup Guide" href="userguide/samples/setup/index.html"/>
-             <item name="Extending the Service Bus" href="userguide/extending.html"/>
 -*-*-*-
 Message: Adding installation guide - Thanks Sadeep for the contribution
 -*-*-*-
 When: 2011-12-21 08:23:45 -0500 
+-*-*-*-
+Who: hiranya

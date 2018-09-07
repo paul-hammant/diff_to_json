@@ -429,3 +429,5 @@ Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFac
 Message: Adding payload factory mediator. SYNAPSE-821. Thanks Sadeep for the patch
 -*-*-*-
 When: 2011-12-07 05:01:53 -0500 
+-*-*-*-
+Who: hiranya

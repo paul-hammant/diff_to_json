@@ -1,3 +1,14 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/rest/RESTConstants.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/rest/RESTConstants.java	(revision 1352888)
++++ java/modules/core/src/main/java/org/apache/synapse/rest/RESTConstants.java	(revision 1352889)
+@@ -46,4 +46,6 @@
+ 
+     public static final String DEFAULT_ENCODING = "UTF-8";
+ 
++    public static final String NO_MATCHING_RESOURCE_HANDLER = "NO_MATCHING_RESOURCE_HANDLER";
++
+ }
 Index: java/modules/core/src/main/java/org/apache/synapse/rest/API.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/rest/API.java	(revision 1352888)
@@ -28,18 +39,9 @@ Index: java/modules/core/src/main/java/org/apache/synapse/rest/API.java
          }
      }
  
-Index: java/modules/core/src/main/java/org/apache/synapse/rest/RESTConstants.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/rest/RESTConstants.java	(revision 1352888)
-+++ java/modules/core/src/main/java/org/apache/synapse/rest/RESTConstants.java	(revision 1352889)
-@@ -46,4 +46,6 @@
- 
-     public static final String DEFAULT_ENCODING = "UTF-8";
- 
-+    public static final String NO_MATCHING_RESOURCE_HANDLER = "NO_MATCHING_RESOURCE_HANDLER";
-+
- }
 -*-*-*-
 Message: Providig a hook to handle messages with no matching API resources
 -*-*-*-
 When: 2012-06-22 09:42:43 -0400 
+-*-*-*-
+Who: hiranya

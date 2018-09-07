@@ -16,3 +16,5 @@ Index: java/modules/core/src/main/java/org/apache/synapse/util/PayloadHelper.jav
 Message: Fixing SYNAPSE-809
 -*-*-*-
 When: 2011-12-19 03:46:58 -0500 
+-*-*-*-
+Who: hiranya

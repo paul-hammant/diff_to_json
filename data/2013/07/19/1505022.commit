@@ -1,0 +1,57 @@
+Index: java/modules/extensions/src/test/java/org/apache/synapse/mediators/bsf/ScriptMediatorSerializationTest.java
+===================================================================
+--- java/modules/extensions/src/test/java/org/apache/synapse/mediators/bsf/ScriptMediatorSerializationTest.java	(revision 1505021)
++++ java/modules/extensions/src/test/java/org/apache/synapse/mediators/bsf/ScriptMediatorSerializationTest.java	(revision 1505022)
+@@ -42,6 +42,12 @@
+         assertTrue(serialization(inputXml, scriptMediatorSerializer));
+     }
+ 
++    public void testScriptMediatorSerializationScenarioThree() {
++        String inputXml = "<script xmlns=\"http://ws.apache.org/ns/synapse\" language=\"js\" key=\"jsMaster\" function=\"functionFoo\"><include key=\"jschild1\"/><include key=\"jschild2\"/></script>";
++        assertTrue(serialization(inputXml, mediatorFactory, scriptMediatorSerializer));
++        assertTrue(serialization(inputXml, scriptMediatorSerializer));
++    }
++
+     public void testInlineScriptMediatorSerializationScenarioOne() {
+         String inputXml = "<syn:script xmlns:syn=\"http://ws.apache.org/ns/synapse\" language='js'>" +
+                 "<![CDATA[var symbol = mc.getPayloadXML()..*::Code.toString();mc.setPayloadXML(<m:getQuote xmlns:m=\"http://services.samples/xsd\">\n" +
+Index: java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMediatorFactory.java
+===================================================================
+--- java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMediatorFactory.java	(revision 1505021)
++++ java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMediatorFactory.java	(revision 1505022)
+@@ -29,10 +29,7 @@
+ import org.apache.synapse.config.xml.ValueFactory;
+ 
+ import javax.xml.namespace.QName;
+-import java.util.Iterator;
+-import java.util.Map;
+-import java.util.Properties;
+-import java.util.TreeMap;
++import java.util.*;
+ 
+ /**
+  * Creates an instance of a Script mediator for inline or external script mediation for BSF
+@@ -112,7 +109,7 @@
+         // from void ScriptMediator.prepareExternalScript(MessageContext synCtx)
+ 
+         // TreeMap used to keep given scripts order if needed
+-        Map<Value, Object> includeKeysMap = new TreeMap<Value, Object>();
++        Map<Value, Object> includeKeysMap = new LinkedHashMap<Value, Object>();
+         Iterator itr = elem.getChildrenWithName(INCLUDE_Q);
+         while (itr.hasNext()) {
+             OMElement includeElem = (OMElement) itr.next();
+@@ -121,7 +118,7 @@
+             // ValueFactory for creating dynamic or static Value
+             ValueFactory keyFac = new ValueFactory();
+             // create dynamic or static key based on OMElement
+-            Value generatedKey = keyFac.createValue(XMLConfigConstants.KEY, elem);
++            Value generatedKey = keyFac.createValue(XMLConfigConstants.KEY, includeElem);
+ 
+             if (key == null) {
+                 throw new SynapseException("Cannot use 'include' element without 'key'" +
+-*-*-*-
+Message: Applying the patch for SYNAPSE-892 with a test case. Script mediator doesn't parse and serialize includes properly.
+-*-*-*-
+When: 2013-07-19 17:12:52 -0400 
+-*-*-*-
+Who: hiranya

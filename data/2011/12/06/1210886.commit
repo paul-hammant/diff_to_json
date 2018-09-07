@@ -1,8 +1,423 @@
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessLogger.java
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java
 ===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessLogger.java	(nonexistent)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessLogger.java	(revision 1210886)
-@@ -0,0 +1,227 @@
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java	(revision 1210885)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java	(revision 1210886)
+@@ -722,16 +722,25 @@
+                         MessageContext responseMsgCtx = outMsgCtx.getOperationContext().
+                                 getMessageContext(WSDL2Constants.MESSAGE_LABEL_IN);
+                         if (responseMsgCtx == null ||
++                                outMsgCtx.getOptions().isUseSeparateListener() ||
++                                outMsgCtx.getOperationContext().isComplete()) {
++                            if (responseMsgCtx != null &&
++                                    responseMsgCtx.getProperty("synapse.send") == null) {
++                                return;
++                            }
++                        } else if (responseMsgCtx == null ||
+                                 outMsgCtx.getOptions().isUseSeparateListener()) {
+                             // Since we need to notify the SynapseCallback receiver to remove the
+                             // call backs registered  we set a custom property
+-                            if (outMsgCtx.getOperationContext().isComplete()) {
+-                                setHeaders(context, response, outMsgCtx, responseMsgCtx);
+-                                outMsgCtx.setProperty(NhttpConstants.HTTP_202_RECEIVED, "true");
+-                                mr.receive(outMsgCtx);
+-                            }
++                            setHeaders(context, response, outMsgCtx, responseMsgCtx);
++                            outMsgCtx.setProperty(NhttpConstants.HTTP_202_RECEIVED, "true");
++                            mr.receive(outMsgCtx);
+                             return;
+                         }
++
++                        if (responseMsgCtx == null) {
++                            return;
++                        }
+                         setHeaders(context, response, outMsgCtx, responseMsgCtx);
+                         responseMsgCtx.setServerSide(true);
+                         responseMsgCtx.setDoingREST(outMsgCtx.isDoingREST());
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/DefaultHttpGetProcessor.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/DefaultHttpGetProcessor.java	(revision 1210885)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/DefaultHttpGetProcessor.java	(revision 1210886)
+@@ -127,11 +127,15 @@
+         } else if (serviceName != null && parameters.containsKey("wsdl")) {
+             generateWsdl(request, response, msgContext,
+                     conn, os, serviceName, parameters, isRestDispatching);
++            return;
+         } else if (serviceName != null && parameters.containsKey("wsdl2")) {
+             generateWsdl2(request, response, msgContext,
+                     conn, os, serviceName, isRestDispatching);
++            return;
+         } else if (serviceName != null && parameters.containsKey("xsd")) {
+-            generateXsd(response, conn, os, serviceName, parameters);
++            generateXsd(request, response, msgContext, conn, os, serviceName,
++                    parameters, isRestDispatching);
++            return;
+         } else if (serviceName != null && parameters.containsKey("info")) {
+             generateServiceDetailsPage(response, conn, os, serviceName);
+         } else if (uri.startsWith(servicePath) &&
+@@ -144,12 +148,15 @@
+         }
+ 
+         // make sure that the output stream is flushed and closed properly
++        closeOutputStream(os);
++    }
++
++    private void closeOutputStream(OutputStream os) {
+         try {
+             os.flush();
+             os.close();
+         } catch (IOException ignore) {
+         }
+-
+     }
+ 
+     /**
+@@ -186,7 +193,7 @@
+             if (serviceName.startsWith("/")) {
+                 serviceName = serviceName.substring(1);
+             }
+-            if (serviceName.indexOf("?") != -1) {
++            if (serviceName.contains("?")) {
+                 serviceName = serviceName.substring(0, serviceName.indexOf("?"));
+             }
+         } else {
+@@ -277,15 +284,19 @@
+     /**
+      * Generates Schema.
+      *
++     * @param request     HttpRequest
+      * @param response    HttpResponse
++     * @param messageCtx  Current MessageContext
+      * @param conn        NHttpServerConnection
+      * @param os          OutputStream
+      * @param serviceName service name
+      * @param parameters  url parameters
++     * @param isRestDispatching Whether to handle this as REST
+      */
+-    protected void generateXsd(HttpResponse response, NHttpServerConnection conn,
++    protected void generateXsd(HttpRequest request, HttpResponse response,
++                               MessageContext messageCtx, NHttpServerConnection conn,
+                                OutputStream os, String serviceName,
+-                               Map<String, String> parameters) {
++                               Map<String, String> parameters, boolean isRestDispatching) {
+         if (parameters.get("xsd") == null || "".equals(parameters.get("xsd"))) {
+             AxisService service = cfgCtx.getAxisConfiguration()
+                     .getServices().get(serviceName);
+@@ -296,11 +307,15 @@
+                     response.addHeader(CONTENT_TYPE, TEXT_XML);
+                     serverHandler.commitResponseHideExceptions(conn, response);
+                     os.write(baos.toByteArray());
++                    closeOutputStream(os);
+ 
+                 } catch (Exception e) {
+                     handleBrowserException(response, conn, os,
+                             "Error generating ?xsd output for service : " + serviceName, e);
+                 }
++            } else {
++                processGetAndDelete(request, response, messageCtx, conn, os,
++                        serviceName, isRestDispatching);
+             }
+ 
+         } else {
+@@ -330,6 +345,7 @@
+                         response.addHeader(CONTENT_TYPE, TEXT_XML);
+                         serverHandler.commitResponseHideExceptions(conn, response);
+                         os.write(baos.toByteArray());
++                        closeOutputStream(os);
+                     } catch (Exception e) {
+                         handleBrowserException(response, conn, os,
+                                 "Error generating named ?xsd output for service : " + serviceName, e);
+@@ -338,7 +354,11 @@
+                 } else {
+                     // no schema available by that name  - send 404
+                     response.setStatusCode(HttpStatus.SC_NOT_FOUND);
++                    closeOutputStream(os);
+                 }
++            } else {
++                processGetAndDelete(request, response, messageCtx, conn, os,
++                        serviceName, isRestDispatching);
+             }
+         }
+     }
+@@ -373,6 +393,7 @@
+                 response.addHeader(CONTENT_TYPE, TEXT_XML);
+                 serverHandler.commitResponseHideExceptions(conn, response);
+                 os.write(baos.toByteArray());
++                closeOutputStream(os);
+ 
+             } catch (Exception e) {
+                 handleBrowserException(response, conn, os,
+@@ -416,6 +437,7 @@
+                 response.addHeader(CONTENT_TYPE, TEXT_XML);
+                 serverHandler.commitResponseHideExceptions(conn, response);
+                 os.write(baos.toByteArray());
++                closeOutputStream(os);
+ 
+             } catch (Exception e) {
+                 handleBrowserException(response, conn, os,
+@@ -602,7 +624,7 @@
+         Hashtable erroneousServices = cfgCtx.getAxisConfiguration().getFaultyServices();
+         boolean servicesFound = false;
+ 
+-        StringBuffer resultBuf = new StringBuffer();
++        StringBuilder resultBuf = new StringBuilder();
+         resultBuf.append("<html><head><title>Axis2: Services</title></head>" + "<body>");
+ 
+         if ((services != null) && !services.isEmpty()) {
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/util/AccessTimeUtil.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/util/AccessTimeUtil.java	(nonexistent)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/util/AccessTimeUtil.java	(revision 1210886)
+@@ -0,0 +1,181 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++package org.apache.synapse.transport.nhttp.util;
++
++import org.apache.synapse.transport.nhttp.AccessConstants;
++
++import java.text.SimpleDateFormat;
++import java.util.Date;
++import java.util.TimeZone;
++
++/**
++ * Utility methods related to the Access Time
++ */
++public class AccessTimeUtil {
++
++    private static String calculateTimeZoneOffset(long offset) {
++        StringBuilder tz = new StringBuilder();
++        if ((offset < 0)) {
++            tz.append("-");
++            offset = -offset;
++        } else {
++            tz.append("+");
++        }
++
++        long hourOffset = offset / (1000 * 60 * 60);
++        long minuteOffset = (offset / (1000 * 60)) % 60;
++
++        if (hourOffset < 10) {
++            tz.append("0");
++        }
++        tz.append(hourOffset);
++
++        if (minuteOffset < 10) {
++            tz.append("0");
++        }
++        tz.append(minuteOffset);
++
++        return tz.toString();
++    }
++
++    /**
++     * gets the timezone +/-{****}}, offset from GMT,
++     * @return String time zone (eg, +0530, -0600).
++     */
++    public static String getTimeZone() {
++        try {
++            int offset = TimeZone.getDefault().getRawOffset();
++            return calculateTimeZoneOffset(offset);
++        } catch (Exception e) {
++            return "";
++        }
++    }
++
++    /**
++     * AccessDateStruct Class
++     */
++    private static class AccessDateStruct {
++        private Date currentDate = new Date();
++        private String currentDateString = null;
++        private SimpleDateFormat dayFormatter = new SimpleDateFormat("dd");
++        private SimpleDateFormat monthFormatter = new SimpleDateFormat("MM");
++        private SimpleDateFormat yearFormatter = new SimpleDateFormat("yyyy");
++
++        private SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
++
++        public AccessDateStruct() {
++            TimeZone tz = TimeZone.getDefault();
++            dayFormatter.setTimeZone(tz);
++            monthFormatter.setTimeZone(tz);
++            yearFormatter.setTimeZone(tz);
++            timeFormatter.setTimeZone(tz);
++        }
++    }
++
++    /**
++     * The system time when we last updated the Date, that is used for log lines.
++     */
++    private static final ThreadLocal<AccessDateStruct> currentDateStruct =
++            new ThreadLocal<AccessDateStruct>() {
++                @Override
++                protected AccessDateStruct initialValue() {
++                    return new AccessDateStruct();
++                }
++            };
++
++
++    /**
++     * This method returns a Date object that is accurate to within one second.
++     * If a thread calls this method to get a Date and it's been less than 1
++     * second since a new Date was created, this method simply gives out the
++     * same Date again so that the system doesn't spend time creating Date
++     * objects unnecessarily.
++     *
++     * @return Date
++     */
++    public static Date getDate() {
++        // Only create a new Date once per second, max.
++        long systime = System.currentTimeMillis();
++        AccessDateStruct struct = currentDateStruct.get();
++        if ((systime - struct.currentDate.getTime()) > 1000) {
++            struct.currentDate.setTime(systime);
++            struct.currentDateString = null;
++        }
++        return struct.currentDate;
++    }
++
++    private static AccessDateStruct getAccessDateStruct(Date date) {
++        AccessDateStruct struct = currentDateStruct.get();
++        if (struct.currentDateString == null) {
++            StringBuilder current = new StringBuilder(32);
++            current.append('[');
++            current.append(struct.dayFormatter.format(date));
++            current.append('/');
++            current.append(lookup(struct.monthFormatter.format(date)));
++            current.append('/');
++            current.append(struct.yearFormatter.format(date));
++            current.append(':');
++            current.append(struct.timeFormatter.format(date));
++            current.append(' ');
++            current.append(AccessTimeUtil.getTimeZone());
++            current.append(']');
++            struct.currentDateString = current.toString();
++        }
++        return struct;
++    }
++
++    /**
++     * Return the month abbreviation for the specified month, which must
++     * be a two-digit String.
++     *
++     * @param month Month number ("01" .. "12").
++     * @return - the month
++     */
++    private static String lookup(String month) {
++        int index;
++        try {
++            index = Integer.parseInt(month) - 1;
++        } catch (Throwable t) {
++            handleThrowable(t);
++            index = 0;  // Can not happen, in theory
++        }
++        return (AccessConstants.MONTHS[index]);
++    }
++
++    public static String getAccessDate(Date date) {
++         AccessDateStruct struct = getAccessDateStruct(date);
++        return struct.currentDateString;
++    }
++
++    /**
++     * Checks whether the supplied Throwable is one that needs to be
++     * re-thrown and swallows all others.
++     *
++     * @param t the Throwable to check
++     */
++    public static void handleThrowable(Throwable t) {
++        if (t instanceof ThreadDeath) {
++            throw (ThreadDeath) t;
++        }
++        if (t instanceof VirtualMachineError) {
++            throw (VirtualMachineError) t;
++        }
++        // All other instances of Throwable will be silently swallowed
++    }
++}
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessConstants.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessConstants.java	(nonexistent)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessConstants.java	(revision 1210886)
+@@ -0,0 +1,59 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++package org.apache.synapse.transport.nhttp;
++
++/**
++ * Constants used in the Access Class
++ */
++public class AccessConstants {
++
++    /**
++     * Pattern used to log - Default is COMBINED_PATTERN given below.
++     */
++    public static final String COMBINED_PATTERN =
++            "%h %l %u %t \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\"";
++
++    /**
++     * The set of month abbreviations for log messages.
++     */
++    public static final String MONTHS[] =
++            {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
++             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
++
++    /**
++     * The directory in which log files are created.
++     */
++    public static String DIRECTORY = "repository/logs";
++
++    /**
++     * Gives the format of the date to be appended to the name of the access log file.
++     */
++    public static String FILE_FORMAT = "yyyy-MM-dd";
++
++    /**
++     * The prefix that is added to log file file names.
++     */
++    public static String PREFIX = "http_access_";
++
++    /**
++     * The suffix that is added to log file file names.
++     */
++    public static String SUFFIX = ".log";
++
++}
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessHandler.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessHandler.java	(nonexistent)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessHandler.java	(revision 1210886)
+@@ -0,0 +1,40 @@
 +/*
 + *  Licensed to the Apache Software Foundation (ASF) under one
 + *  or more contributor license agreements.  See the NOTICE file
@@ -26,224 +441,23 @@ Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/trans
 +import org.apache.commons.logging.Log;
 +import org.apache.commons.logging.LogFactory;
 +
-+import java.io.BufferedWriter;
-+import java.io.File;
-+import java.io.FileWriter;
-+import java.io.IOException;
-+import java.io.PrintWriter;
-+import java.text.SimpleDateFormat;
-+import java.util.Date;
-+
 +/**
-+ * Class that logs the Http Accesses to the access log files. Code segment borrowed from
-+ * Apache Tomcat's org.apache.catalina.valves.AccessLogValve with thanks.
++ * Handles the Access, providing an Access object.
 + */
-+public class AccessLogger {
++public class AccessHandler {
 +
 +    public final static String ACCESS_LOG_ID = "org.apache.synapse.transport.nhttp.access";
-+    private static Log log = LogFactory.getLog(ACCESS_LOG_ID);
 +
-+    public AccessLogger(final Log log) {
-+        super();
-+        this.initOpen();
-+        AccessLogger.log = log;
-+        buffered = true;
-+        checkExists = false;
-+    }
++    private final static Log accessLog = LogFactory.getLog(ACCESS_LOG_ID);
 +
-+    /**
-+     * A date formatter to format a Date into a date in the given file format
-+     */
-+    protected SimpleDateFormat fileDateFormatter =
-+            new SimpleDateFormat(AccessConstants.FILE_FORMAT);
++    private static final AccessLogger accessLogger = new AccessLogger(accessLog);
 +
-+    /**
-+     * The PrintWriter to which we are currently logging, if any.
-+     */
-+    protected PrintWriter writer;
++    private static final Access access = new Access(accessLog, accessLogger);
 +
-+    /**
-+     * The as-of date for the currently open log file, or a zero-length
-+     * string if there is no open log file.
-+     */
-+    private volatile String dateStamp = "";
-+
-+    /**
-+     * Instant when the log daily rotation was last checked.
-+     */
-+    private volatile long rotationLastChecked = 0L;
-+
-+    /**
-+     * Buffered logging.
-+     */
-+    private boolean buffered = true;
-+
-+    /**
-+     * Do we check for log file existence? Helpful if an external
-+     * agent renames the log file so we can automatically recreate it.
-+     */
-+    private boolean checkExists = false;
-+
-+    /**
-+     * The current log file we are writing to. Helpful when checkExists
-+     * is true.
-+     */
-+    protected File currentLogFile = null;
-+
-+    /**
-+     * Can the log file be rotated.
-+     */
-+    protected boolean isRotatable = true;
-+
-+
-+    /**
-+     * Log the specified message to the log file, switching files if the date
-+     * has changed since the previous log call.
-+     *
-+     * @param message Message to be logged
-+     */
-+    public void log(String message) {
-+        if (isRotatable) {
-+            // Only do a logfile switch check once a second, max.
-+            long systemTime = System.currentTimeMillis();
-+            if ((systemTime - rotationLastChecked) > 1000) {
-+                synchronized (this) {
-+                    if ((systemTime - rotationLastChecked) > 1000) {
-+                        rotationLastChecked = systemTime;
-+
-+                        String tsDate;
-+                        // Check for a change of date
-+                        tsDate = fileDateFormatter.format(new Date(systemTime));
-+
-+                        // If the date has changed, switch log files
-+                        if (!dateStamp.equals(tsDate)) {
-+                            close();
-+                            dateStamp = tsDate;
-+                            open();
-+                        }
-+                    }
-+                }
-+            }
-+        }
-+
-+        /* In case something external rotated the file instead */
-+        if (checkExists) {
-+            synchronized (this) {
-+                if (currentLogFile != null && !currentLogFile.exists()) {
-+                    try {
-+                        close();
-+                    } catch (Throwable e) {
-+                        handleThrowable(e);
-+                        log.info("Access Log file Close failed");
-+                    }
-+
-+                    /* Make sure date is correct */
-+                    dateStamp = fileDateFormatter.format(
-+                            new Date(System.currentTimeMillis()));
-+
-+                    open();
-+                }
-+            }
-+        }
-+
-+        // Log this message
-+        synchronized (this) {
-+            if (writer != null) {
-+                writer.println(message);
-+
-+                if (!buffered) {
-+                    writer.flush();
-+                }
-+            }
-+        }
-+    }
-+
-+    protected synchronized void initOpen() {
-+        /* Make sure date is correct */
-+        dateStamp = fileDateFormatter.format(
-+                new Date(System.currentTimeMillis()));
-+        this.open();
-+    }
-+
-+    /**
-+     * Open the new log file for the date specified by <code>dateStamp</code>.
-+     */
-+    protected synchronized void open() {
-+        // Create the directory if necessary
-+        File dir = new File(AccessConstants.DIRECTORY);
-+        if (!dir.exists()) {
-+            if (!dir.mkdirs()) {
-+                log.error("Access Log Open Directory Failed");
-+            }
-+        }
-+
-+        // Open the current log file
-+        try {
-+            String pathName;
-+            // If no rotate - no need for dateStamp in fileName
-+            if (isRotatable) {
-+                pathName = dir.getAbsolutePath() + File.separator + AccessConstants.PREFIX +
-+                           dateStamp + AccessConstants.SUFFIX;
-+            } else {
-+                pathName = dir.getAbsolutePath() + File.separator + AccessConstants.PREFIX +
-+                           AccessConstants.SUFFIX;
-+            }
-+
-+            writer = new PrintWriter(new BufferedWriter(new FileWriter(
-+                    pathName, true), 128000), true);
-+
-+            currentLogFile = new File(pathName);
-+        } catch (IOException e) {
-+            log.warn("Unable to open the print writer", e);
-+            writer = null;
-+            currentLogFile = null;
-+        }
-+    }
-+
-+    /**
-+     * Close the currently open log file (if any)
-+     */
-+    synchronized void close() {
-+        if (writer == null) {
-+            return;
-+        }
-+        writer.flush();
-+        writer.close();
-+        writer = null;
-+        dateStamp = "";
-+        currentLogFile = null;
-+    }
-+
-+    /**
-+     * Checks whether the supplied Throwable is one that needs to be
-+     * re-thrown and swallows all others.
-+     *
-+     * @param t the Throwable to check
-+     */
-+    public static void handleThrowable(Throwable t) {
-+        if (t instanceof ThreadDeath) {
-+            throw (ThreadDeath) t;
-+        }
-+        if (t instanceof VirtualMachineError) {
-+            throw (VirtualMachineError) t;
-+        }
-+        // All other instances of Throwable will be silently swallowed
++    public static Access getAccess() {
++        return access;
 +    }
 +}
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java	(revision 1210885)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java	(revision 1210886)
-@@ -476,6 +476,9 @@
-             response.setHeader(
-                 HTTP.CONTENT_TYPE,
-                 messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
-+        } else if ( Boolean.TRUE == noEntityBody) {
-+            ((BasicHttpEntity)response.getEntity()).setChunked(false);
-+            ((BasicHttpEntity)response.getEntity()).setContentLength(0);
-         }
-         response.setStatusCode(determineHttpStatusCode(msgContext, response));
- 
 Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Access.java
 ===================================================================
 --- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Access.java	(nonexistent)
@@ -1133,426 +1347,25 @@ Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/trans
          } catch (XMLStreamException e) {
              log.error("Error creating response SOAP envelope", e);
          } catch (IOException e) {
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java
 ===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java	(revision 1210885)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java	(revision 1210886)
-@@ -722,16 +722,25 @@
-                         MessageContext responseMsgCtx = outMsgCtx.getOperationContext().
-                                 getMessageContext(WSDL2Constants.MESSAGE_LABEL_IN);
-                         if (responseMsgCtx == null ||
-+                                outMsgCtx.getOptions().isUseSeparateListener() ||
-+                                outMsgCtx.getOperationContext().isComplete()) {
-+                            if (responseMsgCtx != null &&
-+                                    responseMsgCtx.getProperty("synapse.send") == null) {
-+                                return;
-+                            }
-+                        } else if (responseMsgCtx == null ||
-                                 outMsgCtx.getOptions().isUseSeparateListener()) {
-                             // Since we need to notify the SynapseCallback receiver to remove the
-                             // call backs registered  we set a custom property
--                            if (outMsgCtx.getOperationContext().isComplete()) {
--                                setHeaders(context, response, outMsgCtx, responseMsgCtx);
--                                outMsgCtx.setProperty(NhttpConstants.HTTP_202_RECEIVED, "true");
--                                mr.receive(outMsgCtx);
--                            }
-+                            setHeaders(context, response, outMsgCtx, responseMsgCtx);
-+                            outMsgCtx.setProperty(NhttpConstants.HTTP_202_RECEIVED, "true");
-+                            mr.receive(outMsgCtx);
-                             return;
-                         }
-+
-+                        if (responseMsgCtx == null) {
-+                            return;
-+                        }
-                         setHeaders(context, response, outMsgCtx, responseMsgCtx);
-                         responseMsgCtx.setServerSide(true);
-                         responseMsgCtx.setDoingREST(outMsgCtx.isDoingREST());
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/DefaultHttpGetProcessor.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/DefaultHttpGetProcessor.java	(revision 1210885)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/DefaultHttpGetProcessor.java	(revision 1210886)
-@@ -127,11 +127,15 @@
-         } else if (serviceName != null && parameters.containsKey("wsdl")) {
-             generateWsdl(request, response, msgContext,
-                     conn, os, serviceName, parameters, isRestDispatching);
-+            return;
-         } else if (serviceName != null && parameters.containsKey("wsdl2")) {
-             generateWsdl2(request, response, msgContext,
-                     conn, os, serviceName, isRestDispatching);
-+            return;
-         } else if (serviceName != null && parameters.containsKey("xsd")) {
--            generateXsd(response, conn, os, serviceName, parameters);
-+            generateXsd(request, response, msgContext, conn, os, serviceName,
-+                    parameters, isRestDispatching);
-+            return;
-         } else if (serviceName != null && parameters.containsKey("info")) {
-             generateServiceDetailsPage(response, conn, os, serviceName);
-         } else if (uri.startsWith(servicePath) &&
-@@ -144,12 +148,15 @@
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java	(revision 1210885)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java	(revision 1210886)
+@@ -476,6 +476,9 @@
+             response.setHeader(
+                 HTTP.CONTENT_TYPE,
+                 messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
++        } else if ( Boolean.TRUE == noEntityBody) {
++            ((BasicHttpEntity)response.getEntity()).setChunked(false);
++            ((BasicHttpEntity)response.getEntity()).setContentLength(0);
          }
+         response.setStatusCode(determineHttpStatusCode(msgContext, response));
  
-         // make sure that the output stream is flushed and closed properly
-+        closeOutputStream(os);
-+    }
-+
-+    private void closeOutputStream(OutputStream os) {
-         try {
-             os.flush();
-             os.close();
-         } catch (IOException ignore) {
-         }
--
-     }
- 
-     /**
-@@ -186,7 +193,7 @@
-             if (serviceName.startsWith("/")) {
-                 serviceName = serviceName.substring(1);
-             }
--            if (serviceName.indexOf("?") != -1) {
-+            if (serviceName.contains("?")) {
-                 serviceName = serviceName.substring(0, serviceName.indexOf("?"));
-             }
-         } else {
-@@ -277,15 +284,19 @@
-     /**
-      * Generates Schema.
-      *
-+     * @param request     HttpRequest
-      * @param response    HttpResponse
-+     * @param messageCtx  Current MessageContext
-      * @param conn        NHttpServerConnection
-      * @param os          OutputStream
-      * @param serviceName service name
-      * @param parameters  url parameters
-+     * @param isRestDispatching Whether to handle this as REST
-      */
--    protected void generateXsd(HttpResponse response, NHttpServerConnection conn,
-+    protected void generateXsd(HttpRequest request, HttpResponse response,
-+                               MessageContext messageCtx, NHttpServerConnection conn,
-                                OutputStream os, String serviceName,
--                               Map<String, String> parameters) {
-+                               Map<String, String> parameters, boolean isRestDispatching) {
-         if (parameters.get("xsd") == null || "".equals(parameters.get("xsd"))) {
-             AxisService service = cfgCtx.getAxisConfiguration()
-                     .getServices().get(serviceName);
-@@ -296,11 +307,15 @@
-                     response.addHeader(CONTENT_TYPE, TEXT_XML);
-                     serverHandler.commitResponseHideExceptions(conn, response);
-                     os.write(baos.toByteArray());
-+                    closeOutputStream(os);
- 
-                 } catch (Exception e) {
-                     handleBrowserException(response, conn, os,
-                             "Error generating ?xsd output for service : " + serviceName, e);
-                 }
-+            } else {
-+                processGetAndDelete(request, response, messageCtx, conn, os,
-+                        serviceName, isRestDispatching);
-             }
- 
-         } else {
-@@ -330,6 +345,7 @@
-                         response.addHeader(CONTENT_TYPE, TEXT_XML);
-                         serverHandler.commitResponseHideExceptions(conn, response);
-                         os.write(baos.toByteArray());
-+                        closeOutputStream(os);
-                     } catch (Exception e) {
-                         handleBrowserException(response, conn, os,
-                                 "Error generating named ?xsd output for service : " + serviceName, e);
-@@ -338,7 +354,11 @@
-                 } else {
-                     // no schema available by that name  - send 404
-                     response.setStatusCode(HttpStatus.SC_NOT_FOUND);
-+                    closeOutputStream(os);
-                 }
-+            } else {
-+                processGetAndDelete(request, response, messageCtx, conn, os,
-+                        serviceName, isRestDispatching);
-             }
-         }
-     }
-@@ -373,6 +393,7 @@
-                 response.addHeader(CONTENT_TYPE, TEXT_XML);
-                 serverHandler.commitResponseHideExceptions(conn, response);
-                 os.write(baos.toByteArray());
-+                closeOutputStream(os);
- 
-             } catch (Exception e) {
-                 handleBrowserException(response, conn, os,
-@@ -416,6 +437,7 @@
-                 response.addHeader(CONTENT_TYPE, TEXT_XML);
-                 serverHandler.commitResponseHideExceptions(conn, response);
-                 os.write(baos.toByteArray());
-+                closeOutputStream(os);
- 
-             } catch (Exception e) {
-                 handleBrowserException(response, conn, os,
-@@ -602,7 +624,7 @@
-         Hashtable erroneousServices = cfgCtx.getAxisConfiguration().getFaultyServices();
-         boolean servicesFound = false;
- 
--        StringBuffer resultBuf = new StringBuffer();
-+        StringBuilder resultBuf = new StringBuilder();
-         resultBuf.append("<html><head><title>Axis2: Services</title></head>" + "<body>");
- 
-         if ((services != null) && !services.isEmpty()) {
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/util/AccessTimeUtil.java
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessLogger.java
 ===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/util/AccessTimeUtil.java	(nonexistent)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/util/AccessTimeUtil.java	(revision 1210886)
-@@ -0,0 +1,181 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+package org.apache.synapse.transport.nhttp.util;
-+
-+import org.apache.synapse.transport.nhttp.AccessConstants;
-+
-+import java.text.SimpleDateFormat;
-+import java.util.Date;
-+import java.util.TimeZone;
-+
-+/**
-+ * Utility methods related to the Access Time
-+ */
-+public class AccessTimeUtil {
-+
-+    private static String calculateTimeZoneOffset(long offset) {
-+        StringBuilder tz = new StringBuilder();
-+        if ((offset < 0)) {
-+            tz.append("-");
-+            offset = -offset;
-+        } else {
-+            tz.append("+");
-+        }
-+
-+        long hourOffset = offset / (1000 * 60 * 60);
-+        long minuteOffset = (offset / (1000 * 60)) % 60;
-+
-+        if (hourOffset < 10) {
-+            tz.append("0");
-+        }
-+        tz.append(hourOffset);
-+
-+        if (minuteOffset < 10) {
-+            tz.append("0");
-+        }
-+        tz.append(minuteOffset);
-+
-+        return tz.toString();
-+    }
-+
-+    /**
-+     * gets the timezone +/-{****}}, offset from GMT,
-+     * @return String time zone (eg, +0530, -0600).
-+     */
-+    public static String getTimeZone() {
-+        try {
-+            int offset = TimeZone.getDefault().getRawOffset();
-+            return calculateTimeZoneOffset(offset);
-+        } catch (Exception e) {
-+            return "";
-+        }
-+    }
-+
-+    /**
-+     * AccessDateStruct Class
-+     */
-+    private static class AccessDateStruct {
-+        private Date currentDate = new Date();
-+        private String currentDateString = null;
-+        private SimpleDateFormat dayFormatter = new SimpleDateFormat("dd");
-+        private SimpleDateFormat monthFormatter = new SimpleDateFormat("MM");
-+        private SimpleDateFormat yearFormatter = new SimpleDateFormat("yyyy");
-+
-+        private SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
-+
-+        public AccessDateStruct() {
-+            TimeZone tz = TimeZone.getDefault();
-+            dayFormatter.setTimeZone(tz);
-+            monthFormatter.setTimeZone(tz);
-+            yearFormatter.setTimeZone(tz);
-+            timeFormatter.setTimeZone(tz);
-+        }
-+    }
-+
-+    /**
-+     * The system time when we last updated the Date, that is used for log lines.
-+     */
-+    private static final ThreadLocal<AccessDateStruct> currentDateStruct =
-+            new ThreadLocal<AccessDateStruct>() {
-+                @Override
-+                protected AccessDateStruct initialValue() {
-+                    return new AccessDateStruct();
-+                }
-+            };
-+
-+
-+    /**
-+     * This method returns a Date object that is accurate to within one second.
-+     * If a thread calls this method to get a Date and it's been less than 1
-+     * second since a new Date was created, this method simply gives out the
-+     * same Date again so that the system doesn't spend time creating Date
-+     * objects unnecessarily.
-+     *
-+     * @return Date
-+     */
-+    public static Date getDate() {
-+        // Only create a new Date once per second, max.
-+        long systime = System.currentTimeMillis();
-+        AccessDateStruct struct = currentDateStruct.get();
-+        if ((systime - struct.currentDate.getTime()) > 1000) {
-+            struct.currentDate.setTime(systime);
-+            struct.currentDateString = null;
-+        }
-+        return struct.currentDate;
-+    }
-+
-+    private static AccessDateStruct getAccessDateStruct(Date date) {
-+        AccessDateStruct struct = currentDateStruct.get();
-+        if (struct.currentDateString == null) {
-+            StringBuilder current = new StringBuilder(32);
-+            current.append('[');
-+            current.append(struct.dayFormatter.format(date));
-+            current.append('/');
-+            current.append(lookup(struct.monthFormatter.format(date)));
-+            current.append('/');
-+            current.append(struct.yearFormatter.format(date));
-+            current.append(':');
-+            current.append(struct.timeFormatter.format(date));
-+            current.append(' ');
-+            current.append(AccessTimeUtil.getTimeZone());
-+            current.append(']');
-+            struct.currentDateString = current.toString();
-+        }
-+        return struct;
-+    }
-+
-+    /**
-+     * Return the month abbreviation for the specified month, which must
-+     * be a two-digit String.
-+     *
-+     * @param month Month number ("01" .. "12").
-+     * @return - the month
-+     */
-+    private static String lookup(String month) {
-+        int index;
-+        try {
-+            index = Integer.parseInt(month) - 1;
-+        } catch (Throwable t) {
-+            handleThrowable(t);
-+            index = 0;  // Can not happen, in theory
-+        }
-+        return (AccessConstants.MONTHS[index]);
-+    }
-+
-+    public static String getAccessDate(Date date) {
-+         AccessDateStruct struct = getAccessDateStruct(date);
-+        return struct.currentDateString;
-+    }
-+
-+    /**
-+     * Checks whether the supplied Throwable is one that needs to be
-+     * re-thrown and swallows all others.
-+     *
-+     * @param t the Throwable to check
-+     */
-+    public static void handleThrowable(Throwable t) {
-+        if (t instanceof ThreadDeath) {
-+            throw (ThreadDeath) t;
-+        }
-+        if (t instanceof VirtualMachineError) {
-+            throw (VirtualMachineError) t;
-+        }
-+        // All other instances of Throwable will be silently swallowed
-+    }
-+}
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessConstants.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessConstants.java	(nonexistent)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessConstants.java	(revision 1210886)
-@@ -0,0 +1,59 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+package org.apache.synapse.transport.nhttp;
-+
-+/**
-+ * Constants used in the Access Class
-+ */
-+public class AccessConstants {
-+
-+    /**
-+     * Pattern used to log - Default is COMBINED_PATTERN given below.
-+     */
-+    public static final String COMBINED_PATTERN =
-+            "%h %l %u %t \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\"";
-+
-+    /**
-+     * The set of month abbreviations for log messages.
-+     */
-+    public static final String MONTHS[] =
-+            {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-+             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-+
-+    /**
-+     * The directory in which log files are created.
-+     */
-+    public static String DIRECTORY = "repository/logs";
-+
-+    /**
-+     * Gives the format of the date to be appended to the name of the access log file.
-+     */
-+    public static String FILE_FORMAT = "yyyy-MM-dd";
-+
-+    /**
-+     * The prefix that is added to log file file names.
-+     */
-+    public static String PREFIX = "http_access_";
-+
-+    /**
-+     * The suffix that is added to log file file names.
-+     */
-+    public static String SUFFIX = ".log";
-+
-+}
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessHandler.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessHandler.java	(nonexistent)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessHandler.java	(revision 1210886)
-@@ -0,0 +1,40 @@
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessLogger.java	(nonexistent)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessLogger.java	(revision 1210886)
+@@ -0,0 +1,227 @@
 +/*
 + *  Licensed to the Apache Software Foundation (ASF) under one
 + *  or more contributor license agreements.  See the NOTICE file
@@ -1576,24 +1389,213 @@ Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/trans
 +import org.apache.commons.logging.Log;
 +import org.apache.commons.logging.LogFactory;
 +
++import java.io.BufferedWriter;
++import java.io.File;
++import java.io.FileWriter;
++import java.io.IOException;
++import java.io.PrintWriter;
++import java.text.SimpleDateFormat;
++import java.util.Date;
++
 +/**
-+ * Handles the Access, providing an Access object.
++ * Class that logs the Http Accesses to the access log files. Code segment borrowed from
++ * Apache Tomcat's org.apache.catalina.valves.AccessLogValve with thanks.
 + */
-+public class AccessHandler {
++public class AccessLogger {
 +
 +    public final static String ACCESS_LOG_ID = "org.apache.synapse.transport.nhttp.access";
++    private static Log log = LogFactory.getLog(ACCESS_LOG_ID);
 +
-+    private final static Log accessLog = LogFactory.getLog(ACCESS_LOG_ID);
++    public AccessLogger(final Log log) {
++        super();
++        this.initOpen();
++        AccessLogger.log = log;
++        buffered = true;
++        checkExists = false;
++    }
 +
-+    private static final AccessLogger accessLogger = new AccessLogger(accessLog);
++    /**
++     * A date formatter to format a Date into a date in the given file format
++     */
++    protected SimpleDateFormat fileDateFormatter =
++            new SimpleDateFormat(AccessConstants.FILE_FORMAT);
 +
-+    private static final Access access = new Access(accessLog, accessLogger);
++    /**
++     * The PrintWriter to which we are currently logging, if any.
++     */
++    protected PrintWriter writer;
 +
-+    public static Access getAccess() {
-+        return access;
++    /**
++     * The as-of date for the currently open log file, or a zero-length
++     * string if there is no open log file.
++     */
++    private volatile String dateStamp = "";
++
++    /**
++     * Instant when the log daily rotation was last checked.
++     */
++    private volatile long rotationLastChecked = 0L;
++
++    /**
++     * Buffered logging.
++     */
++    private boolean buffered = true;
++
++    /**
++     * Do we check for log file existence? Helpful if an external
++     * agent renames the log file so we can automatically recreate it.
++     */
++    private boolean checkExists = false;
++
++    /**
++     * The current log file we are writing to. Helpful when checkExists
++     * is true.
++     */
++    protected File currentLogFile = null;
++
++    /**
++     * Can the log file be rotated.
++     */
++    protected boolean isRotatable = true;
++
++
++    /**
++     * Log the specified message to the log file, switching files if the date
++     * has changed since the previous log call.
++     *
++     * @param message Message to be logged
++     */
++    public void log(String message) {
++        if (isRotatable) {
++            // Only do a logfile switch check once a second, max.
++            long systemTime = System.currentTimeMillis();
++            if ((systemTime - rotationLastChecked) > 1000) {
++                synchronized (this) {
++                    if ((systemTime - rotationLastChecked) > 1000) {
++                        rotationLastChecked = systemTime;
++
++                        String tsDate;
++                        // Check for a change of date
++                        tsDate = fileDateFormatter.format(new Date(systemTime));
++
++                        // If the date has changed, switch log files
++                        if (!dateStamp.equals(tsDate)) {
++                            close();
++                            dateStamp = tsDate;
++                            open();
++                        }
++                    }
++                }
++            }
++        }
++
++        /* In case something external rotated the file instead */
++        if (checkExists) {
++            synchronized (this) {
++                if (currentLogFile != null && !currentLogFile.exists()) {
++                    try {
++                        close();
++                    } catch (Throwable e) {
++                        handleThrowable(e);
++                        log.info("Access Log file Close failed");
++                    }
++
++                    /* Make sure date is correct */
++                    dateStamp = fileDateFormatter.format(
++                            new Date(System.currentTimeMillis()));
++
++                    open();
++                }
++            }
++        }
++
++        // Log this message
++        synchronized (this) {
++            if (writer != null) {
++                writer.println(message);
++
++                if (!buffered) {
++                    writer.flush();
++                }
++            }
++        }
++    }
++
++    protected synchronized void initOpen() {
++        /* Make sure date is correct */
++        dateStamp = fileDateFormatter.format(
++                new Date(System.currentTimeMillis()));
++        this.open();
++    }
++
++    /**
++     * Open the new log file for the date specified by <code>dateStamp</code>.
++     */
++    protected synchronized void open() {
++        // Create the directory if necessary
++        File dir = new File(AccessConstants.DIRECTORY);
++        if (!dir.exists()) {
++            if (!dir.mkdirs()) {
++                log.error("Access Log Open Directory Failed");
++            }
++        }
++
++        // Open the current log file
++        try {
++            String pathName;
++            // If no rotate - no need for dateStamp in fileName
++            if (isRotatable) {
++                pathName = dir.getAbsolutePath() + File.separator + AccessConstants.PREFIX +
++                           dateStamp + AccessConstants.SUFFIX;
++            } else {
++                pathName = dir.getAbsolutePath() + File.separator + AccessConstants.PREFIX +
++                           AccessConstants.SUFFIX;
++            }
++
++            writer = new PrintWriter(new BufferedWriter(new FileWriter(
++                    pathName, true), 128000), true);
++
++            currentLogFile = new File(pathName);
++        } catch (IOException e) {
++            log.warn("Unable to open the print writer", e);
++            writer = null;
++            currentLogFile = null;
++        }
++    }
++
++    /**
++     * Close the currently open log file (if any)
++     */
++    synchronized void close() {
++        if (writer == null) {
++            return;
++        }
++        writer.flush();
++        writer.close();
++        writer = null;
++        dateStamp = "";
++        currentLogFile = null;
++    }
++
++    /**
++     * Checks whether the supplied Throwable is one that needs to be
++     * re-thrown and swallows all others.
++     *
++     * @param t the Throwable to check
++     */
++    public static void handleThrowable(Throwable t) {
++        if (t instanceof ThreadDeath) {
++            throw (ThreadDeath) t;
++        }
++        if (t instanceof VirtualMachineError) {
++            throw (VirtualMachineError) t;
++        }
++        // All other instances of Throwable will be silently swallowed
 +    }
 +}
 -*-*-*-
 Message: Access logs and a few bug fixes
 -*-*-*-
 When: 2011-12-06 07:34:02 -0500 
+-*-*-*-
+Who: hiranya

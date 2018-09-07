@@ -121,3 +121,5 @@ Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/for
 Message: Fix SYNAPSE-805
 -*-*-*-
 When: 2011-12-13 04:38:48 -0500 
+-*-*-*-
+Who: charith

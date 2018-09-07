@@ -51,3 +51,5 @@ Index: java/modules/core/src/main/java/org/apache/synapse/config/Entry.java
 Message: Fixed SYNAPSE-819.
 -*-*-*-
 When: 2011-12-05 00:30:40 -0500 
+-*-*-*-
+Who: rajikak

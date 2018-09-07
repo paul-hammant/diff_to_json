@@ -1,0 +1,68 @@
+Index: java/modules/extensions/src/main/java/org/apache/synapse/mediators/xquery/XQueryMediator.java
+===================================================================
+--- java/modules/extensions/src/main/java/org/apache/synapse/mediators/xquery/XQueryMediator.java	(revision 1505037)
++++ java/modules/extensions/src/main/java/org/apache/synapse/mediators/xquery/XQueryMediator.java	(revision 1505038)
+@@ -382,6 +382,27 @@
+                         ((OMElement) destination).setText(
+                                 String.valueOf(xqItem.getItemAsString()));
+                     }
++                } else if (target.getXPath() == null) {
++                    //In the case soap body doesn't have the first element --> Empty soap body
++                    destination = synCtx.getEnvelope().getBody();
++                    if (synLog.isTraceOrDebugEnabled()) {
++                        synLog.traceOrDebug("The target node " + destination);
++                    }
++
++                    //If the result is XML
++                    if (XQItemType.XQITEMKIND_DOCUMENT_ELEMENT == itemKind ||
++                            XQItemType.XQITEMKIND_ELEMENT == itemKind ||
++                            XQItemType.XQITEMKIND_DOCUMENT == itemKind) {
++                        StAXOMBuilder builder = new StAXOMBuilder(
++                                XMLInputFactory.newInstance().createXMLStreamReader(
++                                        new StringReader(xqItem.getItemAsString())));
++                        OMElement resultOM = builder.getDocumentElement();
++                        if (resultOM != null) {
++                            ((OMElement) destination).addChild(resultOM);
++                        }
++                    }
++                    //No else part since soap body could have only XML part not text values
++
+                 }
+                 break;   // Only take the *first* value of the result sequence
+             }
+Index: java/modules/extensions/src/test/java/org/apache/synapse/mediators/xquery/XQueryMediatorTest.java
+===================================================================
+--- java/modules/extensions/src/test/java/org/apache/synapse/mediators/xquery/XQueryMediatorTest.java	(revision 1505037)
++++ java/modules/extensions/src/test/java/org/apache/synapse/mediators/xquery/XQueryMediatorTest.java	(revision 1505038)
+@@ -19,6 +19,7 @@
+ package org.apache.synapse.mediators.xquery;
+ 
+ import junit.framework.TestCase;
++import org.apache.axiom.om.OMAbstractFactory;
+ import org.apache.synapse.MessageContext;
+ import org.apache.synapse.config.SynapseConfigUtils;
+ import org.apache.synapse.mediators.TestUtils;
+@@ -255,4 +256,17 @@
+         assertTrue(mediator.mediate(mc));
+         assertEquals("true", mc.getEnvelope().getBody().getFirstElement().getText());
+     }
++
++    public void testEmptyBodyQuery() throws Exception {
++        MessageContext mc = TestUtils.getTestContext(sampleXml3, null);
++        mc.setEnvelope(OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope());
++
++        XQueryMediator mediator = new XQueryMediator();
++        mediator.setQuerySource(" declare namespace m0=\"http://services.samples/xsd\";\n" +
++                " declare variable $payload as document-node() external;\n" +
++                " declare variable $commission as document-node() external;\n" +
++                " <testing/>");
++        assertTrue(mediator.mediate(mc));
++        assertEquals("testing", mc.getEnvelope().getBody().getFirstElement().getLocalName());
++    }
+ }
+-*-*-*-
+Message: Applying the patch for SYNAPSE-877, Appling XQuery transformations on empty SOAP body. Added a test case to verify the fix.
+-*-*-*-
+When: 2013-07-19 17:52:03 -0400 
+-*-*-*-
+Who: hiranya

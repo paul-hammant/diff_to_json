@@ -1,0 +1,19 @@
+Index: java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPProducerClient.java
+===================================================================
+--- java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPProducerClient.java	(revision 1510088)
++++ java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPProducerClient.java	(revision 1510089)
+@@ -74,7 +74,7 @@
+         }
+ 
+         if (queueName != null) {
+-            AMQPProducerClient.produce(MESSAGE2, channel, QUEUE_NAME);
++            AMQPProducerClient.produce(MESSAGE2, channel, queueName);
+         } else {
+             if (routingKey != null) {
+                 AMQPProducerClient.route(MESSAGE2, channel, exchangeName, routingKey);
+-*-*-*-
+Message: used the passed queue name.
+-*-*-*-
+When: 2013-08-03 22:19:12 -0400 
+-*-*-*-
+Who: rajikak

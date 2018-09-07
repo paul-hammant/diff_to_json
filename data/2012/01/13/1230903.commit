@@ -38,3 +38,5 @@ Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/Sch
 Message: Shutting down the schedulers initiated by the scheduled processors
 -*-*-*-
 When: 2012-01-13 00:25:15 -0500 
+-*-*-*-
+Who: hiranya

@@ -79,3 +79,5 @@ Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseImpo
 Message: comitting patch for SYNAPSE-863
 -*-*-*-
 When: 2012-04-16 03:52:07 -0400 
+-*-*-*-
+Who: uswick

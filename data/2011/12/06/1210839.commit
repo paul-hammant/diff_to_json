@@ -34,3 +34,5 @@ Index: java/modules/core/src/main/java/org/apache/synapse/deployers/AbstractSyna
 Message: Fixing a startup error
 -*-*-*-
 When: 2011-12-06 05:04:36 -0500 
+-*-*-*-
+Who: hiranya

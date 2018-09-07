@@ -1,0 +1,556 @@
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java	(revision 1512882)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java	(revision 1512883)
+@@ -171,7 +171,7 @@
+         targetConfiguration.setMetrics(metrics);
+ 
+         try {
+-            String prefix = namePrefix + "-Sender I/O dispatcher";
++            String prefix = namePrefix + "-PT-Sender I/O Dispatcher";
+ 
+             ioReactor = new DefaultConnectingIOReactor(
+                             targetConfiguration.getReactorConfig(),
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpListener.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpListener.java	(revision 1512882)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpListener.java	(revision 1512883)
+@@ -80,8 +80,10 @@
+ 
+     /** The custom URI map for the services if there are any */
+     private Map<String, String> serviceNameToEPRMap = new HashMap<String, String>();
++
+     /** The service name map for the custom URI if there are any */
+     private Map<String, String> eprToServiceNameMap = new HashMap<String, String>();
++
+     /** the axis observer that gets notified of service life cycle events*/
+     private final AxisObserver axisObserver = new GenericAxisObserver();
+ 
+@@ -137,10 +139,10 @@
+         log.info("Starting pass-through " + namePrefix + " listener...");
+ 
+         try {
+-            String prefix = namePrefix + "-Listener I/O dispatcher";
++            String prefix = namePrefix + "-PT-Listener I/O Dispatcher";
+             ioReactor = new DefaultListeningIOReactor(
+                             sourceConfiguration.getReactorConfig(),
+-                            new NativeThreadFactory(new ThreadGroup(prefix + " thread group"), prefix));
++                            new NativeThreadFactory(new ThreadGroup(prefix + " Thread Group"), prefix));
+             
+             ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
+ 
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/config/HttpTransportConfiguration.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/config/HttpTransportConfiguration.java	(revision 1512882)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/config/HttpTransportConfiguration.java	(revision 1512883)
+@@ -28,6 +28,10 @@
+ import java.nio.charset.CodingErrorAction;
+ import java.util.Properties;
+ 
++/**
++ * A base class for parsing transport configuration files and initializing basic
++ * HTTP Core configuration objects.
++ */
+ public abstract class HttpTransportConfiguration {
+ 
+     protected Log log = LogFactory.getLog(this.getClass());
+@@ -34,6 +38,12 @@
+ 
+     private Properties props;
+ 
++    /**
++     * Create a new HttpTransportConfiguration instance.
++     *
++     * @param fileName Name of the file (without extensions) from where the transport
++     *                 configuration should be loaded.
++     */
+     public HttpTransportConfiguration(String fileName) {
+         try {
+             props = MiscellaneousUtil.loadProperties(fileName + ".properties");
+@@ -40,8 +50,18 @@
+         } catch (Exception ignored) {}
+     }
+ 
++    /**
++     * Get the number of I/O dispatcher threads that should be used in each IOReactor.
++     *
++     * @return A positive integer
++     */
+     abstract protected int getThreadsPerReactor();
+ 
++    /**
++     * Get the IOReactor configuration
++     *
++     * @return A fully initialized IOReactorConfig instance
++     */
+     public IOReactorConfig getReactorConfig() {
+         IOReactorConfig.Builder builder = IOReactorConfig.custom()
+                 .setIoThreadCount(getThreadsPerReactor())
+@@ -66,6 +86,11 @@
+         return builder.build();
+     }
+ 
++    /**
++     * Get the connection configuration
++     *
++     * @return A fully initialized ConnectionConfig instance
++     */
+     public ConnectionConfig getConnectionConfig() {
+         return ConnectionConfig.custom()
+                 .setBufferSize(getIntProperty(HttpConfigConstants.SOCKET_BUFFER_SIZE, 8 * 1024))
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingIOSession.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingIOSession.java	(revision 1512882)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingIOSession.java	(revision 1512883)
+@@ -31,6 +31,14 @@
+ import java.nio.channels.SelectionKey;
+ import java.util.concurrent.atomic.AtomicLong;
+ 
++/**
++ * A decorator (wrapper) for IOSession instances. This decorator logs additional
++ * debug information regarding each of the events triggered on the actual IOSession
++ * instance. Most events are logged 'before' they are dispatched to the wrapped
++ * IOSession, but this implementation does not modify the event arguments by any means.
++ * In that sense this decorator is read-only and safe. This implementation also facilitates
++ * intercepting and logging HTTP messages at wire-level.
++ */
+ public class LoggingIOSession implements IOSession {
+ 
+     private static AtomicLong COUNT = new AtomicLong(0);
+@@ -41,14 +49,22 @@
+     private final ByteChannel channel;
+     private final String id;
+ 
++    /**
++     * Create a new instance of the decorator.
++     *
++     * @param sessionLog Log instance used to log IOSession events.
++     * @param wireLog Log instance used to log wire-level HTTP messages.
++     * @param session IOSession to be decorated.
++     * @param id An identifier (name) that will be attached to the IOSession for the logging
++     *           purposes.
++     */
+     public LoggingIOSession(
+             final Log sessionLog,
+             final Log wireLog,
+             final IOSession session,
+             final String id) {
+-        super();
+         if (session == null) {
+-            throw new IllegalArgumentException("I/O session may not be null");
++            throw new IllegalArgumentException("I/O session must not be null");
+         }
+         this.session = session;
+         this.channel = new LoggingByteChannel();
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingNHttpClientConnection.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingNHttpClientConnection.java	(revision 1512882)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingNHttpClientConnection.java	(revision 1512883)
+@@ -36,6 +36,11 @@
+ import java.nio.charset.CharsetDecoder;
+ import java.nio.charset.CharsetEncoder;
+ 
++/**
++ * An extension of the DefaultNHttpClientConnection class, that provides some
++ * additional logging features. This implementation enhances the default connection
++ * class by logging all the major events that occur on the connection instance.
++ */
+ public class LoggingNHttpClientConnection extends DefaultNHttpClientConnection {
+ 
+     private final Log log;
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingNHttpServerConnectionFactory.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingNHttpServerConnectionFactory.java	(revision 1512882)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingNHttpServerConnectionFactory.java	(revision 1512883)
+@@ -40,6 +40,13 @@
+ 
+ import java.io.IOException;
+ 
++/**
++ * A connection factory implementation for DefaultNHttpServerConnection instances.
++ * Based on the current logging configuration, this factory decides whether to create
++ * regular DefaultNHttpServerConnection objects or to create LoggingNHttpServerConnection
++ * objects. Also, depending on the logging configuration, this factory may choose to
++ * wrap IOSession instances in LoggingIOSession objects.
++ */
+ public class LoggingNHttpServerConnectionFactory implements NHttpConnectionFactory<DefaultNHttpServerConnection> {
+ 
+     private static final Log sourceConnLog = LogFactory.getLog(
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingClientEventHandler.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingClientEventHandler.java	(revision 1512882)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingClientEventHandler.java	(revision 1512883)
+@@ -30,6 +30,16 @@
+ 
+ import java.io.IOException;
+ 
++/**
++ * A decorator (wrapper) for NHttpClientEventHandler instances. This decorator
++ * logs additional debug information regarding each of the events triggered on the
++ * actual NHttpClientEventHandler instance. Most events are logged 'before' they are
++ * dispatched to the wrapped NHttpClientEventHandler, but this implementation does
++ * not modify the event arguments by any means. In that sense this decorator is
++ * read-only and safe. This implementation does not log the exception event. It is
++ * expected that the actual NHttpClientEventHandler will take the necessary steps to
++ * log exceptions.
++ */
+ public class LoggingClientEventHandler implements NHttpClientEventHandler {
+ 
+     private final Log log;
+@@ -36,10 +46,14 @@
+ 
+     private final NHttpClientEventHandler handler;
+ 
++    /**
++     * Create a new instance of the decorator.
++     *
++     * @param handler The instance of NHttpClientEventHandler to be decorated (wrapped)
++     */
+     public LoggingClientEventHandler(final NHttpClientEventHandler handler) {
+-        super();
+         if (handler == null) {
+-            throw new IllegalArgumentException("HTTP client handler may not be null");
++            throw new IllegalArgumentException("HTTP client handler must not be null");
+         }
+         this.handler = handler;
+         this.log = LogFactory.getLog(handler.getClass());
+@@ -73,7 +87,7 @@
+ 
+     public void requestReady(final NHttpClientConnection conn) throws IOException, HttpException {
+         if (this.log.isDebugEnabled()) {
+-            this.log.debug("HTTP connection " + conn + ": InRequest ready" + getRequestMessageID(conn));
++            this.log.debug("HTTP connection " + conn + ": InRequest ready");
+         }
+         this.handler.requestReady(conn);
+     }
+@@ -80,7 +94,7 @@
+ 
+     public void outputReady(final NHttpClientConnection conn, final ContentEncoder encoder) throws IOException, HttpException {
+         if (this.log.isDebugEnabled()) {
+-            this.log.debug("HTTP connection " + conn + ": Output ready" + getRequestMessageID(conn));
++            this.log.debug("HTTP connection " + conn + ": Output ready");
+         }
+         this.handler.outputReady(conn, encoder);
+         if (this.log.isDebugEnabled()) {
+@@ -91,8 +105,7 @@
+     public void responseReceived(final NHttpClientConnection conn) throws IOException, HttpException {
+         HttpResponse response = conn.getHttpResponse();
+         if (this.log.isDebugEnabled()) {
+-            this.log.debug("HTTP connection " + conn + " : "
+-                    + response.getStatusLine() + getRequestMessageID(conn));
++            this.log.debug("HTTP connection " + conn + " : " + response.getStatusLine());
+         }
+         this.handler.responseReceived(conn);
+     }
+@@ -99,7 +112,7 @@
+ 
+     public void inputReady(final NHttpClientConnection conn, final ContentDecoder decoder) throws IOException, HttpException {
+         if (this.log.isDebugEnabled()) {
+-            this.log.debug("HTTP connection " + conn + ": Input ready" + getRequestMessageID(conn));
++            this.log.debug("HTTP connection " + conn + ": Input ready");
+         }
+         this.handler.inputReady(conn, decoder);
+         if (this.log.isDebugEnabled()) {
+@@ -109,17 +122,8 @@
+ 
+     public void timeout(final NHttpClientConnection conn) throws IOException, HttpException {
+         if (this.log.isDebugEnabled()) {
+-            this.log.debug("HTTP connection " + conn + ": Timeout" + getRequestMessageID(conn));
++            this.log.debug("HTTP connection " + conn + ": Timeout");
+         }
+         this.handler.timeout(conn);
+     }
+-
+-    private static String getRequestMessageID(final NHttpClientConnection conn) {
+-        /*Axis2HttpRequest axis2Request = (Axis2HttpRequest)
+-                conn.getContext().getAttribute(ClientHandler.AXIS2_HTTP_REQUEST);
+-        if (axis2Request != null) {
+-            return " [InRequest Message ID : " + axis2Request.getMsgContext().getMessageID() + "]";
+-        }*/
+-        return "";
+-    }
+ }
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingNHttpSSLServerConnectionFactory.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingNHttpSSLServerConnectionFactory.java	(revision 1512882)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingNHttpSSLServerConnectionFactory.java	(revision 1512883)
+@@ -28,6 +28,10 @@
+ 
+ import javax.net.ssl.SSLContext;
+ 
++/**
++ * The SSL-enabled version of the LoggingNHttpServerConnectionFactory. Identical in behavior
++ * to the parent class, but wraps IOSession instances with SSLIOSession instances.
++ */
+ public class LoggingNHttpSSLServerConnectionFactory extends LoggingNHttpServerConnectionFactory {
+ 
+     private SSLContext sslContext;
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/Wire.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/Wire.java	(revision 1512882)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/Wire.java	(revision 1512883)
+@@ -23,40 +23,42 @@
+ 
+ import java.nio.ByteBuffer;
+ 
++/**
++ * A utility for logging wire-level information of HTTP connections.
++ */
+ public class Wire {
+ 
+     private final Log log;
+ 
+     public Wire(final Log log) {
+-        super();
+         this.log = log;
+     }
+ 
+     private void wire(final String header, final byte[] b, int pos, int off) {
+-        StringBuilder buffer = new StringBuilder();
++        StringBuilder builder = new StringBuilder();
+         for (int i = 0; i < off; i++) {
+             int ch = b[pos + i];
+             if (ch == 13) {
+-                buffer.append("[\\r]");
++                builder.append("[\\r]");
+             } else if (ch == 10) {
+-                buffer.append("[\\n]\"");
+-                buffer.insert(0, "\"");
+-                buffer.insert(0, header);
+-                this.log.debug(buffer.toString());
+-                buffer.setLength(0);
++                builder.append("[\\n]\"");
++                builder.insert(0, "\"");
++                builder.insert(0, header);
++                this.log.debug(builder.toString());
++                builder.setLength(0);
+             } else if ((ch < 32) || (ch > 127)) {
+-                buffer.append("[0x");
+-                buffer.append(Integer.toHexString(ch));
+-                buffer.append("]");
++                builder.append("[0x");
++                builder.append(Integer.toHexString(ch));
++                builder.append("]");
+             } else {
+-                buffer.append((char) ch);
++                builder.append((char) ch);
+             }
+         }
+-        if (buffer.length() > 0) {
+-            buffer.append('\"');
+-            buffer.insert(0, '\"');
+-            buffer.insert(0, header);
+-            this.log.debug(buffer.toString());
++        if (builder.length() > 0) {
++            builder.append('\"');
++            builder.insert(0, '\"');
++            builder.insert(0, header);
++            this.log.debug(builder.toString());
+         }
+     }
+ 
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingUtils.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingUtils.java	(revision 1512882)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingUtils.java	(revision 1512883)
+@@ -33,22 +33,15 @@
+ 
+ public class LoggingUtils {
+ 
+-    private static NHttpClientEventHandler decorate(NHttpClientEventHandler handler) {
+-        Log log = LogFactory.getLog(handler.getClass());
+-        if (log.isDebugEnabled()) {
+-            handler = new LoggingClientEventHandler(handler);
+-        }
+-        return handler;
+-    }
+-
+-    private static NHttpServerEventHandler decorate(NHttpServerEventHandler handler) {
+-        Log log = LogFactory.getLog(handler.getClass());
+-        if (log.isDebugEnabled()) {
+-            handler = new LoggingServerEventHandler(handler);
+-        }
+-        return handler;
+-    }
+-
++    /**
++     * Create a new DefaultHttpServerIODispatch instance using the provided parameters.
++     * This method may decorate (wrap) the original arguments with logging-enabled wrappers,
++     * depending on the current logging configuration.
++     *
++     * @param handler An NHttpServerEventHandler instance
++     * @param config A ConnectionConfig instance
++     * @return A DefaultHttpServerIODispatch instance
++     */
+     public static DefaultHttpServerIODispatch getServerIODispatch(final NHttpServerEventHandler handler,
+                                                                   final ConnectionConfig config) {
+         return new DefaultHttpServerIODispatch(decorate(handler),
+@@ -55,6 +48,17 @@
+                 new LoggingNHttpServerConnectionFactory(config));
+     }
+ 
++    /**
++     * Create a new DefaultHttpServerIODispatch instance using the provided parameters.
++     * This method may decorate (wrap) the original arguments with logging-enabled wrappers,
++     * depending on the current logging configuration.
++     *
++     * @param handler An NHttpServerEventHandler instance
++     * @param config A ConnectionConfig instance
++     * @param sslContext An SSLContext instance to initialize SSL support
++     * @param sslSetupHandler An SSLSetupHandler instance
++     * @return A DefaultHttpServerIODispatch instance
++     */
+     public static DefaultHttpServerIODispatch getServerIODispatch(final NHttpServerEventHandler handler,
+                                                                   final ConnectionConfig config,
+                                                                   final SSLContext sslContext,
+@@ -63,6 +67,15 @@
+                 new LoggingNHttpSSLServerConnectionFactory(config, sslContext, sslSetupHandler));
+     }
+ 
++    /**
++     * Create a new DefaultHttpClientIODispatch instance using the provided parameters.
++     * This method may decorate (wrap) the original arguments with logging-enabled wrappers,
++     * depending on the current logging configuration.
++     *
++     * @param handler An NHttpClientEventHandler instance
++     * @param config A ConnectionConfig instance
++     * @return A DefaultHttpClientIODispatch instance
++     */
+     public static DefaultHttpClientIODispatch getClientIODispatch(final NHttpClientEventHandler handler,
+                                                                   final ConnectionConfig config) {
+         return new DefaultHttpClientIODispatch(decorate(handler),
+@@ -69,6 +82,18 @@
+                 new LoggingNHttpClientConnectionFactory(config));
+     }
+ 
++    /**
++     * Create a new DefaultHttpClientIODispatch instance using the provided parameters.
++     * This method may decorate (wrap) the original arguments with logging-enabled wrappers,
++     * depending on the current logging configuration.
++     *
++     * @param handler An NHttpServerEventHandler instance
++     * @param config A ConnectionConfig instance
++     * @param sslContext An SSLContext instance to initialize SSL support
++     * @param sslSetupHandler An SSLSetupHandler instance
++     * @param customContexts A Map of endpoints and SSLContext instances
++     * @return A DefaultHttpClientIODispatch instance
++     */
+     public static DefaultHttpClientIODispatch getClientIODispatch(final NHttpClientEventHandler handler,
+                                                                   final ConnectionConfig config,
+                                                                   final SSLContext sslContext,
+@@ -77,4 +102,20 @@
+         return new DefaultHttpClientIODispatch(decorate(handler),
+                 new LoggingNHttpSSLClientConnectionFactory(config, sslContext, sslSetupHandler, customContexts));
+     }
++
++    private static NHttpClientEventHandler decorate(NHttpClientEventHandler handler) {
++        Log log = LogFactory.getLog(handler.getClass());
++        if (log.isDebugEnabled()) {
++            handler = new LoggingClientEventHandler(handler);
++        }
++        return handler;
++    }
++
++    private static NHttpServerEventHandler decorate(NHttpServerEventHandler handler) {
++        Log log = LogFactory.getLog(handler.getClass());
++        if (log.isDebugEnabled()) {
++            handler = new LoggingServerEventHandler(handler);
++        }
++        return handler;
++    }
+ }
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingNHttpClientConnectionFactory.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingNHttpClientConnectionFactory.java	(revision 1512882)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingNHttpClientConnectionFactory.java	(revision 1512883)
+@@ -40,6 +40,13 @@
+ 
+ import java.io.IOException;
+ 
++/**
++ * A connection factory implementation for DefaultNHttpClientConnection instances.
++ * Based on the current logging configuration, this factory decides whether to create
++ * regular DefaultNHttpClientConnection objects or to create LoggingNHttpClientConnection
++ * objects. Also, depending on the logging configuration, this factory may choose to
++ * wrap IOSession instances in LoggingIOSession objects.
++ */
+ public class LoggingNHttpClientConnectionFactory implements NHttpConnectionFactory<DefaultNHttpClientConnection> {
+ 
+     private static final Log targetConnLog = LogFactory.getLog(
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingNHttpServerConnection.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingNHttpServerConnection.java	(revision 1512882)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingNHttpServerConnection.java	(revision 1512883)
+@@ -36,6 +36,11 @@
+ import java.nio.charset.CharsetDecoder;
+ import java.nio.charset.CharsetEncoder;
+ 
++/**
++ * An extension of the DefaultNHttpServerConnection class, that provides some
++ * additional logging features. This implementation enhances the default connection
++ * class by logging all the major events that occur on the connection instance.
++ */
+ public class LoggingNHttpServerConnection extends DefaultNHttpServerConnection {
+ 
+     private final Log log;
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingNHttpSSLClientConnectionFactory.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingNHttpSSLClientConnectionFactory.java	(revision 1512882)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingNHttpSSLClientConnectionFactory.java	(revision 1512883)
+@@ -30,6 +30,12 @@
+ import java.net.InetSocketAddress;
+ import java.util.Map;
+ 
++/**
++ * The SSL-enabled version of the LoggingNHttpClientConnectionFactory. Identical in behavior
++ * to the parent class, but wraps IOSession instances with SSLIOSession instances. This
++ * implementation also supports using different SSLContext instances for different target
++ * I/O sessions.
++ */
+ public class LoggingNHttpSSLClientConnectionFactory extends LoggingNHttpClientConnectionFactory {
+ 
+     private SSLContext sslContext;
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingServerEventHandler.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingServerEventHandler.java	(revision 1512882)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingServerEventHandler.java	(revision 1512883)
+@@ -30,6 +30,16 @@
+ 
+ import java.io.IOException;
+ 
++/**
++ * A decorator (wrapper) for NHttpServerEventHandler instances. This decorator
++ * logs additional debug information regarding each of the events triggered on the
++ * actual NHttpServerEventHandler instance. Most events are logged 'before' they are
++ * dispatched to the wrapped NHttpServerEventHandler, but this implementation does
++ * not modify the event arguments by any means. In that sense this decorator is
++ * read-only and safe. This implementation does not log the exception event. It is
++ * expected that the actual NHttpServerEventHandler will take the necessary steps to
++ * log exceptions.
++ */
+ public class LoggingServerEventHandler implements NHttpServerEventHandler {
+ 
+     private final Log log;
+@@ -36,10 +46,15 @@
+ 
+     private final NHttpServerEventHandler handler;
+ 
++    /**
++     * Create a new instance of the decorator.
++     *
++     * @param handler The instance of NHttpServerEventHandler to be decorated (wrapped)
++     */
+     public LoggingServerEventHandler(final NHttpServerEventHandler handler) {
+         super();
+         if (handler == null) {
+-            throw new IllegalArgumentException("HTTP service handler may not be null");
++            throw new IllegalArgumentException("HTTP service handler must not be null");
+         }
+         this.handler = handler;
+         this.log = LogFactory.getLog(handler.getClass());
+-*-*-*-
+Message: Some java docs to the new logging package
+-*-*-*-
+When: 2013-08-11 02:52:43 -0400 
+-*-*-*-
+Who: hiranya

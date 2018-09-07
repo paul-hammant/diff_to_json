@@ -1,0 +1,55 @@
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java	(revision 1513051)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java	(revision 1513052)
+@@ -244,7 +244,6 @@
+         }
+     }
+ 
+-
+     public InvocationResponse invoke(MessageContext msgContext) throws AxisFault {
+         // remove unwanted HTTP headers (if any from the current message)
+         PassThroughTransportUtils.removeUnwantedHeaders(msgContext,
+@@ -390,17 +389,16 @@
+                             msgContext);
+ 					OMOutputFormat format = PassThroughTransportUtils.getOMOutputFormat(msgContext);
+ 					formatter.writeTo(msgContext, format, _out, false);
+-					try {
+-                        long messageSize = setStreamAsTempData(formatter,msgContext,format);
++                    try {
++                        long messageSize = setStreamAsTempData(formatter, msgContext, format);
+                         msgContext.setProperty(
+                                 PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH, messageSize);
+                         formatter.writeTo(msgContext, format, out, false);
+                     } catch (IOException e) {
+-                    	 handleException("IO error while building message", e);
++                    	 handleException("I/O error while serializing message", e);
+                     }
+                 	pipe.setSerializationComplete(true);
+ 				} else {
+-					
+ 					if ((disableChunking == null || !"true".equals(disableChunking)) ||
+ 					    (forceHttp10 == null || !"true".equals(forceHttp10))) {
+ 						MessageFormatter formatter =  MessageProcessorSelector.getMessageFormatter(
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpListener.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpListener.java	(revision 1513051)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpListener.java	(revision 1513052)
+@@ -264,7 +264,10 @@
+     }
+ 
+     public void destroy() {
+-        log.info("Destroying pass-through " + namePrefix + " listener");
++        if (log.isDebugEnabled()) {
++            log.debug("Destroying pass-through " + namePrefix + " listener");
++        }
++        ioReactor = null;
+         sourceConfiguration.getConfigurationContext().
+                 getAxisConfiguration().getObserversList().remove(axisObserver);
+ 
+-*-*-*-
+Message: Changed the log level of a statement
+-*-*-*-
+When: 2013-08-12 02:48:54 -0400 
+-*-*-*-
+Who: hiranya

@@ -1,0 +1,31 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/eip/splitter/IterateMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/eip/splitter/IterateMediator.java	(revision 1505444)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/eip/splitter/IterateMediator.java	(revision 1505445)
+@@ -39,7 +39,6 @@
+ import org.apache.synapse.util.xpath.SynapseXPath;
+ import org.jaxen.JaxenException;
+ 
+-import java.util.Iterator;
+ import java.util.List;
+ 
+ /**
+@@ -124,8 +123,10 @@
+                 }
+ 
+                 if (synLog.isTraceOrDebugEnabled()) {
+-                    synLog.traceOrDebug("Submitting " + (msgNumber+1) + " of " + msgNumber +
+-                        " messages for processing in parallel");
++                    synLog.traceOrDebug("Submitting " + (msgNumber + 1) + " of " + msgNumber +
++                            (target.isAsynchronous() ?
++                                    " messages for processing in parallel" :
++                                    " messages for processing sequentially"));
+                 }
+ 
+                 target.mediate(
+-*-*-*-
+Message: Applying the patch for SYNAPSE-945. Fixing a debug log statement.
+-*-*-*-
+When: 2013-07-21 14:56:06 -0400 
+-*-*-*-
+Who: hiranya

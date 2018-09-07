@@ -718,3 +718,5 @@ Index: java/repository/conf/sample/resources/proxy/sample_proxy_1.wsdl
 Message: Removing extra spaces at line end.
 -*-*-*-
 When: 2012-09-23 03:24:18 -0400 
+-*-*-*-
+Who: veithen

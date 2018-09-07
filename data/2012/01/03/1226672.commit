@@ -1,154 +1,3 @@
-Index: java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/FIXSessionFactory.java
-===================================================================
---- java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/FIXSessionFactory.java	(revision 1226671)
-+++ java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/FIXSessionFactory.java	(revision 1226672)
-@@ -24,6 +24,7 @@
- import org.apache.axis2.description.Parameter;
- import org.apache.axis2.transport.base.BaseUtils;
- import org.apache.axis2.transport.base.threads.WorkerPool;
-+import org.apache.axis2.util.JavaUtils;
- import org.apache.commons.logging.Log;
- import org.apache.commons.logging.LogFactory;
- import org.quickfixj.jmx.JmxExporter;
-@@ -120,13 +121,24 @@
-                 //Get a new FIX Application
-                 Application messageHandler = applicationFactory.getFIXApplication(service,
-                         listenerThreadPool, true);
-+                boolean threadedConnector = useThreadedConnector(service, true);
-                 //Create a new FIX Acceptor
--                Acceptor acceptor = new SocketAcceptor(
--                        messageHandler,
--                        storeFactory,
--                        settings,
--                        logFactory,
--                        messageFactory);
-+                Acceptor acceptor;
-+                if (threadedConnector) {
-+                    acceptor = new ThreadedSocketAcceptor(
-+                            messageHandler,
-+                            storeFactory,
-+                            settings,
-+                            logFactory,
-+                            messageFactory);
-+                } else {
-+                    acceptor = new SocketAcceptor(
-+                            messageHandler,
-+                            storeFactory,
-+                            settings,
-+                            logFactory,
-+                            messageFactory);
-+                }
- 
-                 acceptor.start();
-                 initJMX(acceptor, service.getName());
-@@ -197,15 +209,26 @@
-         //Get a new FIX application
-         Application messageHandler = applicationFactory.getFIXApplication(service,
-                 senderThreadPool, false);
-+        boolean threadedConnector = useThreadedConnector(service, false);
- 
-         try {
-            //Create a new FIX initiator
--            Initiator initiator = new SocketInitiator(
--                    messageHandler,
--                    storeFactory,
--                    settings,
--                    logFactory,
--                    messageFactory);
-+            Initiator initiator;
-+            if (threadedConnector) {
-+                initiator = new ThreadedSocketInitiator(
-+                        messageHandler,
-+                        storeFactory,
-+                        settings,
-+                        logFactory,
-+                        messageFactory);
-+            } else {
-+                initiator = new SocketInitiator(
-+                        messageHandler,
-+                        storeFactory,
-+                        settings,
-+                        logFactory,
-+                        messageFactory);
-+            }
- 
-             initiator.start();
-             initJMX(initiator, service.getName());
-@@ -242,12 +265,23 @@
-                 Application messageHandler = applicationFactory.getFIXApplication(service,
-                         senderThreadPool, false);
- 
--                Initiator initiator = new SocketInitiator(
--                    messageHandler,
--                    storeFactory,
--                    settings,
--                    logFactory,
--                    messageFactory);
-+                boolean threadedConnector = useThreadedConnector(service, false);
-+                Initiator initiator;
-+                if (threadedConnector) {
-+                    initiator = new ThreadedSocketInitiator(
-+                            messageHandler,
-+                            storeFactory,
-+                            settings,
-+                            logFactory,
-+                            messageFactory);
-+                } else {
-+                    initiator = new SocketInitiator(
-+                            messageHandler,
-+                            storeFactory,
-+                            settings,
-+                            logFactory,
-+                            messageFactory);
-+                }
- 
-                 initiator.start();
-                 initJMX(initiator, service.getName());
-@@ -511,6 +545,25 @@
-             log.error("Error while initializing JMX support for the service: " + service, e);
-         }
-     }
-+
-+    private boolean useThreadedConnector(AxisService service, boolean acceptor) {
-+	    Parameter param = service.getParameter(FIXConstants.FIX_USE_THREADED_ACCEPTOR);
-+        if (acceptor && param != null && JavaUtils.isTrueExplicitly(param.getValue())) {
-+            return true;
-+        }
-+
-+        param = service.getParameter(FIXConstants.FIX_USE_THREADED_INITIATOR);
-+        if (!acceptor && param != null && JavaUtils.isTrueExplicitly(param.getValue())) {
-+            return true;
-+        }
-+
-+        param = service.getParameter(FIXConstants.FIX_USE_THREADED_CONNECTORS);
-+        if (param != null && JavaUtils.isTrueExplicitly(param.getValue())) {
-+            return true;
-+        }
-+
-+        return false;
-+    }
- }
- 
- 
-Index: java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/FIXConstants.java
-===================================================================
---- java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/FIXConstants.java	(revision 1226671)
-+++ java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/FIXConstants.java	(revision 1226672)
-@@ -107,6 +107,14 @@
-     public static final String FIX_ACCEPTOR_EVENT_HANDLER = "transport.fix.AcceptorSessionEventHandler";
-     public static final String FIX_INITIATOR_EVENT_HANDLER = "transport.fix.InitiatorSessionEventHandler";
- 
-+    public static final String FIX_PROCESS_SINGLE_THREADED = "transport.fix.ProcessSingleThreaded";
-+    public static final String FIX_ACCEPTOR_SINGLE_THREADED = "transport.fix.AcceptorSingleThreaded";
-+    public static final String FIX_INITIATOR_SINGLE_THREADED = "transport.fix.InitiatorSingleThreaded";
-+
-+    public static final String FIX_USE_THREADED_CONNECTORS = "transport.fix.UseThreadedConnectors";
-+    public static final String FIX_USE_THREADED_ACCEPTOR = "transport.fix.UseThreadedAcceptor";
-+    public static final String FIX_USE_THREADED_INITIATOR = "transport.fix.UseThreadedInitiator";
-+
-     //--------------------------- Message level properties -----------------------------------
- 
-     public static final String FIX_IGNORE_ORDER = "transport.fix.IgnoreOrder";
 Index: java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/FIXIncomingMessageHandler.java
 ===================================================================
 --- java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/FIXIncomingMessageHandler.java	(revision 1226671)
@@ -454,7 +303,160 @@ Index: java/modules/transports/optional/fix/src/main/java/org/apache/synapse/tra
      }
  
  }
+Index: java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/FIXSessionFactory.java
+===================================================================
+--- java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/FIXSessionFactory.java	(revision 1226671)
++++ java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/FIXSessionFactory.java	(revision 1226672)
+@@ -24,6 +24,7 @@
+ import org.apache.axis2.description.Parameter;
+ import org.apache.axis2.transport.base.BaseUtils;
+ import org.apache.axis2.transport.base.threads.WorkerPool;
++import org.apache.axis2.util.JavaUtils;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+ import org.quickfixj.jmx.JmxExporter;
+@@ -120,13 +121,24 @@
+                 //Get a new FIX Application
+                 Application messageHandler = applicationFactory.getFIXApplication(service,
+                         listenerThreadPool, true);
++                boolean threadedConnector = useThreadedConnector(service, true);
+                 //Create a new FIX Acceptor
+-                Acceptor acceptor = new SocketAcceptor(
+-                        messageHandler,
+-                        storeFactory,
+-                        settings,
+-                        logFactory,
+-                        messageFactory);
++                Acceptor acceptor;
++                if (threadedConnector) {
++                    acceptor = new ThreadedSocketAcceptor(
++                            messageHandler,
++                            storeFactory,
++                            settings,
++                            logFactory,
++                            messageFactory);
++                } else {
++                    acceptor = new SocketAcceptor(
++                            messageHandler,
++                            storeFactory,
++                            settings,
++                            logFactory,
++                            messageFactory);
++                }
+ 
+                 acceptor.start();
+                 initJMX(acceptor, service.getName());
+@@ -197,15 +209,26 @@
+         //Get a new FIX application
+         Application messageHandler = applicationFactory.getFIXApplication(service,
+                 senderThreadPool, false);
++        boolean threadedConnector = useThreadedConnector(service, false);
+ 
+         try {
+            //Create a new FIX initiator
+-            Initiator initiator = new SocketInitiator(
+-                    messageHandler,
+-                    storeFactory,
+-                    settings,
+-                    logFactory,
+-                    messageFactory);
++            Initiator initiator;
++            if (threadedConnector) {
++                initiator = new ThreadedSocketInitiator(
++                        messageHandler,
++                        storeFactory,
++                        settings,
++                        logFactory,
++                        messageFactory);
++            } else {
++                initiator = new SocketInitiator(
++                        messageHandler,
++                        storeFactory,
++                        settings,
++                        logFactory,
++                        messageFactory);
++            }
+ 
+             initiator.start();
+             initJMX(initiator, service.getName());
+@@ -242,12 +265,23 @@
+                 Application messageHandler = applicationFactory.getFIXApplication(service,
+                         senderThreadPool, false);
+ 
+-                Initiator initiator = new SocketInitiator(
+-                    messageHandler,
+-                    storeFactory,
+-                    settings,
+-                    logFactory,
+-                    messageFactory);
++                boolean threadedConnector = useThreadedConnector(service, false);
++                Initiator initiator;
++                if (threadedConnector) {
++                    initiator = new ThreadedSocketInitiator(
++                            messageHandler,
++                            storeFactory,
++                            settings,
++                            logFactory,
++                            messageFactory);
++                } else {
++                    initiator = new SocketInitiator(
++                            messageHandler,
++                            storeFactory,
++                            settings,
++                            logFactory,
++                            messageFactory);
++                }
+ 
+                 initiator.start();
+                 initJMX(initiator, service.getName());
+@@ -511,6 +545,25 @@
+             log.error("Error while initializing JMX support for the service: " + service, e);
+         }
+     }
++
++    private boolean useThreadedConnector(AxisService service, boolean acceptor) {
++	    Parameter param = service.getParameter(FIXConstants.FIX_USE_THREADED_ACCEPTOR);
++        if (acceptor && param != null && JavaUtils.isTrueExplicitly(param.getValue())) {
++            return true;
++        }
++
++        param = service.getParameter(FIXConstants.FIX_USE_THREADED_INITIATOR);
++        if (!acceptor && param != null && JavaUtils.isTrueExplicitly(param.getValue())) {
++            return true;
++        }
++
++        param = service.getParameter(FIXConstants.FIX_USE_THREADED_CONNECTORS);
++        if (param != null && JavaUtils.isTrueExplicitly(param.getValue())) {
++            return true;
++        }
++
++        return false;
++    }
+ }
+ 
+ 
+Index: java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/FIXConstants.java
+===================================================================
+--- java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/FIXConstants.java	(revision 1226671)
++++ java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/FIXConstants.java	(revision 1226672)
+@@ -107,6 +107,14 @@
+     public static final String FIX_ACCEPTOR_EVENT_HANDLER = "transport.fix.AcceptorSessionEventHandler";
+     public static final String FIX_INITIATOR_EVENT_HANDLER = "transport.fix.InitiatorSessionEventHandler";
+ 
++    public static final String FIX_PROCESS_SINGLE_THREADED = "transport.fix.ProcessSingleThreaded";
++    public static final String FIX_ACCEPTOR_SINGLE_THREADED = "transport.fix.AcceptorSingleThreaded";
++    public static final String FIX_INITIATOR_SINGLE_THREADED = "transport.fix.InitiatorSingleThreaded";
++
++    public static final String FIX_USE_THREADED_CONNECTORS = "transport.fix.UseThreadedConnectors";
++    public static final String FIX_USE_THREADED_ACCEPTOR = "transport.fix.UseThreadedAcceptor";
++    public static final String FIX_USE_THREADED_INITIATOR = "transport.fix.UseThreadedInitiator";
++
+     //--------------------------- Message level properties -----------------------------------
+ 
+     public static final String FIX_IGNORE_ORDER = "transport.fix.IgnoreOrder";
 -*-*-*-
 Message: Some improvements and control over how threads are handled by the FIX transport
 -*-*-*-
 When: 2012-01-03 01:44:07 -0500 
+-*-*-*-
+Who: hiranya

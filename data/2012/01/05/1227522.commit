@@ -39,3 +39,5 @@ Index: java/modules/core/src/main/java/org/apache/synapse/util/MessageHelper.jav
 Message: Preserving the tracing state of the message when it's being cloned
 -*-*-*-
 When: 2012-01-05 03:10:36 -0500 
+-*-*-*-
+Who: hiranya

@@ -1,22 +1,3 @@
-Index: java/modules/core/pom.xml
-===================================================================
---- java/modules/core/pom.xml	(revision 1224921)
-+++ java/modules/core/pom.xml	(revision 1224922)
-@@ -231,11 +231,11 @@
-             <artifactId>synapse-vfs-transport</artifactId>
-             <scope>test</scope>
-         </dependency>
--	<dependency>
--	    <!-- Required for validate mediator tests on JDK 5 -->
-+	    <dependency>
-+	        <!-- Required for validate mediator tests on JDK 5 -->
-             <groupId>xerces</groupId>
-             <artifactId>xercesImpl</artifactId>
--	    <scope>test</scope>
-+	        <scope>test</scope>
-         </dependency>
-     </dependencies>
- </project>
 Index: java/pom.xml
 ===================================================================
 --- java/pom.xml	(revision 1224921)
@@ -91,7 +72,28 @@ Index: java/pom.xml
                  <configuration>
                      <!-- These features are disabled since they cause "mvn site" to hang -->
                      <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+Index: java/modules/core/pom.xml
+===================================================================
+--- java/modules/core/pom.xml	(revision 1224921)
++++ java/modules/core/pom.xml	(revision 1224922)
+@@ -231,11 +231,11 @@
+             <artifactId>synapse-vfs-transport</artifactId>
+             <scope>test</scope>
+         </dependency>
+-	<dependency>
+-	    <!-- Required for validate mediator tests on JDK 5 -->
++	    <dependency>
++	        <!-- Required for validate mediator tests on JDK 5 -->
+             <groupId>xerces</groupId>
+             <artifactId>xercesImpl</artifactId>
+-	    <scope>test</scope>
++	        <scope>test</scope>
+         </dependency>
+     </dependencies>
+ </project>
 -*-*-*-
 Message: Modifying javadoc plugin configuration to prevent the effects of http://jira.codehaus.org/browse/MJAVADOC-276
 -*-*-*-
 When: 2011-12-27 10:03:22 -0500 
+-*-*-*-
+Who: hiranya

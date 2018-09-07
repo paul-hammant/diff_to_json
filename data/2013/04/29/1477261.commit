@@ -16,3 +16,5 @@ Message: Fixed build problems (with Maven != 3.0.4) caused by broken third party
 
 -*-*-*-
 When: 2013-04-29 14:35:25 -0400 
+-*-*-*-
+Who: veithen

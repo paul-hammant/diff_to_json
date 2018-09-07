@@ -16,3 +16,5 @@ Index: java/modules/samples/services/MTOMSwASampleService/conf/services.xml
 Message: Ensure that the correct message receiver is used for oneWayUploadUsingMTOM.
 -*-*-*-
 When: 2012-09-17 15:03:07 -0400 
+-*-*-*-
+Who: veithen

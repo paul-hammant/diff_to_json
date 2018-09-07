@@ -346,3 +346,5 @@ Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/ProxyServic
 Message: Fixing some issues with REST mediation
 -*-*-*-
 When: 2011-12-05 08:18:45 -0500 
+-*-*-*-
+Who: hiranya

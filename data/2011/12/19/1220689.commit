@@ -1,3 +1,16 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/JmxAdapter.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/JmxAdapter.java	(revision 1220688)
++++ java/modules/core/src/main/java/org/apache/synapse/JmxAdapter.java	(revision 1220689)
+@@ -223,8 +223,6 @@
+             if (jmxInformation.getRemoteAccessFile() != null) {
+                 env.put("jmx.remote.x.access.file", jmxInformation.getRemoteAccessFile());
+             }
+-        } else {
+-            log.warn("Using unsecured JMX remote access!");
+         }
+ 
+         if (jmxInformation.isRemoteSSL()) {
 Index: java/modules/distribution/pom.xml
 ===================================================================
 --- java/modules/distribution/pom.xml	(revision 1220688)
@@ -20,20 +33,9 @@ Index: java/modules/distribution/pom.xml
              <groupId>org.apache.axis2</groupId>
              <artifactId>addressing</artifactId>
              <version>${addressing.version}</version>
-Index: java/modules/core/src/main/java/org/apache/synapse/JmxAdapter.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/JmxAdapter.java	(revision 1220688)
-+++ java/modules/core/src/main/java/org/apache/synapse/JmxAdapter.java	(revision 1220689)
-@@ -223,8 +223,6 @@
-             if (jmxInformation.getRemoteAccessFile() != null) {
-                 env.put("jmx.remote.x.access.file", jmxInformation.getRemoteAccessFile());
-             }
--        } else {
--            log.warn("Using unsecured JMX remote access!");
-         }
- 
-         if (jmxInformation.isRemoteSSL()) {
 -*-*-*-
 Message: Fixing SYNAPSE-585 and removing an unnecessary warning
 -*-*-*-
 When: 2011-12-19 06:18:09 -0500 
+-*-*-*-
+Who: hiranya

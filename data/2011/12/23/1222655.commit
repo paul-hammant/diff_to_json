@@ -11,6 +11,28 @@ Index: java/src/site/xdoc/Synapse_Samples.xml
  
          <p>
          Condition III : Complex conditions with AND, OR and NOT<br/>
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/EnqueueMediatorFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/EnqueueMediatorFactory.java	(revision 1222654)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/EnqueueMediatorFactory.java	(revision 1222655)
+@@ -43,7 +43,7 @@
+         if (seqAtt != null && !"".equals(seqAtt.getAttributeValue())) {
+             mediator.setSequenceName(seqAtt.getAttributeValue());
+         } else {
+-            handleException("sequence is a required attribue");
++            handleException("sequence is a required attribute");
+         }
+ 
+         OMAttribute priorityAtt = elem.getAttribute(PRIORITY_ATT);
+@@ -55,7 +55,7 @@
+         if (queueAtt != null && !"".equals(queueAtt.getAttributeValue())) {
+             mediator.setExecutorName(queueAtt.getAttributeValue());
+         } else {
+-            handleException("Queue is a required attribue");
++            handleException("Queue is a required attribute");
+         }
+ 
+         return mediator;
 Index: java/modules/extensions/src/main/java/org/apache/synapse/mediators/throttle/ThrottleMediator.java
 ===================================================================
 --- java/modules/extensions/src/main/java/org/apache/synapse/mediators/throttle/ThrottleMediator.java	(revision 1222654)
@@ -63,28 +85,6 @@ Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framewo
              log.info("Derby is successfully started.");
  
          } catch (Exception e) {
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/EnqueueMediatorFactory.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/EnqueueMediatorFactory.java	(revision 1222654)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/EnqueueMediatorFactory.java	(revision 1222655)
-@@ -43,7 +43,7 @@
-         if (seqAtt != null && !"".equals(seqAtt.getAttributeValue())) {
-             mediator.setSequenceName(seqAtt.getAttributeValue());
-         } else {
--            handleException("sequence is a required attribue");
-+            handleException("sequence is a required attribute");
-         }
- 
-         OMAttribute priorityAtt = elem.getAttribute(PRIORITY_ATT);
-@@ -55,7 +55,7 @@
-         if (queueAtt != null && !"".equals(queueAtt.getAttributeValue())) {
-             mediator.setExecutorName(queueAtt.getAttributeValue());
-         } else {
--            handleException("Queue is a required attribue");
-+            handleException("Queue is a required attribute");
-         }
- 
-         return mediator;
 Index: java/pom.xml
 ===================================================================
 --- java/pom.xml	(revision 1222654)
@@ -102,3 +102,5 @@ Index: java/pom.xml
 Message: Upgrading throttle version used - SYNAPSE-788
 -*-*-*-
 When: 2011-12-23 07:18:52 -0500 
+-*-*-*-
+Who: hiranya

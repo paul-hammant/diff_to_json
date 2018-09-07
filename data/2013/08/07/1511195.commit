@@ -1,0 +1,255 @@
+Index: java/modules/core/src/test/java/org/apache/synapse/config/xml/templates/TemplateSerializationTest.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/config/xml/templates/TemplateSerializationTest.java	(nonexistent)
++++ java/modules/core/src/test/java/org/apache/synapse/config/xml/templates/TemplateSerializationTest.java	(revision 1511195)
+@@ -0,0 +1,98 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.config.xml.templates;
++
++import org.apache.axiom.om.OMElement;
++import org.apache.synapse.config.xml.AbstractTestCase;
++import org.apache.synapse.config.xml.TemplateMediatorSerializer;
++import org.apache.synapse.config.xml.XMLToTemplateMapper;
++import org.apache.synapse.config.xml.endpoints.TemplateSerializer;
++import org.apache.synapse.endpoints.Template;
++import org.apache.synapse.mediators.template.TemplateMediator;
++
++public class TemplateSerializationTest extends AbstractTestCase {
++
++    public void testEndpointTemplateScenarioOne() throws Exception {
++        String inputXML = "<template name=\"t1\" xmlns=\"http://ws.apache.org/ns/synapse\">" +
++                "<parameter name=\"name\"/><parameter name=\"uri\"/><endpoint/>" +
++                "</template>" ;
++
++        OMElement inputElement = createOMElement(inputXML);
++        XMLToTemplateMapper mapper = new XMLToTemplateMapper();
++        Template template = (Template) mapper.getObjectFromOMNode(inputElement, null);
++
++        OMElement serializedOut = new TemplateSerializer().serializeEndpointTemplate(template, null);
++        assertTrue(compare(serializedOut, inputElement));
++    }
++
++    public void testEndpointTemplateScenarioTwo() throws Exception {
++        String inputXML = "<template name=\"t1\" xmlns=\"http://ws.apache.org/ns/synapse\">" +
++                "<parameter name=\"name\"/><parameter name=\"uri\"/>" +
++                "<endpoint><timeout><duration>10000</duration></timeout></endpoint>" +
++                "</template>" ;
++
++        OMElement inputElement = createOMElement(inputXML);
++        XMLToTemplateMapper mapper = new XMLToTemplateMapper();
++        Template template = (Template) mapper.getObjectFromOMNode(inputElement, null);
++
++        OMElement serializedOut = new TemplateSerializer().serializeEndpointTemplate(template, null);
++        assertTrue(compare(serializedOut,inputElement));
++    }
++
++    public void testSequenceTemplateScenarioOne() throws Exception {
++        String inputXML = "<template name=\"t2\" xmlns=\"http://ws.apache.org/ns/synapse\">" +
++                "<sequence/>" +
++                "</template>" ;
++
++        OMElement inputElement = createOMElement(inputXML);
++        XMLToTemplateMapper mapper = new XMLToTemplateMapper();
++        TemplateMediator template = (TemplateMediator) mapper.getObjectFromOMNode(inputElement, null);
++
++        OMElement serializedOut = new TemplateMediatorSerializer().serializeMediator(null, template);
++        assertTrue(compare(serializedOut,inputElement));
++    }
++
++    public void testSequenceTemplateScenarioTwo() throws Exception {
++        String inputXML = "<template name=\"t2\" xmlns=\"http://ws.apache.org/ns/synapse\">" +
++                "<sequence><log/><drop/></sequence>" +
++                "</template>" ;
++
++        OMElement inputElement = createOMElement(inputXML);
++        XMLToTemplateMapper mapper = new XMLToTemplateMapper();
++        TemplateMediator template = (TemplateMediator) mapper.getObjectFromOMNode(inputElement, null);
++
++        OMElement serializedOut = new TemplateMediatorSerializer().serializeMediator(null, template);
++        assertTrue(compare(serializedOut,inputElement));
++    }
++
++    public void testSequenceTemplateScenarioThree() throws Exception {
++        String inputXML = "<template name=\"t2\" xmlns=\"http://ws.apache.org/ns/synapse\">" +
++                "<parameter name=\"foo\"/><parameter name=\"bar\"/>" +
++                "<sequence><log/><drop/></sequence>" +
++                "</template>" ;
++
++        OMElement inputElement = createOMElement(inputXML);
++        XMLToTemplateMapper mapper = new XMLToTemplateMapper();
++        TemplateMediator template = (TemplateMediator) mapper.getObjectFromOMNode(inputElement, null);
++
++        OMElement serializedOut = new TemplateMediatorSerializer().serializeMediator(null, template);
++        assertTrue(compare(serializedOut,inputElement));
++    }
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateMediatorFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateMediatorFactory.java	(revision 1511194)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateMediatorFactory.java	(revision 1511195)
+@@ -16,6 +16,7 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.config.xml;
+ 
+ import org.apache.axiom.om.OMAttribute;
+@@ -22,14 +23,11 @@
+ import org.apache.axiom.om.OMElement;
+ import org.apache.synapse.Mediator;
+ import org.apache.synapse.SynapseException;
+-import org.apache.synapse.mediators.TemplateParameter;
+ import org.apache.synapse.mediators.template.TemplateMediator;
+ 
+ import javax.xml.namespace.QName;
+-import java.util.ArrayList;
+-import java.util.Collection;
+-import java.util.Iterator;
+ import java.util.Properties;
++
+ /**
+  * Factory class for Template configuration as follows
+  * <template name="simple_func">
+@@ -39,6 +37,7 @@
+     </template>
+  */
+ public class TemplateMediatorFactory extends AbstractListMediatorFactory {
++
+     private static final QName TEMPLATE_Q
+             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "template");
+     private static final QName TEMPLATE_BODY_Q
+@@ -55,7 +54,7 @@
+             OMElement templateBodyElem = elem.getFirstChildWithName(TEMPLATE_BODY_Q);
+             addChildren(templateBodyElem, templateTemplateMediator, properties);
+         } else {
+-            String msg = "A EIP template should be a named mediator .";
++            String msg = "An EIP template must be a named mediator .";
+             log.error(msg);
+             throw new SynapseException(msg);
+         }
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateParameterSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateParameterSerializer.java	(revision 1511194)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateParameterSerializer.java	(revision 1511195)
+@@ -61,7 +61,7 @@
+      */
+     public static void serializeTemplateParameters(OMElement parent,
+                                                Collection<TemplateParameter> params) {
+-            serializeTemplateParameters(parent, params, PARAMETER_Q);
++        serializeTemplateParameters(parent, params, PARAMETER_Q);
+     }
+ 
+     /**
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/TemplateFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/TemplateFactory.java	(revision 1511194)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/TemplateFactory.java	(revision 1511195)
+@@ -33,6 +33,7 @@
+ import java.util.Properties;
+ 
+ public class TemplateFactory {
++
+     public static final Log log = LogFactory.getLog(TemplateFactory.class);
+ 
+     public Template createEndpointTemplate(OMElement element, Properties properties) {
+@@ -53,15 +54,11 @@
+                 new QName(SynapseConstants.SYNAPSE_NAMESPACE, "parameter"));
+         while (paramItr.hasNext()) {
+             OMElement paramElement = (OMElement) paramItr.next();
+-
+             OMAttribute paramName = paramElement.getAttribute(new QName("name"));
+-
+             if (paramName == null) {
+                 handleException("parameter name should be present");
+             }
+-
+             assert paramName != null;
+-
+             template.addParameter(paramName.getAttributeValue().trim());
+         }
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/TemplateSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/TemplateSerializer.java	(revision 1511194)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/TemplateSerializer.java	(revision 1511195)
+@@ -45,9 +45,8 @@
+ 
+         List<String> parameters = template.getParameters();
+         for (String entry : parameters) {
+-            OMElement paramElement = fac.createOMElement(
+-                    new QName(SynapseConstants.SYNAPSE_NAMESPACE, "parameter"));
+-
++            OMElement paramElement = fac.createOMElement("parameter",
++                    SynapseConstants.SYNAPSE_OMNAMESPACE);
+             paramElement.addAttribute(fac.createOMAttribute("name", nullNS, entry));
+             templateElement.addChild(paramElement);
+         }
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateMediatorSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateMediatorSerializer.java	(revision 1511194)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateMediatorSerializer.java	(revision 1511195)
+@@ -39,6 +39,7 @@
+     protected OMElement serializeSpecificMediator(Mediator m) {
+         if (!(m instanceof TemplateMediator)) {
+             handleException("Unsupported mediator passed in for serialization : " + m.getType());
++            return null;
+         }
+ 
+         TemplateMediator mediator = (TemplateMediator) m;
+@@ -45,8 +46,7 @@
+         OMElement templateElem = fac.createOMElement("template", synNS);
+ 
+         if (mediator.getName() != null) {
+-            templateElem.addAttribute(fac.createOMAttribute(
+-                    "name", nullNS, mediator.getName()));
++            templateElem.addAttribute(fac.createOMAttribute("name", nullNS, mediator.getName()));
+             //serialize parameters
+             serializeParams(templateElem,mediator);
+             serializeBody(templateElem, mediator.getList());
+@@ -65,7 +65,7 @@
+     private void serializeParams(OMElement templateElem, TemplateMediator mediator) {
+         Collection<TemplateParameter> params = mediator.getParameters();
+         if (params != null && params.size() > 0) {
+-               TemplateParameterSerializer.serializeTemplateParameters(templateElem,mediator.getParameters());
++            TemplateParameterSerializer.serializeTemplateParameters(templateElem,mediator.getParameters());
+         }
+     }
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/template/TemplateMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/template/TemplateMediator.java	(revision 1511194)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/template/TemplateMediator.java	(revision 1511195)
+@@ -42,7 +42,7 @@
+ 
+     private String eipPatternName;
+     private String fileName;
+-    /** flag to ensure that each and every sequence is initialized and destroyed atmost once */
++    /** flag to ensure that each and every sequence is initialized and destroyed at most once */
+     private boolean initialized = false;
+ 
+     public void setParameters(Collection<TemplateParameter> paramNames) {
+-*-*-*-
+Message: Added template serialization test cases
+-*-*-*-
+When: 2013-08-07 03:02:38 -0400 
+-*-*-*-
+Who: hiranya

@@ -1,15 +1,3 @@
-Index: java/repository/conf/sample/synapse_sample_50.xml
-===================================================================
---- java/repository/conf/sample/synapse_sample_50.xml	(revision 1388960)
-+++ java/repository/conf/sample/synapse_sample_50.xml	(revision 1388961)
-@@ -23,6 +23,7 @@
- 
-     <sequence name="main">
-         <!-- filtering of messages with XPath and regex matches -->
-+        <header name="Action" value="urn:getQuote"/>
-         <filter source="get-property('To')" regex=".*/StockQuote.*">
-             <then>
-                 <send>
 Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample50.xml
 ===================================================================
 --- java/modules/documentation/src/site/xdoc/userguide/samples/sample50.xml	(revision 1388960)
@@ -22,19 +10,6 @@ Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample50.xml
          &lt;filter source="get-property('To')" regex=".*/StockQuote.*"&gt;
              &lt;then&gt;
                  &lt;send&gt;
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Axis2HttpRequest.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Axis2HttpRequest.java	(revision 1388960)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Axis2HttpRequest.java	(revision 1388961)
-@@ -253,7 +253,7 @@
-         }
- 
-         if (msgContext.isSOAP11() && soapAction != null &&
--                soapAction.length() > 0) {
-+                soapAction.length() >= 0) {
-             Header existingHeader =
-                     httpRequest.getFirstHeader(HTTPConstants.HEADER_SOAP_ACTION);
-             if (existingHeader != null) {
 Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/util/MessageFormatterDecoratorFactory.java
 ===================================================================
 --- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/util/MessageFormatterDecoratorFactory.java	(revision 1388960)
@@ -57,6 +32,19 @@ Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/trans
  
              Object o = msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
              if (o != null && o instanceof Map) {
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Axis2HttpRequest.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Axis2HttpRequest.java	(revision 1388960)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Axis2HttpRequest.java	(revision 1388961)
+@@ -253,7 +253,7 @@
+         }
+ 
+         if (msgContext.isSOAP11() && soapAction != null &&
+-                soapAction.length() > 0) {
++                soapAction.length() >= 0) {
+             Header existingHeader =
+                     httpRequest.getFirstHeader(HTTPConstants.HEADER_SOAP_ACTION);
+             if (existingHeader != null) {
 Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java
 ===================================================================
 --- java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java	(revision 1388960)
@@ -79,8 +67,22 @@ Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transpo
          OMOutputFormat format = BaseUtils.getOMOutputFormat(msgContext);
          
          try {
+Index: java/repository/conf/sample/synapse_sample_50.xml
+===================================================================
+--- java/repository/conf/sample/synapse_sample_50.xml	(revision 1388960)
++++ java/repository/conf/sample/synapse_sample_50.xml	(revision 1388961)
+@@ -23,6 +23,7 @@
+ 
+     <sequence name="main">
+         <!-- filtering of messages with XPath and regex matches -->
++        <header name="Action" value="urn:getQuote"/>
+         <filter source="get-property('To')" regex=".*/StockQuote.*">
+             <then>
+                 <send>
 -*-*-*-
 Message: Applied Sagara's patches for SYNAPSE-910 and SYNAPSE-912 to make Synapse compatible with the latest Axis2 trunk.
 
 -*-*-*-
 When: 2012-09-23 03:05:54 -0400 
+-*-*-*-
+Who: veithen

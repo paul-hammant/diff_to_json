@@ -1,201 +1,3 @@
-Index: java/modules/integration/src/test/resources/sample155.xml
-===================================================================
---- java/modules/integration/src/test/resources/sample155.xml	(nonexistent)
-+++ java/modules/integration/src/test/resources/sample155.xml	(revision 1214233)
-@@ -0,0 +1,18 @@
-+<synapseSample>
-+    <sampleID>155</sampleID>
-+    <sampleName>Dual channel invocation on both client side and serverside of Synapse with Proxy Services</sampleName>
-+    <synapseConfig>
-+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
-+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
-+        <synapseXml>repository/conf/sample/synapse_sample_155.xml</synapseXml>
-+    </synapseConfig>
-+    <backEndServerConfig>
-+        <axis2Server id='0'>
-+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
-+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
-+        </axis2Server>
-+    </backEndServerConfig>
-+    <clientConfig>
-+	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
-+    </clientConfig>
-+</synapseSample>
-Index: java/modules/integration/src/test/resources/sample156.xml
-===================================================================
---- java/modules/integration/src/test/resources/sample156.xml	(nonexistent)
-+++ java/modules/integration/src/test/resources/sample156.xml	(revision 1214233)
-@@ -0,0 +1,18 @@
-+<synapseSample>
-+    <sampleID>156</sampleID>
-+    <sampleName>Service Integration with specifying the receiving sequence</sampleName>
-+    <synapseConfig>
-+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
-+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
-+        <synapseXml>repository/conf/sample/synapse_sample_156.xml</synapseXml>
-+    </synapseConfig>
-+    <backEndServerConfig>
-+        <axis2Server id='0'>
-+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
-+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
-+        </axis2Server>
-+    </backEndServerConfig>
-+    <clientConfig>
-+	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
-+    </clientConfig>
-+</synapseSample>
-Index: java/modules/integration/src/test/resources/sample157.xml
-===================================================================
---- java/modules/integration/src/test/resources/sample157.xml	(nonexistent)
-+++ java/modules/integration/src/test/resources/sample157.xml	(revision 1214233)
-@@ -0,0 +1,18 @@
-+<synapseSample>
-+    <sampleID>157</sampleID>
-+    <sampleName>Conditional Router for Routing Messages based on HTTP URL, HTTP Headers and Query Parameters</sampleName>
-+    <synapseConfig>
-+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
-+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
-+        <synapseXml>repository/conf/sample/synapse_sample_157.xml</synapseXml>
-+    </synapseConfig>
-+    <backEndServerConfig>
-+        <axis2Server id='0'>
-+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
-+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
-+        </axis2Server>
-+    </backEndServerConfig>
-+    <clientConfig>
-+	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
-+    </clientConfig>
-+</synapseSample>
-Index: java/modules/integration/src/test/resources/sample150.xml
-===================================================================
---- java/modules/integration/src/test/resources/sample150.xml	(nonexistent)
-+++ java/modules/integration/src/test/resources/sample150.xml	(revision 1214233)
-@@ -0,0 +1,18 @@
-+<synapseSample>
-+    <sampleID>150</sampleID>
-+    <sampleName>Introduction to proxy services</sampleName>
-+    <synapseConfig>
-+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
-+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
-+        <synapseXml>repository/conf/sample/synapse_sample_150.xml</synapseXml>
-+    </synapseConfig>
-+    <backEndServerConfig>
-+        <axis2Server id='0'>
-+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
-+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
-+        </axis2Server>
-+    </backEndServerConfig>
-+    <clientConfig>
-+	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
-+    </clientConfig>
-+</synapseSample>
-Index: java/modules/integration/src/test/resources/sample151.xml
-===================================================================
---- java/modules/integration/src/test/resources/sample151.xml	(nonexistent)
-+++ java/modules/integration/src/test/resources/sample151.xml	(revision 1214233)
-@@ -0,0 +1,18 @@
-+<synapseSample>
-+    <sampleID>151</sampleID>
-+    <sampleName>Custom sequences and endpoints with proxy services</sampleName>
-+    <synapseConfig>
-+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
-+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
-+        <synapseXml>repository/conf/sample/synapse_sample_151.xml</synapseXml>
-+    </synapseConfig>
-+    <backEndServerConfig>
-+        <axis2Server id='0'>
-+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
-+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
-+        </axis2Server>
-+    </backEndServerConfig>
-+    <clientConfig>
-+	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
-+    </clientConfig>
-+</synapseSample>
-Index: java/modules/integration/src/test/resources/sample152.xml
-===================================================================
---- java/modules/integration/src/test/resources/sample152.xml	(nonexistent)
-+++ java/modules/integration/src/test/resources/sample152.xml	(revision 1214233)
-@@ -0,0 +1,18 @@
-+<synapseSample>
-+    <sampleID>152</sampleID>
-+    <sampleName>Switching transports and message format from SOAP to REST/POX</sampleName>
-+    <synapseConfig>
-+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
-+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
-+        <synapseXml>repository/conf/sample/synapse_sample_152.xml</synapseXml>
-+    </synapseConfig>
-+    <backEndServerConfig>
-+        <axis2Server id='0'>
-+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
-+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
-+        </axis2Server>
-+    </backEndServerConfig>
-+    <clientConfig>
-+	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
-+    </clientConfig>
-+</synapseSample>
-Index: java/modules/integration/src/test/resources/sample153.xml
-===================================================================
---- java/modules/integration/src/test/resources/sample153.xml	(nonexistent)
-+++ java/modules/integration/src/test/resources/sample153.xml	(revision 1214233)
-@@ -0,0 +1,18 @@
-+<synapseSample>
-+    <sampleID>153</sampleID>
-+    <sampleName>Routing the messages arrived to a proxy service without processing the security headers</sampleName>
-+    <synapseConfig>
-+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
-+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
-+        <synapseXml>repository/conf/sample/synapse_sample_153.xml</synapseXml>
-+    </synapseConfig>
-+    <backEndServerConfig>
-+        <axis2Server id='0'>
-+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
-+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
-+        </axis2Server>
-+    </backEndServerConfig>
-+    <clientConfig>
-+	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
-+    </clientConfig>
-+</synapseSample>
-Index: java/modules/integration/src/test/resources/sample154.xml
-===================================================================
---- java/modules/integration/src/test/resources/sample154.xml	(nonexistent)
-+++ java/modules/integration/src/test/resources/sample154.xml	(revision 1214233)
-@@ -0,0 +1,32 @@
-+<synapseSample>
-+    <sampleID>154</sampleID>
-+    <sampleName>Load Balancing with Proxy Services</sampleName>
-+    <synapseConfig>
-+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
-+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
-+        <synapseXml>repository/conf/sample/synapse_sample_154.xml</synapseXml>
-+    </synapseConfig>
-+    <backEndServerConfig>
-+        <axis2Server id='1'>
-+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
-+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
-+	    <httpPort>9001</httpPort>
-+	    <httpsPort>9005</httpsPort>
-+        </axis2Server>
-+        <axis2Server id='2'>
-+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
-+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
-+	    <httpPort>9002</httpPort>
-+	    <httpsPort>9006</httpsPort>
-+        </axis2Server>
-+        <axis2Server id='3'>
-+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
-+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
-+	    <httpPort>9003</httpPort>
-+	    <httpsPort>9007</httpsPort>
-+        </axis2Server>
-+    </backEndServerConfig>
-+    <clientConfig>
-+	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
-+    </clientConfig>
-+</synapseSample>
 Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
 ===================================================================
 --- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1214232)
@@ -234,6 +36,167 @@ Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framewo
      }
  }
 \ No newline at end of file
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample150.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample150.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample150.java	(revision 1214233)
+@@ -0,0 +1,46 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++package org.apache.synapse.samples.framework.tests.proxy;
++
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.samples.framework.SampleClientResult;
++import org.apache.synapse.samples.framework.SynapseTestCase;
++import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
++
++public class Sample150 extends SynapseTestCase {
++
++    private static final Log log = LogFactory.getLog(Sample150.class);
++
++    private StockQuoteSampleClient client;
++
++    public Sample150() {
++        super(150);
++        client = getStockQuoteClient();
++    }
++
++
++    public void testBasicProxy() {
++        String addUrl = "http://localhost:8280/services/StockQuoteProxy";
++        log.info("Running test: Introduction to proxy services");
++        SampleClientResult result = client.requestStandardQuote(addUrl, null, null, "IBM" ,null);
++        assertTrue("Client did not get run successfully ", result.responseReceived());
++    }
++
++}
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample151.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample151.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample151.java	(revision 1214233)
+@@ -0,0 +1,50 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++package org.apache.synapse.samples.framework.tests.proxy;
++
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.samples.framework.SampleClientResult;
++import org.apache.synapse.samples.framework.SynapseTestCase;
++import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
++
++public class Sample151 extends SynapseTestCase {
++
++    private static final Log log = LogFactory.getLog(Sample151.class);
++
++    private StockQuoteSampleClient client;
++
++    public Sample151() {
++        super(151);
++        client = getStockQuoteClient();
++    }
++
++
++    public void testCustomSequencesEndpointsWithProxy() {
++        String addUrl = "http://localhost:8280/services/StockQuoteProxy1";
++        String addUrl2 = "http://localhost:8280/services/StockQuoteProxy2";
++
++        log.info("Running test: Custom sequences and endpoints with proxy services");
++        SampleClientResult result1 = client.requestStandardQuote(addUrl, null, null, "IBM" ,null);
++        assertTrue("Client did not get run successfully ", result1.responseReceived());
++        SampleClientResult result2 = client.requestStandardQuote(addUrl2, null, null, "IBM" ,null);
++        assertTrue("Client did not get run successfully ", result2.responseReceived());
++    }
++
++}
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample152.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample152.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample152.java	(revision 1214233)
+@@ -0,0 +1,50 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++package org.apache.synapse.samples.framework.tests.proxy;
++
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.samples.framework.SampleClientResult;
++import org.apache.synapse.samples.framework.SynapseTestCase;
++import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
++
++public class Sample152 extends SynapseTestCase {
++
++    private static final Log log = LogFactory.getLog(Sample152.class);
++
++    private StockQuoteSampleClient client;
++
++    public Sample152() {
++        super(152);
++        client = getStockQuoteClient();
++    }
++
++
++    public void testTransportAndFormatSwitching() {
++        String url2 = "https://localhost:8243/services/StockQuoteProxy";
++        System.setProperty("javax.net.ssl.trustStore", System.getProperty("user.dir") +
++                "/modules/integration/src/test/resources/trust.jks");
++
++        log.info("Running test: Switching transports and message format from SOAP to REST/POX");
++
++        SampleClientResult result2 = client.requestStandardQuote(null, url2, null, "IBM" ,null);
++        assertTrue("Client did not a response with https ", result2.responseReceived());
++    }
++
++}
 Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample153.java
 ===================================================================
 --- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample153.java	(nonexistent)
@@ -600,167 +563,204 @@ Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framewo
 +    }
 +
 +}
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample150.java
+Index: java/modules/integration/src/test/resources/sample150.xml
 ===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample150.java	(nonexistent)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample150.java	(revision 1214233)
-@@ -0,0 +1,46 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+package org.apache.synapse.samples.framework.tests.proxy;
-+
-+import org.apache.commons.logging.Log;
-+import org.apache.commons.logging.LogFactory;
-+import org.apache.synapse.samples.framework.SampleClientResult;
-+import org.apache.synapse.samples.framework.SynapseTestCase;
-+import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
-+
-+public class Sample150 extends SynapseTestCase {
-+
-+    private static final Log log = LogFactory.getLog(Sample150.class);
-+
-+    private StockQuoteSampleClient client;
-+
-+    public Sample150() {
-+        super(150);
-+        client = getStockQuoteClient();
-+    }
-+
-+
-+    public void testBasicProxy() {
-+        String addUrl = "http://localhost:8280/services/StockQuoteProxy";
-+        log.info("Running test: Introduction to proxy services");
-+        SampleClientResult result = client.requestStandardQuote(addUrl, null, null, "IBM" ,null);
-+        assertTrue("Client did not get run successfully ", result.responseReceived());
-+    }
-+
-+}
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample151.java
+--- java/modules/integration/src/test/resources/sample150.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample150.xml	(revision 1214233)
+@@ -0,0 +1,18 @@
++<synapseSample>
++    <sampleID>150</sampleID>
++    <sampleName>Introduction to proxy services</sampleName>
++    <synapseConfig>
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>repository/conf/sample/synapse_sample_150.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+Index: java/modules/integration/src/test/resources/sample151.xml
 ===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample151.java	(nonexistent)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample151.java	(revision 1214233)
-@@ -0,0 +1,50 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+package org.apache.synapse.samples.framework.tests.proxy;
-+
-+import org.apache.commons.logging.Log;
-+import org.apache.commons.logging.LogFactory;
-+import org.apache.synapse.samples.framework.SampleClientResult;
-+import org.apache.synapse.samples.framework.SynapseTestCase;
-+import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
-+
-+public class Sample151 extends SynapseTestCase {
-+
-+    private static final Log log = LogFactory.getLog(Sample151.class);
-+
-+    private StockQuoteSampleClient client;
-+
-+    public Sample151() {
-+        super(151);
-+        client = getStockQuoteClient();
-+    }
-+
-+
-+    public void testCustomSequencesEndpointsWithProxy() {
-+        String addUrl = "http://localhost:8280/services/StockQuoteProxy1";
-+        String addUrl2 = "http://localhost:8280/services/StockQuoteProxy2";
-+
-+        log.info("Running test: Custom sequences and endpoints with proxy services");
-+        SampleClientResult result1 = client.requestStandardQuote(addUrl, null, null, "IBM" ,null);
-+        assertTrue("Client did not get run successfully ", result1.responseReceived());
-+        SampleClientResult result2 = client.requestStandardQuote(addUrl2, null, null, "IBM" ,null);
-+        assertTrue("Client did not get run successfully ", result2.responseReceived());
-+    }
-+
-+}
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample152.java
+--- java/modules/integration/src/test/resources/sample151.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample151.xml	(revision 1214233)
+@@ -0,0 +1,18 @@
++<synapseSample>
++    <sampleID>151</sampleID>
++    <sampleName>Custom sequences and endpoints with proxy services</sampleName>
++    <synapseConfig>
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>repository/conf/sample/synapse_sample_151.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+Index: java/modules/integration/src/test/resources/sample152.xml
 ===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample152.java	(nonexistent)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample152.java	(revision 1214233)
-@@ -0,0 +1,50 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+package org.apache.synapse.samples.framework.tests.proxy;
-+
-+import org.apache.commons.logging.Log;
-+import org.apache.commons.logging.LogFactory;
-+import org.apache.synapse.samples.framework.SampleClientResult;
-+import org.apache.synapse.samples.framework.SynapseTestCase;
-+import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
-+
-+public class Sample152 extends SynapseTestCase {
-+
-+    private static final Log log = LogFactory.getLog(Sample152.class);
-+
-+    private StockQuoteSampleClient client;
-+
-+    public Sample152() {
-+        super(152);
-+        client = getStockQuoteClient();
-+    }
-+
-+
-+    public void testTransportAndFormatSwitching() {
-+        String url2 = "https://localhost:8243/services/StockQuoteProxy";
-+        System.setProperty("javax.net.ssl.trustStore", System.getProperty("user.dir") +
-+                "/modules/integration/src/test/resources/trust.jks");
-+
-+        log.info("Running test: Switching transports and message format from SOAP to REST/POX");
-+
-+        SampleClientResult result2 = client.requestStandardQuote(null, url2, null, "IBM" ,null);
-+        assertTrue("Client did not a response with https ", result2.responseReceived());
-+    }
-+
-+}
+--- java/modules/integration/src/test/resources/sample152.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample152.xml	(revision 1214233)
+@@ -0,0 +1,18 @@
++<synapseSample>
++    <sampleID>152</sampleID>
++    <sampleName>Switching transports and message format from SOAP to REST/POX</sampleName>
++    <synapseConfig>
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>repository/conf/sample/synapse_sample_152.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+Index: java/modules/integration/src/test/resources/sample153.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample153.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample153.xml	(revision 1214233)
+@@ -0,0 +1,18 @@
++<synapseSample>
++    <sampleID>153</sampleID>
++    <sampleName>Routing the messages arrived to a proxy service without processing the security headers</sampleName>
++    <synapseConfig>
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>repository/conf/sample/synapse_sample_153.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+Index: java/modules/integration/src/test/resources/sample154.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample154.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample154.xml	(revision 1214233)
+@@ -0,0 +1,32 @@
++<synapseSample>
++    <sampleID>154</sampleID>
++    <sampleName>Load Balancing with Proxy Services</sampleName>
++    <synapseConfig>
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>repository/conf/sample/synapse_sample_154.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='1'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++	    <httpPort>9001</httpPort>
++	    <httpsPort>9005</httpsPort>
++        </axis2Server>
++        <axis2Server id='2'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++	    <httpPort>9002</httpPort>
++	    <httpsPort>9006</httpsPort>
++        </axis2Server>
++        <axis2Server id='3'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++	    <httpPort>9003</httpPort>
++	    <httpsPort>9007</httpsPort>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+Index: java/modules/integration/src/test/resources/sample155.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample155.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample155.xml	(revision 1214233)
+@@ -0,0 +1,18 @@
++<synapseSample>
++    <sampleID>155</sampleID>
++    <sampleName>Dual channel invocation on both client side and serverside of Synapse with Proxy Services</sampleName>
++    <synapseConfig>
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>repository/conf/sample/synapse_sample_155.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+Index: java/modules/integration/src/test/resources/sample156.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample156.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample156.xml	(revision 1214233)
+@@ -0,0 +1,18 @@
++<synapseSample>
++    <sampleID>156</sampleID>
++    <sampleName>Service Integration with specifying the receiving sequence</sampleName>
++    <synapseConfig>
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>repository/conf/sample/synapse_sample_156.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+Index: java/modules/integration/src/test/resources/sample157.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample157.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample157.xml	(revision 1214233)
+@@ -0,0 +1,18 @@
++<synapseSample>
++    <sampleID>157</sampleID>
++    <sampleName>Conditional Router for Routing Messages based on HTTP URL, HTTP Headers and Query Parameters</sampleName>
++    <synapseConfig>
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>repository/conf/sample/synapse_sample_157.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
 Index: java/modules/integration/pom.xml
 ===================================================================
 --- java/modules/integration/pom.xml	(revision 1214232)
@@ -1020,3 +1020,5 @@ Index: java/modules/integration/pom.xml
 Message: Adding proxy service tests
 -*-*-*-
 When: 2011-12-14 08:24:09 -0500 
+-*-*-*-
+Who: hiranya

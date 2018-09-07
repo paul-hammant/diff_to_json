@@ -16,3 +16,5 @@ Index: java/modules/core/src/main/java/org/apache/synapse/mediators/store/Messag
 Message: applying the patchfor SYNAPSE-804
 -*-*-*-
 When: 2011-11-30 08:46:04 -0500 
+-*-*-*-
+Who: charith

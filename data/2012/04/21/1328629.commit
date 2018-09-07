@@ -61,3 +61,5 @@ Index: java/modules/core/src/test/java/org/apache/synapse/registry/url/SimpleURL
 Message: Fixed an invalid test case that was making unfounded assumptions about how empty elements are serialized.
 -*-*-*-
 When: 2012-04-21 06:21:20 -0400 
+-*-*-*-
+Who: veithen

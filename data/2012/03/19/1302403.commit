@@ -105,3 +105,5 @@ Index: java/modules/distribution/pom.xml
 Message: Adding docs distro as a dependency
 -*-*-*-
 When: 2012-03-19 08:53:58 -0400 
+-*-*-*-
+Who: hiranya

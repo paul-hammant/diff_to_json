@@ -132,28 +132,25 @@ Index: java/modules/distribution/src/main/conf/providers.xml
          <extension name="gz"/>
          <extension name="tgz"/>
          <mime-type name="application/x-tgz" />
-Index: java/modules/transports/core/vfs/pom.xml
+Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSUtils.java
 ===================================================================
---- java/modules/transports/core/vfs/pom.xml	(revision 1213627)
-+++ java/modules/transports/core/vfs/pom.xml	(revision 1213628)
-@@ -52,7 +52,7 @@
-                         <Import-Package>
-                             !org.apache.commons.io.output,
-                             org.apache.commons.io.output; version=0.0.0,
--                            org.apache.commons.vfs.*; version=0.0.0,
-+                            org.apache.commons.vfs2.*; version=0.0.0,
- 							org.apache.commons.io; version=0.0.0,
-                             *; resolution:=optional
-                         </Import-Package>
-@@ -135,7 +135,7 @@
-     <dependencies>
-         <dependency>
-             <groupId>org.apache.commons</groupId>
--            <artifactId>commons-vfs</artifactId>
-+            <artifactId>commons-vfs2</artifactId>
-             <version>${commons.vfs.version}</version>
-         </dependency>
-         <dependency>
+--- java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSUtils.java	(revision 1213627)
++++ java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSUtils.java	(revision 1213628)
+@@ -23,10 +23,10 @@
+ import org.apache.axis2.transport.base.BaseUtils;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+-import org.apache.commons.vfs.FileContent;
+-import org.apache.commons.vfs.FileObject;
+-import org.apache.commons.vfs.FileSystemException;
+-import org.apache.commons.vfs.FileSystemManager;
++import org.apache.commons.vfs2.FileContent;
++import org.apache.commons.vfs2.FileObject;
++import org.apache.commons.vfs2.FileSystemException;
++import org.apache.commons.vfs2.FileSystemManager;
+ 
+ import java.io.IOException;
+ import java.io.InputStream;
 Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/FileObjectDataSource.java
 ===================================================================
 --- java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/FileObjectDataSource.java	(revision 1213627)
@@ -205,25 +202,28 @@ Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transpo
  
  import java.io.IOException;
  
-Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSUtils.java
+Index: java/modules/transports/core/vfs/pom.xml
 ===================================================================
---- java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSUtils.java	(revision 1213627)
-+++ java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSUtils.java	(revision 1213628)
-@@ -23,10 +23,10 @@
- import org.apache.axis2.transport.base.BaseUtils;
- import org.apache.commons.logging.Log;
- import org.apache.commons.logging.LogFactory;
--import org.apache.commons.vfs.FileContent;
--import org.apache.commons.vfs.FileObject;
--import org.apache.commons.vfs.FileSystemException;
--import org.apache.commons.vfs.FileSystemManager;
-+import org.apache.commons.vfs2.FileContent;
-+import org.apache.commons.vfs2.FileObject;
-+import org.apache.commons.vfs2.FileSystemException;
-+import org.apache.commons.vfs2.FileSystemManager;
- 
- import java.io.IOException;
- import java.io.InputStream;
+--- java/modules/transports/core/vfs/pom.xml	(revision 1213627)
++++ java/modules/transports/core/vfs/pom.xml	(revision 1213628)
+@@ -52,7 +52,7 @@
+                         <Import-Package>
+                             !org.apache.commons.io.output,
+                             org.apache.commons.io.output; version=0.0.0,
+-                            org.apache.commons.vfs.*; version=0.0.0,
++                            org.apache.commons.vfs2.*; version=0.0.0,
+ 							org.apache.commons.io; version=0.0.0,
+                             *; resolution:=optional
+                         </Import-Package>
+@@ -135,7 +135,7 @@
+     <dependencies>
+         <dependency>
+             <groupId>org.apache.commons</groupId>
+-            <artifactId>commons-vfs</artifactId>
++            <artifactId>commons-vfs2</artifactId>
+             <version>${commons.vfs.version}</version>
+         </dependency>
+         <dependency>
 Index: java/modules/patches/jars/commons-vfs2-2.0-vfs-178.jar
 ===================================================================
 Cannot display: file marked as a binary type.
@@ -273,3 +273,5 @@ Index: java/pom.xml
 Message: Migrating to commons-vfs2 and adding synapse patches to vfs 2.0
 -*-*-*-
 When: 2011-12-13 04:34:05 -0500 
+-*-*-*-
+Who: kasun

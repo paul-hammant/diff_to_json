@@ -1,0 +1,19 @@
+Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportSender.java
+===================================================================
+--- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportSender.java	(revision 1511809)
++++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportSender.java	(revision 1511810)
+@@ -93,8 +93,6 @@
+         cache = new AMQPSenderCache(new ConcurrentHashMap<Integer, AMQPSender>());
+         responseTracker = new ConcurrentHashMap<String, Semaphore>();
+         responseMessage = new ConcurrentHashMap<String, AMQPTransportMessage>();
+-//        MBeanRegister.getInstance().registerMBean(
+-//                new TransportView(null, this), "Transport", "amqp-tx-receiver");
+ 
+         log.info("AMQP transport sender initializing..");
+     }
+-*-*-*-
+Message: removed dead codes.
+-*-*-*-
+When: 2013-08-08 10:36:18 -0400 
+-*-*-*-
+Who: rajikak

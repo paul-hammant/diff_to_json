@@ -1,3 +1,1624 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java	(revision 1361638)
++++ java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java	(revision 1361639)
+@@ -36,6 +36,8 @@
+ import org.apache.commons.io.FilenameUtils;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.commons.beanstalk.enterprise.EnterpriseBeanstalkConstants;
++import org.apache.synapse.commons.beanstalk.enterprise.EnterpriseBeanstalkManager;
+ import org.apache.synapse.commons.datasource.DataSourceRepositoryHolder;
+ import org.apache.synapse.commons.snmp.SNMPConstants;
+ import org.apache.synapse.commons.snmp.SynapseSNMPAgent;
+@@ -187,6 +189,7 @@
+         deployMediatorExtensions();
+         initDataSourceHelper(serverContextInformation);
+         initSharedSecretCallbackHandlerCache(serverContextInformation);
++        initEnterpriseBeanstalkManager(serverContextInformation);
+         initialized = true;
+     }
+ 
+@@ -397,6 +400,15 @@
+                 synapseTaskManager.cleanup();
+             }
+ 
++            // destroy beanstalks.
++            EnterpriseBeanstalkManager manager = (EnterpriseBeanstalkManager)
++                    serverContextInformation.getProperty(
++                            EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_MANAGER_PROP_NAME);
++
++            if (manager != null) {
++                manager.destroy();
++            }
++
+             // stop the listener manager
+             if (listenerManager != null) {
+                 listenerManager.stop();
+@@ -864,6 +876,28 @@
+         }
+     }
+ 
++    private synchronized void initEnterpriseBeanstalkManager(ServerContextInformation serverInfo) {
++
++        if (serverInfo.getProperty(
++                EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_MANAGER_PROP_NAME) == null) {
++
++            EnterpriseBeanstalkManager beanstalkManager = new EnterpriseBeanstalkManager();
++
++            Object configProps = serverInfo.getProperty(
++                    EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_CONFIG_PROP_NAME);
++
++            if (configProps instanceof Properties) {
++                beanstalkManager.init((Properties) configProps);
++            } else {
++                Properties synapseProperties = SynapsePropertiesLoader.reloadSynapseProperties();
++                beanstalkManager.init(synapseProperties);
++            }
++            serverInfo.addProperty(
++                    EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_MANAGER_PROP_NAME,
++                    beanstalkManager);
++        }
++    }
++
+     private void addDefaultBuildersAndFormatters(AxisConfiguration axisConf) {
+         if (axisConf.getMessageBuilder("text/plain") == null) {
+             axisConf.addMessageBuilder("text/plain", new PlainTextBuilder());
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/Value.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/Value.java	(revision 1361638)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/Value.java	(revision 1361639)
+@@ -19,8 +19,7 @@
+ 
+ package org.apache.synapse.mediators;
+ 
+-import org.apache.axiom.om.OMElement;
+-import org.apache.axiom.om.OMNamespace;
++import org.apache.axiom.om.*;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.MessageContext;
+@@ -126,6 +125,38 @@
+ 
+     }
+ 
++    public Object evaluateObjectValue(MessageContext synCtx) {
++        if (keyValue != null) {
++            return keyValue;
++        } else if (expression != null) {
++            return getObjectValue(synCtx);
++        } else {
++            handleException("Unable to resolve the value: " + toString());
++            return null;
++        }
++    }
++
++    private Object getObjectValue(MessageContext synCtx) {
++        try {
++            Object result = expression.selectSingleNode(synCtx);
++
++            if (result instanceof OMText) {
++                return ((OMText) result).getText();
++            } else if (result instanceof OMElement) {
++                return ((OMElement) result).getText();
++            } else if (result instanceof OMDocument) {
++                return ((OMDocument) result).getOMDocumentElement().toString();
++            } else if (result instanceof OMAttribute) {
++                return ((OMAttribute) result).getAttributeValue();
++            } else {
++                return result;
++            }
++        } catch (JaxenException e) {
++            handleException("Failed to evaluate the XPath expression: " + expression, e);
++        }
++        return null;
++    }
++
+     /**
+      * Get the name of the value attribute
+      *
+@@ -145,6 +176,10 @@
+         throw new SynapseException(msg);
+     }
+ 
++    private void handleException(String msg, Exception e) {
++        log.error(msg, e);
++        throw new SynapseException(msg, e);
++    }
+ 
+     /**
+      * checks whether key returned by #getKeyValue() is a string of an expression type.
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/bean/enterprise/EJBMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/bean/enterprise/EJBMediator.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/bean/enterprise/EJBMediator.java	(revision 1361639)
+@@ -0,0 +1,235 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.mediators.bean.enterprise;
++
++import org.apache.synapse.ManagedLifecycle;
++import org.apache.synapse.MessageContext;
++import org.apache.synapse.SynapseException;
++import org.apache.synapse.commons.beanstalk.enterprise.EnterpriseBeanstalk;
++import org.apache.synapse.commons.beanstalk.enterprise.EnterpriseBeanstalkConstants;
++import org.apache.synapse.commons.beanstalk.enterprise.EnterpriseBeanstalkManager;
++import org.apache.synapse.core.SynapseEnvironment;
++import org.apache.synapse.mediators.AbstractMediator;
++import org.apache.synapse.mediators.Value;
++import org.apache.synapse.mediators.bean.BeanUtils;
++import org.apache.synapse.mediators.bean.Target;
++
++import java.lang.reflect.Method;
++import java.util.ArrayList;
++import java.util.List;
++
++/**
++ * EJB mediator calls an external Enterprise JavaBean(EJB) and stores the result in the message
++ * payload or in a message context property.
++ * This mediator supports EJB3 Stateless and Stateful Session Beans.
++ */
++public class EJBMediator extends AbstractMediator implements ManagedLifecycle {
++
++    /**
++     * Name of the beanstalk to be used for this invocation.
++     */
++    private String beanstalkName;
++
++    /**
++     * Fully qualified name of the remote interface of the EJB.
++     */
++    private String className;
++
++    /**
++     * Session id of the stateful session bean call, null for stateless session bean calls.
++     */
++    private Value sessionId;
++
++    /**
++     * Target to store the result of the EJB method call.
++     */
++    private Target target;
++
++    /**
++     * JNDI name of the bean. Could be null if this bean is already cached in the beanstalk.
++     */
++    private String jndiName;
++
++    /**
++     * Whether or not this bean is removed from the beanstalk after the method invocation.
++     */
++    private boolean remove;
++
++    /**
++     * Argument list for the remote method invocation.
++     */
++    private List<Value> argumentList = new ArrayList<Value>();
++
++    /**
++     * EnterpriseBeanstalk retrieved from the Synapse environment.
++     */
++    private volatile EnterpriseBeanstalk beanstalk;
++
++    /**
++     * Resolved method. This is inferred by looking at the method name and the argument count.
++     */
++    private volatile Method method;
++
++    /**
++     *
++     * @param se SynapseEnvironment to be used for initialization
++     */
++    public void init(SynapseEnvironment se) {
++
++        EnterpriseBeanstalkManager beanstalkManager =
++                (EnterpriseBeanstalkManager) se.getServerContextInformation().getProperty(
++                        EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_MANAGER_PROP_NAME);
++
++        if (beanstalkManager == null) {
++            throw new SynapseException("Initialization failed. EnterpriseBeanstalkManager not " +
++                    "found.");
++        }
++
++        beanstalk = beanstalkManager.getEnterpriseBeanstalk(beanstalkName);
++
++        if (beanstalk == null) {
++            throw new SynapseException("Initialization failed. '" + beanstalkName +
++                    "' beanstalk not found in EnterpriseBeanstalkManager.");
++        }
++    }
++
++    /**
++     * Calls an external EJB according to the supplied semantics and attaches the result into the
++     * message/message context.
++     * @param synCtx The current message for mediation
++     * @return true If mediation should continue
++     */
++    public boolean mediate(MessageContext synCtx) {
++
++        Object ejb = beanstalk.getEnterpriseBean(
++                                    className,
++                                    sessionId == null ? null : sessionId.evaluateValue(synCtx),
++                                    jndiName);
++
++        if (ejb == null) {
++            handleException("EJB not found. class: " + className + ", bean id: " + sessionId +
++                    ", jndi name: " + jndiName + ".", synCtx);
++        }
++
++        Object result = null;
++        try {
++            result = BeanUtils.invokeInstanceMethod(ejb, method, buildArguments(synCtx));
++        } catch (SynapseException e) {
++            handleException("Failed to invoke method: " + method + " on EJB object of " +
++                    "type: " + className + ".", e, synCtx);
++        }
++
++        if (target != null) {
++            target.insert(synCtx, result);
++        }
++
++        if (remove) {
++            beanstalk.removeEnterpriseBean(className,
++                                sessionId == null ? null : sessionId.evaluateValue(synCtx));
++        }
++
++        return true;
++    }
++
++    public void destroy() {
++    }
++
++    /**
++     * Builds the argument values using the current message context.
++     * @param synCtx Current message context
++     * @return Built argument list
++     */
++    private Object[] buildArguments(MessageContext synCtx) {
++
++        Object[] args = new Object[argumentList.size()];
++        for (int i = 0; i < args.length; ++i) {
++            args[i] = argumentList.get(i).evaluateObjectValue(synCtx);
++        }
++        return args;
++    }
++
++
++    //-------------------------- Getters & Setters --------------------------//
++
++    public String getBeanstalkName() {
++        return beanstalkName;
++    }
++
++    public void setBeanstalkName(String beanstalkName) {
++        this.beanstalkName = beanstalkName;
++    }
++
++    public String getClassName() {
++        return className;
++    }
++
++    public void setClassName(String className) {
++        this.className = className;
++    }
++
++    public Value getSessionId() {
++        return sessionId;
++    }
++
++    public void setSessionId(Value sessionId) {
++        this.sessionId = sessionId;
++    }
++
++    public Method getMethod() {
++        return method;
++    }
++
++    public void setMethod(Method method) {
++        this.method = method;
++    }
++
++    public Target getTarget() {
++        return target;
++    }
++
++    public void setTarget(Target target) {
++        this.target = target;
++    }
++
++    public String getJndiName() {
++        return jndiName;
++    }
++
++    public void setJndiName(String jndiName) {
++        this.jndiName = jndiName;
++    }
++
++    public boolean isRemove() {
++        return remove;
++    }
++
++    public void setRemove(boolean remove) {
++        this.remove = remove;
++    }
++
++    public List<Value> getArgumentList() {
++        return argumentList;
++    }
++
++    public void addArgument(Value argument) {
++        argumentList.add(argument);
++    }
++
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/bean/enterprise/EJBConstants.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/bean/enterprise/EJBConstants.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/bean/enterprise/EJBConstants.java	(revision 1361639)
+@@ -0,0 +1,41 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.mediators.bean.enterprise;
++
++/**
++ * Defines constants used by EJB mediator configuration.
++ */
++public interface EJBConstants {
++
++    public static final String BEANSTALK = "beanstalk";
++
++    public static final String METHOD = "method";
++
++    public static final String SESSION_ID = "sessionId";
++
++    public static final String JNDI_NAME = "jndiName";
++
++    public static final String REMOVE = "remove";
++
++    public static final String ARGS = "args";
++
++    public static final String ARG = "arg";
++
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanConstants.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanConstants.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanConstants.java	(revision 1361639)
+@@ -0,0 +1,41 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.mediators.bean;
++
++/**
++ * Defines constants used by Bean mediator configuration.
++ */
++public interface BeanConstants {
++
++    public static final String ACTION = "action";
++
++    public static final String CLASS = "class";
++
++    public static final String VAR = "var";
++
++    public static final String REPLACE = "replace";
++
++    public static final String PROPERTY = "property";
++
++    public static final String VALUE = "value";
++
++    public static final String TARGET = "target";
++
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanUtils.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanUtils.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanUtils.java	(revision 1361639)
+@@ -0,0 +1,121 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.mediators.bean;
++
++import org.apache.axiom.om.util.AXIOMUtil;
++import org.apache.axis2.databinding.typemapping.SimpleTypeMapper;
++import org.apache.synapse.SynapseException;
++
++import javax.xml.stream.XMLStreamException;
++import java.lang.reflect.InvocationTargetException;
++import java.lang.reflect.Method;
++
++/**
++ * Provides utility methods for method invocation via reflection.
++ */
++public class BeanUtils {
++
++    private BeanUtils() {}
++
++    /**
++     * Invokes the given method on the given object via reflection, handles simple type conversion
++     * from String to simple types.
++     * @param instance  Instance to invoke the method on.
++     * @param method    Method to be invoked.
++     * @param args      Arguments for the method invocation.
++     * @return          Return value of the method invocation.
++     * @throws SynapseException If method invocation fails.
++     */
++    public static Object invokeInstanceMethod(Object instance, Method method, Object[] args) throws
++                                                                                  SynapseException {
++        Class[] paramTypes = method.getParameterTypes();
++
++        if (paramTypes.length != args.length) {
++            throw new SynapseException("Provided argument count does not match method the " +
++                    "parameter count of method '" + method.getName() + "'. Argument count = " +
++                    args.length + ", method parameter count = " + paramTypes.length + ".");
++        }
++
++        Object[] processedArgs = new Object[paramTypes.length];
++
++        for (int i = 0; i < paramTypes.length; ++i) {
++
++            if (args[i] == null || paramTypes[i].isAssignableFrom(args[i].getClass())) {
++                processedArgs[i] = args[i];
++            } else if (SimpleTypeMapper.isSimpleType(paramTypes[i])) {
++                try {
++                    // Workaround for https://issues.apache.org/jira/browse/AXIS2-5212
++                    processedArgs[i] = SimpleTypeMapper.getSimpleTypeObject(paramTypes[i],
++                            AXIOMUtil.stringToOM("<a>" + args[i].toString() + "</a>"));
++                } catch (XMLStreamException ignored) {
++                }
++            } else {
++                throw new SynapseException("Incompatible argument found in argument " + i +
++                        " for '" + method.getName() + "' method.");
++            }
++        }
++
++        try {
++            return method.invoke(instance, processedArgs);
++        } catch (IllegalAccessException e) {
++            throw new SynapseException("Error while invoking '" + method.getName() + "' method " +
++                    "via reflection.", e);
++        } catch (InvocationTargetException e) {
++            throw new SynapseException("Error while invoking '" + method.getName() + "' method " +
++                    "via reflection.", e);
++        }
++    }
++
++    /**
++     * Finds a method in the given class with the given method name and argument count. Fails to
++     * resolve the method if two or more overloaded methods are present with the given name and
++     * argument count.
++     *
++     * @param clazz      Class to search for the method in.
++     * @param methodName Method name to search for.
++     * @param argCount   Length of the argument list.
++     * @return           The resolved method, or null if no matching method is found.
++     * @throws SynapseException If two or more overloaded methods are found with the given name and
++     * argument count.
++     */
++    public static Method resolveMethod(Class clazz, String methodName, int argCount) throws
++                                                                                  SynapseException {
++        Method resolvedMethod = null;
++
++        for (Method method : clazz.getMethods()) {
++
++            if (method.getName().equals(methodName) &&
++                    method.getParameterTypes().length == argCount) {
++
++                if (resolvedMethod == null) {
++                    resolvedMethod = method;
++                } else {
++                    throw new SynapseException("More than one '" + methodName + "' methods " +
++                            "taking " + argCount + " arguments are found in '" +
++                            clazz.getName() + "' class.");
++                }
++
++            }
++        }
++
++        return resolvedMethod;
++    }
++
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/bean/Target.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/bean/Target.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/bean/Target.java	(revision 1361639)
+@@ -0,0 +1,113 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.mediators.bean;
++
++import org.apache.axiom.om.OMElement;
++import org.apache.axiom.om.OMText;
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.MessageContext;
++import org.apache.synapse.SynapseException;
++import org.apache.synapse.config.xml.ValueFactory;
++import org.apache.synapse.config.xml.ValueSerializer;
++import org.apache.synapse.mediators.Value;
++import org.apache.synapse.util.xpath.SynapseXPath;
++import org.jaxen.JaxenException;
++
++/**
++ * Represents a Target of an action performed by a mediator. Handles both static property names and
++ * dynamic(XPath) keys.
++ */
++public class Target {
++
++    private static final Log log = LogFactory.getLog(Target.class);
++
++    private Value value;
++
++    /**
++     * Creates a new Target from the OMElement
++     * @param attributeName Name of the attribute where the property name/ XPath expression is
++     * stored.
++     * @param element OMElement where the the XPath expression and the namespaces are stored.
++     */
++    public Target(String attributeName, OMElement element) {
++        this.value = new ValueFactory().createValue(attributeName, element);
++    }
++
++    /**
++     * Inserts the given object into the target specified by the current Target object.
++     * @param synCtx Message Context to be enriched with the object.
++     * @param object Object to be inserted.
++     */
++    public void insert(MessageContext synCtx, Object object) {
++
++        if (value.getExpression() != null) {
++
++            SynapseXPath expression = value.getExpression();
++            Object targetObj = null;
++
++            try {
++                targetObj = expression.selectSingleNode(synCtx);
++            } catch (JaxenException e) {
++                handleException("Failed to select the target.", e);
++            }
++
++            if (targetObj instanceof OMText) {
++                Object targetParent = ((OMText) targetObj).getParent();
++                if (targetParent != null && targetParent instanceof OMElement) {
++                    ((OMElement) targetParent).setText(object == null ? "" : object.toString());
++                } else {
++                    handleException("Invalid target is specified by the expression: " + expression);
++                }
++            } else {
++                handleException("Invalid target is specified by the expression: " + expression);
++            }
++
++        } else if (value.getKeyValue() != null) {
++
++            synCtx.setProperty(value.getKeyValue(), object);
++
++        } else {
++
++            handleException("Invalid target description. " + value);
++        }
++    }
++
++    /**
++     * Serialized this Target object into the given element with the given attribute name.
++     *
++     * @param attributeName Name of the attribute.
++     * @param element Element to serialize this target in to.
++     * @return Element after serializing this target.
++     */
++    public OMElement serializeTarget(String attributeName, OMElement element) {
++        return new ValueSerializer().serializeValue(value, attributeName, element);
++    }
++
++    private void handleException(String msg) {
++        log.error(msg);
++        throw new SynapseException(msg);
++    }
++
++    private void handleException(String msg, Throwable e) {
++        log.error(msg);
++        throw new SynapseException(msg, e);
++    }
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanMediator.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanMediator.java	(revision 1361639)
+@@ -0,0 +1,311 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.mediators.bean;
++
++import org.apache.synapse.MessageContext;
++import org.apache.synapse.SynapseException;
++import org.apache.synapse.SynapseLog;
++import org.apache.synapse.mediators.AbstractMediator;
++import org.apache.synapse.mediators.Value;
++
++import java.beans.IntrospectionException;
++import java.beans.PropertyDescriptor;
++import java.util.Map;
++
++/**
++ * Bean mediator can manipulate a JavaBean that is bound to the Synapse message context as a
++ * property.
++ * This mediator can be used to create a new bean (CREATE action), remove an existing bean
++ * (REMOVE action), set a property of an existing JavaBean (SET_PROPERTY action) or to retrieve a
++ * property of an existing JavaBean (GET_PROPERTY action). Classes of objects manipulated by this
++ * mediator must follow the JavaBeans naming conventions.
++ */
++public class BeanMediator extends AbstractMediator {
++
++    /**
++     * Action performed by this mediator.
++     */
++    private Action action;
++
++    /**
++     * Variable name. This corresponds to the property name using which the bean is attached to
++     * the message context
++     */
++    private String varName;
++
++    /**
++     * Name of the bean property.
++     */
++    private String propertyName;
++
++    /**
++     * Value for SET_PROPERTY action
++     */
++    private Value value;
++
++    /**
++     * Target for GET_PROPERTY action
++     */
++    private Target target;
++
++    /**
++     * Whether or not the existing bean is replaced by the CREATE action.
++     */
++    private boolean replace = true;
++
++    /**
++     * Class object representing the class of the bean
++     */
++    private Class clazz;
++
++    /**
++     * Manipulates a JavaBean attached to the current message context according to the supplied
++     * semantics.
++     * @param synCtx The current message for mediation
++     * @return true If mediation should continue
++     */
++    public boolean mediate(MessageContext synCtx) {
++
++        SynapseLog synLog = getLog(synCtx);
++
++        if (synLog.isTraceOrDebugEnabled()) {
++            synLog.traceOrDebug("Start : Bean mediator");
++
++            if (synLog.isTraceTraceEnabled()) {
++                synLog.traceTrace("Message : " + synCtx.getEnvelope());
++            }
++        }
++
++        boolean output = false;
++
++        switch (action) {
++            case CREATE:
++                if (synLog.isTraceOrDebugEnabled()) {
++                    synLog.traceOrDebug("Creating a new bean of type '" + clazz.getName() +
++                            "' with var name '" + varName + "'.");
++                }
++                output = mediateCreateBeanAction(synCtx);
++                break;
++            case REMOVE:
++                if (synLog.isTraceOrDebugEnabled()) {
++                    synLog.traceOrDebug("Removing the bean with var name '" + varName + "'.");
++                }
++                output = mediateRemoveBeanAction(synCtx);
++                break;
++            case SET_PROPERTY:
++                if (synLog.isTraceOrDebugEnabled()) {
++                    synLog.traceOrDebug("Setting '" + propertyName + "' property of the bean " +
++                            "with var name '" + varName + "'.");
++                }
++                output = mediateSetPropertyAction(synCtx);
++                break;
++            case GET_PROPERTY:
++                if (synLog.isTraceOrDebugEnabled()) {
++                    synLog.traceOrDebug("Retrieving '" + propertyName + "' property of the " +
++                            "bean with var name '" + varName + "'.");
++                }
++                output = mediateGetPropertyAction(synCtx);
++                break;
++            default:
++                assert false;
++        }
++
++        if (synLog.isTraceOrDebugEnabled()) {
++            synLog.traceOrDebug("End : Bean mediator");
++        }
++        return output;
++    }
++
++    /**
++     * Creates a new bean and attaches it to the current message context.
++     * @param synCtx The current message for mediation
++     * @return true If mediation should continue
++     */
++    private boolean mediateCreateBeanAction(MessageContext synCtx) {
++
++        if (!replace && synCtx.getProperty(varName) != null) {
++            return true;
++        }
++
++        Object instance = null;
++        try {
++            instance = clazz.newInstance();
++        } catch (Exception ex) {
++            handleException("An error occurred while instantiating '" + clazz.getName() +
++                    "' class.", ex, synCtx);
++        }
++
++        synCtx.setProperty(varName, instance);
++
++        return true;
++    }
++
++    /**
++     * Removes a bean attached to the current message context.
++     * @param synCtx The current message for mediation
++     * @return true If mediation should continue
++     */
++    private boolean mediateRemoveBeanAction(MessageContext synCtx) {
++
++        synCtx.getPropertyKeySet().remove(varName);
++        return true;
++    }
++
++    /**
++     * Sets a property of a bean attached to the current message context.
++     * @param synCtx The current message for mediation
++     * @return true If mediation should continue
++     */
++    private boolean mediateSetPropertyAction(MessageContext synCtx) {
++
++        Object bean = synCtx.getProperty(varName);
++        if (bean == null) {
++            handleException("Bean with var name '" + varName + "' was not found.", synCtx);
++            return false;
++        }
++        Object valueObj = value.evaluateObjectValue(synCtx);
++
++        if (bean instanceof Map) {
++            ((Map) bean).put(propertyName, valueObj);
++        } else {
++            try {
++                BeanUtils.invokeInstanceMethod(
++                        bean,
++                        new PropertyDescriptor(propertyName, bean.getClass()).getWriteMethod(),
++                        new Object[]{valueObj}
++                );
++            } catch (IntrospectionException e) {
++                handleException("Could not resolve the setter method for '" + propertyName +
++                        "' property in '" + bean.getClass() + "'.", e, synCtx);
++            } catch (SynapseException e) {
++                handleException("Error while invoking the setter method for '" + propertyName +
++                        "' property on '" + bean.getClass() + "'.", e, synCtx);
++            }
++        }
++
++        return true;
++    }
++
++    /**
++     * Retrieves a property of a bean attached to the current message context.
++     * @param synCtx The current message for mediation
++     * @return true If mediation should continue
++     */
++    private boolean mediateGetPropertyAction(MessageContext synCtx) {
++
++        Object bean = synCtx.getProperty(varName);
++        if (bean == null) {
++            handleException("Bean with var name '" + varName + "' was not found.", synCtx);
++            return false;
++        }
++        Object value = null;
++
++        if (bean instanceof Map) {
++            value = ((Map) bean).get(propertyName);
++        } else {
++            try {
++                value = BeanUtils.invokeInstanceMethod(
++                            bean,
++                            new PropertyDescriptor(propertyName, bean.getClass()).getReadMethod(),
++                            new Object[0]
++                        );
++            } catch (IntrospectionException e) {
++                handleException("Could not resolve the getter method for '" + propertyName +
++                        "' property in '" + bean.getClass() + "'.", e, synCtx);
++            } catch (SynapseException e) {
++                handleException("Error while invoking the getter method for '" + propertyName +
++                        "' property on '" + bean.getClass() + "'.", e, synCtx);
++            }
++        }
++
++        try {
++            target.insert(synCtx, value);
++        } catch (SynapseException e) {
++            handleException("Failed to set the target after retrieving bean property.", e,
++                    synCtx);
++        }
++        return true;
++    }
++
++    /**
++     * Defines actions performed by Bean mediator.
++     */
++    public enum Action {
++        CREATE, REMOVE, SET_PROPERTY, GET_PROPERTY
++    }
++
++    //-------------------------- Getters & Setters --------------------------//
++
++    public Action getAction() {
++        return action;
++    }
++
++    public void setAction(Action action) {
++        this.action = action;
++    }
++
++    public String getVarName() {
++        return varName;
++    }
++
++    public void setVarName(String varName) {
++        this.varName = varName;
++    }
++
++    public String getPropertyName() {
++        return propertyName;
++    }
++
++    public void setPropertyName(String propertyName) {
++        this.propertyName = propertyName;
++    }
++
++    public Value getValue() {
++        return value;
++    }
++
++    public void setValue(Value value) {
++        this.value = value;
++    }
++
++    public Target getTarget() {
++        return target;
++    }
++
++    public void setTarget(Target target) {
++        this.target = target;
++    }
++
++    public boolean isReplace() {
++        return replace;
++    }
++
++    public void setReplace(boolean replace) {
++        this.replace = replace;
++    }
++
++    public Class getClazz() {
++        return clazz;
++    }
++
++    public void setClazz(Class clazz) {
++        this.clazz = clazz;
++    }
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediatorFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediatorFactory.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediatorFactory.java	(revision 1361639)
+@@ -0,0 +1,138 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.config.xml;
++
++import org.apache.axiom.om.OMElement;
++import org.apache.synapse.Mediator;
++import org.apache.synapse.mediators.bean.BeanConstants;
++import org.apache.synapse.mediators.bean.BeanUtils;
++import org.apache.synapse.mediators.bean.Target;
++import org.apache.synapse.mediators.bean.enterprise.EJBConstants;
++import org.apache.synapse.mediators.bean.enterprise.EJBMediator;
++
++import javax.xml.namespace.QName;
++import java.lang.reflect.Method;
++import java.util.Iterator;
++import java.util.Properties;
++
++/**
++ * Creates an {@link EJBMediator} from the provided XML configuration.
++ *
++ * <p/>
++ * <pre>
++ * &lt;ejb beanstalk="string" class="string" [sessionId="string"] [remove="true | false"]
++ * [method="string"] [target="string | {xpath}"] [jndiName="string"] /&gt;
++ *   &lt;args&gt;
++ *     &lt;arg (value="string | {xpath}")/&gt;*
++ *   &lt;/args&gt;
++ * &lt;/ejb&gt;
++ * </pre>
++ */
++public class EJBMediatorFactory extends AbstractMediatorFactory {
++
++    private static final QName EJB_Q =
++            new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "ejb");
++
++    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
++
++        EJBMediator mediator = new EJBMediator();
++
++        String attributeValue;
++
++        attributeValue = elem.getAttributeValue(new QName(EJBConstants.BEANSTALK));
++        if (attributeValue != null) {
++            mediator.setBeanstalkName(attributeValue.trim());
++        } else {
++            handleException("'beanstalk' attribute of callEjb mediator is required");
++        }
++
++        attributeValue = elem.getAttributeValue(new QName(BeanConstants.CLASS));
++        if (attributeValue != null) {
++            mediator.setClassName(attributeValue.trim());
++        } else {
++            handleException("'class' attribute of callEjb mediator is required");
++        }
++
++        attributeValue = elem.getAttributeValue(new QName(EJBConstants.SESSION_ID));
++        if (attributeValue != null) {
++            mediator.setSessionId(new ValueFactory().createValue(EJBConstants.SESSION_ID, elem));
++        }
++
++        boolean remove;
++        attributeValue = elem.getAttributeValue(new QName(EJBConstants.REMOVE));
++        remove = Boolean.valueOf(attributeValue);
++        if (remove) {
++            mediator.setRemove(true);
++        }
++
++        if (elem.getAttributeValue(new QName(BeanConstants.TARGET)) != null) {
++            mediator.setTarget(new Target(BeanConstants.TARGET, elem));
++        }
++
++        attributeValue = elem.getAttributeValue(new QName(EJBConstants.JNDI_NAME));
++        if (attributeValue != null) {
++            mediator.setJndiName(attributeValue);
++        }
++
++        OMElement argumentsElem = elem.getFirstChildWithName(
++                new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, EJBConstants.ARGS));
++
++        if (argumentsElem != null) {
++
++            Iterator itr = argumentsElem.getChildrenWithName(
++                    new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, EJBConstants.ARG));
++
++            while (itr.hasNext()) {
++                OMElement argElem = (OMElement) itr.next();
++
++                if (argElem.getAttributeValue(ATT_VALUE) != null) {
++                    mediator.addArgument(
++                            new ValueFactory().createValue(BeanConstants.VALUE, argElem));
++                } else {
++                    handleException("'value' attribute of 'arg' element is required.");
++                }
++            }
++        }
++
++        attributeValue = elem.getAttributeValue(new QName(EJBConstants.METHOD));
++        if (attributeValue != null) {
++            Method method = null;
++            try {
++                method = BeanUtils.resolveMethod(
++                                        Class.forName(mediator.getClassName()),
++                                        attributeValue,
++                                        mediator.getArgumentList().size());
++            } catch (ClassNotFoundException e) {
++                handleException("Could not load '" + mediator.getClassName() + "' class.", e);
++            }
++            mediator.setMethod(method);
++        } else if (!remove) {
++            handleException("'method' attribute of EJB mediator is optional only when it's a " +
++                    "bean removal.");
++        }
++
++        return mediator;
++    }
++
++    public QName getTagQName() {
++        return EJB_Q;
++    }
++
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/BeanMediatorFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/BeanMediatorFactory.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/BeanMediatorFactory.java	(revision 1361639)
+@@ -0,0 +1,159 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.config.xml;
++
++import org.apache.axiom.om.OMElement;
++import org.apache.synapse.Mediator;
++import org.apache.synapse.mediators.bean.BeanConstants;
++import org.apache.synapse.mediators.bean.BeanMediator;
++import org.apache.synapse.mediators.bean.Target;
++
++import javax.xml.namespace.QName;
++import java.util.Properties;
++
++/**
++ * Creates a {@link BeanMediator} from the provided XML configuration.
++ *
++ * <p/>
++ * <pre>
++ * &lt;bean action=&quot;CREATE | REMOVE | SET_PROPERTY | GET_PROPERTY&quot; var=&quot;string&quot;
++ * [class=&quot;string&quot;]  [property=&quot;string&quot;]
++ * [value=&quot;string | {xpath}&quot;] /&gt;
++ * </pre>
++ */
++public class BeanMediatorFactory extends AbstractMediatorFactory {
++
++    private static final QName BEAN_Q
++            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "bean");
++
++    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
++
++        BeanMediator mediator = new BeanMediator();
++
++        String attributeValue;
++
++        attributeValue = elem.getAttributeValue(new QName(BeanConstants.VAR));
++        if (attributeValue != null) {
++            mediator.setVarName(attributeValue);
++        } else {
++            handleException("'var' attribute of Bean mediator is required.");
++        }
++
++        attributeValue = elem.getAttributeValue(new QName(BeanConstants.ACTION));
++        if (attributeValue != null) {
++            try {
++                switch (BeanMediator.Action.valueOf(attributeValue.toUpperCase())) {
++                    case CREATE:
++                        populateCreateBeanCase(mediator, elem);
++                        break;
++                    case REMOVE:
++                        mediator.setAction(BeanMediator.Action.REMOVE);
++                        break;
++                    case SET_PROPERTY:
++                        populateSetPropertyCase(mediator, elem);
++                        break;
++                    case GET_PROPERTY:
++                        populateGetPropertyCase(mediator, elem);
++                        break;
++                    default:
++                        assert false;
++                }
++            } catch (IllegalArgumentException e) {
++                handleException("'action' attribute of bean mediator must be set to 'CREATE', " +
++                        "'REMOVE', 'SET_PROPERTY' or 'GET_PROPERTY'.");
++            }
++        } else {
++            handleException("'action' attribute of Bean mediator is required.");
++        }
++
++        return mediator;
++    }
++
++    private void populateCreateBeanCase(BeanMediator mediator, OMElement elem) {
++
++        mediator.setAction(BeanMediator.Action.CREATE);
++
++        String attributeValue;
++
++        attributeValue = elem.getAttributeValue(new QName(BeanConstants.CLASS));
++        if (attributeValue != null) {
++            try {
++                mediator.setClazz(Class.forName(attributeValue.trim()));
++            } catch (Exception e) {
++                handleException("Error while loading '" + attributeValue + "' class.", e);
++            }
++        } else {
++            handleException("'class' attribute of Bean mediator is required when 'CREATE' action " +
++                    "is set.");
++        }
++
++        attributeValue = elem.getAttributeValue(new QName(BeanConstants.REPLACE));
++        if (attributeValue != null) {
++            mediator.setReplace(Boolean.parseBoolean(attributeValue.trim()));
++        }
++
++    }
++
++    private void populateSetPropertyCase(BeanMediator mediator, OMElement elem) {
++
++        mediator.setAction(BeanMediator.Action.SET_PROPERTY);
++
++        populatePropertyName(mediator, elem);
++
++        if (elem.getAttributeValue(ATT_VALUE) != null) {
++            mediator.setValue(new ValueFactory().createValue(BeanConstants.VALUE, elem));
++        } else {
++            handleException("'value' attribute of Bean mediator is required when 'SET_PROPERTY' " +
++                    "action is set.");
++        }
++    }
++
++    private void populateGetPropertyCase(BeanMediator mediator, OMElement elem) {
++
++        mediator.setAction(BeanMediator.Action.GET_PROPERTY);
++
++        populatePropertyName(mediator, elem);
++
++        if (elem.getAttributeValue(new QName(BeanConstants.TARGET)) != null) {
++            mediator.setTarget(new Target(BeanConstants.TARGET, elem));
++        } else {
++            handleException("'target' attribute of Bean mediator is required when 'GET_PROPERTY' " +
++                    "action is set.");
++        }
++    }
++
++    private void populatePropertyName(BeanMediator mediator, OMElement elem) {
++
++        String attributeValue;
++
++        attributeValue = elem.getAttributeValue(new QName(BeanConstants.PROPERTY));
++        if (attributeValue != null) {
++            mediator.setPropertyName(attributeValue);
++        } else {
++            handleException("'property' attribute of Bean mediator is required when " +
++                    "SET/GET_PROPERTY action is set.");
++        }
++    }
++
++    public QName getTagQName() {
++        return BEAN_Q;
++    }
++
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java	(revision 1361638)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java	(revision 1361639)
+@@ -69,7 +69,9 @@
+         InvokeMediatorSerializer.class,
+         MessageStoreMediatorSerializer.class,
+         URLRewriteMediatorSerializer.class,
+-        PayloadFactoryMediatorSerializer.class
++        PayloadFactoryMediatorSerializer.class,
++        BeanMediatorSerializer.class,
++        EJBMediatorSerializer.class
+     };
+ 
+     private final static MediatorSerializerFinder instance = new MediatorSerializerFinder();
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java	(revision 1361638)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java	(revision 1361639)
+@@ -83,7 +83,9 @@
+         MessageStoreMediatorFactory.class,
+         TemplateMediatorFactory.class,
+         InvokeMediatorFactory.class,
+-        PayloadFactoryMediatorFactory.class
++        PayloadFactoryMediatorFactory.class,
++        BeanMediatorFactory.class,
++        EJBMediatorFactory.class
+     };
+ 
+     private final static MediatorFactoryFinder instance  = new MediatorFactoryFinder();
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediatorSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediatorSerializer.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediatorSerializer.java	(revision 1361639)
+@@ -0,0 +1,118 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.config.xml;
++
++import org.apache.axiom.om.OMElement;
++import org.apache.synapse.Mediator;
++import org.apache.synapse.mediators.Value;
++import org.apache.synapse.mediators.bean.BeanConstants;
++import org.apache.synapse.mediators.bean.enterprise.EJBConstants;
++import org.apache.synapse.mediators.bean.enterprise.EJBMediator;
++
++import java.util.List;
++
++/**
++ * Serializer for {@link EJBMediator} instances.
++ *
++ * @see EJBMediatorFactory
++ */
++public class EJBMediatorSerializer extends AbstractMediatorSerializer {
++
++    private static final String EJB = "ejb";
++
++    public OMElement serializeSpecificMediator(Mediator m) {
++
++        if (!(m instanceof EJBMediator)) {
++            handleException("An unsupported mediator was passed in for serialization : " +
++                    m.getType());
++            return null;
++        }
++
++        EJBMediator mediator = (EJBMediator) m;
++
++        OMElement mediatorElem = fac.createOMElement(EJB, synNS);
++        saveTracingState(mediatorElem, mediator);
++
++        if (mediator.getBeanstalkName() != null) {
++            mediatorElem.addAttribute(fac.createOMAttribute(
++                    EJBConstants.BEANSTALK, nullNS, mediator.getBeanstalkName()));
++        } else {
++            handleException();
++        }
++
++        if (mediator.getClassName() != null) {
++            mediatorElem.addAttribute(fac.createOMAttribute(
++                    BeanConstants.CLASS, nullNS, mediator.getClassName()));
++        } else {
++            handleException();
++        }
++
++        if (mediator.getSessionId() != null) {
++            new ValueSerializer().serializeValue(
++                    mediator.getSessionId(), EJBConstants.SESSION_ID, mediatorElem);
++        }
++
++        if (mediator.getMethod() != null) {
++            mediatorElem.addAttribute(fac.createOMAttribute(
++                    EJBConstants.METHOD, nullNS, mediator.getMethod().getName()));
++        } else if (!mediator.isRemove()) {
++            handleException();
++        }
++
++        if (mediator.getTarget() != null) {
++            mediator.getTarget().serializeTarget(BeanConstants.TARGET, mediatorElem);
++        }
++
++        if (mediator.getJndiName() != null) {
++            mediatorElem.addAttribute(fac.createOMAttribute(
++                    EJBConstants.JNDI_NAME, nullNS, mediator.getJndiName()));
++        }
++
++        if (mediator.isRemove()) {
++            mediatorElem.addAttribute(fac.createOMAttribute(
++                    EJBConstants.REMOVE, nullNS, Boolean.toString(true)));
++        }
++
++        List<Value> argList = mediator.getArgumentList();
++
++        if (argList != null && argList.size() > 0) {
++
++            OMElement argumentsElem = fac.createOMElement(EJBConstants.ARGS, synNS);
++
++            for (Value arg : argList) {
++                OMElement argElem = fac.createOMElement(EJBConstants.ARG, synNS);
++                new ValueSerializer().serializeValue(arg, BeanConstants.VALUE, argElem);
++                argumentsElem.addChild(argElem);
++            }
++
++            mediatorElem.addChild(argumentsElem);
++        }
++
++        return mediatorElem;
++    }
++
++    public String getMediatorClassName() {
++        return EJBMediator.class.getName();
++    }
++
++    private void handleException() {
++        handleException("Invalid ejb mediator was passed in for serialization.");
++    }
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/BeanMediatorSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/BeanMediatorSerializer.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/BeanMediatorSerializer.java	(revision 1361639)
+@@ -0,0 +1,134 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.config.xml;
++
++import org.apache.axiom.om.OMElement;
++import org.apache.synapse.Mediator;
++import org.apache.synapse.mediators.bean.BeanConstants;
++import org.apache.synapse.mediators.bean.BeanMediator;
++
++/**
++ * Serializer for {@link BeanMediator} instances.
++ *
++ * @see BeanMediatorFactory
++ */
++public class BeanMediatorSerializer extends AbstractMediatorSerializer {
++
++    private static final String BEAN = "bean";
++
++    public OMElement serializeSpecificMediator(Mediator m) {
++
++        if (!(m instanceof BeanMediator)) {
++            handleException("Unsupported mediator was passed in for serialization: " + m.getType());
++            return null;
++        }
++
++        BeanMediator mediator = (BeanMediator) m;
++
++        OMElement mediatorElem = fac.createOMElement(BEAN, synNS);
++        saveTracingState(mediatorElem, mediator);
++
++        if (mediator.getAction() != null) {
++            mediatorElem.addAttribute(fac.createOMAttribute(
++                    BeanConstants.ACTION, nullNS, mediator.getAction().toString()));
++        } else {
++            handleException();
++        }
++
++        if (mediator.getVarName() != null) {
++            mediatorElem.addAttribute(fac.createOMAttribute(
++                    BeanConstants.VAR, nullNS, mediator.getVarName()));
++        } else {
++            handleException();
++        }
++
++        switch (mediator.getAction()) {
++            case CREATE:
++                serializeCreateBeanCase(mediatorElem, mediator);
++                break;
++            case SET_PROPERTY:
++                serializeSetPropertyCase(mediatorElem, mediator);
++                break;
++            case GET_PROPERTY:
++                serializeGetPropertyCase(mediatorElem, mediator);
++                break;
++            default:
++                assert false;
++        }
++
++        return mediatorElem;
++    }
++
++    private void serializeCreateBeanCase(OMElement mediatorElem, BeanMediator mediator) {
++
++        if (mediator.getClazz() != null) {
++            mediatorElem.addAttribute(fac.createOMAttribute(
++                    BeanConstants.CLASS, nullNS, mediator.getClazz().getName()));
++        } else {
++            handleException();
++        }
++
++        if (!mediator.isReplace()) {
++            mediatorElem.addAttribute(fac.createOMAttribute(
++                    BeanConstants.REPLACE, nullNS, Boolean.toString(false)));
++        }
++    }
++
++    private void serializeSetPropertyCase(OMElement mediatorElem, BeanMediator mediator) {
++
++        serializePropertyName(mediatorElem, mediator);
++
++        if (mediator.getValue() != null) {
++            new ValueSerializer().serializeValue(
++                    mediator.getValue(), BeanConstants.VALUE, mediatorElem);
++        } else {
++            handleException();
++        }
++    }
++
++    private void serializeGetPropertyCase(OMElement mediatorElem, BeanMediator mediator) {
++
++        serializePropertyName(mediatorElem, mediator);
++
++        if (mediator.getTarget() != null) {
++            mediator.getTarget().serializeTarget(BeanConstants.TARGET, mediatorElem);
++        } else {
++            handleException();
++        }
++    }
++
++    private void serializePropertyName(OMElement mediatorElem, BeanMediator mediator) {
++
++        if (mediator.getPropertyName() != null) {
++            mediatorElem.addAttribute(fac.createOMAttribute(
++                    BeanConstants.PROPERTY, nullNS, mediator.getPropertyName()));
++        } else {
++            handleException();
++        }
++    }
++
++    public String getMediatorClassName() {
++        return BeanMediator.class.getName();
++    }
++
++    private void handleException() {
++        handleException("Invalid bean mediator was passed in for serialization");
++    }
++}
 Index: java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkManager.java
 ===================================================================
 --- java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/enterprise/EnterpriseBeanstalkManager.java	(nonexistent)
@@ -768,1629 +2389,10 @@ Index: java/modules/commons/src/main/java/org/apache/synapse/commons/beanstalk/e
 +        return statefulBeans;
 +    }
 +}
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java	(revision 1361638)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java	(revision 1361639)
-@@ -83,7 +83,9 @@
-         MessageStoreMediatorFactory.class,
-         TemplateMediatorFactory.class,
-         InvokeMediatorFactory.class,
--        PayloadFactoryMediatorFactory.class
-+        PayloadFactoryMediatorFactory.class,
-+        BeanMediatorFactory.class,
-+        EJBMediatorFactory.class
-     };
- 
-     private final static MediatorFactoryFinder instance  = new MediatorFactoryFinder();
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediatorFactory.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediatorFactory.java	(nonexistent)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediatorFactory.java	(revision 1361639)
-@@ -0,0 +1,138 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+
-+package org.apache.synapse.config.xml;
-+
-+import org.apache.axiom.om.OMElement;
-+import org.apache.synapse.Mediator;
-+import org.apache.synapse.mediators.bean.BeanConstants;
-+import org.apache.synapse.mediators.bean.BeanUtils;
-+import org.apache.synapse.mediators.bean.Target;
-+import org.apache.synapse.mediators.bean.enterprise.EJBConstants;
-+import org.apache.synapse.mediators.bean.enterprise.EJBMediator;
-+
-+import javax.xml.namespace.QName;
-+import java.lang.reflect.Method;
-+import java.util.Iterator;
-+import java.util.Properties;
-+
-+/**
-+ * Creates an {@link EJBMediator} from the provided XML configuration.
-+ *
-+ * <p/>
-+ * <pre>
-+ * &lt;ejb beanstalk="string" class="string" [sessionId="string"] [remove="true | false"]
-+ * [method="string"] [target="string | {xpath}"] [jndiName="string"] /&gt;
-+ *   &lt;args&gt;
-+ *     &lt;arg (value="string | {xpath}")/&gt;*
-+ *   &lt;/args&gt;
-+ * &lt;/ejb&gt;
-+ * </pre>
-+ */
-+public class EJBMediatorFactory extends AbstractMediatorFactory {
-+
-+    private static final QName EJB_Q =
-+            new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "ejb");
-+
-+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
-+
-+        EJBMediator mediator = new EJBMediator();
-+
-+        String attributeValue;
-+
-+        attributeValue = elem.getAttributeValue(new QName(EJBConstants.BEANSTALK));
-+        if (attributeValue != null) {
-+            mediator.setBeanstalkName(attributeValue.trim());
-+        } else {
-+            handleException("'beanstalk' attribute of callEjb mediator is required");
-+        }
-+
-+        attributeValue = elem.getAttributeValue(new QName(BeanConstants.CLASS));
-+        if (attributeValue != null) {
-+            mediator.setClassName(attributeValue.trim());
-+        } else {
-+            handleException("'class' attribute of callEjb mediator is required");
-+        }
-+
-+        attributeValue = elem.getAttributeValue(new QName(EJBConstants.SESSION_ID));
-+        if (attributeValue != null) {
-+            mediator.setSessionId(new ValueFactory().createValue(EJBConstants.SESSION_ID, elem));
-+        }
-+
-+        boolean remove;
-+        attributeValue = elem.getAttributeValue(new QName(EJBConstants.REMOVE));
-+        remove = Boolean.valueOf(attributeValue);
-+        if (remove) {
-+            mediator.setRemove(true);
-+        }
-+
-+        if (elem.getAttributeValue(new QName(BeanConstants.TARGET)) != null) {
-+            mediator.setTarget(new Target(BeanConstants.TARGET, elem));
-+        }
-+
-+        attributeValue = elem.getAttributeValue(new QName(EJBConstants.JNDI_NAME));
-+        if (attributeValue != null) {
-+            mediator.setJndiName(attributeValue);
-+        }
-+
-+        OMElement argumentsElem = elem.getFirstChildWithName(
-+                new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, EJBConstants.ARGS));
-+
-+        if (argumentsElem != null) {
-+
-+            Iterator itr = argumentsElem.getChildrenWithName(
-+                    new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, EJBConstants.ARG));
-+
-+            while (itr.hasNext()) {
-+                OMElement argElem = (OMElement) itr.next();
-+
-+                if (argElem.getAttributeValue(ATT_VALUE) != null) {
-+                    mediator.addArgument(
-+                            new ValueFactory().createValue(BeanConstants.VALUE, argElem));
-+                } else {
-+                    handleException("'value' attribute of 'arg' element is required.");
-+                }
-+            }
-+        }
-+
-+        attributeValue = elem.getAttributeValue(new QName(EJBConstants.METHOD));
-+        if (attributeValue != null) {
-+            Method method = null;
-+            try {
-+                method = BeanUtils.resolveMethod(
-+                                        Class.forName(mediator.getClassName()),
-+                                        attributeValue,
-+                                        mediator.getArgumentList().size());
-+            } catch (ClassNotFoundException e) {
-+                handleException("Could not load '" + mediator.getClassName() + "' class.", e);
-+            }
-+            mediator.setMethod(method);
-+        } else if (!remove) {
-+            handleException("'method' attribute of EJB mediator is optional only when it's a " +
-+                    "bean removal.");
-+        }
-+
-+        return mediator;
-+    }
-+
-+    public QName getTagQName() {
-+        return EJB_Q;
-+    }
-+
-+}
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediatorSerializer.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediatorSerializer.java	(nonexistent)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/EJBMediatorSerializer.java	(revision 1361639)
-@@ -0,0 +1,118 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+
-+package org.apache.synapse.config.xml;
-+
-+import org.apache.axiom.om.OMElement;
-+import org.apache.synapse.Mediator;
-+import org.apache.synapse.mediators.Value;
-+import org.apache.synapse.mediators.bean.BeanConstants;
-+import org.apache.synapse.mediators.bean.enterprise.EJBConstants;
-+import org.apache.synapse.mediators.bean.enterprise.EJBMediator;
-+
-+import java.util.List;
-+
-+/**
-+ * Serializer for {@link EJBMediator} instances.
-+ *
-+ * @see EJBMediatorFactory
-+ */
-+public class EJBMediatorSerializer extends AbstractMediatorSerializer {
-+
-+    private static final String EJB = "ejb";
-+
-+    public OMElement serializeSpecificMediator(Mediator m) {
-+
-+        if (!(m instanceof EJBMediator)) {
-+            handleException("An unsupported mediator was passed in for serialization : " +
-+                    m.getType());
-+            return null;
-+        }
-+
-+        EJBMediator mediator = (EJBMediator) m;
-+
-+        OMElement mediatorElem = fac.createOMElement(EJB, synNS);
-+        saveTracingState(mediatorElem, mediator);
-+
-+        if (mediator.getBeanstalkName() != null) {
-+            mediatorElem.addAttribute(fac.createOMAttribute(
-+                    EJBConstants.BEANSTALK, nullNS, mediator.getBeanstalkName()));
-+        } else {
-+            handleException();
-+        }
-+
-+        if (mediator.getClassName() != null) {
-+            mediatorElem.addAttribute(fac.createOMAttribute(
-+                    BeanConstants.CLASS, nullNS, mediator.getClassName()));
-+        } else {
-+            handleException();
-+        }
-+
-+        if (mediator.getSessionId() != null) {
-+            new ValueSerializer().serializeValue(
-+                    mediator.getSessionId(), EJBConstants.SESSION_ID, mediatorElem);
-+        }
-+
-+        if (mediator.getMethod() != null) {
-+            mediatorElem.addAttribute(fac.createOMAttribute(
-+                    EJBConstants.METHOD, nullNS, mediator.getMethod().getName()));
-+        } else if (!mediator.isRemove()) {
-+            handleException();
-+        }
-+
-+        if (mediator.getTarget() != null) {
-+            mediator.getTarget().serializeTarget(BeanConstants.TARGET, mediatorElem);
-+        }
-+
-+        if (mediator.getJndiName() != null) {
-+            mediatorElem.addAttribute(fac.createOMAttribute(
-+                    EJBConstants.JNDI_NAME, nullNS, mediator.getJndiName()));
-+        }
-+
-+        if (mediator.isRemove()) {
-+            mediatorElem.addAttribute(fac.createOMAttribute(
-+                    EJBConstants.REMOVE, nullNS, Boolean.toString(true)));
-+        }
-+
-+        List<Value> argList = mediator.getArgumentList();
-+
-+        if (argList != null && argList.size() > 0) {
-+
-+            OMElement argumentsElem = fac.createOMElement(EJBConstants.ARGS, synNS);
-+
-+            for (Value arg : argList) {
-+                OMElement argElem = fac.createOMElement(EJBConstants.ARG, synNS);
-+                new ValueSerializer().serializeValue(arg, BeanConstants.VALUE, argElem);
-+                argumentsElem.addChild(argElem);
-+            }
-+
-+            mediatorElem.addChild(argumentsElem);
-+        }
-+
-+        return mediatorElem;
-+    }
-+
-+    public String getMediatorClassName() {
-+        return EJBMediator.class.getName();
-+    }
-+
-+    private void handleException() {
-+        handleException("Invalid ejb mediator was passed in for serialization.");
-+    }
-+}
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java	(revision 1361638)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java	(revision 1361639)
-@@ -69,7 +69,9 @@
-         InvokeMediatorSerializer.class,
-         MessageStoreMediatorSerializer.class,
-         URLRewriteMediatorSerializer.class,
--        PayloadFactoryMediatorSerializer.class
-+        PayloadFactoryMediatorSerializer.class,
-+        BeanMediatorSerializer.class,
-+        EJBMediatorSerializer.class
-     };
- 
-     private final static MediatorSerializerFinder instance = new MediatorSerializerFinder();
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/BeanMediatorFactory.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/BeanMediatorFactory.java	(nonexistent)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/BeanMediatorFactory.java	(revision 1361639)
-@@ -0,0 +1,159 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+
-+package org.apache.synapse.config.xml;
-+
-+import org.apache.axiom.om.OMElement;
-+import org.apache.synapse.Mediator;
-+import org.apache.synapse.mediators.bean.BeanConstants;
-+import org.apache.synapse.mediators.bean.BeanMediator;
-+import org.apache.synapse.mediators.bean.Target;
-+
-+import javax.xml.namespace.QName;
-+import java.util.Properties;
-+
-+/**
-+ * Creates a {@link BeanMediator} from the provided XML configuration.
-+ *
-+ * <p/>
-+ * <pre>
-+ * &lt;bean action=&quot;CREATE | REMOVE | SET_PROPERTY | GET_PROPERTY&quot; var=&quot;string&quot;
-+ * [class=&quot;string&quot;]  [property=&quot;string&quot;]
-+ * [value=&quot;string | {xpath}&quot;] /&gt;
-+ * </pre>
-+ */
-+public class BeanMediatorFactory extends AbstractMediatorFactory {
-+
-+    private static final QName BEAN_Q
-+            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "bean");
-+
-+    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
-+
-+        BeanMediator mediator = new BeanMediator();
-+
-+        String attributeValue;
-+
-+        attributeValue = elem.getAttributeValue(new QName(BeanConstants.VAR));
-+        if (attributeValue != null) {
-+            mediator.setVarName(attributeValue);
-+        } else {
-+            handleException("'var' attribute of Bean mediator is required.");
-+        }
-+
-+        attributeValue = elem.getAttributeValue(new QName(BeanConstants.ACTION));
-+        if (attributeValue != null) {
-+            try {
-+                switch (BeanMediator.Action.valueOf(attributeValue.toUpperCase())) {
-+                    case CREATE:
-+                        populateCreateBeanCase(mediator, elem);
-+                        break;
-+                    case REMOVE:
-+                        mediator.setAction(BeanMediator.Action.REMOVE);
-+                        break;
-+                    case SET_PROPERTY:
-+                        populateSetPropertyCase(mediator, elem);
-+                        break;
-+                    case GET_PROPERTY:
-+                        populateGetPropertyCase(mediator, elem);
-+                        break;
-+                    default:
-+                        assert false;
-+                }
-+            } catch (IllegalArgumentException e) {
-+                handleException("'action' attribute of bean mediator must be set to 'CREATE', " +
-+                        "'REMOVE', 'SET_PROPERTY' or 'GET_PROPERTY'.");
-+            }
-+        } else {
-+            handleException("'action' attribute of Bean mediator is required.");
-+        }
-+
-+        return mediator;
-+    }
-+
-+    private void populateCreateBeanCase(BeanMediator mediator, OMElement elem) {
-+
-+        mediator.setAction(BeanMediator.Action.CREATE);
-+
-+        String attributeValue;
-+
-+        attributeValue = elem.getAttributeValue(new QName(BeanConstants.CLASS));
-+        if (attributeValue != null) {
-+            try {
-+                mediator.setClazz(Class.forName(attributeValue.trim()));
-+            } catch (Exception e) {
-+                handleException("Error while loading '" + attributeValue + "' class.", e);
-+            }
-+        } else {
-+            handleException("'class' attribute of Bean mediator is required when 'CREATE' action " +
-+                    "is set.");
-+        }
-+
-+        attributeValue = elem.getAttributeValue(new QName(BeanConstants.REPLACE));
-+        if (attributeValue != null) {
-+            mediator.setReplace(Boolean.parseBoolean(attributeValue.trim()));
-+        }
-+
-+    }
-+
-+    private void populateSetPropertyCase(BeanMediator mediator, OMElement elem) {
-+
-+        mediator.setAction(BeanMediator.Action.SET_PROPERTY);
-+
-+        populatePropertyName(mediator, elem);
-+
-+        if (elem.getAttributeValue(ATT_VALUE) != null) {
-+            mediator.setValue(new ValueFactory().createValue(BeanConstants.VALUE, elem));
-+        } else {
-+            handleException("'value' attribute of Bean mediator is required when 'SET_PROPERTY' " +
-+                    "action is set.");
-+        }
-+    }
-+
-+    private void populateGetPropertyCase(BeanMediator mediator, OMElement elem) {
-+
-+        mediator.setAction(BeanMediator.Action.GET_PROPERTY);
-+
-+        populatePropertyName(mediator, elem);
-+
-+        if (elem.getAttributeValue(new QName(BeanConstants.TARGET)) != null) {
-+            mediator.setTarget(new Target(BeanConstants.TARGET, elem));
-+        } else {
-+            handleException("'target' attribute of Bean mediator is required when 'GET_PROPERTY' " +
-+                    "action is set.");
-+        }
-+    }
-+
-+    private void populatePropertyName(BeanMediator mediator, OMElement elem) {
-+
-+        String attributeValue;
-+
-+        attributeValue = elem.getAttributeValue(new QName(BeanConstants.PROPERTY));
-+        if (attributeValue != null) {
-+            mediator.setPropertyName(attributeValue);
-+        } else {
-+            handleException("'property' attribute of Bean mediator is required when " +
-+                    "SET/GET_PROPERTY action is set.");
-+        }
-+    }
-+
-+    public QName getTagQName() {
-+        return BEAN_Q;
-+    }
-+
-+}
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/BeanMediatorSerializer.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/BeanMediatorSerializer.java	(nonexistent)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/BeanMediatorSerializer.java	(revision 1361639)
-@@ -0,0 +1,134 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+
-+package org.apache.synapse.config.xml;
-+
-+import org.apache.axiom.om.OMElement;
-+import org.apache.synapse.Mediator;
-+import org.apache.synapse.mediators.bean.BeanConstants;
-+import org.apache.synapse.mediators.bean.BeanMediator;
-+
-+/**
-+ * Serializer for {@link BeanMediator} instances.
-+ *
-+ * @see BeanMediatorFactory
-+ */
-+public class BeanMediatorSerializer extends AbstractMediatorSerializer {
-+
-+    private static final String BEAN = "bean";
-+
-+    public OMElement serializeSpecificMediator(Mediator m) {
-+
-+        if (!(m instanceof BeanMediator)) {
-+            handleException("Unsupported mediator was passed in for serialization: " + m.getType());
-+            return null;
-+        }
-+
-+        BeanMediator mediator = (BeanMediator) m;
-+
-+        OMElement mediatorElem = fac.createOMElement(BEAN, synNS);
-+        saveTracingState(mediatorElem, mediator);
-+
-+        if (mediator.getAction() != null) {
-+            mediatorElem.addAttribute(fac.createOMAttribute(
-+                    BeanConstants.ACTION, nullNS, mediator.getAction().toString()));
-+        } else {
-+            handleException();
-+        }
-+
-+        if (mediator.getVarName() != null) {
-+            mediatorElem.addAttribute(fac.createOMAttribute(
-+                    BeanConstants.VAR, nullNS, mediator.getVarName()));
-+        } else {
-+            handleException();
-+        }
-+
-+        switch (mediator.getAction()) {
-+            case CREATE:
-+                serializeCreateBeanCase(mediatorElem, mediator);
-+                break;
-+            case SET_PROPERTY:
-+                serializeSetPropertyCase(mediatorElem, mediator);
-+                break;
-+            case GET_PROPERTY:
-+                serializeGetPropertyCase(mediatorElem, mediator);
-+                break;
-+            default:
-+                assert false;
-+        }
-+
-+        return mediatorElem;
-+    }
-+
-+    private void serializeCreateBeanCase(OMElement mediatorElem, BeanMediator mediator) {
-+
-+        if (mediator.getClazz() != null) {
-+            mediatorElem.addAttribute(fac.createOMAttribute(
-+                    BeanConstants.CLASS, nullNS, mediator.getClazz().getName()));
-+        } else {
-+            handleException();
-+        }
-+
-+        if (!mediator.isReplace()) {
-+            mediatorElem.addAttribute(fac.createOMAttribute(
-+                    BeanConstants.REPLACE, nullNS, Boolean.toString(false)));
-+        }
-+    }
-+
-+    private void serializeSetPropertyCase(OMElement mediatorElem, BeanMediator mediator) {
-+
-+        serializePropertyName(mediatorElem, mediator);
-+
-+        if (mediator.getValue() != null) {
-+            new ValueSerializer().serializeValue(
-+                    mediator.getValue(), BeanConstants.VALUE, mediatorElem);
-+        } else {
-+            handleException();
-+        }
-+    }
-+
-+    private void serializeGetPropertyCase(OMElement mediatorElem, BeanMediator mediator) {
-+
-+        serializePropertyName(mediatorElem, mediator);
-+
-+        if (mediator.getTarget() != null) {
-+            mediator.getTarget().serializeTarget(BeanConstants.TARGET, mediatorElem);
-+        } else {
-+            handleException();
-+        }
-+    }
-+
-+    private void serializePropertyName(OMElement mediatorElem, BeanMediator mediator) {
-+
-+        if (mediator.getPropertyName() != null) {
-+            mediatorElem.addAttribute(fac.createOMAttribute(
-+                    BeanConstants.PROPERTY, nullNS, mediator.getPropertyName()));
-+        } else {
-+            handleException();
-+        }
-+    }
-+
-+    public String getMediatorClassName() {
-+        return BeanMediator.class.getName();
-+    }
-+
-+    private void handleException() {
-+        handleException("Invalid bean mediator was passed in for serialization");
-+    }
-+}
-Index: java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java	(revision 1361638)
-+++ java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java	(revision 1361639)
-@@ -36,6 +36,8 @@
- import org.apache.commons.io.FilenameUtils;
- import org.apache.commons.logging.Log;
- import org.apache.commons.logging.LogFactory;
-+import org.apache.synapse.commons.beanstalk.enterprise.EnterpriseBeanstalkConstants;
-+import org.apache.synapse.commons.beanstalk.enterprise.EnterpriseBeanstalkManager;
- import org.apache.synapse.commons.datasource.DataSourceRepositoryHolder;
- import org.apache.synapse.commons.snmp.SNMPConstants;
- import org.apache.synapse.commons.snmp.SynapseSNMPAgent;
-@@ -187,6 +189,7 @@
-         deployMediatorExtensions();
-         initDataSourceHelper(serverContextInformation);
-         initSharedSecretCallbackHandlerCache(serverContextInformation);
-+        initEnterpriseBeanstalkManager(serverContextInformation);
-         initialized = true;
-     }
- 
-@@ -397,6 +400,15 @@
-                 synapseTaskManager.cleanup();
-             }
- 
-+            // destroy beanstalks.
-+            EnterpriseBeanstalkManager manager = (EnterpriseBeanstalkManager)
-+                    serverContextInformation.getProperty(
-+                            EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_MANAGER_PROP_NAME);
-+
-+            if (manager != null) {
-+                manager.destroy();
-+            }
-+
-             // stop the listener manager
-             if (listenerManager != null) {
-                 listenerManager.stop();
-@@ -864,6 +876,28 @@
-         }
-     }
- 
-+    private synchronized void initEnterpriseBeanstalkManager(ServerContextInformation serverInfo) {
-+
-+        if (serverInfo.getProperty(
-+                EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_MANAGER_PROP_NAME) == null) {
-+
-+            EnterpriseBeanstalkManager beanstalkManager = new EnterpriseBeanstalkManager();
-+
-+            Object configProps = serverInfo.getProperty(
-+                    EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_CONFIG_PROP_NAME);
-+
-+            if (configProps instanceof Properties) {
-+                beanstalkManager.init((Properties) configProps);
-+            } else {
-+                Properties synapseProperties = SynapsePropertiesLoader.reloadSynapseProperties();
-+                beanstalkManager.init(synapseProperties);
-+            }
-+            serverInfo.addProperty(
-+                    EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_MANAGER_PROP_NAME,
-+                    beanstalkManager);
-+        }
-+    }
-+
-     private void addDefaultBuildersAndFormatters(AxisConfiguration axisConf) {
-         if (axisConf.getMessageBuilder("text/plain") == null) {
-             axisConf.addMessageBuilder("text/plain", new PlainTextBuilder());
-Index: java/modules/core/src/main/java/org/apache/synapse/mediators/Value.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/mediators/Value.java	(revision 1361638)
-+++ java/modules/core/src/main/java/org/apache/synapse/mediators/Value.java	(revision 1361639)
-@@ -19,8 +19,7 @@
- 
- package org.apache.synapse.mediators;
- 
--import org.apache.axiom.om.OMElement;
--import org.apache.axiom.om.OMNamespace;
-+import org.apache.axiom.om.*;
- import org.apache.commons.logging.Log;
- import org.apache.commons.logging.LogFactory;
- import org.apache.synapse.MessageContext;
-@@ -126,6 +125,38 @@
- 
-     }
- 
-+    public Object evaluateObjectValue(MessageContext synCtx) {
-+        if (keyValue != null) {
-+            return keyValue;
-+        } else if (expression != null) {
-+            return getObjectValue(synCtx);
-+        } else {
-+            handleException("Unable to resolve the value: " + toString());
-+            return null;
-+        }
-+    }
-+
-+    private Object getObjectValue(MessageContext synCtx) {
-+        try {
-+            Object result = expression.selectSingleNode(synCtx);
-+
-+            if (result instanceof OMText) {
-+                return ((OMText) result).getText();
-+            } else if (result instanceof OMElement) {
-+                return ((OMElement) result).getText();
-+            } else if (result instanceof OMDocument) {
-+                return ((OMDocument) result).getOMDocumentElement().toString();
-+            } else if (result instanceof OMAttribute) {
-+                return ((OMAttribute) result).getAttributeValue();
-+            } else {
-+                return result;
-+            }
-+        } catch (JaxenException e) {
-+            handleException("Failed to evaluate the XPath expression: " + expression, e);
-+        }
-+        return null;
-+    }
-+
-     /**
-      * Get the name of the value attribute
-      *
-@@ -145,6 +176,10 @@
-         throw new SynapseException(msg);
-     }
- 
-+    private void handleException(String msg, Exception e) {
-+        log.error(msg, e);
-+        throw new SynapseException(msg, e);
-+    }
- 
-     /**
-      * checks whether key returned by #getKeyValue() is a string of an expression type.
-Index: java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanUtils.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanUtils.java	(nonexistent)
-+++ java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanUtils.java	(revision 1361639)
-@@ -0,0 +1,121 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+
-+package org.apache.synapse.mediators.bean;
-+
-+import org.apache.axiom.om.util.AXIOMUtil;
-+import org.apache.axis2.databinding.typemapping.SimpleTypeMapper;
-+import org.apache.synapse.SynapseException;
-+
-+import javax.xml.stream.XMLStreamException;
-+import java.lang.reflect.InvocationTargetException;
-+import java.lang.reflect.Method;
-+
-+/**
-+ * Provides utility methods for method invocation via reflection.
-+ */
-+public class BeanUtils {
-+
-+    private BeanUtils() {}
-+
-+    /**
-+     * Invokes the given method on the given object via reflection, handles simple type conversion
-+     * from String to simple types.
-+     * @param instance  Instance to invoke the method on.
-+     * @param method    Method to be invoked.
-+     * @param args      Arguments for the method invocation.
-+     * @return          Return value of the method invocation.
-+     * @throws SynapseException If method invocation fails.
-+     */
-+    public static Object invokeInstanceMethod(Object instance, Method method, Object[] args) throws
-+                                                                                  SynapseException {
-+        Class[] paramTypes = method.getParameterTypes();
-+
-+        if (paramTypes.length != args.length) {
-+            throw new SynapseException("Provided argument count does not match method the " +
-+                    "parameter count of method '" + method.getName() + "'. Argument count = " +
-+                    args.length + ", method parameter count = " + paramTypes.length + ".");
-+        }
-+
-+        Object[] processedArgs = new Object[paramTypes.length];
-+
-+        for (int i = 0; i < paramTypes.length; ++i) {
-+
-+            if (args[i] == null || paramTypes[i].isAssignableFrom(args[i].getClass())) {
-+                processedArgs[i] = args[i];
-+            } else if (SimpleTypeMapper.isSimpleType(paramTypes[i])) {
-+                try {
-+                    // Workaround for https://issues.apache.org/jira/browse/AXIS2-5212
-+                    processedArgs[i] = SimpleTypeMapper.getSimpleTypeObject(paramTypes[i],
-+                            AXIOMUtil.stringToOM("<a>" + args[i].toString() + "</a>"));
-+                } catch (XMLStreamException ignored) {
-+                }
-+            } else {
-+                throw new SynapseException("Incompatible argument found in argument " + i +
-+                        " for '" + method.getName() + "' method.");
-+            }
-+        }
-+
-+        try {
-+            return method.invoke(instance, processedArgs);
-+        } catch (IllegalAccessException e) {
-+            throw new SynapseException("Error while invoking '" + method.getName() + "' method " +
-+                    "via reflection.", e);
-+        } catch (InvocationTargetException e) {
-+            throw new SynapseException("Error while invoking '" + method.getName() + "' method " +
-+                    "via reflection.", e);
-+        }
-+    }
-+
-+    /**
-+     * Finds a method in the given class with the given method name and argument count. Fails to
-+     * resolve the method if two or more overloaded methods are present with the given name and
-+     * argument count.
-+     *
-+     * @param clazz      Class to search for the method in.
-+     * @param methodName Method name to search for.
-+     * @param argCount   Length of the argument list.
-+     * @return           The resolved method, or null if no matching method is found.
-+     * @throws SynapseException If two or more overloaded methods are found with the given name and
-+     * argument count.
-+     */
-+    public static Method resolveMethod(Class clazz, String methodName, int argCount) throws
-+                                                                                  SynapseException {
-+        Method resolvedMethod = null;
-+
-+        for (Method method : clazz.getMethods()) {
-+
-+            if (method.getName().equals(methodName) &&
-+                    method.getParameterTypes().length == argCount) {
-+
-+                if (resolvedMethod == null) {
-+                    resolvedMethod = method;
-+                } else {
-+                    throw new SynapseException("More than one '" + methodName + "' methods " +
-+                            "taking " + argCount + " arguments are found in '" +
-+                            clazz.getName() + "' class.");
-+                }
-+
-+            }
-+        }
-+
-+        return resolvedMethod;
-+    }
-+
-+}
-Index: java/modules/core/src/main/java/org/apache/synapse/mediators/bean/Target.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/mediators/bean/Target.java	(nonexistent)
-+++ java/modules/core/src/main/java/org/apache/synapse/mediators/bean/Target.java	(revision 1361639)
-@@ -0,0 +1,113 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+
-+package org.apache.synapse.mediators.bean;
-+
-+import org.apache.axiom.om.OMElement;
-+import org.apache.axiom.om.OMText;
-+import org.apache.commons.logging.Log;
-+import org.apache.commons.logging.LogFactory;
-+import org.apache.synapse.MessageContext;
-+import org.apache.synapse.SynapseException;
-+import org.apache.synapse.config.xml.ValueFactory;
-+import org.apache.synapse.config.xml.ValueSerializer;
-+import org.apache.synapse.mediators.Value;
-+import org.apache.synapse.util.xpath.SynapseXPath;
-+import org.jaxen.JaxenException;
-+
-+/**
-+ * Represents a Target of an action performed by a mediator. Handles both static property names and
-+ * dynamic(XPath) keys.
-+ */
-+public class Target {
-+
-+    private static final Log log = LogFactory.getLog(Target.class);
-+
-+    private Value value;
-+
-+    /**
-+     * Creates a new Target from the OMElement
-+     * @param attributeName Name of the attribute where the property name/ XPath expression is
-+     * stored.
-+     * @param element OMElement where the the XPath expression and the namespaces are stored.
-+     */
-+    public Target(String attributeName, OMElement element) {
-+        this.value = new ValueFactory().createValue(attributeName, element);
-+    }
-+
-+    /**
-+     * Inserts the given object into the target specified by the current Target object.
-+     * @param synCtx Message Context to be enriched with the object.
-+     * @param object Object to be inserted.
-+     */
-+    public void insert(MessageContext synCtx, Object object) {
-+
-+        if (value.getExpression() != null) {
-+
-+            SynapseXPath expression = value.getExpression();
-+            Object targetObj = null;
-+
-+            try {
-+                targetObj = expression.selectSingleNode(synCtx);
-+            } catch (JaxenException e) {
-+                handleException("Failed to select the target.", e);
-+            }
-+
-+            if (targetObj instanceof OMText) {
-+                Object targetParent = ((OMText) targetObj).getParent();
-+                if (targetParent != null && targetParent instanceof OMElement) {
-+                    ((OMElement) targetParent).setText(object == null ? "" : object.toString());
-+                } else {
-+                    handleException("Invalid target is specified by the expression: " + expression);
-+                }
-+            } else {
-+                handleException("Invalid target is specified by the expression: " + expression);
-+            }
-+
-+        } else if (value.getKeyValue() != null) {
-+
-+            synCtx.setProperty(value.getKeyValue(), object);
-+
-+        } else {
-+
-+            handleException("Invalid target description. " + value);
-+        }
-+    }
-+
-+    /**
-+     * Serialized this Target object into the given element with the given attribute name.
-+     *
-+     * @param attributeName Name of the attribute.
-+     * @param element Element to serialize this target in to.
-+     * @return Element after serializing this target.
-+     */
-+    public OMElement serializeTarget(String attributeName, OMElement element) {
-+        return new ValueSerializer().serializeValue(value, attributeName, element);
-+    }
-+
-+    private void handleException(String msg) {
-+        log.error(msg);
-+        throw new SynapseException(msg);
-+    }
-+
-+    private void handleException(String msg, Throwable e) {
-+        log.error(msg);
-+        throw new SynapseException(msg, e);
-+    }
-+}
-Index: java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanMediator.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanMediator.java	(nonexistent)
-+++ java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanMediator.java	(revision 1361639)
-@@ -0,0 +1,311 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+
-+package org.apache.synapse.mediators.bean;
-+
-+import org.apache.synapse.MessageContext;
-+import org.apache.synapse.SynapseException;
-+import org.apache.synapse.SynapseLog;
-+import org.apache.synapse.mediators.AbstractMediator;
-+import org.apache.synapse.mediators.Value;
-+
-+import java.beans.IntrospectionException;
-+import java.beans.PropertyDescriptor;
-+import java.util.Map;
-+
-+/**
-+ * Bean mediator can manipulate a JavaBean that is bound to the Synapse message context as a
-+ * property.
-+ * This mediator can be used to create a new bean (CREATE action), remove an existing bean
-+ * (REMOVE action), set a property of an existing JavaBean (SET_PROPERTY action) or to retrieve a
-+ * property of an existing JavaBean (GET_PROPERTY action). Classes of objects manipulated by this
-+ * mediator must follow the JavaBeans naming conventions.
-+ */
-+public class BeanMediator extends AbstractMediator {
-+
-+    /**
-+     * Action performed by this mediator.
-+     */
-+    private Action action;
-+
-+    /**
-+     * Variable name. This corresponds to the property name using which the bean is attached to
-+     * the message context
-+     */
-+    private String varName;
-+
-+    /**
-+     * Name of the bean property.
-+     */
-+    private String propertyName;
-+
-+    /**
-+     * Value for SET_PROPERTY action
-+     */
-+    private Value value;
-+
-+    /**
-+     * Target for GET_PROPERTY action
-+     */
-+    private Target target;
-+
-+    /**
-+     * Whether or not the existing bean is replaced by the CREATE action.
-+     */
-+    private boolean replace = true;
-+
-+    /**
-+     * Class object representing the class of the bean
-+     */
-+    private Class clazz;
-+
-+    /**
-+     * Manipulates a JavaBean attached to the current message context according to the supplied
-+     * semantics.
-+     * @param synCtx The current message for mediation
-+     * @return true If mediation should continue
-+     */
-+    public boolean mediate(MessageContext synCtx) {
-+
-+        SynapseLog synLog = getLog(synCtx);
-+
-+        if (synLog.isTraceOrDebugEnabled()) {
-+            synLog.traceOrDebug("Start : Bean mediator");
-+
-+            if (synLog.isTraceTraceEnabled()) {
-+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
-+            }
-+        }
-+
-+        boolean output = false;
-+
-+        switch (action) {
-+            case CREATE:
-+                if (synLog.isTraceOrDebugEnabled()) {
-+                    synLog.traceOrDebug("Creating a new bean of type '" + clazz.getName() +
-+                            "' with var name '" + varName + "'.");
-+                }
-+                output = mediateCreateBeanAction(synCtx);
-+                break;
-+            case REMOVE:
-+                if (synLog.isTraceOrDebugEnabled()) {
-+                    synLog.traceOrDebug("Removing the bean with var name '" + varName + "'.");
-+                }
-+                output = mediateRemoveBeanAction(synCtx);
-+                break;
-+            case SET_PROPERTY:
-+                if (synLog.isTraceOrDebugEnabled()) {
-+                    synLog.traceOrDebug("Setting '" + propertyName + "' property of the bean " +
-+                            "with var name '" + varName + "'.");
-+                }
-+                output = mediateSetPropertyAction(synCtx);
-+                break;
-+            case GET_PROPERTY:
-+                if (synLog.isTraceOrDebugEnabled()) {
-+                    synLog.traceOrDebug("Retrieving '" + propertyName + "' property of the " +
-+                            "bean with var name '" + varName + "'.");
-+                }
-+                output = mediateGetPropertyAction(synCtx);
-+                break;
-+            default:
-+                assert false;
-+        }
-+
-+        if (synLog.isTraceOrDebugEnabled()) {
-+            synLog.traceOrDebug("End : Bean mediator");
-+        }
-+        return output;
-+    }
-+
-+    /**
-+     * Creates a new bean and attaches it to the current message context.
-+     * @param synCtx The current message for mediation
-+     * @return true If mediation should continue
-+     */
-+    private boolean mediateCreateBeanAction(MessageContext synCtx) {
-+
-+        if (!replace && synCtx.getProperty(varName) != null) {
-+            return true;
-+        }
-+
-+        Object instance = null;
-+        try {
-+            instance = clazz.newInstance();
-+        } catch (Exception ex) {
-+            handleException("An error occurred while instantiating '" + clazz.getName() +
-+                    "' class.", ex, synCtx);
-+        }
-+
-+        synCtx.setProperty(varName, instance);
-+
-+        return true;
-+    }
-+
-+    /**
-+     * Removes a bean attached to the current message context.
-+     * @param synCtx The current message for mediation
-+     * @return true If mediation should continue
-+     */
-+    private boolean mediateRemoveBeanAction(MessageContext synCtx) {
-+
-+        synCtx.getPropertyKeySet().remove(varName);
-+        return true;
-+    }
-+
-+    /**
-+     * Sets a property of a bean attached to the current message context.
-+     * @param synCtx The current message for mediation
-+     * @return true If mediation should continue
-+     */
-+    private boolean mediateSetPropertyAction(MessageContext synCtx) {
-+
-+        Object bean = synCtx.getProperty(varName);
-+        if (bean == null) {
-+            handleException("Bean with var name '" + varName + "' was not found.", synCtx);
-+            return false;
-+        }
-+        Object valueObj = value.evaluateObjectValue(synCtx);
-+
-+        if (bean instanceof Map) {
-+            ((Map) bean).put(propertyName, valueObj);
-+        } else {
-+            try {
-+                BeanUtils.invokeInstanceMethod(
-+                        bean,
-+                        new PropertyDescriptor(propertyName, bean.getClass()).getWriteMethod(),
-+                        new Object[]{valueObj}
-+                );
-+            } catch (IntrospectionException e) {
-+                handleException("Could not resolve the setter method for '" + propertyName +
-+                        "' property in '" + bean.getClass() + "'.", e, synCtx);
-+            } catch (SynapseException e) {
-+                handleException("Error while invoking the setter method for '" + propertyName +
-+                        "' property on '" + bean.getClass() + "'.", e, synCtx);
-+            }
-+        }
-+
-+        return true;
-+    }
-+
-+    /**
-+     * Retrieves a property of a bean attached to the current message context.
-+     * @param synCtx The current message for mediation
-+     * @return true If mediation should continue
-+     */
-+    private boolean mediateGetPropertyAction(MessageContext synCtx) {
-+
-+        Object bean = synCtx.getProperty(varName);
-+        if (bean == null) {
-+            handleException("Bean with var name '" + varName + "' was not found.", synCtx);
-+            return false;
-+        }
-+        Object value = null;
-+
-+        if (bean instanceof Map) {
-+            value = ((Map) bean).get(propertyName);
-+        } else {
-+            try {
-+                value = BeanUtils.invokeInstanceMethod(
-+                            bean,
-+                            new PropertyDescriptor(propertyName, bean.getClass()).getReadMethod(),
-+                            new Object[0]
-+                        );
-+            } catch (IntrospectionException e) {
-+                handleException("Could not resolve the getter method for '" + propertyName +
-+                        "' property in '" + bean.getClass() + "'.", e, synCtx);
-+            } catch (SynapseException e) {
-+                handleException("Error while invoking the getter method for '" + propertyName +
-+                        "' property on '" + bean.getClass() + "'.", e, synCtx);
-+            }
-+        }
-+
-+        try {
-+            target.insert(synCtx, value);
-+        } catch (SynapseException e) {
-+            handleException("Failed to set the target after retrieving bean property.", e,
-+                    synCtx);
-+        }
-+        return true;
-+    }
-+
-+    /**
-+     * Defines actions performed by Bean mediator.
-+     */
-+    public enum Action {
-+        CREATE, REMOVE, SET_PROPERTY, GET_PROPERTY
-+    }
-+
-+    //-------------------------- Getters & Setters --------------------------//
-+
-+    public Action getAction() {
-+        return action;
-+    }
-+
-+    public void setAction(Action action) {
-+        this.action = action;
-+    }
-+
-+    public String getVarName() {
-+        return varName;
-+    }
-+
-+    public void setVarName(String varName) {
-+        this.varName = varName;
-+    }
-+
-+    public String getPropertyName() {
-+        return propertyName;
-+    }
-+
-+    public void setPropertyName(String propertyName) {
-+        this.propertyName = propertyName;
-+    }
-+
-+    public Value getValue() {
-+        return value;
-+    }
-+
-+    public void setValue(Value value) {
-+        this.value = value;
-+    }
-+
-+    public Target getTarget() {
-+        return target;
-+    }
-+
-+    public void setTarget(Target target) {
-+        this.target = target;
-+    }
-+
-+    public boolean isReplace() {
-+        return replace;
-+    }
-+
-+    public void setReplace(boolean replace) {
-+        this.replace = replace;
-+    }
-+
-+    public Class getClazz() {
-+        return clazz;
-+    }
-+
-+    public void setClazz(Class clazz) {
-+        this.clazz = clazz;
-+    }
-+}
-Index: java/modules/core/src/main/java/org/apache/synapse/mediators/bean/enterprise/EJBConstants.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/mediators/bean/enterprise/EJBConstants.java	(nonexistent)
-+++ java/modules/core/src/main/java/org/apache/synapse/mediators/bean/enterprise/EJBConstants.java	(revision 1361639)
-@@ -0,0 +1,41 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+
-+package org.apache.synapse.mediators.bean.enterprise;
-+
-+/**
-+ * Defines constants used by EJB mediator configuration.
-+ */
-+public interface EJBConstants {
-+
-+    public static final String BEANSTALK = "beanstalk";
-+
-+    public static final String METHOD = "method";
-+
-+    public static final String SESSION_ID = "sessionId";
-+
-+    public static final String JNDI_NAME = "jndiName";
-+
-+    public static final String REMOVE = "remove";
-+
-+    public static final String ARGS = "args";
-+
-+    public static final String ARG = "arg";
-+
-+}
-Index: java/modules/core/src/main/java/org/apache/synapse/mediators/bean/enterprise/EJBMediator.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/mediators/bean/enterprise/EJBMediator.java	(nonexistent)
-+++ java/modules/core/src/main/java/org/apache/synapse/mediators/bean/enterprise/EJBMediator.java	(revision 1361639)
-@@ -0,0 +1,235 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+
-+package org.apache.synapse.mediators.bean.enterprise;
-+
-+import org.apache.synapse.ManagedLifecycle;
-+import org.apache.synapse.MessageContext;
-+import org.apache.synapse.SynapseException;
-+import org.apache.synapse.commons.beanstalk.enterprise.EnterpriseBeanstalk;
-+import org.apache.synapse.commons.beanstalk.enterprise.EnterpriseBeanstalkConstants;
-+import org.apache.synapse.commons.beanstalk.enterprise.EnterpriseBeanstalkManager;
-+import org.apache.synapse.core.SynapseEnvironment;
-+import org.apache.synapse.mediators.AbstractMediator;
-+import org.apache.synapse.mediators.Value;
-+import org.apache.synapse.mediators.bean.BeanUtils;
-+import org.apache.synapse.mediators.bean.Target;
-+
-+import java.lang.reflect.Method;
-+import java.util.ArrayList;
-+import java.util.List;
-+
-+/**
-+ * EJB mediator calls an external Enterprise JavaBean(EJB) and stores the result in the message
-+ * payload or in a message context property.
-+ * This mediator supports EJB3 Stateless and Stateful Session Beans.
-+ */
-+public class EJBMediator extends AbstractMediator implements ManagedLifecycle {
-+
-+    /**
-+     * Name of the beanstalk to be used for this invocation.
-+     */
-+    private String beanstalkName;
-+
-+    /**
-+     * Fully qualified name of the remote interface of the EJB.
-+     */
-+    private String className;
-+
-+    /**
-+     * Session id of the stateful session bean call, null for stateless session bean calls.
-+     */
-+    private Value sessionId;
-+
-+    /**
-+     * Target to store the result of the EJB method call.
-+     */
-+    private Target target;
-+
-+    /**
-+     * JNDI name of the bean. Could be null if this bean is already cached in the beanstalk.
-+     */
-+    private String jndiName;
-+
-+    /**
-+     * Whether or not this bean is removed from the beanstalk after the method invocation.
-+     */
-+    private boolean remove;
-+
-+    /**
-+     * Argument list for the remote method invocation.
-+     */
-+    private List<Value> argumentList = new ArrayList<Value>();
-+
-+    /**
-+     * EnterpriseBeanstalk retrieved from the Synapse environment.
-+     */
-+    private volatile EnterpriseBeanstalk beanstalk;
-+
-+    /**
-+     * Resolved method. This is inferred by looking at the method name and the argument count.
-+     */
-+    private volatile Method method;
-+
-+    /**
-+     *
-+     * @param se SynapseEnvironment to be used for initialization
-+     */
-+    public void init(SynapseEnvironment se) {
-+
-+        EnterpriseBeanstalkManager beanstalkManager =
-+                (EnterpriseBeanstalkManager) se.getServerContextInformation().getProperty(
-+                        EnterpriseBeanstalkConstants.ENTERPRISE_BEANSTALK_MANAGER_PROP_NAME);
-+
-+        if (beanstalkManager == null) {
-+            throw new SynapseException("Initialization failed. EnterpriseBeanstalkManager not " +
-+                    "found.");
-+        }
-+
-+        beanstalk = beanstalkManager.getEnterpriseBeanstalk(beanstalkName);
-+
-+        if (beanstalk == null) {
-+            throw new SynapseException("Initialization failed. '" + beanstalkName +
-+                    "' beanstalk not found in EnterpriseBeanstalkManager.");
-+        }
-+    }
-+
-+    /**
-+     * Calls an external EJB according to the supplied semantics and attaches the result into the
-+     * message/message context.
-+     * @param synCtx The current message for mediation
-+     * @return true If mediation should continue
-+     */
-+    public boolean mediate(MessageContext synCtx) {
-+
-+        Object ejb = beanstalk.getEnterpriseBean(
-+                                    className,
-+                                    sessionId == null ? null : sessionId.evaluateValue(synCtx),
-+                                    jndiName);
-+
-+        if (ejb == null) {
-+            handleException("EJB not found. class: " + className + ", bean id: " + sessionId +
-+                    ", jndi name: " + jndiName + ".", synCtx);
-+        }
-+
-+        Object result = null;
-+        try {
-+            result = BeanUtils.invokeInstanceMethod(ejb, method, buildArguments(synCtx));
-+        } catch (SynapseException e) {
-+            handleException("Failed to invoke method: " + method + " on EJB object of " +
-+                    "type: " + className + ".", e, synCtx);
-+        }
-+
-+        if (target != null) {
-+            target.insert(synCtx, result);
-+        }
-+
-+        if (remove) {
-+            beanstalk.removeEnterpriseBean(className,
-+                                sessionId == null ? null : sessionId.evaluateValue(synCtx));
-+        }
-+
-+        return true;
-+    }
-+
-+    public void destroy() {
-+    }
-+
-+    /**
-+     * Builds the argument values using the current message context.
-+     * @param synCtx Current message context
-+     * @return Built argument list
-+     */
-+    private Object[] buildArguments(MessageContext synCtx) {
-+
-+        Object[] args = new Object[argumentList.size()];
-+        for (int i = 0; i < args.length; ++i) {
-+            args[i] = argumentList.get(i).evaluateObjectValue(synCtx);
-+        }
-+        return args;
-+    }
-+
-+
-+    //-------------------------- Getters & Setters --------------------------//
-+
-+    public String getBeanstalkName() {
-+        return beanstalkName;
-+    }
-+
-+    public void setBeanstalkName(String beanstalkName) {
-+        this.beanstalkName = beanstalkName;
-+    }
-+
-+    public String getClassName() {
-+        return className;
-+    }
-+
-+    public void setClassName(String className) {
-+        this.className = className;
-+    }
-+
-+    public Value getSessionId() {
-+        return sessionId;
-+    }
-+
-+    public void setSessionId(Value sessionId) {
-+        this.sessionId = sessionId;
-+    }
-+
-+    public Method getMethod() {
-+        return method;
-+    }
-+
-+    public void setMethod(Method method) {
-+        this.method = method;
-+    }
-+
-+    public Target getTarget() {
-+        return target;
-+    }
-+
-+    public void setTarget(Target target) {
-+        this.target = target;
-+    }
-+
-+    public String getJndiName() {
-+        return jndiName;
-+    }
-+
-+    public void setJndiName(String jndiName) {
-+        this.jndiName = jndiName;
-+    }
-+
-+    public boolean isRemove() {
-+        return remove;
-+    }
-+
-+    public void setRemove(boolean remove) {
-+        this.remove = remove;
-+    }
-+
-+    public List<Value> getArgumentList() {
-+        return argumentList;
-+    }
-+
-+    public void addArgument(Value argument) {
-+        argumentList.add(argument);
-+    }
-+
-+}
-Index: java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanConstants.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanConstants.java	(nonexistent)
-+++ java/modules/core/src/main/java/org/apache/synapse/mediators/bean/BeanConstants.java	(revision 1361639)
-@@ -0,0 +1,41 @@
-+/*
-+ *  Licensed to the Apache Software Foundation (ASF) under one
-+ *  or more contributor license agreements.  See the NOTICE file
-+ *  distributed with this work for additional information
-+ *  regarding copyright ownership.  The ASF licenses this file
-+ *  to you under the Apache License, Version 2.0 (the
-+ *  "License"); you may not use this file except in compliance
-+ *  with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ *  Unless required by applicable law or agreed to in writing,
-+ *  software distributed under the License is distributed on an
-+ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ *  KIND, either express or implied.  See the License for the
-+ *  specific language governing permissions and limitations
-+ *  under the License.
-+ */
-+
-+package org.apache.synapse.mediators.bean;
-+
-+/**
-+ * Defines constants used by Bean mediator configuration.
-+ */
-+public interface BeanConstants {
-+
-+    public static final String ACTION = "action";
-+
-+    public static final String CLASS = "class";
-+
-+    public static final String VAR = "var";
-+
-+    public static final String REPLACE = "replace";
-+
-+    public static final String PROPERTY = "property";
-+
-+    public static final String VALUE = "value";
-+
-+    public static final String TARGET = "target";
-+
-+}
 -*-*-*-
 Message: SYNAPSE-838: Introducing Bean and EJB mediators.
 
 -*-*-*-
 When: 2012-07-15 03:17:49 -0400 
+-*-*-*-
+Who: sadeep

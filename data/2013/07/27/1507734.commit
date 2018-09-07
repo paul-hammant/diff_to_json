@@ -1,0 +1,467 @@
+Index: java/modules/tasks/src/main/java/org/apache/synapse/task/TaskScheduler.java
+===================================================================
+--- java/modules/tasks/src/main/java/org/apache/synapse/task/TaskScheduler.java	(revision 1507733)
++++ java/modules/tasks/src/main/java/org/apache/synapse/task/TaskScheduler.java	(revision 1507734)
+@@ -326,7 +326,7 @@
+                 log.debug("Deleting a Job with [ Name :" + name + " ]" +
+                         " [ Group :" + group + " ]");
+             }
+-            scheduler.deleteJob(name, group);
++            scheduler.deleteJob(new JobKey(name, group));
+         } catch (SchedulerException e) {
+             throw new SynapseTaskException("Error deleting a job with  [ Name :" + name + " ]" +
+                     " [ Group :" + group + " ]");
+Index: java/modules/tasks/src/main/java/org/apache/synapse/task/DefaultTaskJobDetailFactory.java
+===================================================================
+--- java/modules/tasks/src/main/java/org/apache/synapse/task/DefaultTaskJobDetailFactory.java	(revision 1507733)
++++ java/modules/tasks/src/main/java/org/apache/synapse/task/DefaultTaskJobDetailFactory.java	(revision 1507734)
+@@ -21,6 +21,7 @@
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+ import org.quartz.Job;
++import org.quartz.JobBuilder;
+ import org.quartz.JobDataMap;
+ import org.quartz.JobDetail;
+ 
+@@ -53,23 +54,6 @@
+             resources = new HashMap<String, Object>();
+         }
+ 
+-        JobDetail jobDetail = new JobDetail();
+-        jobDetail.setJobClass(jobClass);
+-
+-        String name = taskDescription.getName();
+-        if (name == null || "".equals(name)) {
+-            throw new SynapseTaskException("Name cannot be found.", log);
+-        }
+-        jobDetail.setName(name);
+-
+-
+-        String group = taskDescription.getGroup();
+-        if (group != null && !"".equals(group)) {
+-            jobDetail.setGroup(group);
+-        } else {
+-            jobDetail.setGroup(TaskDescription.DEFAULT_GROUP);
+-        }
+-
+         JobDataMap jobDataMap = new JobDataMap(resources);
+ 
+         String className = taskDescription.getTaskClass();
+@@ -81,8 +65,18 @@
+         if (xmlProperties != null) {
+             jobDataMap.put(TaskDescription.PROPERTIES, xmlProperties);
+         }
+-        jobDetail.setJobDataMap(jobDataMap);
+ 
+-        return jobDetail;
++        String name = taskDescription.getName();
++        if (name == null || "".equals(name)) {
++            throw new SynapseTaskException("Name cannot be found.", log);
++        }
++
++        String group = taskDescription.getGroup();
++        if (group == null || "".equals(group)) {
++            group = TaskDescription.DEFAULT_GROUP;
++        }
++
++        return JobBuilder.newJob(jobClass).withIdentity(name, group).
++                usingJobData(jobDataMap).build();
+     }
+ }
+Index: java/modules/tasks/src/main/java/org/apache/synapse/task/DefaultTaskTriggerFactory.java
+===================================================================
+--- java/modules/tasks/src/main/java/org/apache/synapse/task/DefaultTaskTriggerFactory.java	(revision 1507733)
++++ java/modules/tasks/src/main/java/org/apache/synapse/task/DefaultTaskTriggerFactory.java	(revision 1507734)
+@@ -16,16 +16,13 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.task;
+ 
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+-import org.quartz.CronTrigger;
+-import org.quartz.SimpleTrigger;
+-import org.quartz.Trigger;
+-import org.quartz.TriggerUtils;
++import org.quartz.*;
+ 
+-import java.text.ParseException;
+ import java.util.Date;
+ import java.util.Random;
+ 
+@@ -53,47 +50,42 @@
+         long repeatInterval = taskDescription.getInterval();
+         Date startTime = taskDescription.getStartTime();
+         Date endTime = taskDescription.getEndTime();
++        String group = taskDescription.getGroup();
+ 
++        if (group == null || "".equals(group)) {
++            group = TaskDescription.DEFAULT_GROUP;
++        }
++
+         Trigger trigger;
+-        if (cron == null || "".equals(cron)) {
+-            if (repeatCount >= 0) {
+-                trigger = TriggerUtils.makeImmediateTrigger(repeatCount - 1, repeatInterval);
+-            } else {
+-                trigger = TriggerUtils.makeImmediateTrigger(SimpleTrigger.REPEAT_INDEFINITELY,
+-                        repeatInterval);
+-            }
++        TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger()
++                .withIdentity(name + "-trigger-" + String.valueOf(RANDOM.nextLong()), group);
+ 
++        if (startTime != null) {
++            triggerBuilder.startAt(startTime);
+         } else {
+-            CronTrigger cronTrigger = new CronTrigger();
+-            try {
+-                cronTrigger.setCronExpression(cron);
+-                trigger = cronTrigger;
+-            } catch (ParseException e) {
+-                throw new SynapseTaskException("Error setting cron expression : " +
+-                        e.getMessage() + cron, log);
+-            }
++            triggerBuilder.startNow();
+         }
+ 
+-        if (trigger == null) {
+-            throw new SynapseTaskException("Trigger is null for the Task description : " +
+-                    taskDescription, log);
++        if (endTime != null) {
++            triggerBuilder.endAt(endTime);
+         }
+ 
+-        if (startTime != null) {
+-            trigger.setStartTime(startTime);
+-        }
+-        if (endTime != null) {
+-            trigger.setEndTime(endTime);
+-        }
+-        // give the trigger a random name
+-        trigger.setName(name + "-trigger-" + String.valueOf(RANDOM.nextLong()));
+-        String group = taskDescription.getGroup();
+-        if (group != null && !"".equals(group)) {
+-            trigger.setGroup(group);
++        if (cron == null || "".equals(cron)) {
++            if (repeatCount >= 0) {
++                trigger = triggerBuilder.withSchedule(SimpleScheduleBuilder.simpleSchedule()
++                        .withIntervalInMilliseconds(repeatInterval)
++                        .withRepeatCount(repeatCount - 1))
++                        .build();
++            } else {
++                trigger = triggerBuilder.withSchedule(SimpleScheduleBuilder.simpleSchedule()
++                        .withIntervalInMilliseconds(repeatInterval)
++                        .repeatForever())
++                        .build();
++            }
+         } else {
+-            trigger.setGroup(TaskDescription.DEFAULT_GROUP);
++            trigger = triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(cron)).build();
+         }
+-        trigger.setVolatility(taskDescription.isVolatility());
++
+         return trigger;
+     }
+ }
+Index: java/modules/tasks/pom.xml
+===================================================================
+--- java/modules/tasks/pom.xml	(revision 1507733)
++++ java/modules/tasks/pom.xml	(revision 1507734)
+@@ -76,7 +76,7 @@
+             <artifactId>synapse-commons</artifactId>
+         </dependency>
+         <dependency>
+-            <groupId>org.opensymphony</groupId>
++            <groupId>org.quartz-scheduler</groupId>
+             <artifactId>quartz</artifactId>
+         </dependency>
+         <dependency>
+Index: java/modules/core/src/main/java/org/apache/synapse/startup/quartz/SimpleQuartzJob.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/startup/quartz/SimpleQuartzJob.java	(revision 1507733)
++++ java/modules/core/src/main/java/org/apache/synapse/startup/quartz/SimpleQuartzJob.java	(revision 1507734)
+@@ -44,7 +44,7 @@
+ 
+     public void execute(JobExecutionContext ctx) throws JobExecutionException {
+ 
+-        String jobName = ctx.getJobDetail().getFullName();
++        String jobName = ctx.getJobDetail().getKey().getName();
+         if (log.isDebugEnabled()) {
+             log.debug("Executing task : " + jobName);
+         }
+Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/resequence/ResequencingProcessor.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/message/processors/resequence/ResequencingProcessor.java	(revision 1507733)
++++ java/modules/core/src/main/java/org/apache/synapse/message/processors/resequence/ResequencingProcessor.java	(revision 1507734)
+@@ -26,9 +26,7 @@
+ import org.apache.synapse.message.processors.ScheduledMessageProcessor;
+ import org.apache.synapse.message.store.MessageStore;
+ import org.apache.synapse.util.xpath.SynapseXPath;
+-import org.quartz.JobDataMap;
+-import org.quartz.JobDetail;
+-import org.quartz.SchedulerException;
++import org.quartz.*;
+ 
+ import java.util.concurrent.atomic.AtomicBoolean;
+ import java.util.concurrent.atomic.AtomicInteger;
+@@ -175,11 +173,9 @@
+      * @return jobDetail - created JobDetail object with Name and JobClass
+      */
+     @Override
+-    protected JobDetail getJobDetail() {
+-        JobDetail jobDetail = new JobDetail();
+-        jobDetail.setName(name + "-resequensing-job");
+-        jobDetail.setJobClass(ResequencingJob.class);
+-        return jobDetail;
++    protected JobBuilder getJobBuilder() {
++        return JobBuilder.newJob(ResequencingJob.class).withIdentity(
++                name + "-resequencing-job", SCHEDULED_MESSAGE_PROCESSOR_GROUP);
+     }
+ 
+     /**
+@@ -200,8 +196,9 @@
+     @Override
+     public void destroy() {
+         try {
+-            scheduler.deleteJob(name + "-resequensing-job",
+-                    ScheduledMessageProcessor.SCHEDULED_MESSAGE_PROCESSOR_GROUP);
++            scheduler.deleteJob(new JobKey(name + "-resequencing-job",
++                    ScheduledMessageProcessor.SCHEDULED_MESSAGE_PROCESSOR_GROUP));
++            scheduler.shutdown();
+         } catch (SchedulerException e) {
+         }
+     }
+Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/sampler/SamplingProcessor.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/message/processors/sampler/SamplingProcessor.java	(revision 1507733)
++++ java/modules/core/src/main/java/org/apache/synapse/message/processors/sampler/SamplingProcessor.java	(revision 1507734)
+@@ -16,23 +16,21 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.message.processors.sampler;
+ 
+-
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.core.SynapseEnvironment;
+-import org.apache.synapse.message.processors.AbstractMessageProcessor;
+ import org.apache.synapse.message.processors.ScheduledMessageProcessor;
+-import org.quartz.JobDataMap;
+-import org.quartz.JobDetail;
+-import org.quartz.SchedulerException;
++import org.quartz.*;
+ 
+ import java.util.concurrent.atomic.AtomicBoolean;
+ 
+-public class SamplingProcessor extends ScheduledMessageProcessor{
+-    private Log log = LogFactory.getLog(SamplingProcessor.class);
++public class SamplingProcessor extends ScheduledMessageProcessor {
+ 
++    private static final Log log = LogFactory.getLog(SamplingProcessor.class);
++
+     public static final String CONCURRENCY = "concurrency";
+     public static final String SEQUENCE = "sequence";
+ 
+@@ -51,11 +49,9 @@
+     }
+ 
+     @Override
+-    protected JobDetail getJobDetail() {
+-        JobDetail jobDetail = new JobDetail();
+-        jobDetail.setName(name + "-sampling-job");
+-        jobDetail.setJobClass(SamplingJob.class);
+-        return jobDetail;
++    protected JobBuilder getJobBuilder() {
++        return JobBuilder.newJob(SamplingJob.class).withIdentity(
++                name + "-sampling-job", SCHEDULED_MESSAGE_PROCESSOR_GROUP);
+     }
+ 
+     @Override
+@@ -69,8 +65,8 @@
+     @Override
+     public void destroy() {
+          try {
+-            scheduler.deleteJob(name + "-sampling-job",
+-                    ScheduledMessageProcessor.SCHEDULED_MESSAGE_PROCESSOR_GROUP);
++             scheduler.deleteJob(new JobKey(name + "-sampling-job",
++                     ScheduledMessageProcessor.SCHEDULED_MESSAGE_PROCESSOR_GROUP));
+         } catch (SchedulerException e) {
+             log.error("Error while destroying the task " + e);
+         }
+Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ScheduledMessageForwardingProcessor.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ScheduledMessageForwardingProcessor.java	(revision 1507733)
++++ java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ScheduledMessageForwardingProcessor.java	(revision 1507734)
+@@ -16,14 +16,13 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.message.processors.forward;
+ 
+ import org.apache.synapse.SynapseException;
+ import org.apache.synapse.core.SynapseEnvironment;
+ import org.apache.synapse.message.processors.ScheduledMessageProcessor;
+-import org.quartz.JobDataMap;
+-import org.quartz.JobDetail;
+-import org.quartz.SchedulerException;
++import org.quartz.*;
+ 
+ import java.util.Map;
+ import java.util.concurrent.atomic.AtomicBoolean;
+@@ -61,11 +60,9 @@
+     }
+ 
+     @Override
+-    protected JobDetail getJobDetail() {
+-        JobDetail jobDetail = new JobDetail();
+-        jobDetail.setName(name + "-forward job");
+-        jobDetail.setJobClass(ForwardingJob.class);
+-        return jobDetail;
++    protected JobBuilder getJobBuilder() {
++        return JobBuilder.newJob(ForwardingJob.class).withIdentity(
++                name + "-forward job", SCHEDULED_MESSAGE_PROCESSOR_GROUP);
+     }
+ 
+     @Override
+@@ -131,8 +128,8 @@
+     @Override
+     public void destroy() {
+          try {
+-             scheduler.deleteJob(name + "-forward job",
+-                    ScheduledMessageProcessor.SCHEDULED_MESSAGE_PROCESSOR_GROUP);
++             scheduler.deleteJob(new JobKey(name + "-forward job",
++                     ScheduledMessageProcessor.SCHEDULED_MESSAGE_PROCESSOR_GROUP));
+              scheduler.shutdown(true);
+         } catch (SchedulerException e) {
+             log.error("Error while destroying the task " + e);
+Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/ScheduledMessageProcessor.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/message/processors/ScheduledMessageProcessor.java	(revision 1507733)
++++ java/modules/core/src/main/java/org/apache/synapse/message/processors/ScheduledMessageProcessor.java	(revision 1507734)
+@@ -16,22 +16,18 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.message.processors;
+ 
+-import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.SynapseException;
+-import org.apache.synapse.config.SynapseConfiguration;
+ import org.apache.synapse.core.SynapseEnvironment;
+ import org.quartz.*;
+ import org.quartz.impl.StdSchedulerFactory;
+ 
+-import java.text.ParseException;
+ import java.util.Map;
+ 
+ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor {
+ 
+-
+     public static final String SCHEDULED_MESSAGE_PROCESSOR_GROUP =
+             "synapse.message.processor.quartz";
+     public static final String PROCESSOR_INSTANCE = "processor.instance";
+@@ -72,28 +68,26 @@
+ 
+     public void start() {
+         Trigger trigger;
++        TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger().
++                withIdentity(name + "-trigger-");
+         if (cronExpression == null || "".equals(cronExpression)) {
+-            trigger = TriggerUtils.makeImmediateTrigger(SimpleTrigger.REPEAT_INDEFINITELY, interval);
++            trigger = triggerBuilder.withSchedule(SimpleScheduleBuilder.simpleSchedule()
++                    .withIntervalInMilliseconds(interval)
++                    .repeatForever())
++                    .build();
+         } else {
+-            CronTrigger cronTrigger = new CronTrigger();
+-            try {
+-                cronTrigger.setCronExpression(cronExpression);
+-                trigger = cronTrigger;
+-            } catch (ParseException e) {
+-                throw new SynapseException("Error setting cron expression : " +
+-                        e.getMessage() + cronExpression, e);
+-            }
++            trigger = triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(cronExpression))
++                    .build();
+         }
+-        trigger.setName(name + "-trigger");
+ 
+-        JobDetail jobDetail = getJobDetail();
++        JobBuilder jobBuilder = getJobBuilder();
+         JobDataMap jobDataMap = getJobDataMap();
+         jobDataMap.put(MessageProcessorConsents.MESSAGE_STORE,
+                 configuration.getMessageStore(messageStore));
+         jobDataMap.put(MessageProcessorConsents.PARAMETERS, parameters);
+-        jobDetail.setJobDataMap(jobDataMap);
+-        jobDetail.setGroup(SCHEDULED_MESSAGE_PROCESSOR_GROUP);
+ 
++        JobDetail jobDetail = jobBuilder.usingJobData(jobDataMap).build();
++
+         try {
+             scheduler.scheduleJob(jobDetail, trigger);
+         } catch (SchedulerException e) {
+@@ -177,7 +171,7 @@
+         }
+     }
+ 
+-    protected abstract JobDetail getJobDetail();
++    protected abstract JobBuilder getJobBuilder();
+ 
+     protected JobDataMap getJobDataMap() {
+         return new JobDataMap();
+@@ -185,7 +179,7 @@
+ 
+     public void destroy() {
+         try {
+-            scheduler.deleteJob(name + "-trigger",SCHEDULED_MESSAGE_PROCESSOR_GROUP);
++            scheduler.deleteJob( new JobKey(name + "-trigger",SCHEDULED_MESSAGE_PROCESSOR_GROUP));
+             scheduler.shutdown(true);
+         } catch (SchedulerException e) {
+             log.error("Error while destroying the task " + e);
+Index: java/modules/core/pom.xml
+===================================================================
+--- java/modules/core/pom.xml	(revision 1507733)
++++ java/modules/core/pom.xml	(revision 1507734)
+@@ -245,6 +245,7 @@
+                             javax.xml.soap; version=0.0.0,
+                             !org.apache.commons.io,
+                             org.apache.commons.io; version=0.0.0,
++                            org.quartz.*; version=0.0.0,
+                             *;resolution:=optional,
+                         </Import-Package>
+                         <DynamicImport-Package>*</DynamicImport-Package>
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1507733)
++++ java/pom.xml	(revision 1507734)
+@@ -895,7 +895,7 @@
+ 
+             <!-- Quartz (Scheduled Tasks) -->
+             <dependency>
+-                <groupId>org.opensymphony</groupId>
++                <groupId>org.quartz-scheduler</groupId>
+                 <artifactId>quartz</artifactId>
+                 <version>${quartz.version}</version>
+             </dependency>
+@@ -1084,7 +1084,7 @@
+         <bcprov.jdk15.version>140</bcprov.jdk15.version>
+ 
+         <!-- startup, quartz -->
+-        <quartz.version>1.6.0</quartz.version>
++        <quartz.version>2.2.0</quartz.version>
+         <geronimo-spec.version>1.1</geronimo-spec.version>
+ 
+         <!-- misc -->
+-*-*-*-
+Message: Upgrading Quartz version to 2.2.0 (latest). Applying the patch for SYNAPSE-837.
+-*-*-*-
+When: 2013-07-27 18:31:04 -0400 
+-*-*-*-
+Who: hiranya

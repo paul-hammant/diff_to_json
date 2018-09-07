@@ -1,0 +1,22 @@
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1510146)
++++ java/pom.xml	(revision 1510147)
+@@ -198,8 +198,8 @@
+                     <artifactId>maven-compiler-plugin</artifactId>
+                     <version>2.3.2</version>
+                     <configuration>
+-                        <source>1.5</source>
+-                        <target>1.5</target>
++                        <source>1.6</source>
++                        <target>1.6</target>
+                     </configuration>
+                 </plugin>
+                 <plugin>
+-*-*-*-
+Message: If the project uses Java 1.6, then it should also configure the maven-compiler-plugin accordingly.
+
+-*-*-*-
+When: 2013-08-04 08:12:42 -0400 
+-*-*-*-
+Who: veithen

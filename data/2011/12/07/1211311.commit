@@ -1,3 +1,50 @@
+Index: java/modules/extensions/src/main/java/org/apache/synapse/mediators/throttle/ThrottleMediator.java
+===================================================================
+--- java/modules/extensions/src/main/java/org/apache/synapse/mediators/throttle/ThrottleMediator.java	(revision 1211310)
++++ java/modules/extensions/src/main/java/org/apache/synapse/mediators/throttle/ThrottleMediator.java	(revision 1211311)
+@@ -72,6 +72,8 @@
+     private Throttle throttle;
+     /* Lock used to ensure thread-safe creation of the throttle */
+     private final Object throttleLock = new Object();
++    /* Last version of dynamic policy resource*/
++    private long version;
+ 
+     public ThrottleMediator() {
+         this.accessControler = new AccessRateController();
+@@ -181,8 +183,10 @@
+                         boolean reCreate = false;
+                         // if the key refers to a dynamic resource
+                         if (entry.isDynamic()) {
+-                            if (!entry.isCached() || entry.isExpired()) {
++                            if ((!entry.isCached() || entry.isExpired()) &&
++                                    version != entry.getVersion()) {
+                                 reCreate = true;
++                                version = entry.getVersion();
+                             }
+                         }
+                         if (reCreate || throttle == null) {
+Index: java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMediator.java
+===================================================================
+--- java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMediator.java	(revision 1211310)
++++ java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMediator.java	(revision 1211311)
+@@ -20,6 +20,8 @@
+ package org.apache.synapse.mediators.bsf;
+ 
+ import com.sun.phobos.script.javascript.RhinoScriptEngineFactory;
++import com.sun.script.groovy.GroovyScriptEngineFactory;
++import com.sun.script.jruby.JRubyScriptEngineFactory;
+ import org.apache.axiom.om.OMElement;
+ import org.apache.axiom.om.OMText;
+ import org.apache.bsf.xml.XMLHelper;
+@@ -400,6 +402,8 @@
+ 
+         ScriptEngineManager manager = new ScriptEngineManager();
+         manager.registerEngineExtension("js", new RhinoScriptEngineFactory());
++        manager.registerEngineExtension("groovy", new GroovyScriptEngineFactory());
++        manager.registerEngineExtension("rb", new JRubyScriptEngineFactory());
+ 
+         this.scriptEngine = manager.getEngineByExtension(language);
+         if (scriptEngine == null) {
 Index: java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/CacheMediator.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/CacheMediator.java	(revision 1211310)
@@ -382,53 +429,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfigur
       */
      public Map<String, Entry> getDefinedEntries() {
  
-Index: java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMediator.java
-===================================================================
---- java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMediator.java	(revision 1211310)
-+++ java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMediator.java	(revision 1211311)
-@@ -20,6 +20,8 @@
- package org.apache.synapse.mediators.bsf;
- 
- import com.sun.phobos.script.javascript.RhinoScriptEngineFactory;
-+import com.sun.script.groovy.GroovyScriptEngineFactory;
-+import com.sun.script.jruby.JRubyScriptEngineFactory;
- import org.apache.axiom.om.OMElement;
- import org.apache.axiom.om.OMText;
- import org.apache.bsf.xml.XMLHelper;
-@@ -400,6 +402,8 @@
- 
-         ScriptEngineManager manager = new ScriptEngineManager();
-         manager.registerEngineExtension("js", new RhinoScriptEngineFactory());
-+        manager.registerEngineExtension("groovy", new GroovyScriptEngineFactory());
-+        manager.registerEngineExtension("rb", new JRubyScriptEngineFactory());
- 
-         this.scriptEngine = manager.getEngineByExtension(language);
-         if (scriptEngine == null) {
-Index: java/modules/extensions/src/main/java/org/apache/synapse/mediators/throttle/ThrottleMediator.java
-===================================================================
---- java/modules/extensions/src/main/java/org/apache/synapse/mediators/throttle/ThrottleMediator.java	(revision 1211310)
-+++ java/modules/extensions/src/main/java/org/apache/synapse/mediators/throttle/ThrottleMediator.java	(revision 1211311)
-@@ -72,6 +72,8 @@
-     private Throttle throttle;
-     /* Lock used to ensure thread-safe creation of the throttle */
-     private final Object throttleLock = new Object();
-+    /* Last version of dynamic policy resource*/
-+    private long version;
- 
-     public ThrottleMediator() {
-         this.accessControler = new AccessRateController();
-@@ -181,8 +183,10 @@
-                         boolean reCreate = false;
-                         // if the key refers to a dynamic resource
-                         if (entry.isDynamic()) {
--                            if (!entry.isCached() || entry.isExpired()) {
-+                            if ((!entry.isCached() || entry.isExpired()) &&
-+                                    version != entry.getVersion()) {
-                                 reCreate = true;
-+                                version = entry.getVersion();
-                             }
-                         }
-                         if (reCreate || throttle == null) {
 Index: java/pom.xml
 ===================================================================
 --- java/pom.xml	(revision 1211310)
@@ -451,3 +451,5 @@ Message: * Upgrading to caching 3.5
 
 -*-*-*-
 When: 2011-12-07 02:08:33 -0500 
+-*-*-*-
+Who: hiranya

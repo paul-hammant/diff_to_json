@@ -1,0 +1,80 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java	(revision 1504633)
++++ java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java	(revision 1504634)
+@@ -29,6 +29,7 @@
+ import org.apache.axis2.engine.*;
+ import org.apache.axis2.format.BinaryBuilder;
+ import org.apache.axis2.format.PlainTextBuilder;
++import org.apache.axis2.format.PlainTextFormatter;
+ import org.apache.axis2.phaseresolver.PhaseException;
+ import org.apache.axis2.phaseresolver.PhaseMetadata;
+ import org.apache.axis2.util.JavaUtils;
+@@ -905,6 +906,9 @@
+         if (axisConf.getMessageBuilder("application/octet-stream") == null) {
+             axisConf.addMessageBuilder("application/octet-stream", new BinaryBuilder());
+         }
++        if (axisConf.getMessageFormatter("text/plain") == null) {
++            axisConf.addMessageFormatter("text/plain", new PlainTextFormatter());
++        }
+     }
+ 
+     private void addServerIPAndHostEntries() {
+Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSConstants.java
+===================================================================
+--- java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSConstants.java	(revision 1504633)
++++ java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSConstants.java	(revision 1504634)
+@@ -51,7 +51,8 @@
+     public static final String TRANSPORT_FILE_MOVE_TIMESTAMP_FORMAT
+             = "transport.vfs.MoveTimestampFormat";
+ 
+-    public static final String DEFAULT_RESPONSE_FILE = "response.xml";
++    public static final String DEFAULT_XML_RESPONSE_FILE = "response.xml";
++    public static final String DEFAULT_NON_XML_RESPONSE_FILE = "response.dat";
+     
+     public static final String STREAMING = "transport.vfs.Streaming";
+     
+Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSUtils.java
+===================================================================
+--- java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSUtils.java	(revision 1504633)
++++ java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSUtils.java	(revision 1504634)
+@@ -18,6 +18,7 @@
+ */
+ package org.apache.synapse.transport.vfs;
+ 
++import org.apache.axis2.Constants;
+ import org.apache.axis2.context.MessageContext;
+ import org.apache.axis2.description.Parameter;
+ import org.apache.axis2.transport.base.BaseUtils;
+@@ -94,17 +95,22 @@
+ 
+         // if none works.. use default
+         if (fileName == null) {
+-            fileName = VFSConstants.DEFAULT_RESPONSE_FILE;
++            String messageType = (String) msgCtx.getProperty(Constants.Configuration.MESSAGE_TYPE);
++            if (messageType != null && !messageType.contains("xml")) {
++                fileName = VFSConstants.DEFAULT_NON_XML_RESPONSE_FILE;
++            } else {
++                fileName = VFSConstants.DEFAULT_XML_RESPONSE_FILE;
++            }
+         }
+         return fileName;
+     }
+ 
+     /**
+-     * Acquires a file item lock before processing the item, guaranteing that the file is not
++     * Acquires a file item lock before processing the item, guaranteeing that the file is not
+      * processed while it is being uploaded and/or the item is not processed by two listeners
+      *
+      * @param fsManager used to resolve the processing file
+-     * @param fo representing the processign file item
++     * @param fo representing the processing file item
+      * @return boolean true if the lock has been acquired or false if not
+      */
+     public synchronized static boolean acquireLock(FileSystemManager fsManager, FileObject fo) {
+-*-*-*-
+Message: Some changes related to SYNAPSE-851; Adding plain text formatter to the AxisConfig by default (we already add the plain text builder by default). In the VFS sender, setting the default output file name to response.dat for potential non-XML outputs.
+-*-*-*-
+When: 2013-07-18 16:19:35 -0400 
+-*-*-*-
+Who: hiranya

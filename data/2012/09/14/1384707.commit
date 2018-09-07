@@ -29,3 +29,5 @@ Index: java/modules/distribution/src/main/assembly/bin.xml
 Message: Fixed sample 156: WSS4J seems to require Xalan, so include it in the distribution.
 -*-*-*-
 When: 2012-09-14 06:07:09 -0400 
+-*-*-*-
+Who: veithen
