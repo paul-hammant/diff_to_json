@@ -1,217 +1,217 @@
 {
-  "when": "2013-08-15T02:35:22-04:00", 
-  "message": "Removed a dead import and some unnecessary whitespace", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-102,7 +102,7", 
           "lines": [
-            "             TargetRequest request = TargetContext.getRequest(conn);\n", 
-            "             if (request != null) {\n", 
-            "                 request.start(conn);\n", 
-            "-                targetConfiguration.getMetrics().incrementMessagesSent();\n", 
-            "+                metrics.incrementMessagesSent();\n", 
-            "             }\n", 
-            "             conn.getContext().setAttribute(PassThroughConstants.REQ_DEPARTURE_TIME,\n", 
+            "             TargetRequest request = TargetContext.getRequest(conn);\n",
+            "             if (request != null) {\n",
+            "                 request.start(conn);\n",
+            "-                targetConfiguration.getMetrics().incrementMessagesSent();\n",
+            "+                metrics.incrementMessagesSent();\n",
+            "             }\n",
+            "             conn.getContext().setAttribute(PassThroughConstants.REQ_DEPARTURE_TIME,\n",
             "                     System.currentTimeMillis());\n"
-          ]
-        }, 
+          ],
+          "locn": "-102,7 +102,7"
+        },
         {
-          "locn": "-150,11 +150,11", 
           "lines": [
-            "                 int bytesWritten = request.write(conn, encoder);\n", 
-            "                 metrics.incrementBytesSent(bytesWritten);\n", 
-            "             }\n", 
-            "+\n", 
-            "         } catch (IOException ex) {\n", 
-            "             logIOException(conn, ex);\n", 
-            "             TargetContext.updateState(conn, ProtocolState.CLOSING);\n", 
-            "             targetConfiguration.getConnections().shutdownConnection(conn);\n", 
-            "-\n", 
-            "             informWriterError(conn);\n", 
-            " \n", 
+            "                 int bytesWritten = request.write(conn, encoder);\n",
+            "                 metrics.incrementBytesSent(bytesWritten);\n",
+            "             }\n",
+            "+\n",
+            "         } catch (IOException ex) {\n",
+            "             logIOException(conn, ex);\n",
+            "             TargetContext.updateState(conn, ProtocolState.CLOSING);\n",
+            "             targetConfiguration.getConnections().shutdownConnection(conn);\n",
+            "-\n",
+            "             informWriterError(conn);\n",
+            " \n",
             "             MessageContext requestMsgCtx = TargetContext.get(conn).getRequestMsgCtx();\n"
-          ]
-        }, 
+          ],
+          "locn": "-150,11 +150,11"
+        },
         {
-          "locn": "-169,7 +169,6", 
           "lines": [
-            "             log.error(\"Error occurred while writing data to the target\", e);\n", 
-            "             TargetContext.updateState(conn, ProtocolState.CLOSED);\n", 
-            "             targetConfiguration.getConnections().shutdownConnection(conn);\n", 
-            "-\n", 
-            "             informWriterError(conn);\n", 
-            " \n", 
+            "             log.error(\"Error occurred while writing data to the target\", e);\n",
+            "             TargetContext.updateState(conn, ProtocolState.CLOSED);\n",
+            "             targetConfiguration.getConnections().shutdownConnection(conn);\n",
+            "-\n",
+            "             informWriterError(conn);\n",
+            " \n",
             "             MessageContext requestMsgCtx = TargetContext.get(conn).getRequestMsgCtx();\n"
-          ]
-        }, 
+          ],
+          "locn": "-169,7 +169,6"
+        },
         {
-          "locn": "-209,10 +208,9", 
           "lines": [
-            "             if (targetRequest != null) {\n", 
-            "                 method = targetRequest.getMethod();\n", 
-            "             }\n", 
-            "-            boolean canResponseHaveBody =\n", 
-            "-                    isResponseHaveBodyExpected(method, response);\n", 
-            "-            TargetResponse targetResponse = new TargetResponse(\n", 
-            "-                    targetConfiguration, response, conn, canResponseHaveBody);\n", 
-            "+            boolean canResponseHaveBody = isResponseHaveBodyExpected(method, response);\n", 
-            "+            TargetResponse targetResponse = new TargetResponse(targetConfiguration, response,\n", 
-            "+                    conn, canResponseHaveBody);\n", 
-            "             TargetContext.setResponse(conn, targetResponse);\n", 
-            "             targetResponse.start(conn);\n", 
+            "             if (targetRequest != null) {\n",
+            "                 method = targetRequest.getMethod();\n",
+            "             }\n",
+            "-            boolean canResponseHaveBody =\n",
+            "-                    isResponseHaveBodyExpected(method, response);\n",
+            "-            TargetResponse targetResponse = new TargetResponse(\n",
+            "-                    targetConfiguration, response, conn, canResponseHaveBody);\n",
+            "+            boolean canResponseHaveBody = isResponseHaveBodyExpected(method, response);\n",
+            "+            TargetResponse targetResponse = new TargetResponse(targetConfiguration, response,\n",
+            "+                    conn, canResponseHaveBody);\n",
+            "             TargetContext.setResponse(conn, targetResponse);\n",
+            "             targetResponse.start(conn);\n",
             " \n"
-          ]
-        }, 
+          ],
+          "locn": "-209,10 +208,9"
+        },
         {
-          "locn": "-225,17 +223,15", 
           "lines": [
-            "                     new ClientWorker(targetConfiguration.getConfigurationContext(),\n", 
-            "                             requestMsgContext, targetResponse));\n", 
-            " \n", 
-            "-            targetConfiguration.getMetrics().incrementMessagesReceived();\n", 
-            "+            metrics.incrementMessagesReceived();\n", 
-            "             \n", 
-            "-\t\t\tNHttpServerConnection sourceConn =\n", 
-            "-\t\t\t                                   (NHttpServerConnection) requestMsgContext.getProperty(PassThroughConstants.PASS_THROUGH_SOURCE_CONNECTION);\n", 
-            "+\t\t\tNHttpServerConnection sourceConn = (NHttpServerConnection) requestMsgContext.\n", 
-            "+                    getProperty(PassThroughConstants.PASS_THROUGH_SOURCE_CONNECTION);\n", 
-            " \t\t\tif (sourceConn != null) {\n", 
-            " \t\t\t\tsourceConn.getContext().setAttribute(PassThroughConstants.RES_HEADER_ARRIVAL_TIME,\n", 
-            "-\t\t\t\t                                     conn.getContext()\n", 
-            "-\t\t\t\t                                         .getAttribute(PassThroughConstants.RES_HEADER_ARRIVAL_TIME));\n", 
-            "+                        conn.getContext().getAttribute(PassThroughConstants.RES_HEADER_ARRIVAL_TIME));\n", 
-            " \t\t\t\tsourceConn.getContext().setAttribute(PassThroughConstants.REQ_DEPARTURE_TIME,\n", 
-            "-\t\t\t\t                                     conn.getContext()\n", 
-            "-\t\t\t\t                                         .getAttribute(PassThroughConstants.REQ_DEPARTURE_TIME));\n", 
-            "+                        conn.getContext().getAttribute(PassThroughConstants.REQ_DEPARTURE_TIME));\n", 
-            " \n", 
-            " \t\t\t}\n", 
+            "                     new ClientWorker(targetConfiguration.getConfigurationContext(),\n",
+            "                             requestMsgContext, targetResponse));\n",
+            " \n",
+            "-            targetConfiguration.getMetrics().incrementMessagesReceived();\n",
+            "+            metrics.incrementMessagesReceived();\n",
+            "             \n",
+            "-\t\t\tNHttpServerConnection sourceConn =\n",
+            "-\t\t\t                                   (NHttpServerConnection) requestMsgContext.getProperty(PassThroughConstants.PASS_THROUGH_SOURCE_CONNECTION);\n",
+            "+\t\t\tNHttpServerConnection sourceConn = (NHttpServerConnection) requestMsgContext.\n",
+            "+                    getProperty(PassThroughConstants.PASS_THROUGH_SOURCE_CONNECTION);\n",
+            " \t\t\tif (sourceConn != null) {\n",
+            " \t\t\t\tsourceConn.getContext().setAttribute(PassThroughConstants.RES_HEADER_ARRIVAL_TIME,\n",
+            "-\t\t\t\t                                     conn.getContext()\n",
+            "-\t\t\t\t                                         .getAttribute(PassThroughConstants.RES_HEADER_ARRIVAL_TIME));\n",
+            "+                        conn.getContext().getAttribute(PassThroughConstants.RES_HEADER_ARRIVAL_TIME));\n",
+            " \t\t\t\tsourceConn.getContext().setAttribute(PassThroughConstants.REQ_DEPARTURE_TIME,\n",
+            "-\t\t\t\t                                     conn.getContext()\n",
+            "-\t\t\t\t                                         .getAttribute(PassThroughConstants.REQ_DEPARTURE_TIME));\n",
+            "+                        conn.getContext().getAttribute(PassThroughConstants.REQ_DEPARTURE_TIME));\n",
+            " \n",
+            " \t\t\t}\n",
             "                                                                                       \n"
-          ]
-        }, 
+          ],
+          "locn": "-225,17 +223,15"
+        },
         {
-          "locn": "-281,9 +277,7", 
           "lines": [
-            "             }\n", 
-            " \n", 
-            "             TargetContext.updateState(conn, ProtocolState.RESPONSE_BODY);\n", 
-            "-\n", 
-            "             TargetResponse response = TargetContext.getResponse(conn);\n", 
-            "-\n", 
-            " \t\t\tif (response != null) {\n", 
-            " \t\t\t\tint responseRead = response.read(conn, decoder);\n", 
+            "             }\n",
+            " \n",
+            "             TargetContext.updateState(conn, ProtocolState.RESPONSE_BODY);\n",
+            "-\n",
+            "             TargetResponse response = TargetContext.getResponse(conn);\n",
+            "-\n",
+            " \t\t\tif (response != null) {\n",
+            " \t\t\t\tint responseRead = response.read(conn, decoder);\n",
             " \t\t\t\tmetrics.incrementBytesReceived(responseRead);\n"
-          ]
-        }, 
+          ],
+          "locn": "-281,9 +277,7"
+        },
         {
-          "locn": "-303,7 +297,6", 
           "lines": [
-            " \n", 
-            "     public void closed(NHttpClientConnection conn) {\n", 
-            "         ProtocolState state = TargetContext.getState(conn);\n", 
-            "-        \n", 
-            "         boolean sendFault = false;\n", 
-            " \n", 
+            " \n",
+            "     public void closed(NHttpClientConnection conn) {\n",
+            "         ProtocolState state = TargetContext.getState(conn);\n",
+            "-        \n",
+            "         boolean sendFault = false;\n",
+            " \n",
             "         if (state == ProtocolState.REQUEST_READY || state == ProtocolState.RESPONSE_DONE) {\n"
-          ]
-        }, 
+          ],
+          "locn": "-303,7 +297,6"
+        },
         {
-          "locn": "-345,9 +338,7", 
           "lines": [
-            " \n", 
-            "     public void exception(NHttpClientConnection conn, IOException e) {\n", 
-            "         ProtocolState state = TargetContext.getState(conn);\n", 
-            "-\n", 
-            "         logIOException(conn, e);\n", 
-            "-\n", 
-            "         MessageContext requestMsgCtx = TargetContext.get(conn).getRequestMsgCtx();\n", 
-            "         if (requestMsgCtx != null) {\n", 
+            " \n",
+            "     public void exception(NHttpClientConnection conn, IOException e) {\n",
+            "         ProtocolState state = TargetContext.getState(conn);\n",
+            "-\n",
+            "         logIOException(conn, e);\n",
+            "-\n",
+            "         MessageContext requestMsgCtx = TargetContext.get(conn).getRequestMsgCtx();\n",
+            "         if (requestMsgCtx != null) {\n",
             "             targetErrorHandler.handleError(requestMsgCtx,\n"
-          ]
-        }, 
+          ],
+          "locn": "-345,9 +338,7"
+        },
         {
-          "locn": "-528,7 +519,6", 
           "lines": [
-            "     private String getErrorMessage(String message, NHttpClientConnection conn) {\n", 
-            "         if (conn != null && conn instanceof DefaultNHttpClientConnection) {\n", 
-            "             DefaultNHttpClientConnection c = ((DefaultNHttpClientConnection) conn);\n", 
-            "-\n", 
-            "             if (c.getRemoteAddress() != null) {\n", 
-            "                 return message + \" For : \" + c.getRemoteAddress().getHostAddress() + \":\" +\n", 
+            "     private String getErrorMessage(String message, NHttpClientConnection conn) {\n",
+            "         if (conn != null && conn instanceof DefaultNHttpClientConnection) {\n",
+            "             DefaultNHttpClientConnection c = ((DefaultNHttpClientConnection) conn);\n",
+            "-\n",
+            "             if (c.getRemoteAddress() != null) {\n",
+            "                 return message + \" For : \" + c.getRemoteAddress().getHostAddress() + \":\" +\n",
             "                         c.getRemotePort();\n"
-          ]
-        }, 
+          ],
+          "locn": "-528,7 +519,6"
+        },
         {
-          "locn": "-556,9 +546,7", 
           "lines": [
-            " \n", 
-            "     private void informReaderError(NHttpClientConnection conn) {\n", 
-            "         Pipe reader = TargetContext.get(conn).getReader();\n", 
-            "-\n", 
-            "         metrics.incrementFaultsReceiving();\n", 
-            "-\n", 
-            "         if (reader != null) {\n", 
-            "             reader.producerError();\n", 
+            " \n",
+            "     private void informReaderError(NHttpClientConnection conn) {\n",
+            "         Pipe reader = TargetContext.get(conn).getReader();\n",
+            "-\n",
+            "         metrics.incrementFaultsReceiving();\n",
+            "-\n",
+            "         if (reader != null) {\n",
+            "             reader.producerError();\n",
             "         }\n"
-          ]
-        }, 
+          ],
+          "locn": "-556,9 +546,7"
+        },
         {
-          "locn": "-566,9 +554,7", 
           "lines": [
-            " \n", 
-            "     private void informWriterError(NHttpClientConnection conn) {\n", 
-            "         Pipe writer = TargetContext.get(conn).getWriter();\n", 
-            "-\n", 
-            "         metrics.incrementFaultsReceiving();\n", 
-            "-\n", 
-            "         if (writer != null) {\n", 
-            "             writer.consumerError();\n", 
+            " \n",
+            "     private void informWriterError(NHttpClientConnection conn) {\n",
+            "         Pipe writer = TargetContext.get(conn).getWriter();\n",
+            "-\n",
+            "         metrics.incrementFaultsReceiving();\n",
+            "-\n",
+            "         if (writer != null) {\n",
+            "             writer.consumerError();\n",
             "         }\n"
-          ]
+          ],
+          "locn": "-566,9 +554,7"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetHandler.java", 
-      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetHandler.java"
-    }, 
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetHandler.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetHandler.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-53,7 +53,6", 
           "lines": [
-            " import org.apache.synapse.transport.passthru.ProtocolState;\n", 
-            " import org.apache.synapse.transport.passthru.SourceContext;\n", 
-            " import org.apache.synapse.transport.passthru.SourceHandler;\n", 
-            "-import org.apache.synapse.transport.passthru.config.PassThroughConfiguration;\n", 
-            " import org.apache.ws.commons.schema.XmlSchema;\n", 
-            " \n", 
+            " import org.apache.synapse.transport.passthru.ProtocolState;\n",
+            " import org.apache.synapse.transport.passthru.SourceContext;\n",
+            " import org.apache.synapse.transport.passthru.SourceHandler;\n",
+            "-import org.apache.synapse.transport.passthru.config.PassThroughConfiguration;\n",
+            " import org.apache.ws.commons.schema.XmlSchema;\n",
+            " \n",
             " public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {\n"
-          ]
+          ],
+          "locn": "-53,7 +53,6"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/api/PassThroughNHttpGetProcessor.java", 
-      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/api/PassThroughNHttpGetProcessor.java"
-    }, 
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/api/PassThroughNHttpGetProcessor.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/api/PassThroughNHttpGetProcessor.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-167,7 +167,6", 
           "lines": [
-            "             } else if (SourceContext.get(conn).isShutDown()) {\n", 
-            "                 // we need to shut down if the shutdown flag is set\n", 
-            "                 SourceContext.updateState(conn, ProtocolState.CLOSING);\n", 
-            "-\n", 
-            "                 sourceConfiguration.getSourceConnections().closeConnection(conn);\n", 
-            "             } else {\n", 
+            "             } else if (SourceContext.get(conn).isShutDown()) {\n",
+            "                 // we need to shut down if the shutdown flag is set\n",
+            "                 SourceContext.updateState(conn, ProtocolState.CLOSING);\n",
+            "-\n",
+            "                 sourceConfiguration.getSourceConnections().closeConnection(conn);\n",
+            "             } else {\n",
             "                 // Reset connection state\n"
-          ]
+          ],
+          "locn": "-167,7 +167,6"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceResponse.java", 
-      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceResponse.java"
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceResponse.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceResponse.java"
     }
-  ], 
-  "id": "1514175"
+  ],
+  "id": "1514175",
+  "message": "Removed a dead import and some unnecessary whitespace",
+  "when": "2013-08-15T02:35:22-04:00",
+  "who": "hiranya"
 }

@@ -1,97 +1,97 @@
 {
-  "when": "2013-07-18T17:40:26-04:00", 
-  "message": "Applying the patch for SYNAPSE-847; Getting rid of redundant code to close the file input stream. This is taken care of by the FileObject.close() method. Also using an AutoCloseInputStream so that the input stream will be closed early if Synapse consumes it entirely.", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-58,7 +58,7", 
           "lines": [
-            "                             !org.apache.commons.io.output,\n", 
-            "                             org.apache.commons.io.output; version=0.0.0,\n", 
-            "                             org.apache.commons.vfs2.*; version=0.0.0,\n", 
-            "-\t\t\t\t\t\t\torg.apache.commons.io; version=0.0.0,\n", 
-            "+\t\t\t\t\t\t\torg.apache.commons.io.*; version=0.0.0,\n", 
-            "                             *; resolution:=optional\n", 
-            "                         </Import-Package>\n", 
+            "                             !org.apache.commons.io.output,\n",
+            "                             org.apache.commons.io.output; version=0.0.0,\n",
+            "                             org.apache.commons.vfs2.*; version=0.0.0,\n",
+            "-\t\t\t\t\t\t\torg.apache.commons.io; version=0.0.0,\n",
+            "+\t\t\t\t\t\t\torg.apache.commons.io.*; version=0.0.0,\n",
+            "                             *; resolution:=optional\n",
+            "                         </Import-Package>\n",
             "                     </instructions>\n"
-          ]
+          ],
+          "locn": "-58,7 +58,7"
         }
-      ], 
-      "to": "java/modules/transports/core/vfs/pom.xml", 
-      "from": "java/modules/transports/core/vfs/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/transports/core/vfs/pom.xml",
+      "to": "java/modules/transports/core/vfs/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-36,6 +36,7", 
           "lines": [
-            " import org.apache.axis2.transport.base.ManagementSupport;\n", 
-            " import org.apache.axis2.transport.base.threads.WorkerPool;\n", 
-            " import org.apache.commons.io.FileUtils;\n", 
-            "+import org.apache.commons.io.input.AutoCloseInputStream;\n", 
-            " import org.apache.commons.vfs2.*;\n", 
-            " import org.apache.commons.vfs2.impl.StandardFileSystemManager;\n", 
+            " import org.apache.axis2.transport.base.ManagementSupport;\n",
+            " import org.apache.axis2.transport.base.threads.WorkerPool;\n",
+            " import org.apache.commons.io.FileUtils;\n",
+            "+import org.apache.commons.io.input.AutoCloseInputStream;\n",
+            " import org.apache.commons.vfs2.*;\n",
+            " import org.apache.commons.vfs2.impl.StandardFileSystemManager;\n",
             " \n"
-          ]
-        }, 
+          ],
+          "locn": "-36,6 +36,7"
+        },
         {
-          "locn": "-543,7 +544,7", 
           "lines": [
-            "                 dataSource = ManagedDataSourceFactory.create(\n", 
-            "                         new FileObjectDataSource(file, contentType));\n", 
-            "             } else {\n", 
-            "-                in = content.getInputStream();\n", 
-            "+                in = new AutoCloseInputStream(content.getInputStream());\n", 
-            "                 dataSource = null;\n", 
-            "             }\n", 
+            "                 dataSource = ManagedDataSourceFactory.create(\n",
+            "                         new FileObjectDataSource(file, contentType));\n",
+            "             } else {\n",
+            "-                in = content.getInputStream();\n",
+            "+                in = new AutoCloseInputStream(content.getInputStream());\n",
+            "                 dataSource = null;\n",
+            "             }\n",
             "             \n"
-          ]
-        }, 
+          ],
+          "locn": "-543,7 +544,7"
+        },
         {
-          "locn": "-563,15 +564,8", 
           "lines": [
-            "                     null, //* SOAP Action - not applicable *//\n", 
-            "                     contentType\n", 
-            "                 );\n", 
-            "-            }\n", 
-            "-            finally {\n", 
-            "-                if (in != null) {\n", 
-            "-                    try {\n", 
-            "-                        in.close();\n", 
-            "-                    } catch (IOException ex) {\n", 
-            "-                        handleException(\"Error closing stream\", ex);\n", 
-            "-                    }\n", 
-            "-                } else {\n", 
-            "+            } finally {\n", 
-            "+                if (dataSource != null) {\n", 
-            "                     dataSource.destroy();\n", 
-            "                 }\n", 
+            "                     null, //* SOAP Action - not applicable *//\n",
+            "                     contentType\n",
+            "                 );\n",
+            "-            }\n",
+            "-            finally {\n",
+            "-                if (in != null) {\n",
+            "-                    try {\n",
+            "-                        in.close();\n",
+            "-                    } catch (IOException ex) {\n",
+            "-                        handleException(\"Error closing stream\", ex);\n",
+            "-                    }\n",
+            "-                } else {\n",
+            "+            } finally {\n",
+            "+                if (dataSource != null) {\n",
+            "                     dataSource.destroy();\n",
+            "                 }\n",
             "             }\n"
-          ]
-        }, 
+          ],
+          "locn": "-563,15 +564,8"
+        },
         {
-          "locn": "-585,9 +579,10", 
           "lines": [
-            "             \n", 
-            "         } finally {\n", 
-            "             try {\n", 
-            "+                // As per the Commons-VFS API docs, this will also close the underlying\n", 
-            "+                // FileContent object and any open streams.\n", 
-            "                 file.close();\n", 
-            "-            } catch (FileSystemException warn) {\n", 
-            "-                log.warn(\"Cannot close file after processing : \" + file.getName().getPath(), warn);\n", 
-            "+            } catch (FileSystemException ignored) {\n", 
-            "             }\n", 
-            "         }\n", 
+            "             \n",
+            "         } finally {\n",
+            "             try {\n",
+            "+                // As per the Commons-VFS API docs, this will also close the underlying\n",
+            "+                // FileContent object and any open streams.\n",
+            "                 file.close();\n",
+            "-            } catch (FileSystemException warn) {\n",
+            "-                log.warn(\"Cannot close file after processing : \" + file.getName().getPath(), warn);\n",
+            "+            } catch (FileSystemException ignored) {\n",
+            "             }\n",
+            "         }\n",
             "     }\n"
-          ]
+          ],
+          "locn": "-585,9 +579,10"
         }
-      ], 
-      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java", 
-      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java"
+      ],
+      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java",
+      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java"
     }
-  ], 
-  "id": "1504674"
+  ],
+  "id": "1504674",
+  "message": "Applying the patch for SYNAPSE-847; Getting rid of redundant code to close the file input stream. This is taken care of by the FileObject.close() method. Also using an AutoCloseInputStream so that the input stream will be closed early if Synapse consumes it entirely.",
+  "when": "2013-07-18T17:40:26-04:00",
+  "who": "hiranya"
 }

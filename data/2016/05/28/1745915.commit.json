@@ -1,48 +1,48 @@
 {
-  "when": "2016-05-28T14:29:21-04:00", 
-  "message": "erge fix https://issues.apache.org/jira/browse/SYNAPSE-850", 
-  "who": "dushan", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-29,6 +29,7", 
           "lines": [
-            " import org.apache.http.entity.ByteArrayEntity;\n", 
-            " import org.apache.http.impl.DefaultConnectionReuseStrategy;\n", 
-            " import org.apache.http.impl.DefaultHttpResponseFactory;\n", 
-            "+import org.apache.http.message.BasicHttpResponse;\n", 
-            " import org.apache.http.nio.*;\n", 
-            " import org.apache.http.nio.util.HeapByteBufferAllocator;\n", 
+            " import org.apache.http.entity.ByteArrayEntity;\n",
+            " import org.apache.http.impl.DefaultConnectionReuseStrategy;\n",
+            " import org.apache.http.impl.DefaultHttpResponseFactory;\n",
+            "+import org.apache.http.message.BasicHttpResponse;\n",
+            " import org.apache.http.nio.*;\n",
+            " import org.apache.http.nio.util.HeapByteBufferAllocator;\n",
             " import org.apache.http.nio.util.ContentOutputBuffer;\n"
-          ]
-        }, 
+          ],
+          "locn": "-29,6 +29,7"
+        },
         {
-          "locn": "-205,6 +206,17", 
           "lines": [
-            "                 int priority = parser.parse(evaluatorContext);\n", 
-            "                 executor.execute(worker, priority);\n", 
-            "             }\n", 
-            "+            \n", 
-            "+            // See if the client expects a 100-Continue\n", 
-            "+            Header expect = request.getFirstHeader(HTTP.EXPECT_DIRECTIVE);\n", 
-            "+            if (expect != null && HTTP.EXPECT_CONTINUE.equalsIgnoreCase(expect.getValue())) {\n", 
-            "+                HttpResponse ack = new BasicHttpResponse(request.getProtocolVersion(), HttpStatus.SC_CONTINUE, \"Continue\");\n", 
-            "+                conn.submitResponse(ack);\n", 
-            "+                if (log.isDebugEnabled()) {\n", 
-            "+                 log.debug(\"Expect :100 Continue hit sending ack back to the server\");\n", 
-            "+                }\n", 
-            "+                return;\n", 
-            "+            }\n", 
-            " \n", 
-            "         } catch (Exception e) {\n", 
+            "                 int priority = parser.parse(evaluatorContext);\n",
+            "                 executor.execute(worker, priority);\n",
+            "             }\n",
+            "+            \n",
+            "+            // See if the client expects a 100-Continue\n",
+            "+            Header expect = request.getFirstHeader(HTTP.EXPECT_DIRECTIVE);\n",
+            "+            if (expect != null && HTTP.EXPECT_CONTINUE.equalsIgnoreCase(expect.getValue())) {\n",
+            "+                HttpResponse ack = new BasicHttpResponse(request.getProtocolVersion(), HttpStatus.SC_CONTINUE, \"Continue\");\n",
+            "+                conn.submitResponse(ack);\n",
+            "+                if (log.isDebugEnabled()) {\n",
+            "+                 log.debug(\"Expect :100 Continue hit sending ack back to the server\");\n",
+            "+                }\n",
+            "+                return;\n",
+            "+            }\n",
+            " \n",
+            "         } catch (Exception e) {\n",
             "             if (metrics != null) {\n"
-          ]
+          ],
+          "locn": "-205,6 +206,17"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ServerHandler.java", 
-      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ServerHandler.java"
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ServerHandler.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ServerHandler.java"
     }
-  ], 
-  "id": "1745915"
+  ],
+  "id": "1745915",
+  "message": "erge fix https://issues.apache.org/jira/browse/SYNAPSE-850",
+  "when": "2016-05-28T14:29:21-04:00",
+  "who": "dushan"
 }

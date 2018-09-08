@@ -1,59 +1,59 @@
 {
-  "when": "2011-12-19T08:04:11-05:00", 
-  "message": "Upgrading XML APIs version - SYNAPSE-410 - Removed some redundant libs", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-242,6 +242,8", 
           "lines": [
-            "                 <exclude>javax.servlet:servlet-api:jar</exclude>\r\n", 
-            "                 <exclude>xml-apis:xml-apis:jar</exclude>\r\n", 
-            "                 <exclude>xerces:xercesImpl:jar</exclude>\r\n", 
-            "+\t\t<exclude>org.apache.xerces:xercesImpl</exclude>\r\n", 
-            "+\t\t<exclude>org.apache.xerces:xml-apis</exclude>\r\n", 
-            "                 <exclude>junit:junit:jar</exclude>\r\n", 
-            "                 <exclude>org.apache.mina:mina-core:jar</exclude>\r\n", 
+            "                 <exclude>javax.servlet:servlet-api:jar</exclude>\r\n",
+            "                 <exclude>xml-apis:xml-apis:jar</exclude>\r\n",
+            "                 <exclude>xerces:xercesImpl:jar</exclude>\r\n",
+            "+\t\t<exclude>org.apache.xerces:xercesImpl</exclude>\r\n",
+            "+\t\t<exclude>org.apache.xerces:xml-apis</exclude>\r\n",
+            "                 <exclude>junit:junit:jar</exclude>\r\n",
+            "                 <exclude>org.apache.mina:mina-core:jar</exclude>\r\n",
             "                 <exclude>org.slf4j:slf4j-api:jar</exclude>\r\n"
-          ]
+          ],
+          "locn": "-242,6 +242,8"
         }
-      ], 
-      "to": "java/modules/distribution/src/main/assembly/bin.xml", 
-      "from": "java/modules/distribution/src/main/assembly/bin.xml"
-    }, 
+      ],
+      "from": "java/modules/distribution/src/main/assembly/bin.xml",
+      "to": "java/modules/distribution/src/main/assembly/bin.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-828,7 +828,7", 
           "lines": [
-            "         <axis2.transport.version>1.7.0-SNAPSHOT</axis2.transport.version>\n", 
-            "         <axiom.version>1.2.13-SNAPSHOT</axiom.version>\n", 
-            "         <xml_schema.version>1.4.3</xml_schema.version>\n", 
-            "-        <xml_apis.version>1.3.04</xml_apis.version>\n", 
-            "+        <xml_apis.version>2.0.2</xml_apis.version>\n", 
-            "         <wsdl4j.version>1.6.2</wsdl4j.version>\n", 
-            " \n", 
+            "         <axis2.transport.version>1.7.0-SNAPSHOT</axis2.transport.version>\n",
+            "         <axiom.version>1.2.13-SNAPSHOT</axiom.version>\n",
+            "         <xml_schema.version>1.4.3</xml_schema.version>\n",
+            "-        <xml_apis.version>1.3.04</xml_apis.version>\n",
+            "+        <xml_apis.version>2.0.2</xml_apis.version>\n",
+            "         <wsdl4j.version>1.6.2</wsdl4j.version>\n",
+            " \n",
             "         <commons.logging.version>1.1.1</commons.logging.version>\n"
-          ]
-        }, 
+          ],
+          "locn": "-828,7 +828,7"
+        },
         {
-          "locn": "-843,7 +843,7", 
           "lines": [
-            "         <bcprov.jdk15.version>140</bcprov.jdk15.version>\n", 
-            " \n", 
-            "         <xalan.version>2.7.1</xalan.version>\n", 
-            "-        <xerces.version>2.8.1</xerces.version>\n", 
-            "+        <xerces.version>2.9.1</xerces.version>\n", 
-            "         <js.version>1.6R5</js.version>\n", 
-            " \n", 
+            "         <bcprov.jdk15.version>140</bcprov.jdk15.version>\n",
+            " \n",
+            "         <xalan.version>2.7.1</xalan.version>\n",
+            "-        <xerces.version>2.8.1</xerces.version>\n",
+            "+        <xerces.version>2.9.1</xerces.version>\n",
+            "         <js.version>1.6R5</js.version>\n",
+            " \n",
             "         <!-- startup, quartz -->\n"
-          ]
+          ],
+          "locn": "-843,7 +843,7"
         }
-      ], 
-      "to": "java/pom.xml", 
-      "from": "java/pom.xml"
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
     }
-  ], 
-  "id": "1220727"
+  ],
+  "id": "1220727",
+  "message": "Upgrading XML APIs version - SYNAPSE-410 - Removed some redundant libs",
+  "when": "2011-12-19T08:04:11-05:00",
+  "who": "hiranya"
 }

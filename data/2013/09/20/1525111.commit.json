@@ -1,82 +1,82 @@
 {
-  "when": "2013-09-20T15:18:06-04:00", 
-  "message": "Applying the patch for SYNAPSE-977", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-41,7 +41,7", 
           "lines": [
-            "         headerMediator.setQName(new QName(SynapseConstants.HEADER_TO));\n", 
-            "         headerMediator.setValue(TEST_HEADER);\n", 
-            " \n", 
-            "-        // invoke transformation, with static enveope\n", 
-            "+        // invoke transformation, with static envelope\n", 
-            "         MessageContext synCtx = TestUtils.getTestContext(\"<empty/>\");\n", 
-            "         headerMediator.mediate(synCtx);\n", 
+            "         headerMediator.setQName(new QName(SynapseConstants.HEADER_TO));\n",
+            "         headerMediator.setValue(TEST_HEADER);\n",
+            " \n",
+            "-        // invoke transformation, with static enveope\n",
+            "+        // invoke transformation, with static envelope\n",
+            "         MessageContext synCtx = TestUtils.getTestContext(\"<empty/>\");\n",
+            "         headerMediator.mediate(synCtx);\n",
             " \n"
-          ]
-        }, 
+          ],
+          "locn": "-41,7 +41,7"
+        },
         {
-          "locn": "-120,4 +120,29", 
           "lines": [
-            "                 new QName(\"http://org.synapse.example\", \"complexHeader\"));\n", 
-            "         assertNull(result);\n", 
-            "     }\n", 
-            "+\n", 
-            "+    public void testEmbeddedXmlClone() throws Exception {\n", 
-            "+        // Test for SYNAPSE-977\n", 
-            "+        String complexHeader = \"<header><m:complexHeader xmlns:m=\\\"http://org.synapse.example\\\">TEST</m:complexHeader></header>\";\n", 
-            "+\n", 
-            "+        HeaderMediatorFactory fac = new HeaderMediatorFactory();\n", 
-            "+        HeaderMediator headerMediator = (HeaderMediator) fac.createMediator(\n", 
-            "+                AXIOMUtil.stringToOM(complexHeader), new Properties());\n", 
-            "+\n", 
-            "+        // Adding headers.\n", 
-            "+        MessageContext synCtx = TestUtils.getTestContext(\"<empty/>\");\n", 
-            "+        headerMediator.mediate(synCtx);\n", 
-            "+        OMElement result = synCtx.getEnvelope().getHeader().getFirstElement();\n", 
-            "+        assertEquals(\"complexHeader\", result.getLocalName());\n", 
-            "+        assertEquals(\"TEST\", result.getText());\n", 
-            "+\n", 
-            "+        // Now mutate the result\n", 
-            "+        result.setText(\"TEST123\");\n", 
-            "+\n", 
-            "+        synCtx = TestUtils.getTestContext(\"<empty/>\");\n", 
-            "+        headerMediator.mediate(synCtx);\n", 
-            "+        result = synCtx.getEnvelope().getHeader().getFirstElement();\n", 
-            "+        assertEquals(\"complexHeader\", result.getLocalName());\n", 
-            "+        assertEquals(\"TEST\", result.getText());\n", 
-            "+    }\n", 
+            "                 new QName(\"http://org.synapse.example\", \"complexHeader\"));\n",
+            "         assertNull(result);\n",
+            "     }\n",
+            "+\n",
+            "+    public void testEmbeddedXmlClone() throws Exception {\n",
+            "+        // Test for SYNAPSE-977\n",
+            "+        String complexHeader = \"<header><m:complexHeader xmlns:m=\\\"http://org.synapse.example\\\">TEST</m:complexHeader></header>\";\n",
+            "+\n",
+            "+        HeaderMediatorFactory fac = new HeaderMediatorFactory();\n",
+            "+        HeaderMediator headerMediator = (HeaderMediator) fac.createMediator(\n",
+            "+                AXIOMUtil.stringToOM(complexHeader), new Properties());\n",
+            "+\n",
+            "+        // Adding headers.\n",
+            "+        MessageContext synCtx = TestUtils.getTestContext(\"<empty/>\");\n",
+            "+        headerMediator.mediate(synCtx);\n",
+            "+        OMElement result = synCtx.getEnvelope().getHeader().getFirstElement();\n",
+            "+        assertEquals(\"complexHeader\", result.getLocalName());\n",
+            "+        assertEquals(\"TEST\", result.getText());\n",
+            "+\n",
+            "+        // Now mutate the result\n",
+            "+        result.setText(\"TEST123\");\n",
+            "+\n",
+            "+        synCtx = TestUtils.getTestContext(\"<empty/>\");\n",
+            "+        headerMediator.mediate(synCtx);\n",
+            "+        result = synCtx.getEnvelope().getHeader().getFirstElement();\n",
+            "+        assertEquals(\"complexHeader\", result.getLocalName());\n",
+            "+        assertEquals(\"TEST\", result.getText());\n",
+            "+    }\n",
             " }\n"
-          ]
+          ],
+          "locn": "-120,4 +120,29"
         }
-      ], 
-      "to": "java/modules/core/src/test/java/org/apache/synapse/mediators/transform/HeaderMediatorTest.java", 
-      "from": "java/modules/core/src/test/java/org/apache/synapse/mediators/transform/HeaderMediatorTest.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/test/java/org/apache/synapse/mediators/transform/HeaderMediatorTest.java",
+      "to": "java/modules/core/src/test/java/org/apache/synapse/mediators/transform/HeaderMediatorTest.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-169,7 +169,9", 
           "lines": [
-            "             hb.setText(value);\n", 
-            "         } else if (hasEmbeddedXml()) {\n", 
-            "             for (OMElement e : embeddedXmlContent) {\n", 
-            "-                header.addChild(e);\n", 
-            "+                // Don't attach the original OMElement here.\n", 
-            "+                // If another mediator down the line, changes the OM, we are in trouble.\n", 
-            "+                header.addChild(e.cloneOMElement());\n", 
-            "             }\n", 
-            "         }\n", 
+            "             hb.setText(value);\n",
+            "         } else if (hasEmbeddedXml()) {\n",
+            "             for (OMElement e : embeddedXmlContent) {\n",
+            "-                header.addChild(e);\n",
+            "+                // Don't attach the original OMElement here.\n",
+            "+                // If another mediator down the line, changes the OM, we are in trouble.\n",
+            "+                header.addChild(e.cloneOMElement());\n",
+            "             }\n",
+            "         }\n",
             "     }\n"
-          ]
+          ],
+          "locn": "-169,7 +169,9"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/transform/HeaderMediator.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/transform/HeaderMediator.java"
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/transform/HeaderMediator.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/transform/HeaderMediator.java"
     }
-  ], 
-  "id": "1525111"
+  ],
+  "id": "1525111",
+  "message": "Applying the patch for SYNAPSE-977",
+  "when": "2013-09-20T15:18:06-04:00",
+  "who": "hiranya"
 }

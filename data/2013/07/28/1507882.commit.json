@@ -1,32 +1,32 @@
 {
-  "when": "2013-07-28T22:03:06-04:00", 
-  "message": "fixed the rabbitmq client.", 
-  "who": "rajikak", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-27,8 +27,10", 
           "lines": [
-            "         channel.basicConsume(QUEUE_NAME, true, consumer);\n", 
-            "         System.out.println(\"Waiting for message on queue '\" + QUEUE_NAME + \"'\");\n", 
-            " \n", 
-            "-        QueueingConsumer.Delivery delivery = consumer.nextDelivery();\n", 
-            "-        String message = new String(delivery.getBody());\n", 
-            "-        System.out.println(\"[x] received '\" + message + \"'\");\n", 
-            "+        while (true) {\n", 
-            "+            QueueingConsumer.Delivery delivery = consumer.nextDelivery();\n", 
-            "+            String message = new String(delivery.getBody());\n", 
-            "+            System.out.println(\"[x] received '\" + message + \"'\");\n", 
-            "+        }\n", 
-            "     }\n", 
+            "         channel.basicConsume(QUEUE_NAME, true, consumer);\n",
+            "         System.out.println(\"Waiting for message on queue '\" + QUEUE_NAME + \"'\");\n",
+            " \n",
+            "-        QueueingConsumer.Delivery delivery = consumer.nextDelivery();\n",
+            "-        String message = new String(delivery.getBody());\n",
+            "-        System.out.println(\"[x] received '\" + message + \"'\");\n",
+            "+        while (true) {\n",
+            "+            QueueingConsumer.Delivery delivery = consumer.nextDelivery();\n",
+            "+            String message = new String(delivery.getBody());\n",
+            "+            System.out.println(\"[x] received '\" + message + \"'\");\n",
+            "+        }\n",
+            "     }\n",
             " }\n"
-          ]
+          ],
+          "locn": "-27,8 +27,10"
         }
-      ], 
-      "to": "java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPConsumerClient.java", 
-      "from": "java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPConsumerClient.java"
+      ],
+      "from": "java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPConsumerClient.java",
+      "to": "java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPConsumerClient.java"
     }
-  ], 
-  "id": "1507882"
+  ],
+  "id": "1507882",
+  "message": "fixed the rabbitmq client.",
+  "when": "2013-07-28T22:03:06-04:00",
+  "who": "rajikak"
 }

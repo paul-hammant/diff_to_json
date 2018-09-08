@@ -1,52 +1,52 @@
 {
-  "when": "2016-12-28T06:21:37-05:00", 
-  "message": "SYNAPSE-1077: To change the version of a transitive dependency, a dependencyManagement entry is enough; there is no need to exclude the transitive dependency and add it as a direct dependency. In this particular case, this also avoids an unwanted transitive dependency on stax:stax-api (which is excluded in Axis2 and reappears if Jettison is added as a direct dependency).", 
-  "who": "veithen", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-115,10 +115,6", 
           "lines": [
-            "             <groupId>org.apache.axis2</groupId>\n", 
-            "             <artifactId>axis2-json</artifactId>\n", 
-            "         </dependency>\n", 
-            "-        <dependency>\n", 
-            "-            <groupId>org.codehaus.jettison</groupId>\n", 
-            "-            <artifactId>jettison</artifactId>\n", 
-            "-        </dependency>\n", 
-            " \n", 
-            "         <!-- Additional transports -->\n", 
+            "             <groupId>org.apache.axis2</groupId>\n",
+            "             <artifactId>axis2-json</artifactId>\n",
+            "         </dependency>\n",
+            "-        <dependency>\n",
+            "-            <groupId>org.codehaus.jettison</groupId>\n",
+            "-            <artifactId>jettison</artifactId>\n",
+            "-        </dependency>\n",
+            " \n",
+            "         <!-- Additional transports -->\n",
             "         <dependency>\n"
-          ]
+          ],
+          "locn": "-115,10 +115,6"
         }
-      ], 
-      "to": "java/modules/distribution/pom.xml", 
-      "from": "java/modules/distribution/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/distribution/pom.xml",
+      "to": "java/modules/distribution/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-445,12 +445,6", 
           "lines": [
-            "                 <groupId>org.apache.axis2</groupId>\n", 
-            "                 <artifactId>axis2-json</artifactId>\n", 
-            "                 <version>${axis2.version}</version>\n", 
-            "-                <exclusions>\n", 
-            "-                    <exclusion>\n", 
-            "-                        <groupId>org.codehaus.jettison</groupId>\n", 
-            "-                        <artifactId>jettison</artifactId>\n", 
-            "-                    </exclusion>\n", 
-            "-                </exclusions>\n", 
-            "             </dependency>\n", 
-            "             <dependency>\n", 
+            "                 <groupId>org.apache.axis2</groupId>\n",
+            "                 <artifactId>axis2-json</artifactId>\n",
+            "                 <version>${axis2.version}</version>\n",
+            "-                <exclusions>\n",
+            "-                    <exclusion>\n",
+            "-                        <groupId>org.codehaus.jettison</groupId>\n",
+            "-                        <artifactId>jettison</artifactId>\n",
+            "-                    </exclusion>\n",
+            "-                </exclusions>\n",
+            "             </dependency>\n",
+            "             <dependency>\n",
             "                 <groupId>org.codehaus.jettison</groupId>\n"
-          ]
+          ],
+          "locn": "-445,12 +445,6"
         }
-      ], 
-      "to": "java/pom.xml", 
-      "from": "java/pom.xml"
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
     }
-  ], 
-  "id": "1776269"
+  ],
+  "id": "1776269",
+  "message": "SYNAPSE-1077: To change the version of a transitive dependency, a dependencyManagement entry is enough; there is no need to exclude the transitive dependency and add it as a direct dependency. In this particular case, this also avoids an unwanted transitive dependency on stax:stax-api (which is excluded in Axis2 and reappears if Jettison is added as a direct dependency).",
+  "when": "2016-12-28T06:21:37-05:00",
+  "who": "veithen"
 }

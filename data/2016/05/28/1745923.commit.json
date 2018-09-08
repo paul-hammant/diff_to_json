@@ -1,48 +1,48 @@
 {
-  "when": "2016-05-28T15:27:03-04:00", 
-  "message": "Documentation update for Header Mediator with changes made in SYNAPSE-1021", 
-  "who": "isudana", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-407,16 +407,25", 
           "lines": [
-            "         <section name=\"Transformation Mediators\" id=\"TransformationMediators\">\n", 
-            "             <subsection name=\"Header Mediator\" id=\"Header\">\n", 
-            "                 <p>\n", 
-            "-                    Header mediator sets or removes a specified header from the current SOAP\n", 
-            "-                    infoset. The optional 'action' attribute specifies whether the mediator should\n", 
-            "+                    Header mediator sets or removes a specified header from the message.\n", 
-            "+                    The optional 'scope' attribute specifies the scope of the header.\n", 
-            "+                    Scope can be either 'soap' or 'transport'.\n", 
-            "+                    If the scope is set to 'soap', header is treated as a soap header and if it is 'transport',\n", 
-            "+                    header is treated as a transport header.\n", 
-            "+                    If the scope is omitted, header is treated as a soap header or one of the below mentioned known headers.\n", 
-            "+                    The optional 'action' attribute specifies whether the mediator should\n", 
-            "                     set or remove the header. If omitted, it defaults to 'set' action.\n", 
-            "                 </p>\n", 
-            "-                <div class=\"xmlConf\">&lt;header name=\"qname\" (value=\"literal\" | expression=\"xpath\") [action=\"set\"]/&gt;\n", 
-            "-&lt;header name=\"qname\" action=\"remove\"/&gt;</div>\n", 
-            "+                <div class=\"xmlConf\">&lt;header [name=\"qname\"] (value=\"literal\" | expression=\"xpath\") [action=\"set\"] [scope=\"soap | transport\"]&gt;\n", 
-            "+        [&lt;embeddedxml/&gt;]\n", 
-            "+&lt;/header&gt;</div>\n", 
-            "+\n", 
-            "+                <div class=\"xmlConf\">&lt;header name=\"qname\" action=\"remove\" [scope=\"soap | transport\"]/&gt;</div>\n", 
-            "                 <p>\n", 
-            "                     The value of the 'name' attribute must be one of the following aliases or\n", 
-            "                     a valid QName with a namespace prefix. In the latter case the namespace prefix\n", 
-            "                     must be mapped to a valid namespace URI using the standard 'xmlns' attribute.\n", 
-            "+                    When setting an embedded xml element as a soap header, 'name' attribute is not required.\n", 
-            "                 </p>\n", 
-            "                 <ul>\n", 
+            "         <section name=\"Transformation Mediators\" id=\"TransformationMediators\">\n",
+            "             <subsection name=\"Header Mediator\" id=\"Header\">\n",
+            "                 <p>\n",
+            "-                    Header mediator sets or removes a specified header from the current SOAP\n",
+            "-                    infoset. The optional 'action' attribute specifies whether the mediator should\n",
+            "+                    Header mediator sets or removes a specified header from the message.\n",
+            "+                    The optional 'scope' attribute specifies the scope of the header.\n",
+            "+                    Scope can be either 'soap' or 'transport'.\n",
+            "+                    If the scope is set to 'soap', header is treated as a soap header and if it is 'transport',\n",
+            "+                    header is treated as a transport header.\n",
+            "+                    If the scope is omitted, header is treated as a soap header or one of the below mentioned known headers.\n",
+            "+                    The optional 'action' attribute specifies whether the mediator should\n",
+            "                     set or remove the header. If omitted, it defaults to 'set' action.\n",
+            "                 </p>\n",
+            "-                <div class=\"xmlConf\">&lt;header name=\"qname\" (value=\"literal\" | expression=\"xpath\") [action=\"set\"]/&gt;\n",
+            "-&lt;header name=\"qname\" action=\"remove\"/&gt;</div>\n",
+            "+                <div class=\"xmlConf\">&lt;header [name=\"qname\"] (value=\"literal\" | expression=\"xpath\") [action=\"set\"] [scope=\"soap | transport\"]&gt;\n",
+            "+        [&lt;embeddedxml/&gt;]\n",
+            "+&lt;/header&gt;</div>\n",
+            "+\n",
+            "+                <div class=\"xmlConf\">&lt;header name=\"qname\" action=\"remove\" [scope=\"soap | transport\"]/&gt;</div>\n",
+            "                 <p>\n",
+            "                     The value of the 'name' attribute must be one of the following aliases or\n",
+            "                     a valid QName with a namespace prefix. In the latter case the namespace prefix\n",
+            "                     must be mapped to a valid namespace URI using the standard 'xmlns' attribute.\n",
+            "+                    When setting an embedded xml element as a soap header, 'name' attribute is not required.\n",
+            "                 </p>\n",
+            "                 <ul>\n",
             "                     <li>To</li>\n"
-          ]
+          ],
+          "locn": "-407,16 +407,25"
         }
-      ], 
-      "to": "java/modules/documentation/src/site/xdoc/userguide/mediators.xml", 
-      "from": "java/modules/documentation/src/site/xdoc/userguide/mediators.xml"
+      ],
+      "from": "java/modules/documentation/src/site/xdoc/userguide/mediators.xml",
+      "to": "java/modules/documentation/src/site/xdoc/userguide/mediators.xml"
     }
-  ], 
-  "id": "1745923"
+  ],
+  "id": "1745923",
+  "message": "Documentation update for Header Mediator with changes made in SYNAPSE-1021",
+  "when": "2016-05-28T15:27:03-04:00",
+  "who": "isudana"
 }

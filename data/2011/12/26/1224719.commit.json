@@ -1,54 +1,54 @@
 {
-  "when": "2011-12-26T06:59:01-05:00", 
-  "message": "Upgrading javadoc plugin to latest stable - This fixes the last build break at Jenkins", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-98,7 +98,6", 
           "lines": [
-            "                 <plugins>\n", 
-            "                     <plugin>\n", 
-            "                         <artifactId>maven-javadoc-plugin</artifactId>\n", 
-            "-                        <version>2.1</version>\n", 
-            "                         <executions>\n", 
-            "                             <execution>\n", 
+            "                 <plugins>\n",
+            "                     <plugin>\n",
+            "                         <artifactId>maven-javadoc-plugin</artifactId>\n",
+            "-                        <version>2.1</version>\n",
+            "                         <executions>\n",
+            "                             <execution>\n",
             "                                 <goals>\n"
-          ]
-        }, 
+          ],
+          "locn": "-98,7 +98,6"
+        },
         {
-          "locn": "-273,6 +272,11", 
           "lines": [
-            "                     <artifactId>maven-archetype-plugin</artifactId>\n", 
-            "                     <version>2.2</version>\n", 
-            "                 </plugin>\n", 
-            "+                <plugin>\n", 
-            "+                    <groupId>org.apache.maven.plugins</groupId>\n", 
-            "+                    <artifactId>maven-javadoc-plugin</artifactId>\n", 
-            "+                    <version>2.8</version>\n", 
-            "+                </plugin>\n", 
-            "             </plugins>\n", 
-            "         </pluginManagement>\n", 
+            "                     <artifactId>maven-archetype-plugin</artifactId>\n",
+            "                     <version>2.2</version>\n",
+            "                 </plugin>\n",
+            "+                <plugin>\n",
+            "+                    <groupId>org.apache.maven.plugins</groupId>\n",
+            "+                    <artifactId>maven-javadoc-plugin</artifactId>\n",
+            "+                    <version>2.8</version>\n",
+            "+                </plugin>\n",
+            "             </plugins>\n",
+            "         </pluginManagement>\n",
             "     </build>\n"
-          ]
-        }, 
+          ],
+          "locn": "-273,6 +272,11"
+        },
         {
-          "locn": "-913,7 +917,6", 
           "lines": [
-            "             <plugin>\n", 
-            "                 <inherited>false</inherited>\n", 
-            "                 <artifactId>maven-javadoc-plugin</artifactId>\n", 
-            "-                <version>2.1</version>\n", 
-            "                 <configuration>\n", 
-            "                     <links>\n", 
+            "             <plugin>\n",
+            "                 <inherited>false</inherited>\n",
+            "                 <artifactId>maven-javadoc-plugin</artifactId>\n",
+            "-                <version>2.1</version>\n",
+            "                 <configuration>\n",
+            "                     <links>\n",
             "                         <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>\n"
-          ]
+          ],
+          "locn": "-913,7 +917,6"
         }
-      ], 
-      "to": "java/pom.xml", 
-      "from": "java/pom.xml"
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
     }
-  ], 
-  "id": "1224719"
+  ],
+  "id": "1224719",
+  "message": "Upgrading javadoc plugin to latest stable - This fixes the last build break at Jenkins",
+  "when": "2011-12-26T06:59:01-05:00",
+  "who": "hiranya"
 }

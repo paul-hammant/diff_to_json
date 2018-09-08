@@ -1,26 +1,26 @@
 {
-  "when": "2011-12-26T10:39:39-05:00", 
-  "message": "Changing reports plugin version to 2.2 - Previous version causes the maven to throw out an error everytime the dependency report is generated - Known issue in the plugin v2.1.2", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-939,6 +939,7", 
           "lines": [
-            "             </plugin>\n", 
-            "             <plugin>\n", 
-            "                 <artifactId>maven-project-info-reports-plugin</artifactId>\n", 
-            "+\t\t<version>2.2</version>\n", 
-            "                 <configuration>\n", 
-            "                     <!-- These features are disabled since they cause \"mvn site\" to hang -->\n", 
+            "             </plugin>\n",
+            "             <plugin>\n",
+            "                 <artifactId>maven-project-info-reports-plugin</artifactId>\n",
+            "+\t\t<version>2.2</version>\n",
+            "                 <configuration>\n",
+            "                     <!-- These features are disabled since they cause \"mvn site\" to hang -->\n",
             "                     <dependencyLocationsEnabled>false</dependencyLocationsEnabled>\n"
-          ]
+          ],
+          "locn": "-939,6 +939,7"
         }
-      ], 
-      "to": "java/pom.xml", 
-      "from": "java/pom.xml"
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
     }
-  ], 
-  "id": "1224741"
+  ],
+  "id": "1224741",
+  "message": "Changing reports plugin version to 2.2 - Previous version causes the maven to throw out an error everytime the dependency report is generated - Known issue in the plugin v2.1.2",
+  "when": "2011-12-26T10:39:39-05:00",
+  "who": "hiranya"
 }

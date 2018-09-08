@@ -1,27 +1,27 @@
 {
-  "when": "2013-04-29T14:35:25-04:00", 
-  "message": "Fixed build problems (with Maven != 3.0.4) caused by broken third party repository.\n", 
-  "who": "veithen", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-1021,7 +1021,7", 
           "lines": [
-            "         <repository>\n", 
-            "             <id>snmp4j-repo</id>\n", 
-            "             <name>SNMP4J Repository</name>\n", 
-            "-            <url>https://server.oosnmp.net/dist/release/</url>\n", 
-            "+            <url>https://oosnmp.net/dist/release/</url>\n", 
-            "             <releases>\n", 
-            "                 <updatePolicy>never</updatePolicy>\n", 
+            "         <repository>\n",
+            "             <id>snmp4j-repo</id>\n",
+            "             <name>SNMP4J Repository</name>\n",
+            "-            <url>https://server.oosnmp.net/dist/release/</url>\n",
+            "+            <url>https://oosnmp.net/dist/release/</url>\n",
+            "             <releases>\n",
+            "                 <updatePolicy>never</updatePolicy>\n",
             "             </releases>\n"
-          ]
+          ],
+          "locn": "-1021,7 +1021,7"
         }
-      ], 
-      "to": "java/pom.xml", 
-      "from": "java/pom.xml"
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
     }
-  ], 
-  "id": "1477261"
+  ],
+  "id": "1477261",
+  "message": "Fixed build problems (with Maven != 3.0.4) caused by broken third party repository.\n",
+  "when": "2013-04-29T14:35:25-04:00",
+  "who": "veithen"
 }

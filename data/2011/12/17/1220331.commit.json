@@ -1,27 +1,27 @@
 {
-  "when": "2011-12-17T22:46:21-05:00", 
-  "message": "Fixing xalan jar duplication in distribution : SYNAPSE-825", 
-  "who": "kasun", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-584,7 +584,7", 
           "lines": [
-            "         </dependency>\n", 
-            " \n", 
-            "         <dependency>\n", 
-            "-            <groupId>xalan</groupId>\n", 
-            "+            <groupId>org.apache.xalan</groupId>\n", 
-            "             <artifactId>xalan</artifactId>\n", 
-            "             <version>${xalan.version}</version>\n", 
+            "         </dependency>\n",
+            " \n",
+            "         <dependency>\n",
+            "-            <groupId>xalan</groupId>\n",
+            "+            <groupId>org.apache.xalan</groupId>\n",
+            "             <artifactId>xalan</artifactId>\n",
+            "             <version>${xalan.version}</version>\n",
             "         </dependency>\n"
-          ]
+          ],
+          "locn": "-584,7 +584,7"
         }
-      ], 
-      "to": "java/pom.xml", 
-      "from": "java/pom.xml"
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
     }
-  ], 
-  "id": "1220331"
+  ],
+  "id": "1220331",
+  "message": "Fixing xalan jar duplication in distribution : SYNAPSE-825",
+  "when": "2011-12-17T22:46:21-05:00",
+  "who": "kasun"
 }

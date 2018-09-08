@@ -1,26 +1,26 @@
 {
-  "when": "2012-03-19T04:48:38-04:00", 
-  "message": "Adding documentation module to the build", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-1056,6 +1056,7", 
           "lines": [
-            "         <module>modules/packaging/package-skeleton</module>\n", 
-            "         <module>modules/packaging/package-archetype</module>\n", 
-            "         <module>modules/integration</module>\n", 
-            "+\t<module>modules/documentation</module>\n", 
-            "     </modules>\n", 
-            " \n", 
+            "         <module>modules/packaging/package-skeleton</module>\n",
+            "         <module>modules/packaging/package-archetype</module>\n",
+            "         <module>modules/integration</module>\n",
+            "+\t<module>modules/documentation</module>\n",
+            "     </modules>\n",
+            " \n",
             "     <properties>\n"
-          ]
+          ],
+          "locn": "-1056,6 +1056,7"
         }
-      ], 
-      "to": "java/pom.xml", 
-      "from": "java/pom.xml"
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
     }
-  ], 
-  "id": "1302325"
+  ],
+  "id": "1302325",
+  "message": "Adding documentation module to the build",
+  "when": "2012-03-19T04:48:38-04:00",
+  "who": "hiranya"
 }

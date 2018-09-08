@@ -1,232 +1,232 @@
 {
-  "when": "2012-01-18T09:22:49-05:00", 
-  "message": "Some refactoring and building REST APIs at startup", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-119,7 +119,7", 
           "lines": [
-            "                 // this endpoint is static -->\n", 
-            "                 // since template-endpoint is static, should ONLY be loaded at initialization to prevent\n", 
-            "                 // reloading every single time this endpoint is executed..\n", 
-            "-                // incase tempalate config has changed this endpoint should be redeployed\n", 
-            "+                // in case template config has changed this endpoint should be redeployed\n", 
-            "                 reLoad = false;\n", 
-            "             }\n", 
+            "                 // this endpoint is static -->\n",
+            "                 // since template-endpoint is static, should ONLY be loaded at initialization to prevent\n",
+            "                 // reloading every single time this endpoint is executed..\n",
+            "-                // incase tempalate config has changed this endpoint should be redeployed\n",
+            "+                // in case template config has changed this endpoint should be redeployed\n",
+            "                 reLoad = false;\n",
+            "             }\n",
             "         }\n"
-          ]
+          ],
+          "locn": "-119,7 +119,7"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/endpoints/TemplateEndpoint.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/endpoints/TemplateEndpoint.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/endpoints/TemplateEndpoint.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/endpoints/TemplateEndpoint.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-41,6 +41,7", 
           "lines": [
-            " import javax.activation.DataHandler;\n", 
-            " import java.io.BufferedReader;\n", 
-            " import java.io.IOException;\n", 
-            "+import java.io.InputStream;\n", 
-            " import java.io.InputStreamReader;\n", 
-            " import java.text.Format;\n", 
+            " import javax.activation.DataHandler;\n",
+            " import java.io.BufferedReader;\n",
+            " import java.io.IOException;\n",
+            "+import java.io.InputStream;\n",
+            " import java.io.InputStreamReader;\n",
+            " import java.text.Format;\n",
             " import java.text.SimpleDateFormat;\n"
-          ]
-        }, 
+          ],
+          "locn": "-41,6 +41,7"
+        },
         {
-          "locn": "-326,8 +327,10", 
           "lines": [
-            "                         OMText omText = (OMText) propEntry.getValue();\n", 
-            "                         DataHandler dh = (DataHandler) omText.getDataHandler();\n", 
-            "                         if (omText.getDataHandler() != null) {\n", 
-            "+                            InputStream in = null;\n", 
-            "                             try {\n", 
-            "-                                InputStreamReader streamReader = new InputStreamReader(dh.getInputStream());\n", 
-            "+                                in = dh.getInputStream();\n", 
-            "+                                InputStreamReader streamReader = new InputStreamReader(in);\n", 
-            "                                 BufferedReader stringReader = new BufferedReader(streamReader);\n", 
-            "                                 StringBuilder omTextString = new StringBuilder(NULL_STRING);\n", 
+            "                         OMText omText = (OMText) propEntry.getValue();\n",
+            "                         DataHandler dh = (DataHandler) omText.getDataHandler();\n",
+            "                         if (omText.getDataHandler() != null) {\n",
+            "+                            InputStream in = null;\n",
+            "                             try {\n",
+            "-                                InputStreamReader streamReader = new InputStreamReader(dh.getInputStream());\n",
+            "+                                in = dh.getInputStream();\n",
+            "+                                InputStreamReader streamReader = new InputStreamReader(in);\n",
+            "                                 BufferedReader stringReader = new BufferedReader(streamReader);\n",
+            "                                 StringBuilder omTextString = new StringBuilder(NULL_STRING);\n",
             "                                 String tempStr;\n"
-          ]
-        }, 
+          ],
+          "locn": "-326,8 +327,10"
+        },
         {
-          "locn": "-337,6 +340,12", 
           "lines": [
-            "                                 return omTextString.toString();\n", 
-            "                             } catch (IOException e) {\n", 
-            "                                 return NULL_STRING;\n", 
-            "+                            } finally {\n", 
-            "+                                if (in != null) {\n", 
-            "+                                    try {\n", 
-            "+                                        in.close();\n", 
-            "+                                    } catch (IOException ignore) { }\n", 
-            "+                                }\n", 
-            "                             }\n", 
-            "                         } else {\n", 
+            "                                 return omTextString.toString();\n",
+            "                             } catch (IOException e) {\n",
+            "                                 return NULL_STRING;\n",
+            "+                            } finally {\n",
+            "+                                if (in != null) {\n",
+            "+                                    try {\n",
+            "+                                        in.close();\n",
+            "+                                    } catch (IOException ignore) { }\n",
+            "+                                }\n",
+            "                             }\n",
+            "                         } else {\n",
             "                             omText.getText();\n"
-          ]
+          ],
+          "locn": "-337,6 +340,12"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/GetPropertyFunction.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/GetPropertyFunction.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/GetPropertyFunction.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/GetPropertyFunction.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-135,7 +135,7", 
           "lines": [
-            "             Aggregate aggregate = null;\n", 
-            "             String correlationIdName = (id != null ? EIPConstants.AGGREGATE_CORRELATION + \".\" + id :\n", 
-            "                     EIPConstants.AGGREGATE_CORRELATION);\n", 
-            "-            // if a correlateExpression is provided and there is a coresponding\n", 
-            "+            // if a correlateExpression is provided and there is a corresponding\n", 
-            "             // element in the current message prepare to correlate the messages on that\n", 
-            "             if (correlateExpression != null\n", 
+            "             Aggregate aggregate = null;\n",
+            "             String correlationIdName = (id != null ? EIPConstants.AGGREGATE_CORRELATION + \".\" + id :\n",
+            "                     EIPConstants.AGGREGATE_CORRELATION);\n",
+            "-            // if a correlateExpression is provided and there is a coresponding\n",
+            "+            // if a correlateExpression is provided and there is a corresponding\n",
+            "             // element in the current message prepare to correlate the messages on that\n",
+            "             if (correlateExpression != null\n",
             "                     && correlateExpression.evaluate(synCtx) != null) {\n"
-          ]
-        }, 
+          ],
+          "locn": "-135,7 +135,7"
+        },
         {
-          "locn": "-180,7 +180,7", 
           "lines": [
-            "                 }\n", 
-            " \n", 
-            "             } else if (synCtx.getProperty(correlationIdName) != null) {\n", 
-            "-                // if the correlattion cannot be found using the correlateExpression then\n", 
-            "+                // if the correlation cannot be found using the correlateExpression then\n", 
-            "                 // try the default which is through the AGGREGATE_CORRELATION message property\n", 
-            "                 // which is the unique original message id of a split or iterate operation and\n", 
+            "                 }\n",
+            " \n",
+            "             } else if (synCtx.getProperty(correlationIdName) != null) {\n",
+            "-                // if the correlattion cannot be found using the correlateExpression then\n",
+            "+                // if the correlation cannot be found using the correlateExpression then\n",
+            "                 // try the default which is through the AGGREGATE_CORRELATION message property\n",
+            "                 // which is the unique original message id of a split or iterate operation and\n",
             "                 // which thus can be used to uniquely group messages into aggregates\n"
-          ]
+          ],
+          "locn": "-180,7 +180,7"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/eip/aggregator/AggregateMediator.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/eip/aggregator/AggregateMediator.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/eip/aggregator/AggregateMediator.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/eip/aggregator/AggregateMediator.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-319,9 +319,10", 
           "lines": [
-            "         }\r\n", 
-            "     }\r\n", 
-            " \r\n", 
-            "-    public static void defineAPI(SynapseConfiguration config, OMElement elem) {\r\n", 
-            "+    public static API defineAPI(SynapseConfiguration config, OMElement elem) {\r\n", 
-            "         API api = APIFactory.createAPI(elem);\r\n", 
-            "         config.addAPI(api.getName(), api);\r\n", 
-            "+        return api;\r\n", 
-            "     }\r\n", 
-            " \r\n", 
+            "         }\r\n",
+            "     }\r\n",
+            " \r\n",
+            "-    public static void defineAPI(SynapseConfiguration config, OMElement elem) {\r\n",
+            "+    public static API defineAPI(SynapseConfiguration config, OMElement elem) {\r\n",
+            "         API api = APIFactory.createAPI(elem);\r\n",
+            "         config.addAPI(api.getName(), api);\r\n",
+            "+        return api;\r\n",
+            "     }\r\n",
+            " \r\n",
             "     private static void handleException(String msg) {\r\n"
-          ]
+          ],
+          "locn": "-319,9 +319,10"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseXMLConfigurationFactory.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseXMLConfigurationFactory.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseXMLConfigurationFactory.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseXMLConfigurationFactory.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-41,6 +41,7", 
           "lines": [
-            " import org.apache.synapse.endpoints.Endpoint;\n", 
-            " import org.apache.synapse.eventing.SynapseEventSource;\n", 
-            " import org.apache.synapse.mediators.base.SequenceMediator;\n", 
-            "+import org.apache.synapse.rest.API;\n", 
-            " \n", 
-            " import javax.xml.namespace.QName;\n", 
+            " import org.apache.synapse.endpoints.Endpoint;\n",
+            " import org.apache.synapse.eventing.SynapseEventSource;\n",
+            " import org.apache.synapse.mediators.base.SequenceMediator;\n",
+            "+import org.apache.synapse.rest.API;\n",
+            " \n",
+            " import javax.xml.namespace.QName;\n",
             " import javax.xml.stream.XMLStreamException;\n"
-          ]
-        }, 
+          ],
+          "locn": "-41,6 +41,7"
+        },
         {
-          "locn": "-130,7 +131,8", 
           "lines": [
-            "         createEventSources(synapseConfig, root, properties);\n", 
-            "         createExecutors(synapseConfig, root, properties);\n", 
-            "         createMessageStores(synapseConfig, root, properties);\n", 
-            "-        createMessageProcessors(synapseConfig,root,properties);\n", 
-            "+        createMessageProcessors(synapseConfig, root, properties);\n", 
-            "+        createAPIs(synapseConfig, root, properties);\n", 
-            " \n", 
-            "         return synapseConfig;\n", 
+            "         createEventSources(synapseConfig, root, properties);\n",
+            "         createExecutors(synapseConfig, root, properties);\n",
+            "         createMessageStores(synapseConfig, root, properties);\n",
+            "-        createMessageProcessors(synapseConfig,root,properties);\n",
+            "+        createMessageProcessors(synapseConfig, root, properties);\n",
+            "+        createAPIs(synapseConfig, root, properties);\n",
+            " \n",
+            "         return synapseConfig;\n",
             "     }\n"
-          ]
-        }, 
+          ],
+          "locn": "-130,7 +131,8"
+        },
         {
-          "locn": "-414,7 +416,6", 
           "lines": [
-            "         }\n", 
-            "     }\n", 
-            " \n", 
-            "-\n", 
-            "     private static void createMessageProcessors(SynapseConfiguration synapseConfig,\n", 
-            "                                             String rootDirPath, Properties properties) {\n", 
+            "         }\n",
+            "     }\n",
+            " \n",
+            "-\n",
+            "     private static void createMessageProcessors(SynapseConfiguration synapseConfig,\n",
+            "                                             String rootDirPath, Properties properties) {\n",
             " \n"
-          ]
-        }, 
+          ],
+          "locn": "-414,7 +416,6"
+        },
         {
-          "locn": "-439,7 +440,29", 
           "lines": [
-            "         }\n", 
-            "     }\n", 
-            " \n", 
-            "+    private static void createAPIs(SynapseConfiguration synapseConfig,\n", 
-            "+                                            String rootDirPath, Properties properties) {\n", 
-            " \n", 
-            "+        File apiDir = new File(rootDirPath, REST_API_DIR);\n", 
-            "+        if (apiDir.exists()) {\n", 
-            "+            if (log.isDebugEnabled()) {\n", 
-            "+                log.debug(\"Loading APIs from :\" + apiDir.getPath());\n", 
-            "+            }\n", 
-            "+\n", 
-            "+            Iterator apiIterator = FileUtils.iterateFiles(apiDir, extensions, false);\n", 
-            "+            while (apiIterator.hasNext()) {\n", 
-            "+                File file = (File) apiIterator.next();\n", 
-            "+                OMElement document = getOMElement(file);\n", 
-            "+                API api = SynapseXMLConfigurationFactory.defineAPI(synapseConfig, document);\n", 
-            "+                if (api != null) {\n", 
-            "+                    api.setFileName(file.getName());\n", 
-            "+                    synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),\n", 
-            "+                            api.getName());\n", 
-            "+                }\n", 
-            "+            }\n", 
-            "+        }\n", 
-            "+    }\n", 
-            "+\n", 
-            "     private static OMElement getOMElement(File file) {\n", 
-            "         FileInputStream is;\n", 
+            "         }\n",
+            "     }\n",
+            " \n",
+            "+    private static void createAPIs(SynapseConfiguration synapseConfig,\n",
+            "+                                            String rootDirPath, Properties properties) {\n",
+            " \n",
+            "+        File apiDir = new File(rootDirPath, REST_API_DIR);\n",
+            "+        if (apiDir.exists()) {\n",
+            "+            if (log.isDebugEnabled()) {\n",
+            "+                log.debug(\"Loading APIs from :\" + apiDir.getPath());\n",
+            "+            }\n",
+            "+\n",
+            "+            Iterator apiIterator = FileUtils.iterateFiles(apiDir, extensions, false);\n",
+            "+            while (apiIterator.hasNext()) {\n",
+            "+                File file = (File) apiIterator.next();\n",
+            "+                OMElement document = getOMElement(file);\n",
+            "+                API api = SynapseXMLConfigurationFactory.defineAPI(synapseConfig, document);\n",
+            "+                if (api != null) {\n",
+            "+                    api.setFileName(file.getName());\n",
+            "+                    synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),\n",
+            "+                            api.getName());\n",
+            "+                }\n",
+            "+            }\n",
+            "+        }\n",
+            "+    }\n",
+            "+\n",
+            "     private static OMElement getOMElement(File file) {\n",
+            "         FileInputStream is;\n",
             "         OMElement document = null;\n"
-          ]
+          ],
+          "locn": "-439,7 +440,29"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/MultiXMLConfigurationBuilder.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/MultiXMLConfigurationBuilder.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/MultiXMLConfigurationBuilder.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/MultiXMLConfigurationBuilder.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-210,6 +210,11", 
           "lines": [
-            "         </dependency>\n", 
-            "         <dependency>\n", 
-            "             <groupId>net.sf.saxon</groupId>\n", 
-            "+            <artifactId>saxon</artifactId>\n", 
-            "+            <scope>test</scope>\n", 
-            "+        </dependency>\n", 
-            "+        <dependency>\n", 
-            "+            <groupId>net.sf.saxon</groupId>\n", 
-            "             <artifactId>saxon-dom</artifactId>\n", 
-            "             <scope>test</scope>\n", 
+            "         </dependency>\n",
+            "         <dependency>\n",
+            "             <groupId>net.sf.saxon</groupId>\n",
+            "+            <artifactId>saxon</artifactId>\n",
+            "+            <scope>test</scope>\n",
+            "+        </dependency>\n",
+            "+        <dependency>\n",
+            "+            <groupId>net.sf.saxon</groupId>\n",
+            "             <artifactId>saxon-dom</artifactId>\n",
+            "             <scope>test</scope>\n",
             "         </dependency>\n"
-          ]
+          ],
+          "locn": "-210,6 +210,11"
         }
-      ], 
-      "to": "java/modules/core/pom.xml", 
-      "from": "java/modules/core/pom.xml"
+      ],
+      "from": "java/modules/core/pom.xml",
+      "to": "java/modules/core/pom.xml"
     }
-  ], 
-  "id": "1232898"
+  ],
+  "id": "1232898",
+  "message": "Some refactoring and building REST APIs at startup",
+  "when": "2012-01-18T09:22:49-05:00",
+  "who": "hiranya"
 }

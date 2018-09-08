@@ -1,29 +1,29 @@
 {
-  "when": "2013-08-04T08:12:42-04:00", 
-  "message": "If the project uses Java 1.6, then it should also configure the maven-compiler-plugin accordingly.\n", 
-  "who": "veithen", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-198,8 +198,8", 
           "lines": [
-            "                     <artifactId>maven-compiler-plugin</artifactId>\n", 
-            "                     <version>2.3.2</version>\n", 
-            "                     <configuration>\n", 
-            "-                        <source>1.5</source>\n", 
-            "-                        <target>1.5</target>\n", 
-            "+                        <source>1.6</source>\n", 
-            "+                        <target>1.6</target>\n", 
-            "                     </configuration>\n", 
-            "                 </plugin>\n", 
+            "                     <artifactId>maven-compiler-plugin</artifactId>\n",
+            "                     <version>2.3.2</version>\n",
+            "                     <configuration>\n",
+            "-                        <source>1.5</source>\n",
+            "-                        <target>1.5</target>\n",
+            "+                        <source>1.6</source>\n",
+            "+                        <target>1.6</target>\n",
+            "                     </configuration>\n",
+            "                 </plugin>\n",
             "                 <plugin>\n"
-          ]
+          ],
+          "locn": "-198,8 +198,8"
         }
-      ], 
-      "to": "java/pom.xml", 
-      "from": "java/pom.xml"
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
     }
-  ], 
-  "id": "1510147"
+  ],
+  "id": "1510147",
+  "message": "If the project uses Java 1.6, then it should also configure the maven-compiler-plugin accordingly.\n",
+  "when": "2013-08-04T08:12:42-04:00",
+  "who": "veithen"
 }

@@ -1,41 +1,41 @@
 {
-  "when": "2011-12-14T08:30:36-05:00", 
-  "message": "File path update", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-18,6 +18,7", 
           "lines": [
-            "  */\n", 
-            " package org.apache.synapse.samples.framework.tests.proxy;\n", 
-            " \n", 
-            "+import org.apache.commons.io.FilenameUtils;\n", 
-            " import org.apache.commons.logging.Log;\n", 
-            " import org.apache.commons.logging.LogFactory;\n", 
+            "  */\n",
+            " package org.apache.synapse.samples.framework.tests.proxy;\n",
+            " \n",
+            "+import org.apache.commons.io.FilenameUtils;\n",
+            " import org.apache.commons.logging.Log;\n",
+            " import org.apache.commons.logging.LogFactory;\n",
             " import org.apache.synapse.samples.framework.SampleClientResult;\n"
-          ]
-        }, 
+          ],
+          "locn": "-18,6 +18,7"
+        },
         {
-          "locn": "-38,8 +39,9", 
           "lines": [
-            " \n", 
-            "     public void testTransportAndFormatSwitching() {\n", 
-            "         String url2 = \"https://localhost:8243/services/StockQuoteProxy\";\n", 
-            "-        System.setProperty(\"javax.net.ssl.trustStore\", System.getProperty(\"user.dir\") +\n", 
-            "+        String trustStore = FilenameUtils.normalize(System.getProperty(\"user.dir\") +\n", 
-            "                 \"/modules/integration/src/test/resources/trust.jks\");\n", 
-            "+        System.setProperty(\"javax.net.ssl.trustStore\", trustStore);\n", 
-            " \n", 
-            "         log.info(\"Running test: Switching transports and message format from SOAP to REST/POX\");\n", 
+            " \n",
+            "     public void testTransportAndFormatSwitching() {\n",
+            "         String url2 = \"https://localhost:8243/services/StockQuoteProxy\";\n",
+            "-        System.setProperty(\"javax.net.ssl.trustStore\", System.getProperty(\"user.dir\") +\n",
+            "+        String trustStore = FilenameUtils.normalize(System.getProperty(\"user.dir\") +\n",
+            "                 \"/modules/integration/src/test/resources/trust.jks\");\n",
+            "+        System.setProperty(\"javax.net.ssl.trustStore\", trustStore);\n",
+            " \n",
+            "         log.info(\"Running test: Switching transports and message format from SOAP to REST/POX\");\n",
             " \n"
-          ]
+          ],
+          "locn": "-38,8 +39,9"
         }
-      ], 
-      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample152.java", 
-      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample152.java"
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample152.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample152.java"
     }
-  ], 
-  "id": "1214237"
+  ],
+  "id": "1214237",
+  "message": "File path update",
+  "when": "2011-12-14T08:30:36-05:00",
+  "who": "hiranya"
 }

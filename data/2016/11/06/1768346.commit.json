@@ -1,67 +1,67 @@
 {
-  "when": "2016-11-06T10:01:33-05:00", 
-  "message": "fix for SYNAPSE-1060", 
-  "who": "isudana", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-140,7 +140,7", 
           "lines": [
-            "         MessageContext synCtx = TestUtils.getTestContext(\"<getQuote><symbol>IBM</symbol></getQuote>\");\n", 
-            "         propMediatorOne.mediate(synCtx);\n", 
-            "         Object prop = synCtx.getProperty(\"nameOne\");\n", 
-            "-        assertEquals(valueOne, prop);\n", 
-            "+        assertEquals(valueOne.toString(), prop.toString()); // Objects are not equal, so need to compare the content\n", 
-            " \n", 
-            "         // Test XML property retrieval\n", 
+            "         MessageContext synCtx = TestUtils.getTestContext(\"<getQuote><symbol>IBM</symbol></getQuote>\");\n",
+            "         propMediatorOne.mediate(synCtx);\n",
+            "         Object prop = synCtx.getProperty(\"nameOne\");\n",
+            "-        assertEquals(valueOne, prop);\n",
+            "+        assertEquals(valueOne.toString(), prop.toString()); // Objects are not equal, so need to compare the content\n",
+            " \n",
+            "         // Test XML property retrieval\n",
             "         String exprValue = new SynapseXPath(\"synapse:get-property('nameOne')\").stringValueOf(synCtx);\n"
-          ]
+          ],
+          "locn": "-140,7 +140,7"
         }
-      ], 
-      "to": "java/modules/core/src/test/java/org/apache/synapse/mediators/builtin/PropertyMediatorTest.java", 
-      "from": "java/modules/core/src/test/java/org/apache/synapse/mediators/builtin/PropertyMediatorTest.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/test/java/org/apache/synapse/mediators/builtin/PropertyMediatorTest.java",
+      "to": "java/modules/core/src/test/java/org/apache/synapse/mediators/builtin/PropertyMediatorTest.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-288,7 +288,8", 
           "lines": [
-            "         if (value != null) {\n", 
-            "             return value;\n", 
-            "         } else if (valueElement != null) {\n", 
-            "-            return valueElement;\n", 
-            "+            // Need to take a clone of the element, otherwise same reference is shared across all the requests\n", 
-            "+            return valueElement.cloneOMElement();\n", 
-            "         } else {\n", 
-            "             return convertValue(expression.stringValueOf(synCtx), type);\n", 
+            "         if (value != null) {\n",
+            "             return value;\n",
+            "         } else if (valueElement != null) {\n",
+            "-            return valueElement;\n",
+            "+            // Need to take a clone of the element, otherwise same reference is shared across all the requests\n",
+            "+            return valueElement.cloneOMElement();\n",
+            "         } else {\n",
+            "             return convertValue(expression.stringValueOf(synCtx), type);\n",
             "         }\n"
-          ]
+          ],
+          "locn": "-288,7 +288,8"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/PropertyMediator.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/PropertyMediator.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/PropertyMediator.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/PropertyMediator.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-81,7 +81,8", 
           "lines": [
-            "         if (value != null) {\n", 
-            "             propMediator.setValue(value.getAttributeValue(), dataType);\n", 
-            "         } else if (valueElement != null) {\n", 
-            "-            propMediator.setValueElement(valueElement);\n", 
-            "+            propMediator.setValueElement(valueElement.cloneOMElement()); // Need to clone,\n", 
-            "+            // otherwise same reference getting modified at the message flow\n", 
-            "         } else if (expression != null) {\n", 
-            "             try {\n", 
+            "         if (value != null) {\n",
+            "             propMediator.setValue(value.getAttributeValue(), dataType);\n",
+            "         } else if (valueElement != null) {\n",
+            "-            propMediator.setValueElement(valueElement);\n",
+            "+            propMediator.setValueElement(valueElement.cloneOMElement()); // Need to clone,\n",
+            "+            // otherwise same reference getting modified at the message flow\n",
+            "         } else if (expression != null) {\n",
+            "             try {\n",
             "                 propMediator.setExpression(SynapseXPathFactory.getSynapseXPath(elem, ATT_EXPRN),\n"
-          ]
+          ],
+          "locn": "-81,7 +81,8"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/PropertyMediatorFactory.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/PropertyMediatorFactory.java"
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/PropertyMediatorFactory.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/PropertyMediatorFactory.java"
     }
-  ], 
-  "id": "1768346"
+  ],
+  "id": "1768346",
+  "message": "fix for SYNAPSE-1060",
+  "when": "2016-11-06T10:01:33-05:00",
+  "who": "isudana"
 }

@@ -1,40 +1,40 @@
 {
-  "when": "2013-07-20T16:21:35-04:00", 
-  "message": "Applying patch for SYNAPSE-942. Incorrect error handling logic for templates and endpoints.", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-216,7 +216,7", 
           "lines": [
-            "             return mediator;\r\n", 
-            "         } else {\r\n", 
-            "             String msg = \"Invalid mediation template definition without a name\";\r\n", 
-            "-            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_SEQUENCES, msg);\r\n", 
-            "+            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_TEMPLATES, msg);\r\n", 
-            "         }\r\n", 
-            "         return null;\r\n", 
+            "             return mediator;\r\n",
+            "         } else {\r\n",
+            "             String msg = \"Invalid mediation template definition without a name\";\r\n",
+            "-            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_SEQUENCES, msg);\r\n",
+            "+            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_TEMPLATES, msg);\r\n",
+            "         }\r\n",
+            "         return null;\r\n",
             "     }\r\n"
-          ]
-        }, 
+          ],
+          "locn": "-216,7 +216,7"
+        },
         {
-          "locn": "-239,7 +239,7", 
           "lines": [
-            "             return endpoint;\r\n", 
-            "         } else {\r\n", 
-            "             String msg = \"Invalid endpoint definition without a name\";\r\n", 
-            "-            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_SEQUENCES, msg);\r\n", 
-            "+            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_EP, msg);\r\n", 
-            "         }\r\n", 
-            "         return null;\r\n", 
+            "             return endpoint;\r\n",
+            "         } else {\r\n",
+            "             String msg = \"Invalid endpoint definition without a name\";\r\n",
+            "-            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_SEQUENCES, msg);\r\n",
+            "+            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_EP, msg);\r\n",
+            "         }\r\n",
+            "         return null;\r\n",
             "     }\r\n"
-          ]
+          ],
+          "locn": "-239,7 +239,7"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseXMLConfigurationFactory.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseXMLConfigurationFactory.java"
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseXMLConfigurationFactory.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseXMLConfigurationFactory.java"
     }
-  ], 
-  "id": "1505198"
+  ],
+  "id": "1505198",
+  "message": "Applying patch for SYNAPSE-942. Incorrect error handling logic for templates and endpoints.",
+  "when": "2013-07-20T16:21:35-04:00",
+  "who": "hiranya"
 }

@@ -1,29 +1,29 @@
 {
-  "when": "2016-10-01T00:19:32-04:00", 
-  "message": "fix for SYNAPSE-851", 
-  "who": "isudana", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-511,6 +511,10", 
           "lines": [
-            "                 }\n", 
-            "             }\n", 
-            " \n", 
-            "+            // remove CLIENT_API_NON_BLOCKING to avoid Thread switching at the Sender level and allow\n", 
-            "+            // same Thread to be used till the message is delivered through the endpoint\n", 
-            "+            msgContext.removeProperty(msgContext.CLIENT_API_NON_BLOCKING);\n", 
-            "+\n", 
-            "             // does the service specify a default reply file URI ?\n", 
-            "             String replyFileURI = entry.getReplyFileURI();\n", 
+            "                 }\n",
+            "             }\n",
+            " \n",
+            "+            // remove CLIENT_API_NON_BLOCKING to avoid Thread switching at the Sender level and allow\n",
+            "+            // same Thread to be used till the message is delivered through the endpoint\n",
+            "+            msgContext.removeProperty(msgContext.CLIENT_API_NON_BLOCKING);\n",
+            "+\n",
+            "             // does the service specify a default reply file URI ?\n",
+            "             String replyFileURI = entry.getReplyFileURI();\n",
             "             if (replyFileURI != null) {\n"
-          ]
+          ],
+          "locn": "-511,6 +511,10"
         }
-      ], 
-      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java", 
-      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java"
+      ],
+      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java",
+      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java"
     }
-  ], 
-  "id": "1762976"
+  ],
+  "id": "1762976",
+  "message": "fix for SYNAPSE-851",
+  "when": "2016-10-01T00:19:32-04:00",
+  "who": "isudana"
 }

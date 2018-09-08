@@ -1,129 +1,129 @@
 {
-  "when": "2016-11-14T08:31:49-05:00", 
-  "message": "Fix by Vanji for SYNAPSE-1058", 
-  "who": "isudana", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-234,8 +234,8", 
           "lines": [
-            "                                 metrics.incrementMessagesReceived();\n", 
-            " \n", 
-            "                             } catch (AxisFault e) {\n", 
-            "-                                logException(\"Error processing File URI : \"\n", 
-            "-                                        + fileObject.getName(), e);\n", 
-            "+                                logException(\"Error processing File URI : \" +\n", 
-            "+                                             VFSUtils.maskURLPassword(fileObject.getName().getURI()), e);\n", 
-            "                                 entry.setLastPollState(PollTableEntry.FAILED);\n", 
-            "                                 metrics.incrementFaultsReceiving();\n", 
+            "                                 metrics.incrementMessagesReceived();\n",
+            " \n",
+            "                             } catch (AxisFault e) {\n",
+            "-                                logException(\"Error processing File URI : \"\n",
+            "-                                        + fileObject.getName(), e);\n",
+            "+                                logException(\"Error processing File URI : \" +\n",
+            "+                                             VFSUtils.maskURLPassword(fileObject.getName().getURI()), e);\n",
+            "                                 entry.setLastPollState(PollTableEntry.FAILED);\n",
+            "                                 metrics.incrementFaultsReceiving();\n",
             "                             }\n"
-          ]
-        }, 
+          ],
+          "locn": "-234,8 +234,8"
+        },
         {
-          "locn": "-259,8 +259,8", 
           "lines": [
-            "                               }\n", 
-            "                             }\n", 
-            "                         } else if (log.isDebugEnabled()) {\n", 
-            "-                            log.debug(\"Couldn't get the lock for processing the file : \"\n", 
-            "-                                    + fileObject.getName());\n", 
-            "+                            log.debug(\"Couldn't get the lock for processing the file : \" +\n", 
-            "+                                      VFSUtils.maskURLPassword(fileObject.getName().getURI()));\n", 
-            "                         } else if (isFailedRecord) {\n", 
-            "                             if (entry.isFileLockingEnabled()) {\n", 
+            "                               }\n",
+            "                             }\n",
+            "                         } else if (log.isDebugEnabled()) {\n",
+            "-                            log.debug(\"Couldn't get the lock for processing the file : \"\n",
+            "-                                    + fileObject.getName());\n",
+            "+                            log.debug(\"Couldn't get the lock for processing the file : \" +\n",
+            "+                                      VFSUtils.maskURLPassword(fileObject.getName().getURI()));\n",
+            "                         } else if (isFailedRecord) {\n",
+            "                             if (entry.isFileLockingEnabled()) {\n",
             "                                 VFSUtils.releaseLock(fsManager, fileObject);\n"
-          ]
-        }, 
+          ],
+          "locn": "-259,8 +259,8"
+        },
         {
-          "locn": "-313,7 +313,8", 
           "lines": [
-            "                                     metrics.incrementMessagesReceived();\n", 
-            " \n", 
-            "                                 } catch (Exception e) {\n", 
-            "-                                    logException(\"Error processing File URI : \" + child.getName(), e);\n", 
-            "+                                    logException(\"Error processing File URI : \" +\n", 
-            "+                                                 VFSUtils.maskURLPassword(child.getName().getURI()), e);\n", 
-            "                                     failCount++;\n", 
-            "                                     // tell moveOrDeleteAfterProcessing() file failed\n", 
+            "                                     metrics.incrementMessagesReceived();\n",
+            " \n",
+            "                                 } catch (Exception e) {\n",
+            "-                                    logException(\"Error processing File URI : \" + child.getName(), e);\n",
+            "+                                    logException(\"Error processing File URI : \" +\n",
+            "+                                                 VFSUtils.maskURLPassword(child.getName().getURI()), e);\n",
+            "                                     failCount++;\n",
+            "                                     // tell moveOrDeleteAfterProcessing() file failed\n",
             "                                     entry.setLastPollState(PollTableEntry.FAILED);\n"
-          ]
-        }, 
+          ],
+          "locn": "-313,7 +313,8"
+        },
         {
-          "locn": "-424,7 +425,7", 
           "lines": [
-            "                 FileObject dest = moveToDirectory.resolveFile(\n", 
-            "                         prefix + fileObject.getName().getBaseName());\n", 
-            "                 if (log.isDebugEnabled()) {\n", 
-            "-                    log.debug(\"Moving to file :\" + dest.getName().getURI());\n", 
-            "+                    log.debug(\"Moving to file :\" + VFSUtils.maskURLPassword(dest.getName().getURI()));\n", 
-            "                 }\n", 
-            "                 try {\n", 
+            "                 FileObject dest = moveToDirectory.resolveFile(\n",
+            "                         prefix + fileObject.getName().getBaseName());\n",
+            "                 if (log.isDebugEnabled()) {\n",
+            "-                    log.debug(\"Moving to file :\" + dest.getName().getURI());\n",
+            "+                    log.debug(\"Moving to file :\" + VFSUtils.maskURLPassword(dest.getName().getURI()));\n",
+            "                 }\n",
+            "                 try {\n",
             "                     fileObject.moveTo(dest);\n"
-          ]
-        }, 
+          ],
+          "locn": "-424,7 +425,7"
+        },
         {
-          "locn": "-713,7 +714,7", 
           "lines": [
-            "                 FileObject dest = moveToDirectory.resolveFile(\n", 
-            "                         prefix + fileObject.getName().getBaseName());\n", 
-            "                 if (log.isDebugEnabled()) {\n", 
-            "-                    log.debug(\"The failed file is moving to :\" + dest.getName().getURI());\n", 
-            "+                    log.debug(\"The failed file is moving to :\" + VFSUtils.maskURLPassword(dest.getName().getURI()));\n", 
-            "                 }\n", 
-            "                 try {\n", 
+            "                 FileObject dest = moveToDirectory.resolveFile(\n",
+            "                         prefix + fileObject.getName().getBaseName());\n",
+            "                 if (log.isDebugEnabled()) {\n",
+            "-                    log.debug(\"The failed file is moving to :\" + dest.getName().getURI());\n",
+            "+                    log.debug(\"The failed file is moving to :\" + VFSUtils.maskURLPassword(dest.getName().getURI()));\n",
+            "                 }\n",
+            "                 try {\n",
             "                     fileObject.moveTo(dest);\n"
-          ]
+          ],
+          "locn": "-713,7 +714,7"
         }
-      ], 
-      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java", 
-      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java"
-    }, 
+      ],
+      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java",
+      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-272,13 +272,15", 
           "lines": [
-            "                 VFSUtils.releaseLock(fsManager, responseFile);\n", 
-            "             }\n", 
-            "             metrics.incrementFaultsSending();\n", 
-            "-            handleException(\"IO Error while creating response file : \" + responseFile.getName(), e);\n", 
-            "+            handleException(\"IO Error while creating response file : \" +\n", 
-            "+                            VFSUtils.maskURLPassword(responseFile.getName().getURI()), e);\n", 
-            "         } catch (IOException e) {\n", 
-            "             if (lockingEnabled) {\n", 
-            "                 VFSUtils.releaseLock(fsManager, responseFile);\n", 
-            "             }\n", 
-            "             metrics.incrementFaultsSending();\n", 
-            "-            handleException(\"IO Error while creating response file : \" + responseFile.getName(), e);\n", 
-            "+            handleException(\"IO Error while creating response file : \" +\n", 
-            "+                            VFSUtils.maskURLPassword(responseFile.getName().getURI()), e);\n", 
-            "         }\n", 
-            "     }\n", 
+            "                 VFSUtils.releaseLock(fsManager, responseFile);\n",
+            "             }\n",
+            "             metrics.incrementFaultsSending();\n",
+            "-            handleException(\"IO Error while creating response file : \" + responseFile.getName(), e);\n",
+            "+            handleException(\"IO Error while creating response file : \" +\n",
+            "+                            VFSUtils.maskURLPassword(responseFile.getName().getURI()), e);\n",
+            "         } catch (IOException e) {\n",
+            "             if (lockingEnabled) {\n",
+            "                 VFSUtils.releaseLock(fsManager, responseFile);\n",
+            "             }\n",
+            "             metrics.incrementFaultsSending();\n",
+            "-            handleException(\"IO Error while creating response file : \" + responseFile.getName(), e);\n",
+            "+            handleException(\"IO Error while creating response file : \" +\n",
+            "+                            VFSUtils.maskURLPassword(responseFile.getName().getURI()), e);\n",
+            "         }\n",
+            "     }\n",
             " \n"
-          ]
-        }, 
+          ],
+          "locn": "-272,13 +272,15"
+        },
         {
-          "locn": "-289,9 +291,9", 
           "lines": [
-            "         // wait till we get the lock\n", 
-            "         while (!VFSUtils.acquireLock(fsManager, responseFile)) {\n", 
-            "             if (vfsOutInfo.getMaxRetryCount() == tryNum++) {\n", 
-            "-                handleException(\"Couldn't send the message to file : \"\n", 
-            "-                        + responseFile.getName() + \", unable to acquire the \" +\n", 
-            "-                        \"lock even after \" + tryNum + \" retries\");\n", 
-            "+                handleException(\"Couldn't send the message to file : \" +\n", 
-            "+                                VFSUtils.maskURLPassword(responseFile.getName().getURI()) +\n", 
-            "+                                \", unable to acquire the lock even after \" + tryNum + \" retries\");\n", 
-            "             } else {\n", 
-            "                 \n", 
+            "         // wait till we get the lock\n",
+            "         while (!VFSUtils.acquireLock(fsManager, responseFile)) {\n",
+            "             if (vfsOutInfo.getMaxRetryCount() == tryNum++) {\n",
+            "-                handleException(\"Couldn't send the message to file : \"\n",
+            "-                        + responseFile.getName() + \", unable to acquire the \" +\n",
+            "-                        \"lock even after \" + tryNum + \" retries\");\n",
+            "+                handleException(\"Couldn't send the message to file : \" +\n",
+            "+                                VFSUtils.maskURLPassword(responseFile.getName().getURI()) +\n",
+            "+                                \", unable to acquire the lock even after \" + tryNum + \" retries\");\n",
+            "             } else {\n",
+            "                 \n",
             "                 log.warn(\"Couldn't get the lock for the file : \"\n"
-          ]
+          ],
+          "locn": "-289,9 +291,9"
         }
-      ], 
-      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java", 
-      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java"
+      ],
+      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java",
+      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java"
     }
-  ], 
-  "id": "1769621"
+  ],
+  "id": "1769621",
+  "message": "Fix by Vanji for SYNAPSE-1058",
+  "when": "2016-11-14T08:31:49-05:00",
+  "who": "isudana"
 }

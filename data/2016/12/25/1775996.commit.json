@@ -1,31 +1,31 @@
 {
-  "when": "2016-12-25T02:22:25-05:00", 
-  "message": "Fix for SYNAPSE-998 by Vanji - Patch slightly modified", 
-  "who": "isudana", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-239,6 +239,12", 
           "lines": [
-            "             } finally {\n", 
-            "                 if (replyFile != null) {\n", 
-            "                     try {\n", 
-            "+                        if (fsManager!= null &&\n", 
-            "+                            replyFile.getName() != null && replyFile.getName().getScheme() != null &&\n", 
-            "+                            replyFile.getName().getScheme().startsWith(\"file\") &&\n", 
-            "+                            replyFile.getParent() != null && replyFile.getParent().getFileSystem() != null) {\n", 
-            "+                            fsManager.closeFileSystem(replyFile.getParent().getFileSystem());\n", 
-            "+                        }\n", 
-            "                         replyFile.close();\n", 
-            "                     } catch (FileSystemException ignore) {}\n", 
+            "             } finally {\n",
+            "                 if (replyFile != null) {\n",
+            "                     try {\n",
+            "+                        if (fsManager!= null &&\n",
+            "+                            replyFile.getName() != null && replyFile.getName().getScheme() != null &&\n",
+            "+                            replyFile.getName().getScheme().startsWith(\"file\") &&\n",
+            "+                            replyFile.getParent() != null && replyFile.getParent().getFileSystem() != null) {\n",
+            "+                            fsManager.closeFileSystem(replyFile.getParent().getFileSystem());\n",
+            "+                        }\n",
+            "                         replyFile.close();\n",
+            "                     } catch (FileSystemException ignore) {}\n",
             "                 }\n"
-          ]
+          ],
+          "locn": "-239,6 +239,12"
         }
-      ], 
-      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java", 
-      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java"
+      ],
+      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java",
+      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java"
     }
-  ], 
-  "id": "1775996"
+  ],
+  "id": "1775996",
+  "message": "Fix for SYNAPSE-998 by Vanji - Patch slightly modified",
+  "when": "2016-12-25T02:22:25-05:00",
+  "who": "isudana"
 }

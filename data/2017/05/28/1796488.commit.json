@@ -1,49 +1,49 @@
 {
-  "when": "2017-05-28T08:11:40-04:00", 
-  "message": "Minor code simplification.", 
-  "who": "veithen", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-31,10 +31,9", 
           "lines": [
-            " import org.apache.axiom.om.OMText;\r\n", 
-            " import org.apache.axiom.om.OMXMLBuilderFactory;\r\n", 
-            " import org.apache.axiom.om.OMXMLParserWrapper;\r\n", 
-            "-import org.apache.axiom.soap.SOAP11Version;\r\n", 
-            " import org.apache.axiom.soap.SOAPBody;\r\n", 
-            " import org.apache.axiom.soap.SOAPEnvelope;\r\n", 
-            "-import org.apache.axiom.soap.SOAPVersion;\r\n", 
-            "+import org.apache.axiom.soap.SOAPFactory;\r\n", 
-            " import org.apache.commons.logging.Log;\r\n", 
-            " import org.apache.commons.logging.LogFactory;\r\n", 
+            " import org.apache.axiom.om.OMText;\r\n",
+            " import org.apache.axiom.om.OMXMLBuilderFactory;\r\n",
+            " import org.apache.axiom.om.OMXMLParserWrapper;\r\n",
+            "-import org.apache.axiom.soap.SOAP11Version;\r\n",
+            " import org.apache.axiom.soap.SOAPBody;\r\n",
+            " import org.apache.axiom.soap.SOAPEnvelope;\r\n",
+            "-import org.apache.axiom.soap.SOAPVersion;\r\n",
+            "+import org.apache.axiom.soap.SOAPFactory;\r\n",
+            " import org.apache.commons.logging.Log;\r\n",
+            " import org.apache.commons.logging.LogFactory;\r\n",
             " import org.apache.synapse.MessageContext;\r\n"
-          ]
-        }, 
+          ],
+          "locn": "-31,10 +31,9"
+        },
         {
-          "locn": "-99,13 +98,7", 
           "lines": [
-            " \t\tSOAPBody body = envelope.getBody();\r\n", 
-            " \t\tif (body == null) {\r\n", 
-            " \r\n", 
-            "-\t\t\tSOAPVersion version = envelope.getVersion();\r\n", 
-            "-\t\t\tif (version.getEnvelopeURI().equals(\r\n", 
-            "-\t\t\t\t\tSOAP11Version.SOAP_ENVELOPE_NAMESPACE_URI)) {\r\n", 
-            "-\t\t\t\tbody = OMAbstractFactory.getSOAP11Factory().createSOAPBody();\r\n", 
-            "-\t\t\t} else {\r\n", 
-            "-\t\t\t\tbody = OMAbstractFactory.getSOAP12Factory().createSOAPBody();\r\n", 
-            "-\t\t\t}\r\n", 
-            "+\t\t\tbody = ((SOAPFactory)envelope.getOMFactory()).createSOAPBody();\r\n", 
-            " \t\t\tif (envelope.getHeader() != null) {\r\n", 
-            " \t\t\t\tenvelope.getHeader().insertSiblingAfter(body);\r\n", 
+            " \t\tSOAPBody body = envelope.getBody();\r\n",
+            " \t\tif (body == null) {\r\n",
+            " \r\n",
+            "-\t\t\tSOAPVersion version = envelope.getVersion();\r\n",
+            "-\t\t\tif (version.getEnvelopeURI().equals(\r\n",
+            "-\t\t\t\t\tSOAP11Version.SOAP_ENVELOPE_NAMESPACE_URI)) {\r\n",
+            "-\t\t\t\tbody = OMAbstractFactory.getSOAP11Factory().createSOAPBody();\r\n",
+            "-\t\t\t} else {\r\n",
+            "-\t\t\t\tbody = OMAbstractFactory.getSOAP12Factory().createSOAPBody();\r\n",
+            "-\t\t\t}\r\n",
+            "+\t\t\tbody = ((SOAPFactory)envelope.getOMFactory()).createSOAPBody();\r\n",
+            " \t\t\tif (envelope.getHeader() != null) {\r\n",
+            " \t\t\t\tenvelope.getHeader().insertSiblingAfter(body);\r\n",
             " \t\t\t} else {\r\n"
-          ]
+          ],
+          "locn": "-99,13 +98,7"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/util/PayloadHelper.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/util/PayloadHelper.java"
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/util/PayloadHelper.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/util/PayloadHelper.java"
     }
-  ], 
-  "id": "1796488"
+  ],
+  "id": "1796488",
+  "message": "Minor code simplification.",
+  "when": "2017-05-28T08:11:40-04:00",
+  "who": "veithen"
 }

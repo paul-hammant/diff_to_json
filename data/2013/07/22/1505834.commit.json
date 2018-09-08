@@ -1,38 +1,38 @@
 {
-  "when": "2013-07-22T18:20:14-04:00", 
-  "message": "Deleting activemq temp data after the tests", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-21,6 +21,7", 
           "lines": [
-            " \n", 
-            " import org.apache.activemq.broker.BrokerService;\n", 
-            " import org.apache.axiom.om.OMElement;\n", 
-            "+import org.apache.commons.io.FileUtils;\n", 
-            " import org.apache.commons.logging.Log;\n", 
-            " import org.apache.commons.logging.LogFactory;\n", 
+            " \n",
+            " import org.apache.activemq.broker.BrokerService;\n",
+            " import org.apache.axiom.om.OMElement;\n",
+            "+import org.apache.commons.io.FileUtils;\n",
+            " import org.apache.commons.logging.Log;\n",
+            " import org.apache.commons.logging.LogFactory;\n",
             " import org.apache.synapse.samples.framework.config.SampleConfigConstants;\n"
-          ]
-        }, 
+          ],
+          "locn": "-21,6 +21,7"
+        },
         {
-          "locn": "-63,6 +64,7", 
           "lines": [
-            "     public boolean stopProcess() {\n", 
-            "         try {\n", 
-            "             broker.stop();\n", 
-            "+            FileUtils.deleteQuietly(broker.getDataDirectoryFile());\n", 
-            "             return true;\n", 
-            "         } catch (Exception e) {\n", 
+            "     public boolean stopProcess() {\n",
+            "         try {\n",
+            "             broker.stop();\n",
+            "+            FileUtils.deleteQuietly(broker.getDataDirectoryFile());\n",
+            "             return true;\n",
+            "         } catch (Exception e) {\n",
             "             log.error(\"Error while shutting down the broker\", e);\n"
-          ]
+          ],
+          "locn": "-63,6 +64,7"
         }
-      ], 
-      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/ActiveMQController.java", 
-      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/ActiveMQController.java"
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/ActiveMQController.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/ActiveMQController.java"
     }
-  ], 
-  "id": "1505834"
+  ],
+  "id": "1505834",
+  "message": "Deleting activemq temp data after the tests",
+  "when": "2013-07-22T18:20:14-04:00",
+  "who": "hiranya"
 }

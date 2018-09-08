@@ -1,67 +1,67 @@
 {
-  "when": "2017-01-12T18:31:37-05:00", 
-  "message": "Switch some dependencies to snapshot versions so that we can detect regressions in these dependencies early.", 
-  "who": "veithen", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-1064,14 +1064,14", 
           "lines": [
-            "         <commons.codec.version>1.6</commons.codec.version>\n", 
-            " \n", 
-            "         <!-- Axis2 and its dependencies -->\n", 
-            "-        <axis2.version>1.7.3</axis2.version>\n", 
-            "-        <axiom.version>1.2.19</axiom.version>\n", 
-            "+        <axis2.version>1.7.5-SNAPSHOT</axis2.version>\n", 
-            "+        <axiom.version>1.2.21-SNAPSHOT</axiom.version>\n", 
-            "         <wsdl4j.version>1.6.2</wsdl4j.version>\n", 
-            "         <jettison.version>1.3.8</jettison.version>\n", 
-            " \n", 
-            "         <!-- addressing, rampart, neethi -->\n", 
-            "         <addressing.version>${axis2.version}</addressing.version>\n", 
-            "-        <rampart.version>1.7.0</rampart.version>\n", 
-            "+        <rampart.version>1.7.1-SNAPSHOT</rampart.version>\n", 
-            "         <neethi.version>3.0.3</neethi.version>\n", 
-            "         <jruby.version>1.3.0</jruby.version>\n", 
+            "         <commons.codec.version>1.6</commons.codec.version>\n",
+            " \n",
+            "         <!-- Axis2 and its dependencies -->\n",
+            "-        <axis2.version>1.7.3</axis2.version>\n",
+            "-        <axiom.version>1.2.19</axiom.version>\n",
+            "+        <axis2.version>1.7.5-SNAPSHOT</axis2.version>\n",
+            "+        <axiom.version>1.2.21-SNAPSHOT</axiom.version>\n",
+            "         <wsdl4j.version>1.6.2</wsdl4j.version>\n",
+            "         <jettison.version>1.3.8</jettison.version>\n",
+            " \n",
+            "         <!-- addressing, rampart, neethi -->\n",
+            "         <addressing.version>${axis2.version}</addressing.version>\n",
+            "-        <rampart.version>1.7.0</rampart.version>\n",
+            "+        <rampart.version>1.7.1-SNAPSHOT</rampart.version>\n",
+            "         <neethi.version>3.0.3</neethi.version>\n",
+            "         <jruby.version>1.3.0</jruby.version>\n",
             "         <bcprov.jdk15.version>140</bcprov.jdk15.version>\n"
-          ]
+          ],
+          "locn": "-1064,14 +1064,14"
         }
-      ], 
-      "to": "java/pom.xml", 
-      "from": "java/pom.xml"
-    }, 
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-27,7 +27,6", 
           "lines": [
-            " import org.apache.axis2.transport.OutTransportInfo;\n", 
-            " import org.apache.axis2.transport.base.AbstractTransportSender;\n", 
-            " import org.apache.axis2.util.MessageContextBuilder;\n", 
-            "-import org.apache.http.protocol.HTTP;\n", 
-            " import org.apache.synapse.transport.amqp.connectionfactory.AMQPTransportConnectionFactoryManager;\n", 
-            " import org.apache.synapse.transport.amqp.pollingtask.AMQPSimpleConsumerTask;\n", 
+            " import org.apache.axis2.transport.OutTransportInfo;\n",
+            " import org.apache.axis2.transport.base.AbstractTransportSender;\n",
+            " import org.apache.axis2.util.MessageContextBuilder;\n",
+            "-import org.apache.http.protocol.HTTP;\n",
+            " import org.apache.synapse.transport.amqp.connectionfactory.AMQPTransportConnectionFactoryManager;\n",
+            " import org.apache.synapse.transport.amqp.pollingtask.AMQPSimpleConsumerTask;\n",
             " import org.apache.synapse.transport.amqp.sendertask.AMQPSender;\n"
-          ]
-        }, 
+          ],
+          "locn": "-27,7 +27,6"
+        },
         {
-          "locn": "-291,7 +290,7", 
           "lines": [
-            "             }\n", 
-            "             responseMsgCtx.setProperty(\n", 
-            "                     Constants.Configuration.CHARACTER_SET_ENCODING,\n", 
-            "-                    contentType.indexOf(HTTP.CHARSET_PARAM) > 0\n", 
-            "+                    contentType.indexOf(\"; charset=\") > 0\n", 
-            "                             ? charSetEnc : MessageContext.DEFAULT_CHAR_SET_ENCODING);\n", 
-            "             responseMsgCtx.setProperty(\n", 
+            "             }\n",
+            "             responseMsgCtx.setProperty(\n",
+            "                     Constants.Configuration.CHARACTER_SET_ENCODING,\n",
+            "-                    contentType.indexOf(HTTP.CHARSET_PARAM) > 0\n",
+            "+                    contentType.indexOf(\"; charset=\") > 0\n",
+            "                             ? charSetEnc : MessageContext.DEFAULT_CHAR_SET_ENCODING);\n",
+            "             responseMsgCtx.setProperty(\n",
             "                     MessageContext.TRANSPORT_HEADERS, message.getHeaders());\n"
-          ]
+          ],
+          "locn": "-291,7 +290,7"
         }
-      ], 
-      "to": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportSender.java", 
-      "from": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportSender.java"
+      ],
+      "from": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportSender.java",
+      "to": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportSender.java"
     }
-  ], 
-  "id": "1778485"
+  ],
+  "id": "1778485",
+  "message": "Switch some dependencies to snapshot versions so that we can detect regressions in these dependencies early.",
+  "when": "2017-01-12T18:31:37-05:00",
+  "who": "veithen"
 }

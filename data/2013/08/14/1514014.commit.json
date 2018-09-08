@@ -1,259 +1,259 @@
 {
-  "when": "2013-08-14T15:36:51-04:00", 
-  "message": "Documentation update - Removed unsupported parameters from the axis2.xml used for integration tests.", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-24,7 +24,39", 
           "lines": [
-            "         <title>Apache Synapse - Pass Through HTTP Transport</title>\n", 
-            "     </properties>\n", 
-            "     <body>\n", 
-            "-        <section name=\"Pass Through HTTP Transport\" id=\"Introduction\">\n", 
-            "+        <section name=\"Pass Through HTTP Transport\" id=\"Contents\">\n", 
-            "+            <ul>\n", 
-            "+                <li>\n", 
-            "+                    <a href=\"#Introduction\">Introduction</a>\n", 
-            "+                </li>\n", 
-            "+                <li>\n", 
-            "+                    <a href=\"#Configuration\">Transport Configuration</a>\n", 
-            "+                    <ul>\n", 
-            "+                        <li><a href=\"#HTTPListener\">HTTP Transport Listener</a></li>\n", 
-            "+                        <li><a href=\"#HTTPSender\">HTTP Transport Sender</a></li>\n", 
-            "+                        <li><a href=\"#HTTPSListener\">HTTPS Transport Listener</a></li>\n", 
-            "+                        <li><a href=\"#HTTPSSender\">HTTPS Transport Sender</a></li>\n", 
-            "+                    </ul>\n", 
-            "+                </li>\n", 
-            "+                <li>\n", 
-            "+                    <a href=\"#AdvancedSettings\">Advanced Settings and Performance Tuning</a>\n", 
-            "+                    <ul>\n", 
-            "+                        <li><a href=\"#HttpCoreSettings\">Apache HTTP Core Settings</a></li>\n", 
-            "+                        <li><a href=\"#SynapseSettings\">Synapse HTTP Mediation Settings</a></li>\n", 
-            "+                        <li><a href=\"#ThreadPoolSettings\">Thread Pool Settings</a></li>\n", 
-            "+                        <li><a href=\"#AdvancedGuidelines\">Guidelines for Using Advanced Settings</a></li>\n", 
-            "+                        <li><a href=\"#LinuxSettings\">Unix/Linux Specific Settings</a></li>\n", 
-            "+                    </ul>\n", 
-            "+                </li>\n", 
-            "+                <li>\n", 
-            "+                    <a href=\"#Logging\">Logging Configuration</a>\n", 
-            "+                    <ul>\n", 
-            "+                        <li><a href=\"#LoggingGuidelines\">Guidelines for Using Advanced Logging</a></li>\n", 
-            "+                    </ul>\n", 
-            "+                </li>\n", 
-            "+            </ul>\n", 
-            "+        </section>\n", 
-            "+        <section name=\"Introduction\" id=\"Introduction\">\n", 
-            "             <p>\n", 
-            "                 The Pass Through HTTP transport (PTHTTP transport) was developed by\n", 
+            "         <title>Apache Synapse - Pass Through HTTP Transport</title>\n",
+            "     </properties>\n",
+            "     <body>\n",
+            "-        <section name=\"Pass Through HTTP Transport\" id=\"Introduction\">\n",
+            "+        <section name=\"Pass Through HTTP Transport\" id=\"Contents\">\n",
+            "+            <ul>\n",
+            "+                <li>\n",
+            "+                    <a href=\"#Introduction\">Introduction</a>\n",
+            "+                </li>\n",
+            "+                <li>\n",
+            "+                    <a href=\"#Configuration\">Transport Configuration</a>\n",
+            "+                    <ul>\n",
+            "+                        <li><a href=\"#HTTPListener\">HTTP Transport Listener</a></li>\n",
+            "+                        <li><a href=\"#HTTPSender\">HTTP Transport Sender</a></li>\n",
+            "+                        <li><a href=\"#HTTPSListener\">HTTPS Transport Listener</a></li>\n",
+            "+                        <li><a href=\"#HTTPSSender\">HTTPS Transport Sender</a></li>\n",
+            "+                    </ul>\n",
+            "+                </li>\n",
+            "+                <li>\n",
+            "+                    <a href=\"#AdvancedSettings\">Advanced Settings and Performance Tuning</a>\n",
+            "+                    <ul>\n",
+            "+                        <li><a href=\"#HttpCoreSettings\">Apache HTTP Core Settings</a></li>\n",
+            "+                        <li><a href=\"#SynapseSettings\">Synapse HTTP Mediation Settings</a></li>\n",
+            "+                        <li><a href=\"#ThreadPoolSettings\">Thread Pool Settings</a></li>\n",
+            "+                        <li><a href=\"#AdvancedGuidelines\">Guidelines for Using Advanced Settings</a></li>\n",
+            "+                        <li><a href=\"#LinuxSettings\">Unix/Linux Specific Settings</a></li>\n",
+            "+                    </ul>\n",
+            "+                </li>\n",
+            "+                <li>\n",
+            "+                    <a href=\"#Logging\">Logging Configuration</a>\n",
+            "+                    <ul>\n",
+            "+                        <li><a href=\"#LoggingGuidelines\">Guidelines for Using Advanced Logging</a></li>\n",
+            "+                    </ul>\n",
+            "+                </li>\n",
+            "+            </ul>\n",
+            "+        </section>\n",
+            "+        <section name=\"Introduction\" id=\"Introduction\">\n",
+            "             <p>\n",
+            "                 The Pass Through HTTP transport (PTHTTP transport) was developed by\n",
             "                 <a href=\"http://wso2.com\">WSO2</a> as a more efficient and more scalable\n"
-          ]
-        }, 
+          ],
+          "locn": "-24,7 +24,39"
+        },
         {
-          "locn": "-81,6 +113,7", 
           "lines": [
-            "                 the mediation engine. Settings related to configuring I/O reactor threads and PTHTTP\n", 
-            "                 threads are discussed under <a href=\"#AdvancedSettings\">advanced settings</a>.\n", 
-            "             </p>\n", 
-            "+            <p><a href=\"#Contents\">[Back to top]</a></p>\n", 
-            "         </section>\n", 
-            "         <section name=\"Transport Configuration\" id=\"Configuration\">\n", 
+            "                 the mediation engine. Settings related to configuring I/O reactor threads and PTHTTP\n",
+            "                 threads are discussed under <a href=\"#AdvancedSettings\">advanced settings</a>.\n",
+            "             </p>\n",
+            "+            <p><a href=\"#Contents\">[Back to top]</a></p>\n",
+            "         </section>\n",
+            "         <section name=\"Transport Configuration\" id=\"Configuration\">\n",
             "             <p>\n"
-          ]
-        }, 
+          ],
+          "locn": "-81,6 +113,7"
+        },
         {
-          "locn": "-186,6 +219,7", 
           "lines": [
-            "                 <p>\n", 
-            "                     All the above parameters are also applicable to the HTTPS transport listener.\n", 
-            "                 </p>\n", 
-            "+                <p><a href=\"#Contents\">Back to top</a></p>\n", 
-            "             </subsection>\n", 
-            "             <subsection name=\"HTTP Transport Sender\" id=\"HTTPSender\">\n", 
+            "                 <p>\n",
+            "                     All the above parameters are also applicable to the HTTPS transport listener.\n",
+            "                 </p>\n",
+            "+                <p><a href=\"#Contents\">Back to top</a></p>\n",
+            "             </subsection>\n",
+            "             <subsection name=\"HTTP Transport Sender\" id=\"HTTPSender\">\n",
             "                 <p>\n"
-          ]
-        }, 
+          ],
+          "locn": "-186,6 +219,7"
+        },
         {
-          "locn": "-245,6 +279,7", 
           "lines": [
-            "                         <td>N/A</td>\n", 
-            "                     </tr>\n", 
-            "                 </table>\n", 
-            "+                <p><a href=\"#Contents\">Back to top</a></p>\n", 
-            "             </subsection>\n", 
-            "             <subsection name=\"HTTPS Transport Listener\" id=\"HTTPSListener\">\n", 
+            "                         <td>N/A</td>\n",
+            "                     </tr>\n",
+            "                 </table>\n",
+            "+                <p><a href=\"#Contents\">Back to top</a></p>\n",
+            "             </subsection>\n",
+            "             <subsection name=\"HTTPS Transport Listener\" id=\"HTTPSListener\">\n",
             "                 <p>\n"
-          ]
-        }, 
+          ],
+          "locn": "-245,6 +279,7"
+        },
         {
-          "locn": "-438,6 +473,7", 
           "lines": [
-            "                         <td>https://&lt;host&gt;:&lt;port&gt;/</td>\n", 
-            "                     </tr>\n", 
-            "                 </table>\n", 
-            "+                <p><a href=\"#Contents\">Back to top</a></p>\n", 
-            "             </subsection>\n", 
-            "             <subsection name=\"HTTPS Transport Sender\" id=\"HTTPSSender\">\n", 
+            "                         <td>https://&lt;host&gt;:&lt;port&gt;/</td>\n",
+            "                     </tr>\n",
+            "                 </table>\n",
+            "+                <p><a href=\"#Contents\">Back to top</a></p>\n",
+            "             </subsection>\n",
+            "             <subsection name=\"HTTPS Transport Sender\" id=\"HTTPSSender\">\n",
             "                 <p>\n"
-          ]
-        }, 
+          ],
+          "locn": "-438,6 +473,7"
+        },
         {
-          "locn": "-677,6 +713,7", 
           "lines": [
-            "                         <td>N/A</td>\n", 
-            "                     </tr>\n", 
-            "                 </table>\n", 
-            "+                <p><a href=\"#Contents\">Back to top</a></p>\n", 
-            "             </subsection>\n", 
-            "         </section>\n", 
+            "                         <td>N/A</td>\n",
+            "                     </tr>\n",
+            "                 </table>\n",
+            "+                <p><a href=\"#Contents\">Back to top</a></p>\n",
+            "             </subsection>\n",
+            "         </section>\n",
             "         <section name=\"Advanced Settings and Performance Tuning\" id=\"AdvancedSettings\">\n"
-          ]
-        }, 
+          ],
+          "locn": "-677,6 +713,7"
+        },
         {
-          "locn": "-858,6 +895,7", 
           "lines": [
-            "                         <td>report</td>\n", 
-            "                     </tr>\n", 
-            "                 </table>\n", 
-            "+                <p><a href=\"#Contents\">Back to top</a></p>\n", 
-            "             </subsection>\n", 
-            "             <subsection name=\"Synapse HTTP Mediation Settings\" id=\"SynapseSettings\">\n", 
+            "                         <td>report</td>\n",
+            "                     </tr>\n",
+            "                 </table>\n",
+            "+                <p><a href=\"#Contents\">Back to top</a></p>\n",
+            "             </subsection>\n",
+            "             <subsection name=\"Synapse HTTP Mediation Settings\" id=\"SynapseSettings\">\n",
             "                 <p>\n"
-          ]
-        }, 
+          ],
+          "locn": "-858,6 +895,7"
+        },
         {
-          "locn": "-908,6 +946,7", 
           "lines": [
-            "                         <td>true</td>\n", 
-            "                     </tr>\n", 
-            "                 </table>\n", 
-            "+                <p><a href=\"#Contents\">Back to top</a></p>\n", 
-            "             </subsection>\n", 
-            "             <subsection name=\"Thread Pool Settings\" id=\"ThreadPoolSettings\">\n", 
+            "                         <td>true</td>\n",
+            "                     </tr>\n",
+            "                 </table>\n",
+            "+                <p><a href=\"#Contents\">Back to top</a></p>\n",
+            "             </subsection>\n",
+            "             <subsection name=\"Thread Pool Settings\" id=\"ThreadPoolSettings\">\n",
             "                 <p>\n"
-          ]
-        }, 
+          ],
+          "locn": "-908,6 +946,7"
+        },
         {
-          "locn": "-978,6 +1017,7", 
           "lines": [
-            "                         <td>-1</td>\n", 
-            "                     </tr>\n", 
-            "                 </table>\n", 
-            "+                <p><a href=\"#Contents\">Back to top</a></p>\n", 
-            "             </subsection>\n", 
-            "             <subsection name=\"Guidelines for Using Advanced Settings\" id=\"AdvancedGuidelines\">\n", 
+            "                         <td>-1</td>\n",
+            "                     </tr>\n",
+            "                 </table>\n",
+            "+                <p><a href=\"#Contents\">Back to top</a></p>\n",
+            "             </subsection>\n",
+            "             <subsection name=\"Guidelines for Using Advanced Settings\" id=\"AdvancedGuidelines\">\n",
             "                 <p>\n"
-          ]
-        }, 
+          ],
+          "locn": "-978,6 +1017,7"
+        },
         {
-          "locn": "-1007,6 +1047,7", 
           "lines": [
-            "                     This will give you a much clear idea about what transport level properties need to\n", 
-            "                     be tuned up in your deployment.\n", 
-            "                 </p>\n", 
-            "+                <p><a href=\"#Contents\">Back to top</a></p>\n", 
-            "             </subsection>\n", 
-            "             <subsection name=\"Unix/Linux Specific Settings\" id=\"LinuxSettings\">\n", 
+            "                     This will give you a much clear idea about what transport level properties need to\n",
+            "                     be tuned up in your deployment.\n",
+            "                 </p>\n",
+            "+                <p><a href=\"#Contents\">Back to top</a></p>\n",
+            "             </subsection>\n",
+            "             <subsection name=\"Unix/Linux Specific Settings\" id=\"LinuxSettings\">\n",
             "                 <p>\n"
-          ]
-        }, 
+          ],
+          "locn": "-1007,6 +1047,7"
+        },
         {
-          "locn": "-1038,6 +1079,7", 
           "lines": [
-            " net.ipv4.ip_local_port_range = 1024 65535</div>\n", 
-            "                     </li>\n", 
-            "                 </ul>\n", 
-            "+                <p><a href=\"#Contents\">Back to top</a></p>\n", 
-            "             </subsection>\n", 
-            "         </section>\n", 
+            " net.ipv4.ip_local_port_range = 1024 65535</div>\n",
+            "                     </li>\n",
+            "                 </ul>\n",
+            "+                <p><a href=\"#Contents\">Back to top</a></p>\n",
+            "             </subsection>\n",
+            "         </section>\n",
             "         <section name=\"Logging Configuration\" id=\"Logging\">\n"
-          ]
-        }, 
+          ],
+          "locn": "-1038,6 +1079,7"
+        },
         {
-          "locn": "-1165,6 +1207,7", 
           "lines": [
-            "                     Enables all the advanced logging features (all listed above).\n", 
-            "                 </dd>\n", 
-            "             </dl>\n", 
-            "+            <p><a href=\"#Contents\">Back to top</a></p>\n", 
-            "             <subsection name=\"Guidelines for Using Advanced Logging\" id=\"LoggingGuidelines\">\n", 
-            "                 <p>\n", 
+            "                     Enables all the advanced logging features (all listed above).\n",
+            "                 </dd>\n",
+            "             </dl>\n",
+            "+            <p><a href=\"#Contents\">Back to top</a></p>\n",
+            "             <subsection name=\"Guidelines for Using Advanced Logging\" id=\"LoggingGuidelines\">\n",
+            "                 <p>\n",
             "                     Most of the above advanced logging features have been designed to aid Synapse developers\n"
-          ]
-        }, 
+          ],
+          "locn": "-1165,6 +1207,7"
+        },
         {
-          "locn": "-1194,6 +1237,7", 
           "lines": [
-            "                     mindful about how much extra information you want Synapse to log, the prevailing\n", 
-            "                     levels of load/traffic and the availability of hardware resources.\n", 
-            "                 </p>\n", 
-            "+                <p><a href=\"#Contents\">Back to top</a></p>\n", 
-            "             </subsection>\n", 
-            "         </section>\n", 
+            "                     mindful about how much extra information you want Synapse to log, the prevailing\n",
+            "                     levels of load/traffic and the availability of hardware resources.\n",
+            "                 </p>\n",
+            "+                <p><a href=\"#Contents\">Back to top</a></p>\n",
+            "             </subsection>\n",
+            "         </section>\n",
             "     </body>\n"
-          ]
+          ],
+          "locn": "-1194,6 +1237,7"
         }
-      ], 
-      "to": "java/modules/documentation/src/site/xdoc/userguide/transports/pass_through.xml", 
-      "from": "java/modules/documentation/src/site/xdoc/userguide/transports/pass_through.xml"
-    }, 
+      ],
+      "from": "java/modules/documentation/src/site/xdoc/userguide/transports/pass_through.xml",
+      "to": "java/modules/documentation/src/site/xdoc/userguide/transports/pass_through.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-191,7 +191,6", 
           "lines": [
-            " \n", 
-            "     <transportReceiver name=\"http\" class=\"org.apache.synapse.transport.passthru.PassThroughHttpListener\">\n", 
-            "         <parameter name=\"port\">8280</parameter>\n", 
-            "-        <parameter name=\"non-blocking\">true</parameter>\n", 
-            "         <parameter name=\"httpGetProcessor\" locked=\"false\">org.apache.synapse.transport.passthru.api.PassThroughNHttpGetProcessor</parameter>\n", 
-            "         <!--parameter name=\"bind-address\" locked=\"false\">hostname or IP address</parameter-->\n", 
+            " \n",
+            "     <transportReceiver name=\"http\" class=\"org.apache.synapse.transport.passthru.PassThroughHttpListener\">\n",
+            "         <parameter name=\"port\">8280</parameter>\n",
+            "-        <parameter name=\"non-blocking\">true</parameter>\n",
+            "         <parameter name=\"httpGetProcessor\" locked=\"false\">org.apache.synapse.transport.passthru.api.PassThroughNHttpGetProcessor</parameter>\n",
+            "         <!--parameter name=\"bind-address\" locked=\"false\">hostname or IP address</parameter-->\n",
             "         <!--parameter name=\"WSDLEPRPrefix\" locked=\"false\">https://apachehost:port/somepath</parameter-->\n"
-          ]
-        }, 
+          ],
+          "locn": "-191,7 +191,6"
+        },
         {
-          "locn": "-199,7 +198,6", 
           "lines": [
-            " \n", 
-            "     <transportReceiver name=\"https\" class=\"org.apache.synapse.transport.passthru.PassThroughHttpSSLListener\">\n", 
-            "         <parameter name=\"port\" locked=\"false\">8243</parameter>\n", 
-            "-        <parameter name=\"non-blocking\" locked=\"false\">true</parameter>\n", 
-            "         <parameter name=\"httpGetProcessor\" locked=\"false\">org.apache.synapse.transport.passthru.api.PassThroughNHttpGetProcessor</parameter>\n", 
-            "         <parameter name=\"keystore\" locked=\"false\">\n", 
+            " \n",
+            "     <transportReceiver name=\"https\" class=\"org.apache.synapse.transport.passthru.PassThroughHttpSSLListener\">\n",
+            "         <parameter name=\"port\" locked=\"false\">8243</parameter>\n",
+            "-        <parameter name=\"non-blocking\" locked=\"false\">true</parameter>\n",
+            "         <parameter name=\"httpGetProcessor\" locked=\"false\">org.apache.synapse.transport.passthru.api.PassThroughNHttpGetProcessor</parameter>\n",
+            "         <parameter name=\"keystore\" locked=\"false\">\n",
             "             <KeyStore>\n"
-          ]
-        }, 
+          ],
+          "locn": "-199,7 +198,6"
+        },
         {
-          "locn": "-233,8 +231,6", 
           "lines": [
-            "     <!--/transportSender-->\n", 
-            " \n", 
-            "     <transportSender name=\"http\"  class=\"org.apache.synapse.transport.passthru.PassThroughHttpSender\">\n", 
-            "-        <parameter name=\"non-blocking\" locked=\"false\">true</parameter>\n", 
-            "-        <parameter name=\"warnOnHTTP500\" locked=\"false\">*</parameter>\n", 
-            "         <!--parameter name=\"http.proxyHost\" locked=\"false\">localhost</parameter>\n", 
-            "         <parameter name=\"http.proxyPort\" locked=\"false\">3128</parameter>\n", 
+            "     <!--/transportSender-->\n",
+            " \n",
+            "     <transportSender name=\"http\"  class=\"org.apache.synapse.transport.passthru.PassThroughHttpSender\">\n",
+            "-        <parameter name=\"non-blocking\" locked=\"false\">true</parameter>\n",
+            "-        <parameter name=\"warnOnHTTP500\" locked=\"false\">*</parameter>\n",
+            "         <!--parameter name=\"http.proxyHost\" locked=\"false\">localhost</parameter>\n",
+            "         <parameter name=\"http.proxyPort\" locked=\"false\">3128</parameter>\n",
             "         <parameter name=\"http.nonProxyHosts\" locked=\"false\">localhost|moon|sun</parameter-->\n"
-          ]
-        }, 
+          ],
+          "locn": "-233,8 +231,6"
+        },
         {
-          "locn": "-241,8 +237,6", 
           "lines": [
-            "     </transportSender>\n", 
-            " \n", 
-            "     <transportSender name=\"https\" class=\"org.apache.synapse.transport.passthru.PassThroughHttpSSLSender\">\n", 
-            "-        <parameter name=\"non-blocking\" locked=\"false\">true</parameter>\n", 
-            "-        <parameter name=\"warnOnHTTP500\" locked=\"false\">*</parameter>\n", 
-            "         <parameter name=\"keystore\" locked=\"false\">\n", 
-            "             <KeyStore>\n", 
+            "     </transportSender>\n",
+            " \n",
+            "     <transportSender name=\"https\" class=\"org.apache.synapse.transport.passthru.PassThroughHttpSSLSender\">\n",
+            "-        <parameter name=\"non-blocking\" locked=\"false\">true</parameter>\n",
+            "-        <parameter name=\"warnOnHTTP500\" locked=\"false\">*</parameter>\n",
+            "         <parameter name=\"keystore\" locked=\"false\">\n",
+            "             <KeyStore>\n",
             "                 <Location>modules/integration/src/test/resources/identity.jks</Location>\n"
-          ]
+          ],
+          "locn": "-241,8 +237,6"
         }
-      ], 
-      "to": "java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_def.xml", 
-      "from": "java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_def.xml"
+      ],
+      "from": "java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_def.xml",
+      "to": "java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_def.xml"
     }
-  ], 
-  "id": "1514014"
+  ],
+  "id": "1514014",
+  "message": "Documentation update - Removed unsupported parameters from the axis2.xml used for integration tests.",
+  "when": "2013-08-14T15:36:51-04:00",
+  "who": "hiranya"
 }

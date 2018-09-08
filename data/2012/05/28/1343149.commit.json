@@ -1,26 +1,26 @@
 {
-  "when": "2012-05-28T02:47:23-04:00", 
-  "message": "Making NHTTP ports available via system properties", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-109,6 +109,7", 
           "lines": [
-            "         }\n", 
-            " \n", 
-            "         port = port + portOffset;\n", 
-            "+        System.setProperty(transportIn.getName() + \".nio.port\", String.valueOf(port));\n", 
-            " \n", 
-            "         param = transportIn.getParameter(NhttpConstants.BIND_ADDRESS);\n", 
+            "         }\n",
+            " \n",
+            "         port = port + portOffset;\n",
+            "+        System.setProperty(transportIn.getName() + \".nio.port\", String.valueOf(port));\n",
+            " \n",
+            "         param = transportIn.getParameter(NhttpConstants.BIND_ADDRESS);\n",
             "         if (param != null) {\n"
-          ]
+          ],
+          "locn": "-109,6 +109,7"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java", 
-      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java"
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java"
     }
-  ], 
-  "id": "1343149"
+  ],
+  "id": "1343149",
+  "message": "Making NHTTP ports available via system properties",
+  "when": "2012-05-28T02:47:23-04:00",
+  "who": "hiranya"
 }

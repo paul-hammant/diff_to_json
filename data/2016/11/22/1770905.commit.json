@@ -1,45 +1,45 @@
 {
-  "when": "2016-11-22T21:10:46-05:00", 
-  "message": "applying patch by vanji to fix SYNAPSE-1061", 
-  "who": "isudana", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-237,6 +237,7", 
           "lines": [
-            "         return WeightedRRLCAlgorithm.class.getName();\n", 
-            "     }\n", 
-            " \n", 
-            "+    @Override\n", 
-            "     public LoadbalanceAlgorithm clone() {\n", 
-            "         return null;\n", 
+            "         return WeightedRRLCAlgorithm.class.getName();\n",
+            "     }\n",
+            " \n",
+            "+    @Override\n",
+            "     public LoadbalanceAlgorithm clone() {\n",
+            "         return null;\n",
             "     }\n"
-          ]
-        }, 
+          ],
+          "locn": "-237,6 +237,7"
+        },
         {
-          "locn": "-392,13 +393,7", 
           "lines": [
-            "         public void reCalcuateWeight() {\n", 
-            "             if (totalConnections > 0) {\n", 
-            "                 double weightRatio = (double) fixedWeight / totalWeight;\n", 
-            "-                double connectionRatio;\n", 
-            "-                if (totalConnections != 0) {\n", 
-            "-                    connectionRatio = (double) currentConnectionCount / totalConnections;\n", 
-            "-                } else {\n", 
-            "-                    connectionRatio = 0;\n", 
-            "-                }\n", 
-            "-\n", 
-            "+                double connectionRatio = (double) currentConnectionCount / totalConnections;\n", 
-            "                 double diff = weightRatio - connectionRatio;\n", 
-            "                 double multiple = diff * totalConnections;\n", 
+            "         public void reCalcuateWeight() {\n",
+            "             if (totalConnections > 0) {\n",
+            "                 double weightRatio = (double) fixedWeight / totalWeight;\n",
+            "-                double connectionRatio;\n",
+            "-                if (totalConnections != 0) {\n",
+            "-                    connectionRatio = (double) currentConnectionCount / totalConnections;\n",
+            "-                } else {\n",
+            "-                    connectionRatio = 0;\n",
+            "-                }\n",
+            "-\n",
+            "+                double connectionRatio = (double) currentConnectionCount / totalConnections;\n",
+            "                 double diff = weightRatio - connectionRatio;\n",
+            "                 double multiple = diff * totalConnections;\n",
             "                 double floor = Math.floor(multiple);\n"
-          ]
+          ],
+          "locn": "-392,13 +393,7"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/endpoints/algorithms/WeightedRRLCAlgorithm.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/endpoints/algorithms/WeightedRRLCAlgorithm.java"
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/endpoints/algorithms/WeightedRRLCAlgorithm.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/endpoints/algorithms/WeightedRRLCAlgorithm.java"
     }
-  ], 
-  "id": "1770905"
+  ],
+  "id": "1770905",
+  "message": "applying patch by vanji to fix SYNAPSE-1061",
+  "when": "2016-11-22T21:10:46-05:00",
+  "who": "isudana"
 }

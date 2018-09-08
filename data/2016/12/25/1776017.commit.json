@@ -1,166 +1,166 @@
 {
-  "when": "2016-12-25T12:12:21-05:00", 
-  "message": "Avoid get-property() function in default scope look for entries from remote registry", 
-  "who": "isudana", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-95,6 +95,17", 
           "lines": [
-            "         }\n", 
-            "     }\n", 
-            " \n", 
-            "+    public Object getLocalEntry(String key) {\n", 
-            "+        Object ret = properties.get(key);\n", 
-            "+        if (ret != null) {\n", 
-            "+            return ret;\n", 
-            "+        } else if (getConfiguration() != null) {\n", 
-            "+            return getConfiguration().getLocalRegistryEntry(key);\n", 
-            "+        } else {\n", 
-            "+            return null;\n", 
-            "+        }\n", 
-            "+    }\n", 
-            "+\n", 
-            "     public void setProperty(String key, Object value) {\n", 
-            "         properties.put(key, value);\n", 
+            "         }\n",
+            "     }\n",
+            " \n",
+            "+    public Object getLocalEntry(String key) {\n",
+            "+        Object ret = properties.get(key);\n",
+            "+        if (ret != null) {\n",
+            "+            return ret;\n",
+            "+        } else if (getConfiguration() != null) {\n",
+            "+            return getConfiguration().getLocalRegistryEntry(key);\n",
+            "+        } else {\n",
+            "+            return null;\n",
+            "+        }\n",
+            "+    }\n",
+            "+\n",
+            "     public void setProperty(String key, Object value) {\n",
+            "         properties.put(key, value);\n",
             "     }\n"
-          ]
+          ],
+          "locn": "-95,6 +95,17"
         }
-      ], 
-      "to": "java/modules/core/src/test/java/org/apache/synapse/TestMessageContext.java", 
-      "from": "java/modules/core/src/test/java/org/apache/synapse/TestMessageContext.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/test/java/org/apache/synapse/TestMessageContext.java",
+      "to": "java/modules/core/src/test/java/org/apache/synapse/TestMessageContext.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-156,6 +156,14", 
           "lines": [
-            "     public Object getEntry(String key);\n", 
-            " \n", 
-            "     /**\n", 
-            "+     * Get the value of a property set on the message instance or from the local registry\n", 
-            "+     *\n", 
-            "+     * @param key key to look up property\n", 
-            "+     * @return value for the given key\n", 
-            "+     */\n", 
-            "+    public Object getLocalEntry(String key);\n", 
-            "+\n", 
-            "+    /**\n", 
-            "      * Set a custom (local) property with the given name on the message instance\n", 
-            "      * @param key key to be used\n", 
+            "     public Object getEntry(String key);\n",
+            " \n",
+            "     /**\n",
+            "+     * Get the value of a property set on the message instance or from the local registry\n",
+            "+     *\n",
+            "+     * @param key key to look up property\n",
+            "+     * @return value for the given key\n",
+            "+     */\n",
+            "+    public Object getLocalEntry(String key);\n",
+            "+\n",
+            "+    /**\n",
+            "      * Set a custom (local) property with the given name on the message instance\n",
+            "      * @param key key to be used\n",
             "      * @param value value to be saved\n"
-          ]
+          ],
+          "locn": "-156,6 +156,14"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/MessageContext.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/MessageContext.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/MessageContext.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/MessageContext.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-199,6 +199,20", 
           "lines": [
-            "         }\n", 
-            "     }\n", 
-            " \n", 
-            "+    public Object getLocalEntry(String key) {\n", 
-            "+        Object o = localEntries.get(key);\n", 
-            "+        if (o != null && o instanceof Entry) {\n", 
-            "+            return ((Entry) o).getValue();\n", 
-            "+        } else {\n", 
-            "+            Object e = getConfiguration().getLocalRegistryEntry(key);\n", 
-            "+            if (e != null) {\n", 
-            "+                localEntries.put(key, e);\n", 
-            "+                return e;\n", 
-            "+            }\n", 
-            "+        }\n", 
-            "+        return null;\n", 
-            "+    }\n", 
-            "+\n", 
-            "     /**\n", 
-            "      * Get a read-only view of all the properties currently set on this\n", 
+            "         }\n",
+            "     }\n",
+            " \n",
+            "+    public Object getLocalEntry(String key) {\n",
+            "+        Object o = localEntries.get(key);\n",
+            "+        if (o != null && o instanceof Entry) {\n",
+            "+            return ((Entry) o).getValue();\n",
+            "+        } else {\n",
+            "+            Object e = getConfiguration().getLocalRegistryEntry(key);\n",
+            "+            if (e != null) {\n",
+            "+                localEntries.put(key, e);\n",
+            "+                return e;\n",
+            "+            }\n",
+            "+        }\n",
+            "+        return null;\n",
+            "+    }\n",
+            "+\n",
+            "     /**\n",
+            "      * Get a read-only view of all the properties currently set on this\n",
             "      * message context\n"
-          ]
+          ],
+          "locn": "-199,6 +199,20"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2MessageContext.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2MessageContext.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2MessageContext.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2MessageContext.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-267,7 +267,7", 
           "lines": [
-            "                 if (result != null) {\n", 
-            "                     return result;\n", 
-            "                 } else {\n", 
-            "-                    return synCtx.getEntry(key);\n", 
-            "+                    return synCtx.getLocalEntry(key);\n", 
-            "                 }\n", 
-            "             }\n", 
+            "                 if (result != null) {\n",
+            "                     return result;\n",
+            "                 } else {\n",
+            "-                    return synCtx.getEntry(key);\n",
+            "+                    return synCtx.getLocalEntry(key);\n",
+            "                 }\n",
+            "             }\n",
             "         } else if (XMLConfigConstants.SCOPE_AXIS2.equals(scope)\n"
-          ]
+          ],
+          "locn": "-267,7 +267,7"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/GetPropertyFunction.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/GetPropertyFunction.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/GetPropertyFunction.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/GetPropertyFunction.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-676,6 +676,23", 
           "lines": [
-            "     }\n", 
-            " \n", 
-            "     /**\n", 
-            "+     * Get the resource from local registry\n", 
-            "+     *\n", 
-            "+     * @param key the key of the resource required\n", 
-            "+     * @return value for the key\n", 
-            "+     */\n", 
-            "+    public Object getLocalRegistryEntry(String key) {\n", 
-            "+        Object o = localRegistry.get(key);\n", 
-            "+        if (o != null && o instanceof Entry) {\n", 
-            "+            Entry entry = (Entry) o;\n", 
-            "+            if (!entry.isDynamic()) {  // Skip dynamic entries\n", 
-            "+                return entry.getValue();\n", 
-            "+            }\n", 
-            "+        }\n", 
-            "+        return null;\n", 
-            "+    }\n", 
-            "+\n", 
-            "+    /**\n", 
-            "      * Get the resource with the given key\n", 
-            "      *\n", 
+            "     }\n",
+            " \n",
+            "     /**\n",
+            "+     * Get the resource from local registry\n",
+            "+     *\n",
+            "+     * @param key the key of the resource required\n",
+            "+     * @return value for the key\n",
+            "+     */\n",
+            "+    public Object getLocalRegistryEntry(String key) {\n",
+            "+        Object o = localRegistry.get(key);\n",
+            "+        if (o != null && o instanceof Entry) {\n",
+            "+            Entry entry = (Entry) o;\n",
+            "+            if (!entry.isDynamic()) {  // Skip dynamic entries\n",
+            "+                return entry.getValue();\n",
+            "+            }\n",
+            "+        }\n",
+            "+        return null;\n",
+            "+    }\n",
+            "+\n",
+            "+    /**\n",
+            "      * Get the resource with the given key\n",
+            "      *\n",
             "      * @param key\n"
-          ]
+          ],
+          "locn": "-676,6 +676,23"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfiguration.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfiguration.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfiguration.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfiguration.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-187,6 +187,10", 
           "lines": [
-            "         return mc.getEntry(key);\n", 
-            "     }\n", 
-            " \n", 
-            "+    public Object getLocalEntry(String key) {\n", 
-            "+        return mc.getLocalEntry(key);\n", 
-            "+    }\n", 
-            "+\n", 
-            "     public void setProperty(String key, Object value) {\n", 
-            "         if (value instanceof XMLObject) {\n", 
+            "         return mc.getEntry(key);\n",
+            "     }\n",
+            " \n",
+            "+    public Object getLocalEntry(String key) {\n",
+            "+        return mc.getLocalEntry(key);\n",
+            "+    }\n",
+            "+\n",
+            "     public void setProperty(String key, Object value) {\n",
+            "         if (value instanceof XMLObject) {\n",
             "             OMElement omElement = null;\n"
-          ]
+          ],
+          "locn": "-187,6 +187,10"
         }
-      ], 
-      "to": "java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMessageContext.java", 
-      "from": "java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMessageContext.java"
+      ],
+      "from": "java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMessageContext.java",
+      "to": "java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMessageContext.java"
     }
-  ], 
-  "id": "1776017"
+  ],
+  "id": "1776017",
+  "message": "Avoid get-property() function in default scope look for entries from remote registry",
+  "when": "2016-12-25T12:12:21-05:00",
+  "who": "isudana"
 }

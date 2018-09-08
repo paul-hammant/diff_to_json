@@ -1,27 +1,27 @@
 {
-  "when": "2012-08-08T14:42:20-04:00", 
-  "message": "Fixed sample number and added a link.", 
-  "who": "veithen", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-100,7 +100,7", 
           "lines": [
-            " &lt;messageFormatter contentType=&quot;application/json&quot;\n", 
-            "     class=&quot;org.apache.axis2.json.JSONMessageFormatter&quot;/&gt;</div>\n", 
-            "     \t\t\t<p>\n", 
-            "-                    If you are planning to run sample 440, you should also add the above two entries\n", 
-            "+                    If you are planning to run <a href=\"../sample158.html\">sample 158</a>, you should also add the above two entries\n", 
-            "                     to the 'samples/axis2Client/client_repo/conf/axis2.xml' file.\n", 
-            "     \t\t\t</p>\n", 
+            " &lt;messageFormatter contentType=&quot;application/json&quot;\n",
+            "     class=&quot;org.apache.axis2.json.JSONMessageFormatter&quot;/&gt;</div>\n",
+            "     \t\t\t<p>\n",
+            "-                    If you are planning to run sample 440, you should also add the above two entries\n",
+            "+                    If you are planning to run <a href=\"../sample158.html\">sample 158</a>, you should also add the above two entries\n",
+            "                     to the 'samples/axis2Client/client_repo/conf/axis2.xml' file.\n",
+            "     \t\t\t</p>\n",
             " \t\t\t</subsection>\n"
-          ]
+          ],
+          "locn": "-100,7 +100,7"
         }
-      ], 
-      "to": "java/modules/documentation/src/site/xdoc/userguide/samples/setup/script.xml", 
-      "from": "java/modules/documentation/src/site/xdoc/userguide/samples/setup/script.xml"
+      ],
+      "from": "java/modules/documentation/src/site/xdoc/userguide/samples/setup/script.xml",
+      "to": "java/modules/documentation/src/site/xdoc/userguide/samples/setup/script.xml"
     }
-  ], 
-  "id": "1370881"
+  ],
+  "id": "1370881",
+  "message": "Fixed sample number and added a link.",
+  "when": "2012-08-08T14:42:20-04:00",
+  "who": "veithen"
 }

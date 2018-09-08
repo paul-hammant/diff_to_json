@@ -1,193 +1,193 @@
 {
-  "when": "2016-12-27T23:08:49-05:00", 
-  "message": "Bundling axis2-json and jettison as part of distribution package and enabling json content type by default in axsi2.xml. Samples and setup guide also updated to reflect these changes.", 
-  "who": "ravi", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-78,9 +78,6", 
           "lines": [
-            "                 <p>\n", 
-            "                     <ul>\n", 
-            "                         <li>\n", 
-            "-                            Setup Synapse and the sample Axis2 client for JSON  (Refer  Synapse <a href=\"setup/script.html#json\">Samples Setup Guide</a> for details)\n", 
-            "-                        </li>\n", 
-            "-                        <li>\n", 
-            "                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2\n", 
-            "                         </li>\n", 
+            "                 <p>\n",
+            "                     <ul>\n",
+            "                         <li>\n",
+            "-                            Setup Synapse and the sample Axis2 client for JSON  (Refer  Synapse <a href=\"setup/script.html#json\">Samples Setup Guide</a> for details)\n",
+            "-                        </li>\n",
+            "-                        <li>\n",
+            "                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2\n",
+            "                         </li>\n",
             "                         <li>\n"
-          ]
+          ],
+          "locn": "-78,9 +78,6"
         }
-      ], 
-      "to": "java/modules/documentation/src/site/xdoc/userguide/samples/sample158.xml", 
-      "from": "java/modules/documentation/src/site/xdoc/userguide/samples/sample158.xml"
-    }, 
+      ],
+      "from": "java/modules/documentation/src/site/xdoc/userguide/samples/sample158.xml",
+      "to": "java/modules/documentation/src/site/xdoc/userguide/samples/sample158.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-39,8 +39,11", 
           "lines": [
-            " \t\t\t\t\t<a href=\"#python\">Python Support</a>\n", 
-            " \t\t\t\t</li>\n", 
-            " \t\t\t\t<li>\n", 
-            "-\t\t\t\t\t<a href=\"#json\">JSON Support</a>\n", 
-            "+\t\t\t\t\t<a href=\"#json-syn3\">JSON Support on Synapse 3.0.0</a>\n", 
-            " \t\t\t\t</li>\n", 
-            "+\t\t\t\t<li>\n", 
-            "+\t\t\t\t\t<a href=\"#json\">JSON Support Prior to Synapse 3.0.0</a>\n", 
-            "+\t\t\t\t</li>\n", 
-            " \t\t\t</ul>\n", 
-            " \t\t</section>\n", 
+            " \t\t\t\t\t<a href=\"#python\">Python Support</a>\n",
+            " \t\t\t\t</li>\n",
+            " \t\t\t\t<li>\n",
+            "-\t\t\t\t\t<a href=\"#json\">JSON Support</a>\n",
+            "+\t\t\t\t\t<a href=\"#json-syn3\">JSON Support on Synapse 3.0.0</a>\n",
+            " \t\t\t\t</li>\n",
+            "+\t\t\t\t<li>\n",
+            "+\t\t\t\t\t<a href=\"#json\">JSON Support Prior to Synapse 3.0.0</a>\n",
+            "+\t\t\t\t</li>\n",
+            " \t\t\t</ul>\n",
+            " \t\t</section>\n",
             " \t\t<section name=\"Configuring Synapse for Script Mediator Support\"\n"
-          ]
-        }, 
+          ],
+          "locn": "-39,8 +39,11"
+        },
         {
-          "locn": "-84,12 +87,20", 
           "lines": [
-            " \t\t\t\t</p>\n", 
-            " \t\t\t</subsection>\n", 
-            " \n", 
-            "-\t\t\t<subsection name=\"JSON Support\" id=\"json\">\n", 
-            "+\t\t\t<subsection name=\"JSON Support on Synapse 3.0.0\" id=\"json-syn3\">\n", 
-            " \t\t\t\t<p>\n", 
-            " \t\t\t\t\t<a class=\"externalLink\" href=\"http://json.org\">JSON</a>\n", 
-            " \t\t\t\t\tis a lightweight data-interchange format.\n", 
-            "-\t\t\t\t\tIt can be used as an alternative to XML or SOAP. To enable the JSON\n", 
-            "-\t\t\t\t\tsupport in Synapse, following two jar files should be deployed into the 'lib'\n", 
-            "+\t\t\t\t\tIt can be used as an alternative to XML or SOAP. From Synapse 3.0.0 onward, there are no additional\n", 
-            "+\t\t\t\t\tsteps required to enable JSON.\n", 
-            "+\n", 
-            "+\t\t\t\t</p>\n", 
-            "+\t\t\t</subsection>\n", 
-            "+\n", 
-            "+\t\t\t<subsection name=\"JSON Support Prior to Synapse 3.0.0\" id=\"json\">\n", 
-            "+\t\t\t\t<p>\n", 
-            "+\t\t\t\t\tTo enable JSON\n", 
-            "+\t\t\t\t\tsupport on Synpase versions prior to 3.0.0, the following two jar files should be deployed into the 'lib'\n", 
-            " \t\t\t\t\tdirectory of Synapse.\n", 
-            " \t\t\t\t</p>\n", 
+            " \t\t\t\t</p>\n",
+            " \t\t\t</subsection>\n",
+            " \n",
+            "-\t\t\t<subsection name=\"JSON Support\" id=\"json\">\n",
+            "+\t\t\t<subsection name=\"JSON Support on Synapse 3.0.0\" id=\"json-syn3\">\n",
+            " \t\t\t\t<p>\n",
+            " \t\t\t\t\t<a class=\"externalLink\" href=\"http://json.org\">JSON</a>\n",
+            " \t\t\t\t\tis a lightweight data-interchange format.\n",
+            "-\t\t\t\t\tIt can be used as an alternative to XML or SOAP. To enable the JSON\n",
+            "-\t\t\t\t\tsupport in Synapse, following two jar files should be deployed into the 'lib'\n",
+            "+\t\t\t\t\tIt can be used as an alternative to XML or SOAP. From Synapse 3.0.0 onward, there are no additional\n",
+            "+\t\t\t\t\tsteps required to enable JSON.\n",
+            "+\n",
+            "+\t\t\t\t</p>\n",
+            "+\t\t\t</subsection>\n",
+            "+\n",
+            "+\t\t\t<subsection name=\"JSON Support Prior to Synapse 3.0.0\" id=\"json\">\n",
+            "+\t\t\t\t<p>\n",
+            "+\t\t\t\t\tTo enable JSON\n",
+            "+\t\t\t\t\tsupport on Synpase versions prior to 3.0.0, the following two jar files should be deployed into the 'lib'\n",
+            " \t\t\t\t\tdirectory of Synapse.\n",
+            " \t\t\t\t</p>\n",
             " \t\t\t\t<ul>\n"
-          ]
-        }, 
+          ],
+          "locn": "-84,12 +87,20"
+        },
         {
-          "locn": "-97,7 +108,7", 
           "lines": [
-            " \t\t\t\t\t\t<a class=\"externalLink\" href=\"http://repo1.maven.org/maven2/org/apache/axis2/axis2-json\">axis2-json.jar</a>\n", 
-            " \t\t\t\t\t</li>\n", 
-            " \t\t\t\t\t<li>\n", 
-            "-\t\t\t\t\t\t<a class=\"externalLink\" href=\"http://jettison.codehaus.org/Download\">jettison.jar</a>\n", 
-            "+\t\t\t\t\t\t<a class=\"externalLink\" href=\"http://central.maven.org/maven2/org/codehaus/jettison/jettison/\">jettison.jar</a>\n", 
-            " \t\t\t\t\t</li>\n", 
-            " \t\t\t\t</ul>\n", 
+            " \t\t\t\t\t\t<a class=\"externalLink\" href=\"http://repo1.maven.org/maven2/org/apache/axis2/axis2-json\">axis2-json.jar</a>\n",
+            " \t\t\t\t\t</li>\n",
+            " \t\t\t\t\t<li>\n",
+            "-\t\t\t\t\t\t<a class=\"externalLink\" href=\"http://jettison.codehaus.org/Download\">jettison.jar</a>\n",
+            "+\t\t\t\t\t\t<a class=\"externalLink\" href=\"http://central.maven.org/maven2/org/codehaus/jettison/jettison/\">jettison.jar</a>\n",
+            " \t\t\t\t\t</li>\n",
+            " \t\t\t\t</ul>\n",
             "                 <p>\n"
-          ]
+          ],
+          "locn": "-97,7 +108,7"
         }
-      ], 
-      "to": "java/modules/documentation/src/site/xdoc/userguide/samples/setup/script.xml", 
-      "from": "java/modules/documentation/src/site/xdoc/userguide/samples/setup/script.xml"
-    }, 
+      ],
+      "from": "java/modules/documentation/src/site/xdoc/userguide/samples/setup/script.xml",
+      "to": "java/modules/documentation/src/site/xdoc/userguide/samples/setup/script.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-383,6 +383,7", 
           "lines": [
-            "                 <li><a href=\"tcp_udp.html\">TCP/UDP Setup Guide</a></li>\n", 
-            "                 <li><a href=\"db.html\">Database Setup Guide</a></li>\n", 
-            "                 <li><a href=\"script.html\">Script Setup Guide</a></li>\n", 
-            "+                <li><a href=\"script.html#json-syn3\">JSON Setup Guide</a></li>\n", 
-            "                 <li><a href=\"mail.html\">E-Mail Setup Guide</a></li>\n", 
-            "             </ul>\n", 
+            "                 <li><a href=\"tcp_udp.html\">TCP/UDP Setup Guide</a></li>\n",
+            "                 <li><a href=\"db.html\">Database Setup Guide</a></li>\n",
+            "                 <li><a href=\"script.html\">Script Setup Guide</a></li>\n",
+            "+                <li><a href=\"script.html#json-syn3\">JSON Setup Guide</a></li>\n",
+            "                 <li><a href=\"mail.html\">E-Mail Setup Guide</a></li>\n",
+            "             </ul>\n",
             "         </section>\n"
-          ]
+          ],
+          "locn": "-383,6 +383,7"
         }
-      ], 
-      "to": "java/modules/documentation/src/site/xdoc/userguide/samples/setup/index.xml", 
-      "from": "java/modules/documentation/src/site/xdoc/userguide/samples/setup/index.xml"
-    }, 
+      ],
+      "from": "java/modules/documentation/src/site/xdoc/userguide/samples/setup/index.xml",
+      "to": "java/modules/documentation/src/site/xdoc/userguide/samples/setup/index.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-110,6 +110,12", 
           "lines": [
-            "             <artifactId>axis2-codegen</artifactId>\n", 
-            "         </dependency>\n", 
-            " \n", 
-            "+\t<!-- JSON Support --> \n", 
-            "+\t<dependency>\n", 
-            "+\t\t<groupId>org.apache.axis2</groupId>\n", 
-            "+\t\t<artifactId>axis2-json</artifactId>\n", 
-            "+\t</dependency>\n", 
-            "+\n", 
-            "         <!-- Additional transports -->\n", 
-            "         <dependency>\n", 
+            "             <artifactId>axis2-codegen</artifactId>\n",
+            "         </dependency>\n",
+            " \n",
+            "+\t<!-- JSON Support --> \n",
+            "+\t<dependency>\n",
+            "+\t\t<groupId>org.apache.axis2</groupId>\n",
+            "+\t\t<artifactId>axis2-json</artifactId>\n",
+            "+\t</dependency>\n",
+            "+\n",
+            "         <!-- Additional transports -->\n",
+            "         <dependency>\n",
             "             <groupId>org.apache.axis2</groupId>\n"
-          ]
+          ],
+          "locn": "-110,6 +110,12"
         }
-      ], 
-      "to": "java/modules/distribution/pom.xml", 
-      "from": "java/modules/distribution/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/distribution/pom.xml",
+      "to": "java/modules/distribution/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-427,7 +427,12", 
           "lines": [
-            "                 <groupId>org.apache.axis2</groupId>\n", 
-            "                 <artifactId>axis2-transport-mail</artifactId>\n", 
-            "                 <version>${axis2.version}</version>\n", 
-            "-            </dependency>\n", 
-            "+\t    </dependency>\n", 
-            "+\t    <dependency>\n", 
-            "+                <groupId>org.apache.axis2</groupId>\n", 
-            "+                <artifactId>axis2-json</artifactId>\n", 
-            "+                <version>${axis2.version}</version>\n", 
-            "+\t    </dependency>\n", 
-            "             <dependency>\n", 
-            "                 <groupId>org.apache.axis2</groupId>\n", 
+            "                 <groupId>org.apache.axis2</groupId>\n",
+            "                 <artifactId>axis2-transport-mail</artifactId>\n",
+            "                 <version>${axis2.version}</version>\n",
+            "-            </dependency>\n",
+            "+\t    </dependency>\n",
+            "+\t    <dependency>\n",
+            "+                <groupId>org.apache.axis2</groupId>\n",
+            "+                <artifactId>axis2-json</artifactId>\n",
+            "+                <version>${axis2.version}</version>\n",
+            "+\t    </dependency>\n",
+            "             <dependency>\n",
+            "                 <groupId>org.apache.axis2</groupId>\n",
             "                 <artifactId>axis2-adb</artifactId>\n"
-          ]
+          ],
+          "locn": "-427,7 +427,12"
         }
-      ], 
-      "to": "java/pom.xml", 
-      "from": "java/pom.xml"
-    }, 
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-148,8 +148,8", 
           "lines": [
-            "                          class=\"org.apache.synapse.format.hessian.HessianMessageFormatter\"/>-->\n", 
-            "         <!--<messageFormatter contentType=\"\"\n", 
-            "                          class=\"org.apache.synapse.format.hessian.HessianMessageFormatter\"/>-->\n", 
-            "-        <!--<messageFormatter contentType=\"application/json\"\n", 
-            "-                         class=\"org.apache.axis2.json.JSONMessageFormatter\"/>-->\n", 
-            "+        <messageFormatter contentType=\"application/json\"\n", 
-            "+                         class=\"org.apache.axis2.json.JSONMessageFormatter\"/>\n", 
-            " \n", 
-            "     </messageFormatters>\n", 
+            "                          class=\"org.apache.synapse.format.hessian.HessianMessageFormatter\"/>-->\n",
+            "         <!--<messageFormatter contentType=\"\"\n",
+            "                          class=\"org.apache.synapse.format.hessian.HessianMessageFormatter\"/>-->\n",
+            "-        <!--<messageFormatter contentType=\"application/json\"\n",
+            "-                         class=\"org.apache.axis2.json.JSONMessageFormatter\"/>-->\n",
+            "+        <messageFormatter contentType=\"application/json\"\n",
+            "+                         class=\"org.apache.axis2.json.JSONMessageFormatter\"/>\n",
+            " \n",
+            "     </messageFormatters>\n",
             " \n"
-          ]
-        }, 
+          ],
+          "locn": "-148,8 +148,8"
+        },
         {
-          "locn": "-178,8 +178,8", 
           "lines": [
-            "                          class=\"org.apache.synapse.format.hessian.HessianMessageBuilder\"/>-->\n", 
-            "         <!--<messageBuilder contentType=\"\"\n", 
-            "                          class=\"org.apache.synapse.format.hessian.HessianMessageBuilder\"/>-->\n", 
-            "-        <!--<messageBuilder contentType=\"application/json\"\n", 
-            "-                         class=\"org.apache.axis2.json.JSONOMBuilder\"/>-->\n", 
-            "+        <messageBuilder contentType=\"application/json\"\n", 
-            "+                         class=\"org.apache.axis2.json.JSONOMBuilder\"/>\n", 
-            "     </messageBuilders>\n", 
-            " \n", 
+            "                          class=\"org.apache.synapse.format.hessian.HessianMessageBuilder\"/>-->\n",
+            "         <!--<messageBuilder contentType=\"\"\n",
+            "                          class=\"org.apache.synapse.format.hessian.HessianMessageBuilder\"/>-->\n",
+            "-        <!--<messageBuilder contentType=\"application/json\"\n",
+            "-                         class=\"org.apache.axis2.json.JSONOMBuilder\"/>-->\n",
+            "+        <messageBuilder contentType=\"application/json\"\n",
+            "+                         class=\"org.apache.axis2.json.JSONOMBuilder\"/>\n",
+            "     </messageBuilders>\n",
+            " \n",
             "     <!-- ================================================= -->\n"
-          ]
+          ],
+          "locn": "-178,8 +178,8"
         }
-      ], 
-      "to": "java/repository/conf/axis2.xml", 
-      "from": "java/repository/conf/axis2.xml"
+      ],
+      "from": "java/repository/conf/axis2.xml",
+      "to": "java/repository/conf/axis2.xml"
     }
-  ], 
-  "id": "1776225"
+  ],
+  "id": "1776225",
+  "message": "Bundling axis2-json and jettison as part of distribution package and enabling json content type by default in axsi2.xml. Samples and setup guide also updated to reflect these changes.",
+  "when": "2016-12-27T23:08:49-05:00",
+  "who": "ravi"
 }

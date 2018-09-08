@@ -1,27 +1,27 @@
 {
-  "when": "2013-07-28T00:17:14-04:00", 
-  "message": "Renamed test method", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-8,7 +8,7", 
           "lines": [
-            "         super(300);\n", 
-            "     }\n", 
-            " \n", 
-            "-    public void testRestToPox() throws Exception {\n", 
-            "+    public void testScheduledTask() throws Exception {\n", 
-            "         log.info(\"Waiting 10 seconds for the task to run...\");\n", 
-            "         Thread.sleep(10000);\n", 
+            "         super(300);\n",
+            "     }\n",
+            " \n",
+            "-    public void testRestToPox() throws Exception {\n",
+            "+    public void testScheduledTask() throws Exception {\n",
+            "         log.info(\"Waiting 10 seconds for the task to run...\");\n",
+            "         Thread.sleep(10000);\n",
             "         int messageCount = getAxis2Server().getMessageCount(\"SimpleStockQuoteService\", \"getQuote\");\n"
-          ]
+          ],
+          "locn": "-8,7 +8,7"
         }
-      ], 
-      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/tasks/Sample300.java", 
-      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/tasks/Sample300.java"
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/tasks/Sample300.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/tasks/Sample300.java"
     }
-  ], 
-  "id": "1507756"
+  ],
+  "id": "1507756",
+  "message": "Renamed test method",
+  "when": "2013-07-28T00:17:14-04:00",
+  "who": "hiranya"
 }

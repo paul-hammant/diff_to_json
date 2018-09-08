@@ -1,82 +1,82 @@
 {
-  "when": "2013-08-02T00:10:48-04:00", 
-  "message": "fixed logs + multiple consumer ha.", 
-  "who": "rajikak", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-99,7 +99,7", 
           "lines": [
-            "                 semaphore.release();\n", 
-            " \n", 
-            "             } catch (IOException e) {\n", 
-            "-                log.error(\"I/O error occurred while retrieving the\", e);\n", 
-            "+                log.error(\"I/O error occurred\", e);\n", 
-            "             } catch (InterruptedException e) {\n", 
-            "                 log.error(\"Retrieving task was interrupted\", e);\n", 
+            "                 semaphore.release();\n",
+            " \n",
+            "             } catch (IOException e) {\n",
+            "-                log.error(\"I/O error occurred while retrieving the\", e);\n",
+            "+                log.error(\"I/O error occurred\", e);\n",
+            "             } catch (InterruptedException e) {\n",
+            "                 log.error(\"Retrieving task was interrupted\", e);\n",
             "                 Thread.currentThread().interrupt();\n"
-          ]
+          ],
+          "locn": "-99,7 +99,7"
         }
-      ], 
-      "to": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPSimpleConsumerTask.java", 
-      "from": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPSimpleConsumerTask.java"
-    }, 
+      ],
+      "from": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPSimpleConsumerTask.java",
+      "to": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPSimpleConsumerTask.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-544,7 +544,7", 
           "lines": [
-            "                         stop();\n", 
-            "                         try {\n", 
-            "                             start();\n", 
-            "-                            log.info(\"Polling task for service '\" + serviceName + \"' is re-deployed\");\n", 
-            "+                            log.info(\"Worker task for service '\" + serviceName + \"' is re-deployed\");\n", 
-            "                         } catch (AMQPTransportException ex) {\n", 
-            "                             log.error(\"Start of polling tasks failed. System must be restarted!\");\n", 
+            "                         stop();\n",
+            "                         try {\n",
+            "                             start();\n",
+            "-                            log.info(\"Polling task for service '\" + serviceName + \"' is re-deployed\");\n",
+            "+                            log.info(\"Worker task for service '\" + serviceName + \"' is re-deployed\");\n",
+            "                         } catch (AMQPTransportException ex) {\n",
+            "                             log.error(\"Start of polling tasks failed. System must be restarted!\");\n",
             "                         }\n"
-          ]
+          ],
+          "locn": "-544,7 +544,7"
         }
-      ], 
-      "to": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTask.java", 
-      "from": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTask.java"
-    }, 
+      ],
+      "from": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTask.java",
+      "to": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTask.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-128,7 +128,7", 
           "lines": [
-            "                         new AMQPTransportHABrokerEntry(cf.getChannel(), cf.getConnection()));\n", 
-            "                 entry.getLock().release();\n", 
-            " \n", 
-            "-                while (blockedTasks.isEmpty()) {\n", 
-            "+                while (!blockedTasks.isEmpty()) {\n", 
-            "                     entry = blockedTasks.take();\n", 
-            "                     conFacName = entry.getConnectionFactoryName();\n", 
+            "                         new AMQPTransportHABrokerEntry(cf.getChannel(), cf.getConnection()));\n",
+            "                 entry.getLock().release();\n",
+            " \n",
+            "-                while (blockedTasks.isEmpty()) {\n",
+            "+                while (!blockedTasks.isEmpty()) {\n",
+            "                     entry = blockedTasks.take();\n",
+            "                     conFacName = entry.getConnectionFactoryName();\n",
             "                     cf = connectionFactoryManager.\n"
-          ]
-        }, 
+          ],
+          "locn": "-128,7 +128,7"
+        },
         {
-          "locn": "-136,8 +136,10", 
           "lines": [
-            "                     connectionMap.put(\n", 
-            "                             entry.getKey(),\n", 
-            "                             new AMQPTransportHABrokerEntry(cf.getChannel(), cf.getConnection()));\n", 
-            "-                    log.info(\"The task with key '\" + entry.getKey() + \"' was combined with a new \" +\n", 
-            "-                            \"connection factory\");\n", 
-            "+                    if (log.isDebugEnabled()) {\n", 
-            "+                        log.info(\"The worker task with key '\" + entry.getKey() + \"' was combined with \" +\n", 
-            "+                                \"a new connection factory\");\n", 
-            "+                    }\n", 
-            "                     entry.getLock().release();\n", 
-            "                 }\n", 
+            "                     connectionMap.put(\n",
+            "                             entry.getKey(),\n",
+            "                             new AMQPTransportHABrokerEntry(cf.getChannel(), cf.getConnection()));\n",
+            "-                    log.info(\"The task with key '\" + entry.getKey() + \"' was combined with a new \" +\n",
+            "-                            \"connection factory\");\n",
+            "+                    if (log.isDebugEnabled()) {\n",
+            "+                        log.info(\"The worker task with key '\" + entry.getKey() + \"' was combined with \" +\n",
+            "+                                \"a new connection factory\");\n",
+            "+                    }\n",
+            "                     entry.getLock().release();\n",
+            "                 }\n",
             "             }\n"
-          ]
+          ],
+          "locn": "-136,8 +136,10"
         }
-      ], 
-      "to": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/ha/AMQPTransportReconnectHandler.java", 
-      "from": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/ha/AMQPTransportReconnectHandler.java"
+      ],
+      "from": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/ha/AMQPTransportReconnectHandler.java",
+      "to": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/ha/AMQPTransportReconnectHandler.java"
     }
-  ], 
-  "id": "1509529"
+  ],
+  "id": "1509529",
+  "message": "fixed logs + multiple consumer ha.",
+  "when": "2013-08-02T00:10:48-04:00",
+  "who": "rajikak"
 }

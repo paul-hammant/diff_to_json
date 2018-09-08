@@ -1,497 +1,497 @@
 {
-  "when": "2012-01-16T04:31:20-05:00", 
-  "message": "Some refactoring and cleanup", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-39,21 +39,21", 
           "lines": [
-            "     /**\n", 
-            "      * The directory in which log files are created.\n", 
-            "      */\n", 
-            "-    public static String DIRECTORY = \"logs\";\n", 
-            "+    public static final String DIRECTORY = \"logs\";\n", 
-            " \n", 
-            "     /**\n", 
-            "      * Gives the format of the date to be appended to the name of the access log file.\n", 
-            "      */\n", 
-            "-    public static String FILE_FORMAT = \"yyyy-MM-dd\";\n", 
-            "+    public static final String FILE_FORMAT = \"yyyy-MM-dd\";\n", 
-            " \n", 
-            "     /**\n", 
-            "      * The prefix that is added to log file file names.\n", 
-            "      */\n", 
-            "-    public static String PREFIX = \"http_access_\";\n", 
-            "+    public static final String PREFIX = \"http_access_\";\n", 
-            " \n", 
-            "     /**\n", 
-            "      * The suffix that is added to log file file names.\n", 
-            "      */\n", 
-            "-    public static String SUFFIX = \".log\";\n", 
-            "+    public static final String SUFFIX = \".log\";\n", 
-            " \n", 
+            "     /**\n",
+            "      * The directory in which log files are created.\n",
+            "      */\n",
+            "-    public static String DIRECTORY = \"logs\";\n",
+            "+    public static final String DIRECTORY = \"logs\";\n",
+            " \n",
+            "     /**\n",
+            "      * Gives the format of the date to be appended to the name of the access log file.\n",
+            "      */\n",
+            "-    public static String FILE_FORMAT = \"yyyy-MM-dd\";\n",
+            "+    public static final String FILE_FORMAT = \"yyyy-MM-dd\";\n",
+            " \n",
+            "     /**\n",
+            "      * The prefix that is added to log file file names.\n",
+            "      */\n",
+            "-    public static String PREFIX = \"http_access_\";\n",
+            "+    public static final String PREFIX = \"http_access_\";\n",
+            " \n",
+            "     /**\n",
+            "      * The suffix that is added to log file file names.\n",
+            "      */\n",
+            "-    public static String SUFFIX = \".log\";\n",
+            "+    public static final String SUFFIX = \".log\";\n",
+            " \n",
             " }\n"
-          ]
+          ],
+          "locn": "-39,21 +39,21"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessConstants.java", 
-      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessConstants.java"
-    }, 
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessConstants.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessConstants.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-333,8 +333,8", 
           "lines": [
-            "                     Map<String, String> responseHeaders = (Map<String, String>)\n", 
-            "                             msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);\n", 
-            "                     if (responseHeaders != null) {\n", 
-            "-                        for (String headerName : responseHeaders.keySet()) {\n", 
-            "-                            response.addHeader(headerName, responseHeaders.get(headerName));\n", 
-            "+                        for (Map.Entry<String,String> entry : responseHeaders.entrySet()) {\n", 
-            "+                            response.addHeader(entry.getKey(), entry.getValue());\n", 
-            "                         }\n", 
-            "                     }\n", 
+            "                     Map<String, String> responseHeaders = (Map<String, String>)\n",
+            "                             msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);\n",
+            "                     if (responseHeaders != null) {\n",
+            "-                        for (String headerName : responseHeaders.keySet()) {\n",
+            "-                            response.addHeader(headerName, responseHeaders.get(headerName));\n",
+            "+                        for (Map.Entry<String,String> entry : responseHeaders.entrySet()) {\n",
+            "+                            response.addHeader(entry.getKey(), entry.getValue());\n",
+            "                         }\n",
+            "                     }\n",
             "                 }\n"
-          ]
+          ],
+          "locn": "-333,8 +333,8"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ServerWorker.java", 
-      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ServerWorker.java"
-    }, 
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ServerWorker.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ServerWorker.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-172,6 +172,7", 
           "lines": [
-            "         try {\n", 
-            "             FileInputStream fis = new FileInputStream(fileName);\n", 
-            "             definitions = new StAXOMBuilder(fis).getDocumentElement();\n", 
-            "+            assert definitions != null;\n", 
-            "             definitions.build();\n", 
-            "         } catch (FileNotFoundException e) {\n", 
+            "         try {\n",
+            "             FileInputStream fis = new FileInputStream(fileName);\n",
+            "             definitions = new StAXOMBuilder(fis).getDocumentElement();\n",
+            "+            assert definitions != null;\n",
+            "             definitions.build();\n",
+            "         } catch (FileNotFoundException e) {\n",
             "             handleException(\"Priority configuration file cannot be found : \" + fileName, e);\n"
-          ]
-        }, 
+          ],
+          "locn": "-172,6 +172,7"
+        },
         {
-          "locn": "-179,7 +180,6", 
           "lines": [
-            "             handleException(\"Error parsing priority configuration xml file \" + fileName, e);\n", 
-            "         }\n", 
-            " \n", 
-            "-        assert definitions != null;\n", 
-            "         OMElement executorElem = definitions.getFirstChildWithName(\n", 
-            "                 new QName(ExecutorConstants.PRIORITY_EXECUTOR));\n", 
+            "             handleException(\"Error parsing priority configuration xml file \" + fileName, e);\n",
+            "         }\n",
+            " \n",
+            "-        assert definitions != null;\n",
+            "         OMElement executorElem = definitions.getFirstChildWithName(\n",
+            "                 new QName(ExecutorConstants.PRIORITY_EXECUTOR));\n",
             " \n"
-          ]
+          ],
+          "locn": "-179,7 +180,6"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java", 
-      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java"
-    }, 
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-514,7 +514,9", 
           "lines": [
-            "             }\n", 
-            " \n", 
-            "             worker.getServiceHandler().commitResponse(worker.getConn(), response);\n", 
-            "-            lstMetrics.reportResponseCode(response.getStatusLine().getStatusCode());\n", 
-            "+            if (lstMetrics != null) {\n", 
-            "+                lstMetrics.reportResponseCode(response.getStatusLine().getStatusCode());\n", 
-            "+            }\n", 
-            "             OutputStream out = worker.getOutputStream();\n", 
-            " \n", 
+            "             }\n",
+            " \n",
+            "             worker.getServiceHandler().commitResponse(worker.getConn(), response);\n",
+            "-            lstMetrics.reportResponseCode(response.getStatusLine().getStatusCode());\n",
+            "+            if (lstMetrics != null) {\n",
+            "+                lstMetrics.reportResponseCode(response.getStatusLine().getStatusCode());\n",
+            "+            }\n",
+            "             OutputStream out = worker.getOutputStream();\n",
+            " \n",
             "             /*\n"
-          ]
+          ],
+          "locn": "-514,7 +514,9"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java", 
-      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java"
-    }, 
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-328,7 +328,7", 
           "lines": [
-            "     /**\n", 
-            "      * write date and time, in Common Log Format - %t\n", 
-            "      */\n", 
-            "-    protected class DateAndTimeElement implements AccessLogElement {\n", 
-            "+    protected static class DateAndTimeElement implements AccessLogElement {\n", 
-            " \n", 
-            "         public void addElement(StringBuilder buf, Date date, HttpRequest request,\n", 
+            "     /**\n",
+            "      * write date and time, in Common Log Format - %t\n",
+            "      */\n",
+            "-    protected class DateAndTimeElement implements AccessLogElement {\n",
+            "+    protected static class DateAndTimeElement implements AccessLogElement {\n",
+            " \n",
+            "         public void addElement(StringBuilder buf, Date date, HttpRequest request,\n",
             "                                HttpResponse response) {\n"
-          ]
+          ],
+          "locn": "-328,7 +328,7"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Access.java", 
-      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Access.java"
-    }, 
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Access.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Access.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-83,11 +83,11", 
           "lines": [
-            " \n", 
-            "     public String getString() {\n", 
-            "         if (pathSegments != null) {\n", 
-            "-            String str = \"\";\n", 
-            "+            StringBuilder str = new StringBuilder(\"\");\n", 
-            "             for (String segment : pathSegments) {\n", 
-            "-                str += \"/\" + segment;\n", 
-            "+                str.append(\"/\").append(segment);\n", 
-            "             }\n", 
-            "-            return str + \"/*\";\n", 
-            "+            return str.append(\"/*\").toString();\n", 
-            "         } else if (extension != null) {\n", 
-            "             return \"*.\" + extension;\n", 
+            " \n",
+            "     public String getString() {\n",
+            "         if (pathSegments != null) {\n",
+            "-            String str = \"\";\n",
+            "+            StringBuilder str = new StringBuilder(\"\");\n",
+            "             for (String segment : pathSegments) {\n",
+            "-                str += \"/\" + segment;\n",
+            "+                str.append(\"/\").append(segment);\n",
+            "             }\n",
+            "-            return str + \"/*\";\n",
+            "+            return str.append(\"/*\").toString();\n",
+            "         } else if (extension != null) {\n",
+            "             return \"*.\" + extension;\n",
             "         } else {\n"
-          ]
+          ],
+          "locn": "-83,11 +83,11"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/rest/dispatch/URLMappingHelper.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/rest/dispatch/URLMappingHelper.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/rest/dispatch/URLMappingHelper.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/rest/dispatch/URLMappingHelper.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-212,10 +212,9", 
           "lines": [
-            "                     break;\n", 
-            "                 }\n", 
-            "                 case ST_OFF: {\n", 
-            "-                    // mark as in maintenence, and reset all other information\n", 
-            "+                    // mark as in maintenance, and reset all other information\n", 
-            "                     Replicator.setAndReplicateState(REMAINING_RETRIES_KEY,\n", 
-            "-                            definition == null ? -1 :\n", 
-            "-                                    definition.getRetriesOnTimeoutBeforeSuspend(), cfgCtx);\n", 
-            "+                            definition.getRetriesOnTimeoutBeforeSuspend(), cfgCtx);\n", 
-            "                     Replicator.setAndReplicateState(LAST_SUSPEND_DURATION_KEY, null, cfgCtx);\n", 
-            "                     break;\n", 
+            "                     break;\n",
+            "                 }\n",
+            "                 case ST_OFF: {\n",
+            "-                    // mark as in maintenence, and reset all other information\n",
+            "+                    // mark as in maintenance, and reset all other information\n",
+            "                     Replicator.setAndReplicateState(REMAINING_RETRIES_KEY,\n",
+            "-                            definition == null ? -1 :\n",
+            "-                                    definition.getRetriesOnTimeoutBeforeSuspend(), cfgCtx);\n",
+            "+                            definition.getRetriesOnTimeoutBeforeSuspend(), cfgCtx);\n",
+            "                     Replicator.setAndReplicateState(LAST_SUSPEND_DURATION_KEY, null, cfgCtx);\n",
+            "                     break;\n",
             "                 }\n"
-          ]
-        }, 
+          ],
+          "locn": "-212,10 +212,9"
+        },
         {
-          "locn": "-260,9 +259,8", 
           "lines": [
-            "                     break;\n", 
-            "                 }\n", 
-            "                 case ST_OFF: {\n", 
-            "-                    // mark as in maintenence, and reset all other information\n", 
-            "-                    localRemainingRetries = definition == null ?\n", 
-            "-                            -1 : definition.getRetriesOnTimeoutBeforeSuspend();\n", 
-            "+                    // mark as in maintenance, and reset all other information\n", 
-            "+                    localRemainingRetries = definition.getRetriesOnTimeoutBeforeSuspend();\n", 
-            "                     localLastSuspendDuration = -1;\n", 
-            "                     break;\n", 
+            "                     break;\n",
+            "                 }\n",
+            "                 case ST_OFF: {\n",
+            "-                    // mark as in maintenence, and reset all other information\n",
+            "-                    localRemainingRetries = definition == null ?\n",
+            "-                            -1 : definition.getRetriesOnTimeoutBeforeSuspend();\n",
+            "+                    // mark as in maintenance, and reset all other information\n",
+            "+                    localRemainingRetries = definition.getRetriesOnTimeoutBeforeSuspend();\n",
+            "                     localLastSuspendDuration = -1;\n",
+            "                     break;\n",
             "                 }\n"
-          ]
+          ],
+          "locn": "-260,9 +259,8"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/endpoints/EndpointContext.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/endpoints/EndpointContext.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/endpoints/EndpointContext.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/endpoints/EndpointContext.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-70,10 +70,8", 
           "lines": [
-            "             cloneElem.addAttribute(\"sequential\", \"true\", nullNS);\n", 
-            "         }\n", 
-            " \n", 
-            "-        for (Object o : clone.getTargets()) {\n", 
-            "-            if (o instanceof Target) {\n", 
-            "-                cloneElem.addChild(TargetSerializer.serializeTarget((Target) o));\n", 
-            "-            }\n", 
-            "+        for (Target o : clone.getTargets()) {\n", 
-            "+            cloneElem.addChild(TargetSerializer.serializeTarget(o));\n", 
-            "         }\n", 
-            "         return cloneElem;\n", 
+            "             cloneElem.addAttribute(\"sequential\", \"true\", nullNS);\n",
+            "         }\n",
+            " \n",
+            "-        for (Object o : clone.getTargets()) {\n",
+            "-            if (o instanceof Target) {\n",
+            "-                cloneElem.addChild(TargetSerializer.serializeTarget((Target) o));\n",
+            "-            }\n",
+            "+        for (Target o : clone.getTargets()) {\n",
+            "+            cloneElem.addChild(TargetSerializer.serializeTarget(o));\n",
+            "         }\n",
+            "         return cloneElem;\n",
             "     }\n"
-          ]
+          ],
+          "locn": "-70,10 +70,8"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/CloneMediatorSerializer.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/CloneMediatorSerializer.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/CloneMediatorSerializer.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/CloneMediatorSerializer.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-23,7 +23,6", 
           "lines": [
-            " import org.apache.synapse.mediators.Value;\n", 
-            " import org.apache.synapse.mediators.template.InvokeMediator;\n", 
-            " \n", 
-            "-import java.util.Iterator;\n", 
-            " import java.util.Map;\n", 
-            " \n", 
+            " import org.apache.synapse.mediators.Value;\n",
+            " import org.apache.synapse.mediators.template.InvokeMediator;\n",
+            " \n",
+            "-import java.util.Iterator;\n",
+            " import java.util.Map;\n",
+            " \n",
             " /**\n"
-          ]
-        }, 
+          ],
+          "locn": "-23,7 +23,6"
+        },
         {
-          "locn": "-43,6 +42,7", 
           "lines": [
-            "     protected OMElement serializeSpecificMediator(Mediator m) {\n", 
-            "         if (!(m instanceof InvokeMediator)) {\n", 
-            "             handleException(\"Unsupported mediator passed in for serialization : \" + m.getType());\n", 
-            "+            return null;\n", 
-            "         }\n", 
-            "         InvokeMediator mediator = (InvokeMediator) m;\n", 
+            "     protected OMElement serializeSpecificMediator(Mediator m) {\n",
+            "         if (!(m instanceof InvokeMediator)) {\n",
+            "             handleException(\"Unsupported mediator passed in for serialization : \" + m.getType());\n",
+            "+            return null;\n",
+            "         }\n",
+            "         InvokeMediator mediator = (InvokeMediator) m;\n",
             "         OMElement invokeElem = fac.createOMElement(INVOKE_N, synNS);\n"
-          ]
-        }, 
+          ],
+          "locn": "-43,6 +42,7"
+        },
         {
-          "locn": "-60,16 +60,13", 
           "lines": [
-            " \n", 
-            "     private void serializeParams(OMElement invokeElem, InvokeMediator mediator) {\n", 
-            "         Map<String, Value> paramsMap = mediator.getpName2ExpressionMap();\n", 
-            "-        Iterator<String> paramIterator = paramsMap.keySet().iterator();\n", 
-            "-        while (paramIterator.hasNext()) {\n", 
-            "-            String paramName = paramIterator.next();\n", 
-            "-            if (!\"\".equals(paramName)) {\n", 
-            "+        for (Map.Entry<String,Value> entry : paramsMap.entrySet()) {\n", 
-            "+            if (!\"\".equals(entry.getKey())) {\n", 
-            "                 OMElement paramEl = fac.createOMElement(InvokeMediatorFactory.WITH_PARAM_Q.getLocalPart(),\n", 
-            "                                                         synNS);\n", 
-            "-                paramEl.addAttribute(fac.createOMAttribute(\"name\", nullNS, paramName));\n", 
-            "+                paramEl.addAttribute(fac.createOMAttribute(\"name\", nullNS, entry.getKey()));\n", 
-            "                 //serialize value attribute\n", 
-            "-                Value value = paramsMap.get(paramName);\n", 
-            "-                new ValueSerializer().serializeValue(value, \"value\", paramEl);\n", 
-            "+                new ValueSerializer().serializeValue(entry.getValue(), \"value\", paramEl);\n", 
-            "                 invokeElem.addChild(paramEl);\n", 
-            "             }\n", 
+            " \n",
+            "     private void serializeParams(OMElement invokeElem, InvokeMediator mediator) {\n",
+            "         Map<String, Value> paramsMap = mediator.getpName2ExpressionMap();\n",
+            "-        Iterator<String> paramIterator = paramsMap.keySet().iterator();\n",
+            "-        while (paramIterator.hasNext()) {\n",
+            "-            String paramName = paramIterator.next();\n",
+            "-            if (!\"\".equals(paramName)) {\n",
+            "+        for (Map.Entry<String,Value> entry : paramsMap.entrySet()) {\n",
+            "+            if (!\"\".equals(entry.getKey())) {\n",
+            "                 OMElement paramEl = fac.createOMElement(InvokeMediatorFactory.WITH_PARAM_Q.getLocalPart(),\n",
+            "                                                         synNS);\n",
+            "-                paramEl.addAttribute(fac.createOMAttribute(\"name\", nullNS, paramName));\n",
+            "+                paramEl.addAttribute(fac.createOMAttribute(\"name\", nullNS, entry.getKey()));\n",
+            "                 //serialize value attribute\n",
+            "-                Value value = paramsMap.get(paramName);\n",
+            "-                new ValueSerializer().serializeValue(value, \"value\", paramEl);\n",
+            "+                new ValueSerializer().serializeValue(entry.getValue(), \"value\", paramEl);\n",
+            "                 invokeElem.addChild(paramEl);\n",
+            "             }\n",
             "         }\n"
-          ]
+          ],
+          "locn": "-60,16 +60,13"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/InvokeMediatorSerializer.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/InvokeMediatorSerializer.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/InvokeMediatorSerializer.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/InvokeMediatorSerializer.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-32,7 +32,7", 
           "lines": [
-            " import java.util.Map;\n", 
-            " \n", 
-            " public class TemplateSerializer {\n", 
-            "-    protected static OMFactory fac = OMAbstractFactory.getOMFactory();\n", 
-            "+    protected static final OMFactory fac = OMAbstractFactory.getOMFactory();\n", 
-            " \n", 
-            "     protected static final OMNamespace nullNS\n", 
+            " import java.util.Map;\n",
+            " \n",
+            " public class TemplateSerializer {\n",
+            "-    protected static OMFactory fac = OMAbstractFactory.getOMFactory();\n",
+            "+    protected static final OMFactory fac = OMAbstractFactory.getOMFactory();\n",
+            " \n",
+            "     protected static final OMNamespace nullNS\n",
             "             = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, \"\");\n"
-          ]
+          ],
+          "locn": "-32,7 +32,7"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/TemplateSerializer.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/TemplateSerializer.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/TemplateSerializer.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/TemplateSerializer.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-33,7 +33,7", 
           "lines": [
-            " \n", 
-            " public class TemplateEndpointSerializer extends EndpointSerializer {\n", 
-            " \n", 
-            "-    protected static OMNamespace nullNS;\n", 
-            "+    private OMNamespace nullNS;\n", 
-            " \n", 
-            "     public TemplateEndpointSerializer() {\n", 
+            " \n",
+            " public class TemplateEndpointSerializer extends EndpointSerializer {\n",
+            " \n",
+            "-    protected static OMNamespace nullNS;\n",
+            "+    private OMNamespace nullNS;\n",
+            " \n",
+            "     public TemplateEndpointSerializer() {\n",
             "         fac = OMAbstractFactory.getOMFactory();\n"
-          ]
+          ],
+          "locn": "-33,7 +33,7"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/TemplateEndpointSerializer.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/TemplateEndpointSerializer.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/TemplateEndpointSerializer.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/TemplateEndpointSerializer.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-151,8 +151,6", 
           "lines": [
-            "                 SequenceMediator seq = (SequenceMediator) entry.getValue();\n", 
-            "                 seq.setDynamic(true);\n", 
-            "                 seq.setRegistryKey(entry.getKey());\n", 
-            "-            } else if (entry.getValue() instanceof Endpoint) {\n", 
-            "-                Endpoint ep = (Endpoint) entry.getValue();\n", 
-            "             }\n", 
-            " \n", 
+            "                 SequenceMediator seq = (SequenceMediator) entry.getValue();\n",
+            "                 seq.setDynamic(true);\n",
+            "                 seq.setRegistryKey(entry.getKey());\n",
+            "-            } else if (entry.getValue() instanceof Endpoint) {\n",
+            "-                Endpoint ep = (Endpoint) entry.getValue();\n",
+            "             }\n",
+            " \n",
             "         } else {\n"
-          ]
+          ],
+          "locn": "-151,8 +151,6"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/registry/AbstractRegistry.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/registry/AbstractRegistry.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/registry/AbstractRegistry.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/registry/AbstractRegistry.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-173,11 +173,10", 
           "lines": [
-            "             return null;\n", 
-            "         }\n", 
-            " \n", 
-            "-        Set<QName> qNames = extensionMap.keySet();\n", 
-            "-        for (QName qName : qNames) {\n", 
-            "+        for (Map.Entry<QName,T> entry : extensionMap.entrySet()) {\n", 
-            "             //check for a match for the given combination for QName registered\n", 
-            "-            if (subject.equals(qName)) {\n", 
-            "-                return extensionMap.get(qName);\n", 
-            "+            if (subject.equals(entry.getKey())) {\n", 
-            "+                return entry.getValue();\n", 
-            "             }\n", 
-            "         }\n", 
+            "             return null;\n",
+            "         }\n",
+            " \n",
+            "-        Set<QName> qNames = extensionMap.keySet();\n",
+            "-        for (QName qName : qNames) {\n",
+            "+        for (Map.Entry<QName,T> entry : extensionMap.entrySet()) {\n",
+            "             //check for a match for the given combination for QName registered\n",
+            "-            if (subject.equals(qName)) {\n",
+            "-                return extensionMap.get(qName);\n",
+            "+            if (subject.equals(entry.getKey())) {\n",
+            "+                return entry.getValue();\n",
+            "             }\n",
+            "         }\n",
             "         //no match found\n"
-          ]
+          ],
+          "locn": "-173,11 +173,10"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/util/xpath/ext/XpathExtensionUtil.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/util/xpath/ext/XpathExtensionUtil.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/util/xpath/ext/XpathExtensionUtil.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/util/xpath/ext/XpathExtensionUtil.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-241,7 +241,7", 
           "lines": [
-            "             }\n", 
-            " \n", 
-            "         } else {\n", 
-            "-            throw new Exception(\"Error! Cant send Message Context : \" + messageContext);\n", 
-            "+            throw new Exception(\"MessageContext must not be null\");\n", 
-            "         }\n", 
-            "     }\n", 
+            "             }\n",
+            " \n",
+            "         } else {\n",
+            "-            throw new Exception(\"Error! Cant send Message Context : \" + messageContext);\n",
+            "+            throw new Exception(\"MessageContext must not be null\");\n",
+            "         }\n",
+            "     }\n",
             " \n"
-          ]
+          ],
+          "locn": "-241,7 +241,7"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/MessageForwardingProcessorView.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/MessageForwardingProcessorView.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/MessageForwardingProcessorView.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/MessageForwardingProcessorView.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-23,19 +23,15", 
           "lines": [
-            " import org.apache.commons.logging.Log;\n", 
-            " import org.apache.commons.logging.LogFactory;\n", 
-            " import org.apache.synapse.*;\n", 
-            "-import org.apache.synapse.config.SynapseConfiguration;\n", 
-            " import org.apache.synapse.core.axis2.Axis2MessageContext;\n", 
-            " import org.apache.synapse.endpoints.AddressEndpoint;\n", 
-            " import org.apache.synapse.endpoints.Endpoint;\n", 
-            "-import org.apache.synapse.mediators.MediatorFaultHandler;\n", 
-            " import org.apache.synapse.message.processors.MessageProcessorConsents;\n", 
-            "-import org.apache.synapse.message.store.AbstractMessageStore;\n", 
-            " import org.apache.synapse.message.store.MessageStore;\n", 
-            " import org.quartz.*;\n", 
-            " \n", 
-            " import java.util.Map;\n", 
-            " import java.util.Set;\n", 
-            "-import java.util.concurrent.locks.Lock;\n", 
-            " \n", 
-            " /**\n", 
+            " import org.apache.commons.logging.Log;\n",
+            " import org.apache.commons.logging.LogFactory;\n",
+            " import org.apache.synapse.*;\n",
+            "-import org.apache.synapse.config.SynapseConfiguration;\n",
+            " import org.apache.synapse.core.axis2.Axis2MessageContext;\n",
+            " import org.apache.synapse.endpoints.AddressEndpoint;\n",
+            " import org.apache.synapse.endpoints.Endpoint;\n",
+            "-import org.apache.synapse.mediators.MediatorFaultHandler;\n",
+            " import org.apache.synapse.message.processors.MessageProcessorConsents;\n",
+            "-import org.apache.synapse.message.store.AbstractMessageStore;\n",
+            " import org.apache.synapse.message.store.MessageStore;\n",
+            " import org.quartz.*;\n",
+            " \n",
+            " import java.util.Map;\n",
+            " import java.util.Set;\n",
+            "-import java.util.concurrent.locks.Lock;\n",
+            " \n",
+            " /**\n",
             "  * Redelivery Job will replay all the Messages in the Message Store when executed\n"
-          ]
-        }, 
+          ],
+          "locn": "-23,19 +23,15"
+        },
         {
-          "locn": "-50,7 +46,7", 
           "lines": [
-            "         JobDataMap jdm = jobExecutionContext.getMergedJobDataMap();\n", 
-            " \n", 
-            "         /**\n", 
-            "-         * Get the Globle Objects from DataMap\n", 
-            "+         * Get the Global Objects from DataMap\n", 
-            "          */\n", 
-            "         MessageStore messageStore = (MessageStore) jdm.get(\n", 
+            "         JobDataMap jdm = jobExecutionContext.getMergedJobDataMap();\n",
+            " \n",
+            "         /**\n",
+            "-         * Get the Globle Objects from DataMap\n",
+            "+         * Get the Global Objects from DataMap\n",
+            "          */\n",
+            "         MessageStore messageStore = (MessageStore) jdm.get(\n",
             "                 MessageProcessorConsents.MESSAGE_STORE);\n"
-          ]
-        }, 
+          ],
+          "locn": "-50,7 +46,7"
+        },
         {
-          "locn": "-58,15 +54,15", 
           "lines": [
-            "                 MessageProcessorConsents.PARAMETERS);\n", 
-            "         BlockingMessageSender sender =\n", 
-            "                 (BlockingMessageSender) jdm.get(ScheduledMessageForwardingProcessor.BLOCKING_SENDER);\n", 
-            "-\n", 
-            "         ScheduledMessageForwardingProcessor processor =\n", 
-            "                 (ScheduledMessageForwardingProcessor) jdm.get(ScheduledMessageForwardingProcessor.PROCESSOR_INSTANCE);\n", 
-            " \n", 
-            "-\n", 
-            "         int maxDeliverAttempts = -1;\n", 
-            "-        String mdaParam = (String) parameters.get(MessageProcessorConsents.MAX_DELIVER_ATTEMPTS);\n", 
-            "+        String mdaParam = null;\n", 
-            "+        if (parameters != null) {\n", 
-            "+            mdaParam = (String) parameters.get(MessageProcessorConsents.MAX_DELIVER_ATTEMPTS);\n", 
-            "+        }\n", 
-            " \n", 
-            "-\n", 
-            "         if (mdaParam != null) {\n", 
-            "             maxDeliverAttempts = Integer.parseInt(mdaParam);\n", 
+            "                 MessageProcessorConsents.PARAMETERS);\n",
+            "         BlockingMessageSender sender =\n",
+            "                 (BlockingMessageSender) jdm.get(ScheduledMessageForwardingProcessor.BLOCKING_SENDER);\n",
+            "-\n",
+            "         ScheduledMessageForwardingProcessor processor =\n",
+            "                 (ScheduledMessageForwardingProcessor) jdm.get(ScheduledMessageForwardingProcessor.PROCESSOR_INSTANCE);\n",
+            " \n",
+            "-\n",
+            "         int maxDeliverAttempts = -1;\n",
+            "-        String mdaParam = (String) parameters.get(MessageProcessorConsents.MAX_DELIVER_ATTEMPTS);\n",
+            "+        String mdaParam = null;\n",
+            "+        if (parameters != null) {\n",
+            "+            mdaParam = (String) parameters.get(MessageProcessorConsents.MAX_DELIVER_ATTEMPTS);\n",
+            "+        }\n",
+            " \n",
+            "-\n",
+            "         if (mdaParam != null) {\n",
+            "             maxDeliverAttempts = Integer.parseInt(mdaParam);\n",
             " \n"
-          ]
+          ],
+          "locn": "-58,15 +54,15"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ForwardingJob.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ForwardingJob.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ForwardingJob.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ForwardingJob.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-66,8 +66,8", 
           "lines": [
-            " \n", 
-            "         //get the target function template and invoke by passing populated parameters\n", 
-            "         Mediator mediator = synCtx.getSequenceTemplate(targetTemplate);\n", 
-            "-        populateParameters(synCtx, ((TemplateMediator)mediator).getName());\n", 
-            "         if (mediator != null && mediator instanceof TemplateMediator) {\n", 
-            "+            populateParameters(synCtx, ((TemplateMediator) mediator).getName());\n", 
-            "             return mediator.mediate(synCtx);\n", 
-            "         }\n", 
+            " \n",
+            "         //get the target function template and invoke by passing populated parameters\n",
+            "         Mediator mediator = synCtx.getSequenceTemplate(targetTemplate);\n",
+            "-        populateParameters(synCtx, ((TemplateMediator)mediator).getName());\n",
+            "         if (mediator != null && mediator instanceof TemplateMediator) {\n",
+            "+            populateParameters(synCtx, ((TemplateMediator) mediator).getName());\n",
+            "             return mediator.mediate(synCtx);\n",
+            "         }\n",
             "         return false;\n"
-          ]
+          ],
+          "locn": "-66,8 +66,8"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/template/InvokeMediator.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/template/InvokeMediator.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/template/InvokeMediator.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/template/InvokeMediator.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-248,7 +248,7", 
           "lines": [
-            "             }\n", 
-            "         } catch (Exception e) {\n", 
-            "             handleSynapseArtifactDeploymentError(\n", 
-            "-                    \"Template Undeployement of template named : \" + artifactName + \" : Failed\", e);\n", 
-            "+                    \"Template Undeployment of template named : \" + artifactName + \" : Failed\", e);\n", 
-            "         }\n", 
-            "     }\n", 
+            "             }\n",
+            "         } catch (Exception e) {\n",
+            "             handleSynapseArtifactDeploymentError(\n",
+            "-                    \"Template Undeployement of template named : \" + artifactName + \" : Failed\", e);\n",
+            "+                    \"Template Undeployment of template named : \" + artifactName + \" : Failed\", e);\n",
+            "         }\n",
+            "     }\n",
             " \n"
-          ]
-        }, 
+          ],
+          "locn": "-248,7 +248,7"
+        },
         {
-          "locn": "-283,7 +283,7", 
           "lines": [
-            "                     if (mt.getFileName() != null) {\n", 
-            "                         String fileName = getServerConfigurationInformation().getSynapseXMLLocation()\n", 
-            "                                 + File.separator + MultiXMLConfigurationBuilder.TEMPLATES_DIR\n", 
-            "-                                + File.separator + st.getFileName();\n", 
-            "+                                + File.separator + mt.getFileName();\n", 
-            "                         writeToFile(stElem, fileName);\n", 
-            "                         if (log.isDebugEnabled()) {\n", 
+            "                     if (mt.getFileName() != null) {\n",
+            "                         String fileName = getServerConfigurationInformation().getSynapseXMLLocation()\n",
+            "                                 + File.separator + MultiXMLConfigurationBuilder.TEMPLATES_DIR\n",
+            "-                                + File.separator + st.getFileName();\n",
+            "+                                + File.separator + mt.getFileName();\n",
+            "                         writeToFile(stElem, fileName);\n",
+            "                         if (log.isDebugEnabled()) {\n",
             "                             log.debug(\"Restoring the Sequence Template with name : \" +\n"
-          ]
+          ],
+          "locn": "-283,7 +283,7"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/deployers/TemplateDeployer.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/deployers/TemplateDeployer.java"
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/deployers/TemplateDeployer.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/deployers/TemplateDeployer.java"
     }
-  ], 
-  "id": "1231881"
+  ],
+  "id": "1231881",
+  "message": "Some refactoring and cleanup",
+  "when": "2012-01-16T04:31:20-05:00",
+  "who": "hiranya"
 }

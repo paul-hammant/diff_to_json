@@ -1,109 +1,109 @@
 {
-  "when": "2016-02-20T07:52:50-05:00", 
-  "message": "Disable two test cases which are fundamentally broken because they will always fail after a certain date.", 
-  "who": "veithen", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-18,17 +18,19", 
           "lines": [
-            "  */\n", 
-            " package org.apache.synapse.transport.utils.sslcert;\n", 
-            " \n", 
-            "-import junit.framework.TestCase;\n", 
-            " import org.apache.synapse.transport.utils.sslcert.crl.CRLCache;\n", 
-            " import org.apache.synapse.transport.utils.sslcert.crl.CRLVerifier;\n", 
-            " import org.apache.synapse.transport.utils.sslcert.ocsp.OCSPCache;\n", 
-            " import org.apache.synapse.transport.utils.sslcert.ocsp.OCSPVerifier;\n", 
-            " import org.apache.synapse.transport.utils.sslcert.pathvalidation.CertificatePathValidator;\n", 
-            "+import org.junit.Assert;\n", 
-            "+import org.junit.Ignore;\n", 
-            "+import org.junit.Test;\n", 
-            " \n", 
-            " import java.security.Security;\n", 
-            " import java.security.cert.X509Certificate;\n", 
-            " \n", 
-            "-public class RevocationVerificationTest extends TestCase {\n", 
-            "+public class RevocationVerificationTest extends Assert {\n", 
-            " \n", 
-            "     /**\n", 
+            "  */\n",
+            " package org.apache.synapse.transport.utils.sslcert;\n",
+            " \n",
+            "-import junit.framework.TestCase;\n",
+            " import org.apache.synapse.transport.utils.sslcert.crl.CRLCache;\n",
+            " import org.apache.synapse.transport.utils.sslcert.crl.CRLVerifier;\n",
+            " import org.apache.synapse.transport.utils.sslcert.ocsp.OCSPCache;\n",
+            " import org.apache.synapse.transport.utils.sslcert.ocsp.OCSPVerifier;\n",
+            " import org.apache.synapse.transport.utils.sslcert.pathvalidation.CertificatePathValidator;\n",
+            "+import org.junit.Assert;\n",
+            "+import org.junit.Ignore;\n",
+            "+import org.junit.Test;\n",
+            " \n",
+            " import java.security.Security;\n",
+            " import java.security.cert.X509Certificate;\n",
+            " \n",
+            "-public class RevocationVerificationTest extends TestCase {\n",
+            "+public class RevocationVerificationTest extends Assert {\n",
+            " \n",
+            "     /**\n",
             "      * Tests CRL Path Validation with the use of a real certificate chain. The verification process\n"
-          ]
-        }, 
+          ],
+          "locn": "-18,17 +18,19"
+        },
         {
-          "locn": "-40,6 +42,8", 
           "lines": [
-            "      *\n", 
-            "      * @throws Exception\n", 
-            "      */\n", 
-            "+    @Test\n", 
-            "+    @Ignore(\"Unit tests with builtin expiration date are bad\")\n", 
-            "     public void testCRLPathValidation() throws Exception {\n", 
-            "         //Add BouncyCastle as Security Provider.\n", 
+            "      *\n",
+            "      * @throws Exception\n",
+            "      */\n",
+            "+    @Test\n",
+            "+    @Ignore(\"Unit tests with builtin expiration date are bad\")\n",
+            "     public void testCRLPathValidation() throws Exception {\n",
+            "         //Add BouncyCastle as Security Provider.\n",
             "         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());\n"
-          ]
-        }, 
+          ],
+          "locn": "-40,6 +42,8"
+        },
         {
-          "locn": "-54,6 +58,7", 
           "lines": [
-            "      *\n", 
-            "      * @throws Exception\n", 
-            "      */\n", 
-            "+    @Test\n", 
-            "     public void testCRLPathValidationWithFakeCerts() throws Exception {\n", 
-            "         //Add BouncyCastle as Security Provider.\n", 
+            "      *\n",
+            "      * @throws Exception\n",
+            "      */\n",
+            "+    @Test\n",
+            "     public void testCRLPathValidationWithFakeCerts() throws Exception {\n",
+            "         //Add BouncyCastle as Security Provider.\n",
             "         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());\n"
-          ]
-        }, 
+          ],
+          "locn": "-54,6 +58,7"
+        },
         {
-          "locn": "-76,6 +81,8", 
           "lines": [
-            "      *\n", 
-            "      * @throws Exception\n", 
-            "      */\n", 
-            "+    @Test\n", 
-            "+    @Ignore(\"Unit tests with builtin expiration date are bad\")\n", 
-            "     public void testOCSPPathValidation() throws Exception {\n", 
-            "         //Add BouncyCastle as Security Provider.\n", 
+            "      *\n",
+            "      * @throws Exception\n",
+            "      */\n",
+            "+    @Test\n",
+            "+    @Ignore(\"Unit tests with builtin expiration date are bad\")\n",
+            "     public void testOCSPPathValidation() throws Exception {\n",
+            "         //Add BouncyCastle as Security Provider.\n",
             "         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());\n"
-          ]
-        }, 
+          ],
+          "locn": "-76,6 +81,8"
+        },
         {
-          "locn": "-91,6 +98,7", 
           "lines": [
-            "      *\n", 
-            "      * @throws Exception\n", 
-            "      */\n", 
-            "+    @Test\n", 
-            "     public void testOCSPPathValidationWithFakeCerts() throws Exception {\n", 
-            " \n", 
+            "      *\n",
+            "      * @throws Exception\n",
+            "      */\n",
+            "+    @Test\n",
+            "     public void testOCSPPathValidationWithFakeCerts() throws Exception {\n",
+            " \n",
             "         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());\n"
-          ]
+          ],
+          "locn": "-91,6 +98,7"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/src/test/java/org/apache/synapse/transport/utils/sslcert/RevocationVerificationTest.java", 
-      "from": "java/modules/transports/core/nhttp/src/test/java/org/apache/synapse/transport/utils/sslcert/RevocationVerificationTest.java"
-    }, 
+      ],
+      "from": "java/modules/transports/core/nhttp/src/test/java/org/apache/synapse/transport/utils/sslcert/RevocationVerificationTest.java",
+      "to": "java/modules/transports/core/nhttp/src/test/java/org/apache/synapse/transport/utils/sslcert/RevocationVerificationTest.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-1079,7 +1079,7", 
           "lines": [
-            "         <geronimo-spec.version>1.1</geronimo-spec.version>\n", 
-            " \n", 
-            "         <!-- misc -->\n", 
-            "-        <junit.version>3.8.2</junit.version>\n", 
-            "+        <junit.version>4.12</junit.version>\n", 
-            "         <!-- Warning: log4j versions above 1.2.14 introduce additional transitive dependencies,\n", 
-            "              some of which are not available from the Maven central repository. -->\n", 
+            "         <geronimo-spec.version>1.1</geronimo-spec.version>\n",
+            " \n",
+            "         <!-- misc -->\n",
+            "-        <junit.version>3.8.2</junit.version>\n",
+            "+        <junit.version>4.12</junit.version>\n",
+            "         <!-- Warning: log4j versions above 1.2.14 introduce additional transitive dependencies,\n",
+            "              some of which are not available from the Maven central repository. -->\n",
             "         <log4j.version>1.2.14</log4j.version>\n"
-          ]
+          ],
+          "locn": "-1079,7 +1079,7"
         }
-      ], 
-      "to": "java/pom.xml", 
-      "from": "java/pom.xml"
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
     }
-  ], 
-  "id": "1731395"
+  ],
+  "id": "1731395",
+  "message": "Disable two test cases which are fundamentally broken because they will always fail after a certain date.",
+  "when": "2016-02-20T07:52:50-05:00",
+  "who": "veithen"
 }

@@ -1,76 +1,76 @@
 {
-  "when": "2017-01-04T05:07:29-05:00", 
-  "message": "Removing previous versions and updating 3.0.0 release date", 
-  "who": "ravi", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-64,12 +64,5", 
           "lines": [
-            "             <item name=\"Dependencies\" href=\"dependency-management.html\"/>\n", 
-            "             <item name=\"Project Team\" href=\"team-list.html\"/>\n", 
-            "         </menu>\n", 
-            "-        <menu name=\"Previous Releases\">\n", 
-            "-            <item name=\"Version 2.0\" href=\"/2_0/docs_index.html\"/>\n", 
-            "-            <item name=\"Version 1.2\" href=\"/1_2/docs_index.html\"/>\n", 
-            "-            <item name=\"Version 1.1.1\" href=\"/1_1_1/content.html\"/>\n", 
-            "-            <item name=\"Version 1.1\" href=\"/1_1/content.html\"/>\n", 
-            "-            <item name=\"Version 1.0\" href=\"/1_1/content.html\"/>\n", 
-            "-        </menu>\n", 
-            "     </body>\n", 
+            "             <item name=\"Dependencies\" href=\"dependency-management.html\"/>\n",
+            "             <item name=\"Project Team\" href=\"team-list.html\"/>\n",
+            "         </menu>\n",
+            "-        <menu name=\"Previous Releases\">\n",
+            "-            <item name=\"Version 2.0\" href=\"/2_0/docs_index.html\"/>\n",
+            "-            <item name=\"Version 1.2\" href=\"/1_2/docs_index.html\"/>\n",
+            "-            <item name=\"Version 1.1.1\" href=\"/1_1_1/content.html\"/>\n",
+            "-            <item name=\"Version 1.1\" href=\"/1_1/content.html\"/>\n",
+            "-            <item name=\"Version 1.0\" href=\"/1_1/content.html\"/>\n",
+            "-        </menu>\n",
+            "     </body>\n",
             " </project>\n"
-          ]
+          ],
+          "locn": "-64,12 +64,5"
         }
-      ], 
-      "to": "java/modules/documentation/src/site/site.xml", 
-      "from": "java/modules/documentation/src/site/site.xml"
-    }, 
+      ],
+      "from": "java/modules/documentation/src/site/site.xml",
+      "to": "java/modules/documentation/src/site/site.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-25,7 +25,7", 
           "lines": [
-            "     <body>\n", 
-            "         <section name=\"Download Latest Stable Release\">\n", 
-            "             <p>\n", 
-            "-                The latest stable release of Apache Synapse is 3.0. It is highly recommended\n", 
-            "+                The latest stable release of Apache Synapse is 3.0.0. It is highly recommended\n", 
-            "                 to use the latest stable release so that you can use our newest features\n", 
-            "                 while benefiting from all the recent bug fixes and improvements.\n", 
+            "     <body>\n",
+            "         <section name=\"Download Latest Stable Release\">\n",
+            "             <p>\n",
+            "-                The latest stable release of Apache Synapse is 3.0. It is highly recommended\n",
+            "+                The latest stable release of Apache Synapse is 3.0.0. It is highly recommended\n",
+            "                 to use the latest stable release so that you can use our newest features\n",
+            "                 while benefiting from all the recent bug fixes and improvements.\n",
             "             </p>\n"
-          ]
-        }, 
+          ],
+          "locn": "-25,7 +25,7"
+        },
         {
-          "locn": "-35,8 +35,8", 
           "lines": [
-            "                     <th>Release Date</th>\n", 
-            "                 </tr>\n", 
-            "                 <tr>\n", 
-            "-                    <td><a href=\"download/3.0/download.cgi\">3.0</a></td>\n", 
-            "-                    <td>01-Jan-2017</td>\n", 
-            "+                    <td><a href=\"download/3.0.0/download.cgi\">3.0.0</a></td>\n", 
-            "+                    <td>04-Jan-2017</td>\n", 
-            "                 </tr>\n", 
-            "             </table>\n", 
+            "                     <th>Release Date</th>\n",
+            "                 </tr>\n",
+            "                 <tr>\n",
+            "-                    <td><a href=\"download/3.0/download.cgi\">3.0</a></td>\n",
+            "-                    <td>01-Jan-2017</td>\n",
+            "+                    <td><a href=\"download/3.0.0/download.cgi\">3.0.0</a></td>\n",
+            "+                    <td>04-Jan-2017</td>\n",
+            "                 </tr>\n",
+            "             </table>\n",
             "         </section>\n"
-          ]
-        }, 
+          ],
+          "locn": "-35,8 +35,8"
+        },
         {
-          "locn": "-73,4 +73,4", 
           "lines": [
-            "             </table>\n", 
-            "         </section>\n", 
-            "     </body>\n", 
-            "-</document>\n", 
-            "\\ No newline at end of file\n", 
+            "             </table>\n",
+            "         </section>\n",
+            "     </body>\n",
+            "-</document>\n",
+            "\\ No newline at end of file\n",
             "+</document>\n"
-          ]
+          ],
+          "locn": "-73,4 +73,4"
         }
-      ], 
-      "to": "java/modules/documentation/src/site/xdoc/download.xml", 
-      "from": "java/modules/documentation/src/site/xdoc/download.xml"
+      ],
+      "from": "java/modules/documentation/src/site/xdoc/download.xml",
+      "to": "java/modules/documentation/src/site/xdoc/download.xml"
     }
-  ], 
-  "id": "1777274"
+  ],
+  "id": "1777274",
+  "message": "Removing previous versions and updating 3.0.0 release date",
+  "when": "2017-01-04T05:07:29-05:00",
+  "who": "ravi"
 }

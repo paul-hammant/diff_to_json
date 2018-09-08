@@ -1,57 +1,57 @@
 {
-  "when": "2013-08-14T21:36:54-04:00", 
-  "message": "Fixing a race condition in SourceHandler - related to the failure in Sampe150 test case (WSDL generation)", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-193,13 +193,15", 
           "lines": [
-            "                 synchronized (conn.getContext()) {\n", 
-            "                     // SimpleOutputBuffer is not thread safe\n", 
-            "                     // Explicit synchronization required\n", 
-            "-                    int bytesWritten = outBuf.produceContent(encoder);\n", 
-            "-                    if (metrics != null && bytesWritten > 0) {\n", 
-            "-                        metrics.incrementBytesSent(bytesWritten);\n", 
-            "+                    if (outBuf.hasData()) {\n", 
-            "+                        int bytesWritten = outBuf.produceContent(encoder);\n", 
-            "+                        if (metrics != null && bytesWritten > 0) {\n", 
-            "+                            metrics.incrementBytesSent(bytesWritten);\n", 
-            "+                        }\n", 
-            "                     }\n", 
-            " \n", 
-            "                     conn.requestInput();\n", 
-            "-                    if (!outBuf.hasData()) {\n", 
-            "+                    if (!outBuf.hasData() && encoder.isCompleted()) {\n", 
-            "                         // We are done - At this point the entire response payload has been\n", 
-            "                         // written out to the SimpleOutputBuffer\n", 
+            "                 synchronized (conn.getContext()) {\n",
+            "                     // SimpleOutputBuffer is not thread safe\n",
+            "                     // Explicit synchronization required\n",
+            "-                    int bytesWritten = outBuf.produceContent(encoder);\n",
+            "-                    if (metrics != null && bytesWritten > 0) {\n",
+            "-                        metrics.incrementBytesSent(bytesWritten);\n",
+            "+                    if (outBuf.hasData()) {\n",
+            "+                        int bytesWritten = outBuf.produceContent(encoder);\n",
+            "+                        if (metrics != null && bytesWritten > 0) {\n",
+            "+                            metrics.incrementBytesSent(bytesWritten);\n",
+            "+                        }\n",
+            "                     }\n",
+            " \n",
+            "                     conn.requestInput();\n",
+            "-                    if (!outBuf.hasData()) {\n",
+            "+                    if (!outBuf.hasData() && encoder.isCompleted()) {\n",
+            "                         // We are done - At this point the entire response payload has been\n",
+            "                         // written out to the SimpleOutputBuffer\n",
             "                         sourceConfiguration.getSourceConnections().releaseConnection(conn);\n"
-          ]
+          ],
+          "locn": "-193,13 +193,15"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java", 
-      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java"
-    }, 
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-229,7 +229,7", 
           "lines": [
-            "     }\n", 
-            " \n", 
-            "     /**\n", 
-            "-     * Return the number of total connections opened during last 'n' munites\n", 
-            "+     * Return the number of total connections opened during last 'n' minutes\n", 
-            "      * of execution\n", 
-            "      *\n", 
+            "     }\n",
+            " \n",
+            "     /**\n",
+            "-     * Return the number of total connections opened during last 'n' munites\n",
+            "+     * Return the number of total connections opened during last 'n' minutes\n",
+            "      * of execution\n",
+            "      *\n",
             "      * @param n Number of minutes in the execution history\n"
-          ]
+          ],
+          "locn": "-229,7 +229,7"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/jmx/ConnectionsView.java", 
-      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/jmx/ConnectionsView.java"
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/jmx/ConnectionsView.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/jmx/ConnectionsView.java"
     }
-  ], 
-  "id": "1514120"
+  ],
+  "id": "1514120",
+  "message": "Fixing a race condition in SourceHandler - related to the failure in Sampe150 test case (WSDL generation)",
+  "when": "2013-08-14T21:36:54-04:00",
+  "who": "hiranya"
 }

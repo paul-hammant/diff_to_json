@@ -1,28 +1,28 @@
 {
-  "when": "2011-12-19T03:46:58-05:00", 
-  "message": "Fixing SYNAPSE-809", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-201,8 +201,7", 
           "lines": [
-            " \t\t\tlog.error(\"Text Node not found\");\r\n", 
-            " \t\t\treturn null;\r\n", 
-            " \t\t}\r\n", 
-            "-\t\tOMText text = (OMText) textNode;\r\n", 
-            "-\t\treturn text.getText();\r\n", 
-            "+\t\treturn el.getText();\r\n", 
-            " \t}\r\n", 
-            " \r\n", 
+            " \t\t\tlog.error(\"Text Node not found\");\r\n",
+            " \t\t\treturn null;\r\n",
+            " \t\t}\r\n",
+            "-\t\tOMText text = (OMText) textNode;\r\n",
+            "-\t\treturn text.getText();\r\n",
+            "+\t\treturn el.getText();\r\n",
+            " \t}\r\n",
+            " \r\n",
             " \tpublic static String getTextPayload(MessageContext mc) {\r\n"
-          ]
+          ],
+          "locn": "-201,8 +201,7"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/util/PayloadHelper.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/util/PayloadHelper.java"
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/util/PayloadHelper.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/util/PayloadHelper.java"
     }
-  ], 
-  "id": "1220654"
+  ],
+  "id": "1220654",
+  "message": "Fixing SYNAPSE-809",
+  "when": "2011-12-19T03:46:58-05:00",
+  "who": "hiranya"
 }

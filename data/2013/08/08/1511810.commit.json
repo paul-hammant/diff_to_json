@@ -1,27 +1,27 @@
 {
-  "when": "2013-08-08T10:36:18-04:00", 
-  "message": "removed dead codes.", 
-  "who": "rajikak", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-93,8 +93,6", 
           "lines": [
-            "         cache = new AMQPSenderCache(new ConcurrentHashMap<Integer, AMQPSender>());\n", 
-            "         responseTracker = new ConcurrentHashMap<String, Semaphore>();\n", 
-            "         responseMessage = new ConcurrentHashMap<String, AMQPTransportMessage>();\n", 
-            "-//        MBeanRegister.getInstance().registerMBean(\n", 
-            "-//                new TransportView(null, this), \"Transport\", \"amqp-tx-receiver\");\n", 
-            " \n", 
-            "         log.info(\"AMQP transport sender initializing..\");\n", 
+            "         cache = new AMQPSenderCache(new ConcurrentHashMap<Integer, AMQPSender>());\n",
+            "         responseTracker = new ConcurrentHashMap<String, Semaphore>();\n",
+            "         responseMessage = new ConcurrentHashMap<String, AMQPTransportMessage>();\n",
+            "-//        MBeanRegister.getInstance().registerMBean(\n",
+            "-//                new TransportView(null, this), \"Transport\", \"amqp-tx-receiver\");\n",
+            " \n",
+            "         log.info(\"AMQP transport sender initializing..\");\n",
             "     }\n"
-          ]
+          ],
+          "locn": "-93,8 +93,6"
         }
-      ], 
-      "to": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportSender.java", 
-      "from": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportSender.java"
+      ],
+      "from": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportSender.java",
+      "to": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportSender.java"
     }
-  ], 
-  "id": "1511810"
+  ],
+  "id": "1511810",
+  "message": "removed dead codes.",
+  "when": "2013-08-08T10:36:18-04:00",
+  "who": "rajikak"
 }

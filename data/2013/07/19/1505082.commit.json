@@ -1,32 +1,32 @@
 {
-  "when": "2013-07-19T23:08:38-04:00", 
-  "message": "Reverting the fix for SYNAPSE-872 due to a possible regression", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-53,12 +53,7", 
           "lines": [
-            "     VFSOutTransportInfo(String outFileURI, boolean fileLocking) {\n", 
-            "         \n", 
-            "         if (outFileURI.startsWith(VFSConstants.VFS_PREFIX)) {\n", 
-            "-            int qIndex = outFileURI.indexOf(\"?\");\n", 
-            "-            if (qIndex < 0) {\n", 
-            "-                this.outFileURI = outFileURI.substring(VFSConstants.VFS_PREFIX.length());\n", 
-            "-            } else {\n", 
-            "-                this.outFileURI = outFileURI.substring(VFSConstants.VFS_PREFIX.length(), qIndex);\n", 
-            "-            }\n", 
-            "+            this.outFileURI = outFileURI.substring(VFSConstants.VFS_PREFIX.length());\n", 
-            "         } else {\n", 
-            "             this.outFileURI = outFileURI;\n", 
+            "     VFSOutTransportInfo(String outFileURI, boolean fileLocking) {\n",
+            "         \n",
+            "         if (outFileURI.startsWith(VFSConstants.VFS_PREFIX)) {\n",
+            "-            int qIndex = outFileURI.indexOf(\"?\");\n",
+            "-            if (qIndex < 0) {\n",
+            "-                this.outFileURI = outFileURI.substring(VFSConstants.VFS_PREFIX.length());\n",
+            "-            } else {\n",
+            "-                this.outFileURI = outFileURI.substring(VFSConstants.VFS_PREFIX.length(), qIndex);\n",
+            "-            }\n",
+            "+            this.outFileURI = outFileURI.substring(VFSConstants.VFS_PREFIX.length());\n",
+            "         } else {\n",
+            "             this.outFileURI = outFileURI;\n",
             "         }\n"
-          ]
+          ],
+          "locn": "-53,12 +53,7"
         }
-      ], 
-      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSOutTransportInfo.java", 
-      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSOutTransportInfo.java"
+      ],
+      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSOutTransportInfo.java",
+      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSOutTransportInfo.java"
     }
-  ], 
-  "id": "1505082"
+  ],
+  "id": "1505082",
+  "message": "Reverting the fix for SYNAPSE-872 due to a possible regression",
+  "when": "2013-07-19T23:08:38-04:00",
+  "who": "hiranya"
 }

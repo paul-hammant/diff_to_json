@@ -1,40 +1,40 @@
 {
-  "when": "2016-12-26T00:30:46-05:00", 
-  "message": "Fix for SYNAPSE-1063 by Vanjikumaran Sivajothy", 
-  "who": "ravi", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-26,6 +26,7", 
           "lines": [
-            " import org.apache.axis2.AxisFault;\n", 
-            " import org.apache.axis2.addressing.EndpointReference;\n", 
-            " import org.apache.axis2.clustering.Member;\n", 
-            "+import org.apache.commons.lang.StringUtils;\n", 
-            " import org.apache.commons.logging.Log;\n", 
-            " import org.apache.commons.logging.LogFactory;\n", 
+            " import org.apache.axis2.AxisFault;\n",
+            " import org.apache.axis2.addressing.EndpointReference;\n",
+            " import org.apache.axis2.clustering.Member;\n",
+            "+import org.apache.commons.lang.StringUtils;\n",
+            " import org.apache.commons.logging.Log;\n",
+            " import org.apache.commons.logging.LogFactory;\n",
             " import org.apache.synapse.MessageContext;\n"
-          ]
-        }, 
+          ],
+          "locn": "-26,6 +26,7"
+        },
         {
-          "locn": "-155,7 +156,8", 
           "lines": [
-            "         }\n", 
-            "         List<Endpoint> children = new ArrayList<Endpoint>();\n", 
-            "         for (String url : dynamicUrlSet) {\n", 
-            "-            if (url != null && !\"\".equals(url.trim())) {\n", 
-            "+            url = StringUtils.deleteWhitespace(url);\n", 
-            "+            if (StringUtils.isNotEmpty(url)) {\n", 
-            "                 //get an Endpoint from the pool\n", 
-            "                 Endpoint epFromPool = dynamicEndpointPool.get(url);\n", 
+            "         }\n",
+            "         List<Endpoint> children = new ArrayList<Endpoint>();\n",
+            "         for (String url : dynamicUrlSet) {\n",
+            "-            if (url != null && !\"\".equals(url.trim())) {\n",
+            "+            url = StringUtils.deleteWhitespace(url);\n",
+            "+            if (StringUtils.isNotEmpty(url)) {\n",
+            "                 //get an Endpoint from the pool\n",
+            "                 Endpoint epFromPool = dynamicEndpointPool.get(url);\n",
             "                 if (epFromPool == null) {\n"
-          ]
+          ],
+          "locn": "-155,7 +156,8"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/endpoints/RecipientListEndpoint.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/endpoints/RecipientListEndpoint.java"
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/endpoints/RecipientListEndpoint.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/endpoints/RecipientListEndpoint.java"
     }
-  ], 
-  "id": "1776042"
+  ],
+  "id": "1776042",
+  "message": "Fix for SYNAPSE-1063 by Vanjikumaran Sivajothy",
+  "when": "2016-12-26T00:30:46-05:00",
+  "who": "ravi"
 }

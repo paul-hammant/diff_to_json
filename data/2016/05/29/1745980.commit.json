@@ -1,32 +1,32 @@
 {
-  "when": "2016-05-29T05:08:59-04:00", 
-  "message": "Completing the fix done for SYNAPSE-1024", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-385,11 +385,11", 
           "lines": [
-            " \t\t\t\t}\n", 
-            " \t\t\t}\n", 
-            " \n", 
-            "-\t\t\tif (Boolean.TRUE.equals(msgContext.getProperty(\"PASSTHRU_CONNECT_ERROR\"))) {\n", 
-            "+\t\t\tif (Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.PASSTHRU_CONNECT_ERROR))) {\n", 
-            " \t\t\t\treturn;\n", 
-            " \t\t\t}\n", 
-            " \n", 
-            "-\t\t\tOutputStream out = (OutputStream) msgContext.getProperty(\"GET_ME_OUT\");\n", 
-            "+\t\t\tOutputStream out = (OutputStream) msgContext.getProperty(PassThroughConstants.BUILDER_OUTPUT_STREAM);\n", 
-            " \t\t\tif (out != null) {\n", 
-            " \t\t\t\tString disableChunking = (String) msgContext.getProperty(\n", 
+            " \t\t\t\t}\n",
+            " \t\t\t}\n",
+            " \n",
+            "-\t\t\tif (Boolean.TRUE.equals(msgContext.getProperty(\"PASSTHRU_CONNECT_ERROR\"))) {\n",
+            "+\t\t\tif (Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.PASSTHRU_CONNECT_ERROR))) {\n",
+            " \t\t\t\treturn;\n",
+            " \t\t\t}\n",
+            " \n",
+            "-\t\t\tOutputStream out = (OutputStream) msgContext.getProperty(\"GET_ME_OUT\");\n",
+            "+\t\t\tOutputStream out = (OutputStream) msgContext.getProperty(PassThroughConstants.BUILDER_OUTPUT_STREAM);\n",
+            " \t\t\tif (out != null) {\n",
+            " \t\t\t\tString disableChunking = (String) msgContext.getProperty(\n",
             "                         PassThroughConstants.DISABLE_CHUNKING);\n"
-          ]
+          ],
+          "locn": "-385,11 +385,11"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java", 
-      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java"
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java"
     }
-  ], 
-  "id": "1745980"
+  ],
+  "id": "1745980",
+  "message": "Completing the fix done for SYNAPSE-1024",
+  "when": "2016-05-29T05:08:59-04:00",
+  "who": "hiranya"
 }

@@ -1,52 +1,52 @@
 {
-  "when": "2013-07-14T01:34:30-04:00", 
-  "message": "Applying the rest of the patch for SYNAPSE-935 (thanks Dushan for the contributions)", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-66,7 +66,7", 
           "lines": [
-            "            if (forcePTBuild == null){\n", 
-            "              forcePTBuild = true;\n", 
-            "            }\n", 
-            "-            //this to keep track ignore the builder operation even though content level is enable.\n", 
-            "+           //this to keep track ignore the builder operation even though content level is enable.\n", 
-            "         }\n", 
-            "     }\n", 
+            "            if (forcePTBuild == null){\n",
+            "              forcePTBuild = true;\n",
+            "            }\n",
+            "-            //this to keep track ignore the builder operation even though content level is enable.\n",
+            "+           //this to keep track ignore the builder operation even though content level is enable.\n",
+            "         }\n",
+            "     }\n",
             " \n"
-          ]
-        }, 
+          ],
+          "locn": "-66,7 +66,7"
+        },
         {
-          "locn": "-223,7 +223,7", 
           "lines": [
-            "             }\n", 
-            "         } else if (AddressingHelper.isReplyRedirected(messageContext) &&\n", 
-            "                 AddressingHelper.isFaultRedirected(messageContext)) {\n", 
-            "-            if (mepString.equals(WSDL2Constants.MEP_URI_IN_OUT)) {\n", 
-            "+            if (WSDL2Constants.MEP_URI_IN_OUT.equals(mepString)) {\n", 
-            "                 // OR, if 2 way operation but the response is intended to not use the\n", 
-            "                 // response channel of a 2-way transport  then we don't need to keep the\n", 
+            "             }\n",
+            "         } else if (AddressingHelper.isReplyRedirected(messageContext) &&\n",
+            "                 AddressingHelper.isFaultRedirected(messageContext)) {\n",
+            "-            if (mepString.equals(WSDL2Constants.MEP_URI_IN_OUT)) {\n",
+            "+            if (WSDL2Constants.MEP_URI_IN_OUT.equals(mepString)) {\n",
+            "                 // OR, if 2 way operation but the response is intended to not use the\n",
+            "                 // response channel of a 2-way transport  then we don't need to keep the\n",
             "                 // transport waiting.\n"
-          ]
-        }, 
+          ],
+          "locn": "-223,7 +223,7"
+        },
         {
-          "locn": "-260,6 +260,6", 
           "lines": [
-            "     }\n", 
-            " \n", 
-            "     private static boolean isOneWay(String mepString) {\n", 
-            "-        return mepString.equals(WSDL2Constants.MEP_URI_IN_ONLY);\n", 
-            "+        return WSDL2Constants.MEP_URI_IN_ONLY.equals(mepString);\n", 
-            "     }\n", 
+            "     }\n",
+            " \n",
+            "     private static boolean isOneWay(String mepString) {\n",
+            "-        return mepString.equals(WSDL2Constants.MEP_URI_IN_ONLY);\n",
+            "+        return WSDL2Constants.MEP_URI_IN_ONLY.equals(mepString);\n",
+            "     }\n",
             " }\n"
-          ]
+          ],
+          "locn": "-260,6 +260,6"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/RelayUtils.java", 
-      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/RelayUtils.java"
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/RelayUtils.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/RelayUtils.java"
     }
-  ], 
-  "id": "1502939"
+  ],
+  "id": "1502939",
+  "message": "Applying the rest of the patch for SYNAPSE-935 (thanks Dushan for the contributions)",
+  "when": "2013-07-14T01:34:30-04:00",
+  "who": "hiranya"
 }

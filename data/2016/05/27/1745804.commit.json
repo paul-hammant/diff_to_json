@@ -1,64 +1,64 @@
 {
-  "when": "2016-05-27T16:02:53-04:00", 
-  "message": "The transports are now part of the Axis2 release.", 
-  "who": "veithen", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-417,17 +417,17", 
           "lines": [
-            "             <dependency>\n", 
-            "                 <groupId>org.apache.axis2</groupId>\n", 
-            "                 <artifactId>axis2-transport-base</artifactId>\n", 
-            "-                <version>${axis2.transport.version}</version>\n", 
-            "+                <version>${axis2.version}</version>\n", 
-            "             </dependency>\n", 
-            "             <dependency>\n", 
-            "                 <groupId>org.apache.axis2</groupId>\n", 
-            "                 <artifactId>axis2-transport-jms</artifactId>\n", 
-            "-                <version>${axis2.transport.version}</version>\n", 
-            "+                <version>${axis2.version}</version>\n", 
-            "             </dependency>\n", 
-            "             <dependency>\n", 
-            "                 <groupId>org.apache.axis2</groupId>\n", 
-            "                 <artifactId>axis2-transport-mail</artifactId>\n", 
-            "-                <version>${axis2.transport.version}</version>\n", 
-            "+                <version>${axis2.version}</version>\n", 
-            "             </dependency>\n", 
-            "             <dependency>\n", 
+            "             <dependency>\n",
+            "                 <groupId>org.apache.axis2</groupId>\n",
+            "                 <artifactId>axis2-transport-base</artifactId>\n",
+            "-                <version>${axis2.transport.version}</version>\n",
+            "+                <version>${axis2.version}</version>\n",
+            "             </dependency>\n",
+            "             <dependency>\n",
+            "                 <groupId>org.apache.axis2</groupId>\n",
+            "                 <artifactId>axis2-transport-jms</artifactId>\n",
+            "-                <version>${axis2.transport.version}</version>\n",
+            "+                <version>${axis2.version}</version>\n",
+            "             </dependency>\n",
+            "             <dependency>\n",
+            "                 <groupId>org.apache.axis2</groupId>\n",
+            "                 <artifactId>axis2-transport-mail</artifactId>\n",
+            "-                <version>${axis2.transport.version}</version>\n",
+            "+                <version>${axis2.version}</version>\n",
+            "             </dependency>\n",
+            "             <dependency>\n",
             "                 <groupId>org.apache.axis2</groupId>\n"
-          ]
-        }, 
+          ],
+          "locn": "-417,17 +417,17"
+        },
         {
-          "locn": "-729,7 +729,7", 
           "lines": [
-            "             <dependency>\n", 
-            "                 <groupId>org.apache.axis2</groupId>\n", 
-            "                 <artifactId>axis2-transport-testkit</artifactId>\n", 
-            "-                <version>${axis2.transport.version}</version>\n", 
-            "+                <version>${axis2.version}</version>\n", 
-            "                 <scope>test</scope>\n", 
-            "             </dependency>\n", 
+            "             <dependency>\n",
+            "                 <groupId>org.apache.axis2</groupId>\n",
+            "                 <artifactId>axis2-transport-testkit</artifactId>\n",
+            "-                <version>${axis2.transport.version}</version>\n",
+            "+                <version>${axis2.version}</version>\n",
+            "                 <scope>test</scope>\n",
+            "             </dependency>\n",
             "             <dependency>\n"
-          ]
-        }, 
+          ],
+          "locn": "-729,7 +729,7"
+        },
         {
-          "locn": "-1063,7 +1063,6", 
           "lines": [
-            " \n", 
-            "         <!-- Axis2 and its dependencies -->\n", 
-            "         <axis2.version>1.7.2</axis2.version>\n", 
-            "-        <axis2.transport.version>1.7.2</axis2.transport.version>\n", 
-            "         <axiom.version>1.2.19</axiom.version>\n", 
-            "         <wsdl4j.version>1.6.2</wsdl4j.version>\n", 
+            " \n",
+            "         <!-- Axis2 and its dependencies -->\n",
+            "         <axis2.version>1.7.2</axis2.version>\n",
+            "-        <axis2.transport.version>1.7.2</axis2.transport.version>\n",
+            "         <axiom.version>1.2.19</axiom.version>\n",
+            "         <wsdl4j.version>1.6.2</wsdl4j.version>\n",
             " \n"
-          ]
+          ],
+          "locn": "-1063,7 +1063,6"
         }
-      ], 
-      "to": "java/pom.xml", 
-      "from": "java/pom.xml"
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
     }
-  ], 
-  "id": "1745804"
+  ],
+  "id": "1745804",
+  "message": "The transports are now part of the Axis2 release.",
+  "when": "2016-05-27T16:02:53-04:00",
+  "who": "veithen"
 }

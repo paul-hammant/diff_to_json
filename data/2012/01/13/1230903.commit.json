@@ -1,60 +1,60 @@
 {
-  "when": "2012-01-13T00:25:15-05:00", 
-  "message": "Shutting down the schedulers initiated by the scheduled processors", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-33,7 +33,7", 
           "lines": [
-            "  * Redelivery processor is the Message processor which implements the Dead letter channel EIP\n", 
-            "  * It will Time to time Redeliver the Messages to a given target.\n", 
-            "  */\n", 
-            "-public class ScheduledMessageForwardingProcessor extends ScheduledMessageProcessor{\n", 
-            "+public class ScheduledMessageForwardingProcessor extends ScheduledMessageProcessor {\n", 
-            " \n", 
-            "     public static final String BLOCKING_SENDER = \"blocking.sender\";\n", 
+            "  * Redelivery processor is the Message processor which implements the Dead letter channel EIP\n",
+            "  * It will Time to time Redeliver the Messages to a given target.\n",
+            "  */\n",
+            "-public class ScheduledMessageForwardingProcessor extends ScheduledMessageProcessor{\n",
+            "+public class ScheduledMessageForwardingProcessor extends ScheduledMessageProcessor {\n",
+            " \n",
+            "     public static final String BLOCKING_SENDER = \"blocking.sender\";\n",
             " \n"
-          ]
-        }, 
+          ],
+          "locn": "-33,7 +33,7"
+        },
         {
-          "locn": "-131,8 +131,9", 
           "lines": [
-            "     @Override\n", 
-            "     public void destroy() {\n", 
-            "          try {\n", 
-            "-            scheduler.deleteJob(name + \"-forward job\",\n", 
-            "+             scheduler.deleteJob(name + \"-forward job\",\n", 
-            "                     ScheduledMessageProcessor.SCHEDULED_MESSAGE_PROCESSOR_GROUP);\n", 
-            "+             scheduler.shutdown(true);\n", 
-            "         } catch (SchedulerException e) {\n", 
-            "             log.error(\"Error while destroying the task \" + e);\n", 
+            "     @Override\n",
+            "     public void destroy() {\n",
+            "          try {\n",
+            "-            scheduler.deleteJob(name + \"-forward job\",\n",
+            "+             scheduler.deleteJob(name + \"-forward job\",\n",
+            "                     ScheduledMessageProcessor.SCHEDULED_MESSAGE_PROCESSOR_GROUP);\n",
+            "+             scheduler.shutdown(true);\n",
+            "         } catch (SchedulerException e) {\n",
+            "             log.error(\"Error while destroying the task \" + e);\n",
             "         }\n"
-          ]
+          ],
+          "locn": "-131,8 +131,9"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ScheduledMessageForwardingProcessor.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ScheduledMessageForwardingProcessor.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ScheduledMessageForwardingProcessor.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ScheduledMessageForwardingProcessor.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-186,6 +186,7", 
           "lines": [
-            "     public void destroy() {\n", 
-            "         try {\n", 
-            "             scheduler.deleteJob(name + \"-trigger\",SCHEDULED_MESSAGE_PROCESSOR_GROUP);\n", 
-            "+            scheduler.shutdown(true);\n", 
-            "         } catch (SchedulerException e) {\n", 
-            "             log.error(\"Error while destroying the task \" + e);\n", 
+            "     public void destroy() {\n",
+            "         try {\n",
+            "             scheduler.deleteJob(name + \"-trigger\",SCHEDULED_MESSAGE_PROCESSOR_GROUP);\n",
+            "+            scheduler.shutdown(true);\n",
+            "         } catch (SchedulerException e) {\n",
+            "             log.error(\"Error while destroying the task \" + e);\n",
             "         }\n"
-          ]
+          ],
+          "locn": "-186,6 +186,7"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/message/processors/ScheduledMessageProcessor.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/message/processors/ScheduledMessageProcessor.java"
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/message/processors/ScheduledMessageProcessor.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/message/processors/ScheduledMessageProcessor.java"
     }
-  ], 
-  "id": "1230903"
+  ],
+  "id": "1230903",
+  "message": "Shutting down the schedulers initiated by the scheduled processors",
+  "when": "2012-01-13T00:25:15-05:00",
+  "who": "hiranya"
 }

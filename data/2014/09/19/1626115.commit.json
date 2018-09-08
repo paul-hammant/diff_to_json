@@ -1,49 +1,49 @@
 {
-  "when": "2014-09-19T00:18:15-04:00", 
-  "message": "Fixing SYNAPSE-933 Applying patch from Jeewantha with some changes", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-40,13 +40,7", 
           "lines": [
-            " \n", 
-            " import java.net.MalformedURLException;\n", 
-            " import java.net.URL;\n", 
-            "-import java.util.ArrayList;\n", 
-            "-import java.util.HashMap;\n", 
-            "-import java.util.List;\n", 
-            "-import java.util.Map;\n", 
-            "-import java.util.Properties;\n", 
-            "-import java.util.Set;\n", 
-            "-import java.util.UUID;\n", 
-            "+import java.util.*;\n", 
-            " \n", 
-            " /**\n", 
+            " \n",
+            " import java.net.MalformedURLException;\n",
+            " import java.net.URL;\n",
+            "-import java.util.ArrayList;\n",
+            "-import java.util.HashMap;\n",
+            "-import java.util.List;\n",
+            "-import java.util.Map;\n",
+            "-import java.util.Properties;\n",
+            "-import java.util.Set;\n",
+            "-import java.util.UUID;\n",
+            "+import java.util.*;\n",
+            " \n",
+            " /**\n",
             "  * Represents a dynamic load balance endpoint. The application membership is not static,\n"
-          ]
-        }, 
+          ],
+          "locn": "-40,13 +40,7"
+        },
         {
-          "locn": "-462,7 +456,10", 
           "lines": [
-            "             if (currentMember == null) {\n", 
-            "                 return;\n", 
-            "             }\n", 
-            "-            synCtx.getFaultStack().pop(); // Remove the LoadbalanceFaultHandler\n", 
-            "+            Stack faultStack = synCtx.getFaultStack();\n", 
-            "+            if (!faultStack.empty()) {\n", 
-            "+                faultStack.pop(); // Remove the LoadbalanceFaultHandler\n", 
-            "+            }\n", 
-            "             currentMember = lbMembershipHandler.getNextApplicationMember(algorithmContext);\n", 
-            "             if(currentMember == null){\n", 
+            "             if (currentMember == null) {\n",
+            "                 return;\n",
+            "             }\n",
+            "-            synCtx.getFaultStack().pop(); // Remove the LoadbalanceFaultHandler\n",
+            "+            Stack faultStack = synCtx.getFaultStack();\n",
+            "+            if (!faultStack.empty()) {\n",
+            "+                faultStack.pop(); // Remove the LoadbalanceFaultHandler\n",
+            "+            }\n",
+            "             currentMember = lbMembershipHandler.getNextApplicationMember(algorithmContext);\n",
+            "             if(currentMember == null){\n",
             "                 String msg = \"No application members available\";\n"
-          ]
+          ],
+          "locn": "-462,7 +456,10"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/endpoints/DynamicLoadbalanceEndpoint.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/endpoints/DynamicLoadbalanceEndpoint.java"
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/endpoints/DynamicLoadbalanceEndpoint.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/endpoints/DynamicLoadbalanceEndpoint.java"
     }
-  ], 
-  "id": "1626115"
+  ],
+  "id": "1626115",
+  "message": "Fixing SYNAPSE-933 Applying patch from Jeewantha with some changes",
+  "when": "2014-09-19T00:18:15-04:00",
+  "who": "hiranya"
 }

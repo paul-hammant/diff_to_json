@@ -1,66 +1,66 @@
 {
-  "when": "2012-04-20T02:14:17-04:00", 
-  "message": "temporarily disabling synapse library tests..", 
-  "who": "uswick", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-34,6 +34,7", 
           "lines": [
-            " public class LibImportTest extends TestCase {\n", 
-            " \n", 
-            " \n", 
-            "+/*\n", 
-            "     public void testValidImports() {\n", 
-            "         Library library = LibDeployerUtils.createSynapseLibrary(LibDeployerUtilsTest.class.getResource(\"/synapse-libraries/SynapseTestLibrary.zip\").getPath());\n", 
+            " public class LibImportTest extends TestCase {\n",
+            " \n",
+            " \n",
+            "+/*\n",
+            "     public void testValidImports() {\n",
+            "         Library library = LibDeployerUtils.createSynapseLibrary(LibDeployerUtilsTest.class.getResource(\"/synapse-libraries/SynapseTestLibrary.zip\").getPath());\n",
             "         SynapseImport validSynImport = new SynapseImport();\n"
-          ]
-        }, 
+          ],
+          "locn": "-34,6 +34,7"
+        },
         {
-          "locn": "-97,5 +98,6", 
           "lines": [
-            "         assertEquals(\"org.apache.synapse.linkedin\", library.getPackage());\n", 
-            "         assertNull(library.getArtifact(\"org.apache.synapse.linkedin.post_status\"));\n", 
-            "     }\n", 
-            "+*/\n", 
-            " \n", 
+            "         assertEquals(\"org.apache.synapse.linkedin\", library.getPackage());\n",
+            "         assertNull(library.getArtifact(\"org.apache.synapse.linkedin.post_status\"));\n",
+            "     }\n",
+            "+*/\n",
+            " \n",
             " }\n"
-          ]
+          ],
+          "locn": "-97,5 +98,6"
         }
-      ], 
-      "to": "java/modules/core/src/test/java/org/apache/synapse/libraries/LibImportTest.java", 
-      "from": "java/modules/core/src/test/java/org/apache/synapse/libraries/LibImportTest.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/test/java/org/apache/synapse/libraries/LibImportTest.java",
+      "to": "java/modules/core/src/test/java/org/apache/synapse/libraries/LibImportTest.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-33,6 +33,7", 
           "lines": [
-            "  */\n", 
-            " public class LibDeployerUtilsTest extends TestCase {\n", 
-            " \n", 
-            "+/*\n", 
-            "     String path;\n", 
-            " \n", 
+            "  */\n",
+            " public class LibDeployerUtilsTest extends TestCase {\n",
+            " \n",
+            "+/*\n",
+            "     String path;\n",
+            " \n",
             "     public void setUp() {\n"
-          ]
-        }, 
+          ],
+          "locn": "-33,6 +33,7"
+        },
         {
-          "locn": "-48,5 +49,6", 
           "lines": [
-            "         assertEquals(\"org.apache.synapse.linkedin\", library.getPackage());\n", 
-            "         assertEquals(\"synapse library for Linkedin\", library.getDescription());\n", 
-            "     }\n", 
-            "+*/\n", 
-            " \n", 
+            "         assertEquals(\"org.apache.synapse.linkedin\", library.getPackage());\n",
+            "         assertEquals(\"synapse library for Linkedin\", library.getDescription());\n",
+            "     }\n",
+            "+*/\n",
+            " \n",
             " }\n"
-          ]
+          ],
+          "locn": "-48,5 +49,6"
         }
-      ], 
-      "to": "java/modules/core/src/test/java/org/apache/synapse/libraries/util/LibDeployerUtilsTest.java", 
-      "from": "java/modules/core/src/test/java/org/apache/synapse/libraries/util/LibDeployerUtilsTest.java"
+      ],
+      "from": "java/modules/core/src/test/java/org/apache/synapse/libraries/util/LibDeployerUtilsTest.java",
+      "to": "java/modules/core/src/test/java/org/apache/synapse/libraries/util/LibDeployerUtilsTest.java"
     }
-  ], 
-  "id": "1328206"
+  ],
+  "id": "1328206",
+  "message": "temporarily disabling synapse library tests..",
+  "when": "2012-04-20T02:14:17-04:00",
+  "who": "uswick"
 }

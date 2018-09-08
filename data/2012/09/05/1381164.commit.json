@@ -1,33 +1,33 @@
 {
-  "when": "2012-09-05T09:16:52-04:00", 
-  "message": "Replaced tabs with spaces.\n", 
-  "who": "veithen", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-71,11 +71,11", 
           "lines": [
-            "             <groupId>org.apache.synapse</groupId>\n", 
-            "             <artifactId>synapse-fix-transport</artifactId>\n", 
-            "         </dependency>\n", 
-            "-\t<dependency>\n", 
-            "+        <dependency>\n", 
-            "             <groupId>org.apache.synapse</groupId>\n", 
-            "             <artifactId>synapse-documentation</artifactId>\n", 
-            "-\t    <type>zip</type>\n", 
-            "-\t    <classifier>docs</classifier>\n", 
-            "+            <type>zip</type>\n", 
-            "+            <classifier>docs</classifier>\n", 
-            "         </dependency>\n", 
-            " \n", 
+            "             <groupId>org.apache.synapse</groupId>\n",
+            "             <artifactId>synapse-fix-transport</artifactId>\n",
+            "         </dependency>\n",
+            "-\t<dependency>\n",
+            "+        <dependency>\n",
+            "             <groupId>org.apache.synapse</groupId>\n",
+            "             <artifactId>synapse-documentation</artifactId>\n",
+            "-\t    <type>zip</type>\n",
+            "-\t    <classifier>docs</classifier>\n",
+            "+            <type>zip</type>\n",
+            "+            <classifier>docs</classifier>\n",
+            "         </dependency>\n",
+            " \n",
             "         <!-- Wrapper jars -->\n"
-          ]
+          ],
+          "locn": "-71,11 +71,11"
         }
-      ], 
-      "to": "java/modules/distribution/pom.xml", 
-      "from": "java/modules/distribution/pom.xml"
+      ],
+      "from": "java/modules/distribution/pom.xml",
+      "to": "java/modules/distribution/pom.xml"
     }
-  ], 
-  "id": "1381164"
+  ],
+  "id": "1381164",
+  "message": "Replaced tabs with spaces.\n",
+  "when": "2012-09-05T09:16:52-04:00",
+  "who": "veithen"
 }

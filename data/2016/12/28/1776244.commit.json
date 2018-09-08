@@ -1,210 +1,210 @@
 {
-  "when": "2016-12-28T03:47:40-05:00", 
-  "message": "Fixing indents", 
-  "who": "ravi", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-18,9 +18,9", 
           "lines": [
-            "   -->\n", 
-            " \n", 
-            " <project\n", 
-            "-    xmlns=\"http://maven.apache.org/POM/4.0.0\"\n", 
-            "-    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n", 
-            "-    xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd\">\n", 
-            "+        xmlns=\"http://maven.apache.org/POM/4.0.0\"\n", 
-            "+        xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n", 
-            "+        xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd\">\n", 
-            "     <modelVersion>4.0.0</modelVersion>\n", 
-            "     <parent>\n", 
+            "   -->\n",
+            " \n",
+            " <project\n",
+            "-    xmlns=\"http://maven.apache.org/POM/4.0.0\"\n",
+            "-    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n",
+            "-    xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd\">\n",
+            "+        xmlns=\"http://maven.apache.org/POM/4.0.0\"\n",
+            "+        xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n",
+            "+        xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd\">\n",
+            "     <modelVersion>4.0.0</modelVersion>\n",
+            "     <parent>\n",
             "         <groupId>org.apache.synapse</groupId>\n"
-          ]
-        }, 
+          ],
+          "locn": "-18,9 +18,9"
+        },
         {
-          "locn": "-102,7 +102,7", 
           "lines": [
-            "             <artifactId>addressing</artifactId>\n", 
-            "             <type>mar</type>\n", 
-            "         </dependency>\n", 
-            "-        \n", 
-            "+\n", 
-            "         <!-- Because of a design flaw in Axis2 (see AXIS2-4265), axis2-codegen is required\n", 
-            "              to deploy some modules => include this explicitly. -->\n", 
+            "             <artifactId>addressing</artifactId>\n",
+            "             <type>mar</type>\n",
+            "         </dependency>\n",
+            "-        \n",
+            "+\n",
+            "         <!-- Because of a design flaw in Axis2 (see AXIS2-4265), axis2-codegen is required\n",
+            "              to deploy some modules => include this explicitly. -->\n",
             "         <dependency>\n"
-          ]
-        }, 
+          ],
+          "locn": "-102,7 +102,7"
+        },
         {
-          "locn": "-110,7 +110,7", 
           "lines": [
-            "             <artifactId>axis2-codegen</artifactId>\n", 
-            "         </dependency>\n", 
-            " \n", 
-            "-\t    <!-- JSON Support -->\n", 
-            "+        <!-- JSON Support -->\n", 
-            "         <dependency>\n", 
-            "             <groupId>org.apache.axis2</groupId>\n", 
+            "             <artifactId>axis2-codegen</artifactId>\n",
+            "         </dependency>\n",
+            " \n",
+            "-\t    <!-- JSON Support -->\n",
+            "+        <!-- JSON Support -->\n",
+            "         <dependency>\n",
+            "             <groupId>org.apache.axis2</groupId>\n",
             "             <artifactId>axis2-json</artifactId>\n"
-          ]
-        }, 
+          ],
+          "locn": "-110,7 +110,7"
+        },
         {
-          "locn": "-143,7 +143,7", 
           "lines": [
-            "             <artifactId>xmltask</artifactId>\n", 
-            "             <version>1.14</version>\n", 
-            "         </dependency>\n", 
-            "-        \n", 
-            "+\n", 
-            "         <!-- Patches -->\n", 
-            "         <dependency>\n", 
+            "             <artifactId>xmltask</artifactId>\n",
+            "             <version>1.14</version>\n",
+            "         </dependency>\n",
+            "-        \n",
+            "+\n",
+            "         <!-- Patches -->\n",
+            "         <dependency>\n",
             "             <groupId>org.apache.synapse</groupId>\n"
-          ]
-        }, 
+          ],
+          "locn": "-143,7 +143,7"
+        },
         {
-          "locn": "-155,7 +155,7", 
           "lines": [
-            "             <groupId>xerces</groupId>\n", 
-            "             <artifactId>xercesImpl</artifactId>\n", 
-            "         </dependency-->\n", 
-            "-        \n", 
-            "+\n", 
-            "         <!-- Libraries packaged with the sample Axis2 server (but that are not useful for Synapse itself) -->\n", 
-            "         <dependency>\n", 
+            "             <groupId>xerces</groupId>\n",
+            "             <artifactId>xercesImpl</artifactId>\n",
+            "         </dependency-->\n",
+            "-        \n",
+            "+\n",
+            "         <!-- Libraries packaged with the sample Axis2 server (but that are not useful for Synapse itself) -->\n",
+            "         <dependency>\n",
             "             <groupId>org.apache.axis2</groupId>\n"
-          ]
+          ],
+          "locn": "-155,7 +155,7"
         }
-      ], 
-      "to": "java/modules/distribution/pom.xml", 
-      "from": "java/modules/distribution/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/distribution/pom.xml",
+      "to": "java/modules/distribution/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-174,7 +174,7", 
           "lines": [
-            "             </build>\n", 
-            "         </profile>\n", 
-            "     </profiles>\n", 
-            "-    \n", 
-            "+\n", 
-            "     <build>\n", 
-            "         <pluginManagement>\n", 
+            "             </build>\n",
+            "         </profile>\n",
+            "     </profiles>\n",
+            "-    \n",
+            "+\n",
+            "     <build>\n",
+            "         <pluginManagement>\n",
             "             <plugins>\n"
-          ]
-        }, 
+          ],
+          "locn": "-174,7 +174,7"
+        },
         {
-          "locn": "-427,8 +427,8", 
           "lines": [
-            "                 <groupId>org.apache.axis2</groupId>\n", 
-            "                 <artifactId>axis2-transport-mail</artifactId>\n", 
-            "                 <version>${axis2.version}</version>\n", 
-            "-\t    </dependency>\n", 
-            "-\t    <dependency>\n", 
-            "+            </dependency>\n", 
-            "+            <dependency>\n", 
-            "                 <groupId>org.apache.axis2</groupId>\n", 
-            "                 <artifactId>axis2-json</artifactId>\n", 
+            "                 <groupId>org.apache.axis2</groupId>\n",
+            "                 <artifactId>axis2-transport-mail</artifactId>\n",
+            "                 <version>${axis2.version}</version>\n",
+            "-\t    </dependency>\n",
+            "-\t    <dependency>\n",
+            "+            </dependency>\n",
+            "+            <dependency>\n",
+            "                 <groupId>org.apache.axis2</groupId>\n",
+            "                 <artifactId>axis2-json</artifactId>\n",
             "                 <version>${axis2.version}</version>\n"
-          ]
-        }, 
+          ],
+          "locn": "-427,8 +427,8"
+        },
         {
-          "locn": "-438,7 +438,7", 
           "lines": [
-            "                         <artifactId>jettison</artifactId>\n", 
-            "                     </exclusion>\n", 
-            "                 </exclusions>\n", 
-            "-\t    </dependency>\n", 
-            "+            </dependency>\n", 
-            "             <dependency>\n", 
-            "                 <groupId>org.codehaus.jettison</groupId>\n", 
+            "                         <artifactId>jettison</artifactId>\n",
+            "                     </exclusion>\n",
+            "                 </exclusions>\n",
+            "-\t    </dependency>\n",
+            "+            </dependency>\n",
+            "             <dependency>\n",
+            "                 <groupId>org.codehaus.jettison</groupId>\n",
             "                 <artifactId>jettison</artifactId>\n"
-          ]
-        }, 
+          ],
+          "locn": "-438,7 +438,7"
+        },
         {
-          "locn": "-783,19 +783,19", 
           "lines": [
-            " \n", 
-            "             <!-- Saxon -->\n", 
-            "             <dependency>\n", 
-            "-                 <groupId>net.sf.saxon</groupId>\n", 
-            "-                 <artifactId>saxon</artifactId>\n", 
-            "-                 <version>${saxon.version}</version>\n", 
-            "+                <groupId>net.sf.saxon</groupId>\n", 
-            "+                <artifactId>saxon</artifactId>\n", 
-            "+                <version>${saxon.version}</version>\n", 
-            "             </dependency>\n", 
-            "             <dependency>\n", 
-            "-                 <groupId>net.sf.saxon</groupId>\n", 
-            "-                 <artifactId>saxon-dom</artifactId>\n", 
-            "-                 <version>${saxon.version}</version>\n", 
-            "+                <groupId>net.sf.saxon</groupId>\n", 
-            "+                <artifactId>saxon-dom</artifactId>\n", 
-            "+                <version>${saxon.version}</version>\n", 
-            "             </dependency>\n", 
-            "             <dependency>\n", 
-            "-                 <groupId>net.sf.saxon</groupId>\n", 
-            "-                 <artifactId>saxon-xqj</artifactId>\n", 
-            "-                 <version>${saxon.version}</version>\n", 
-            "+                <groupId>net.sf.saxon</groupId>\n", 
-            "+                <artifactId>saxon-xqj</artifactId>\n", 
-            "+                <version>${saxon.version}</version>\n", 
-            "             </dependency>\n", 
-            " \n", 
+            " \n",
+            "             <!-- Saxon -->\n",
+            "             <dependency>\n",
+            "-                 <groupId>net.sf.saxon</groupId>\n",
+            "-                 <artifactId>saxon</artifactId>\n",
+            "-                 <version>${saxon.version}</version>\n",
+            "+                <groupId>net.sf.saxon</groupId>\n",
+            "+                <artifactId>saxon</artifactId>\n",
+            "+                <version>${saxon.version}</version>\n",
+            "             </dependency>\n",
+            "             <dependency>\n",
+            "-                 <groupId>net.sf.saxon</groupId>\n",
+            "-                 <artifactId>saxon-dom</artifactId>\n",
+            "-                 <version>${saxon.version}</version>\n",
+            "+                <groupId>net.sf.saxon</groupId>\n",
+            "+                <artifactId>saxon-dom</artifactId>\n",
+            "+                <version>${saxon.version}</version>\n",
+            "             </dependency>\n",
+            "             <dependency>\n",
+            "-                 <groupId>net.sf.saxon</groupId>\n",
+            "-                 <artifactId>saxon-xqj</artifactId>\n",
+            "-                 <version>${saxon.version}</version>\n",
+            "+                <groupId>net.sf.saxon</groupId>\n",
+            "+                <artifactId>saxon-xqj</artifactId>\n",
+            "+                <version>${saxon.version}</version>\n",
+            "             </dependency>\n",
+            " \n",
             "             <!-- Spring Framework -->\n"
-          ]
-        }, 
+          ],
+          "locn": "-783,19 +783,19"
+        },
         {
-          "locn": "-1030,7 +1030,7", 
           "lines": [
-            "     <properties>\n", 
-            "         <!-- Sets the source encoding to UTF-8 -->\n", 
-            "         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>\n", 
-            "-        \n", 
-            "+\n", 
-            "         <!-- The Java version used to build Synapse. This property is used in the configuration\n", 
-            "              of the maven-compiler-plugin as well as certain ant tasks executed using\n", 
+            "     <properties>\n",
+            "         <!-- Sets the source encoding to UTF-8 -->\n",
+            "         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>\n",
+            "-        \n",
+            "+\n",
+            "         <!-- The Java version used to build Synapse. This property is used in the configuration\n",
+            "              of the maven-compiler-plugin as well as certain ant tasks executed using\n",
             "              maven-antrun-plugin. -->\n"
-          ]
-        }, 
+          ],
+          "locn": "-1030,7 +1030,7"
+        },
         {
-          "locn": "-1272,7 +1272,7", 
           "lines": [
-            "             <id>kasun</id>\n", 
-            "             <email>kasun AT apache.org</email>\n", 
-            "             <organization>WSO2</organization>\n", 
-            "-        </developer> \n", 
-            "+        </developer>\n", 
-            "         <developer>\n", 
-            "             <name>Udayanga Wickramasinghe</name>\n", 
+            "             <id>kasun</id>\n",
+            "             <email>kasun AT apache.org</email>\n",
+            "             <organization>WSO2</organization>\n",
+            "-        </developer> \n",
+            "+        </developer>\n",
+            "         <developer>\n",
+            "             <name>Udayanga Wickramasinghe</name>\n",
             "             <id>uswick</id>\n"
-          ]
-        }, 
+          ],
+          "locn": "-1272,7 +1272,7"
+        },
         {
-          "locn": "-1297,13 +1297,13", 
           "lines": [
-            "             <email>isudana AT apache.org</email>\n", 
-            "             <organization>WSO2</organization>\n", 
-            "         </developer>\n", 
-            "-\t<developer>\n", 
-            "+        <developer>\n", 
-            "             <name>Dushan Abeyruwan</name>\n", 
-            "             <id>dushan</id>\n", 
-            "             <email>dushan AT apache.org</email>\n", 
-            "             <organization>WSO2</organization>\n", 
-            "-    \t</developer>\n", 
-            "-\t<developer>\n", 
-            "+        </developer>\n", 
-            "+        <developer>\n", 
-            "             <name>Ravi Undupitiya</name>\n", 
-            "             <id>ravi</id>\n", 
+            "             <email>isudana AT apache.org</email>\n",
+            "             <organization>WSO2</organization>\n",
+            "         </developer>\n",
+            "-\t<developer>\n",
+            "+        <developer>\n",
+            "             <name>Dushan Abeyruwan</name>\n",
+            "             <id>dushan</id>\n",
+            "             <email>dushan AT apache.org</email>\n",
+            "             <organization>WSO2</organization>\n",
+            "-    \t</developer>\n",
+            "-\t<developer>\n",
+            "+        </developer>\n",
+            "+        <developer>\n",
+            "             <name>Ravi Undupitiya</name>\n",
+            "             <id>ravi</id>\n",
             "             <email>ravi AT apache.org</email>\n"
-          ]
+          ],
+          "locn": "-1297,13 +1297,13"
         }
-      ], 
-      "to": "java/pom.xml", 
-      "from": "java/pom.xml"
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
     }
-  ], 
-  "id": "1776244"
+  ],
+  "id": "1776244",
+  "message": "Fixing indents",
+  "when": "2016-12-28T03:47:40-05:00",
+  "who": "ravi"
 }

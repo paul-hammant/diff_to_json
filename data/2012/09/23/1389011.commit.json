@@ -1,28 +1,28 @@
 {
-  "when": "2012-09-23T06:51:15-04:00", 
-  "message": "Removed empty svn:mergeinfo properties.", 
-  "who": "veithen", 
   "changes": [
     {
-      "chunks": [], 
-      "to": "java/repository/conf/synapse-config/synapse.xml", 
-      "from": "java/repository/conf/synapse-config/synapse.xml"
-    }, 
+      "chunks": [],
+      "from": "java/repository/conf/synapse-config/synapse.xml",
+      "to": "java/repository/conf/synapse-config/synapse.xml"
+    },
     {
-      "chunks": [], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/eventing/filters/TopicBasedEventFilter.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/eventing/filters/TopicBasedEventFilter.java"
-    }, 
+      "chunks": [],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/eventing/filters/TopicBasedEventFilter.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/eventing/filters/TopicBasedEventFilter.java"
+    },
     {
-      "chunks": [], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/util/resolver/CustomXmlSchemaURIResolver.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/util/resolver/CustomXmlSchemaURIResolver.java"
-    }, 
+      "chunks": [],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/util/resolver/CustomXmlSchemaURIResolver.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/util/resolver/CustomXmlSchemaURIResolver.java"
+    },
     {
-      "chunks": [], 
-      "to": "java/modules/transports/core/vfs/src/test/java/org/apache/synapse/transport/vfs/VFSTestEnvironment.java", 
-      "from": "java/modules/transports/core/vfs/src/test/java/org/apache/synapse/transport/vfs/VFSTestEnvironment.java"
+      "chunks": [],
+      "from": "java/modules/transports/core/vfs/src/test/java/org/apache/synapse/transport/vfs/VFSTestEnvironment.java",
+      "to": "java/modules/transports/core/vfs/src/test/java/org/apache/synapse/transport/vfs/VFSTestEnvironment.java"
     }
-  ], 
-  "id": "1389011"
+  ],
+  "id": "1389011",
+  "message": "Removed empty svn:mergeinfo properties.",
+  "when": "2012-09-23T06:51:15-04:00",
+  "who": "veithen"
 }

@@ -1,52 +1,52 @@
 {
-  "when": "2016-06-05T01:49:39-04:00", 
-  "message": "Fix for SYNAPSE-1003", 
-  "who": "ravi", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-585,9 +585,14", 
           "lines": [
-            "     }\n", 
-            " \n", 
-            "     public void destroy() {\n", 
-            "+        if (metricsMBean != null) {\n", 
-            "+            metricsMBean.destroy();\n", 
-            "+        }\n", 
-            "+\n", 
-            "         if (enableMBeanStats) {\n", 
-            "             MBeanRegistrar.getInstance().unRegisterMBean(\"Endpoint\", endpointName);\n", 
-            "         }\n", 
-            "+        metricsMBean = null;\n", 
-            "         this.initialized = false;\n", 
-            "     }\n", 
+            "     }\n",
+            " \n",
+            "     public void destroy() {\n",
+            "+        if (metricsMBean != null) {\n",
+            "+            metricsMBean.destroy();\n",
+            "+        }\n",
+            "+\n",
+            "         if (enableMBeanStats) {\n",
+            "             MBeanRegistrar.getInstance().unRegisterMBean(\"Endpoint\", endpointName);\n",
+            "         }\n",
+            "+        metricsMBean = null;\n",
+            "         this.initialized = false;\n",
+            "     }\n",
             " \n"
-          ]
+          ],
+          "locn": "-585,9 +585,14"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/endpoints/AbstractEndpoint.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/endpoints/AbstractEndpoint.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/endpoints/AbstractEndpoint.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/endpoints/AbstractEndpoint.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-114,6 +114,8", 
           "lines": [
-            " \n", 
-            "     public void destroy() {\n", 
-            "         future.cancel(true);\n", 
-            "+        suspensionCounts.clear();\n", 
-            "+        timeoutCounts.clear();\n", 
-            "     }\n", 
-            " \n", 
+            " \n",
+            "     public void destroy() {\n",
+            "         future.cancel(true);\n",
+            "+        suspensionCounts.clear();\n",
+            "+        timeoutCounts.clear();\n",
+            "     }\n",
+            " \n",
             "     // --- endpoint control ---\n"
-          ]
+          ],
+          "locn": "-114,6 +114,8"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/endpoints/EndpointView.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/endpoints/EndpointView.java"
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/endpoints/EndpointView.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/endpoints/EndpointView.java"
     }
-  ], 
-  "id": "1746863"
+  ],
+  "id": "1746863",
+  "message": "Fix for SYNAPSE-1003",
+  "when": "2016-06-05T01:49:39-04:00",
+  "who": "ravi"
 }

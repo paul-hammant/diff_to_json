@@ -1,39 +1,39 @@
 {
-  "when": "2013-08-02T00:12:37-04:00", 
-  "message": "shut down signal for simple consumer.", 
-  "who": "rajikak", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-28,6 +28,7", 
           "lines": [
-            " \n", 
-            " import com.rabbitmq.client.Channel;\n", 
-            " import com.rabbitmq.client.QueueingConsumer;\n", 
-            "+import com.rabbitmq.client.ShutdownSignalException;\n", 
-            " import org.apache.commons.logging.Log;\n", 
-            " import org.apache.commons.logging.LogFactory;\n", 
+            " \n",
+            " import com.rabbitmq.client.Channel;\n",
+            " import com.rabbitmq.client.QueueingConsumer;\n",
+            "+import com.rabbitmq.client.ShutdownSignalException;\n",
+            " import org.apache.commons.logging.Log;\n",
+            " import org.apache.commons.logging.LogFactory;\n",
             " import org.apache.synapse.transport.amqp.AMQPTransportMessage;\n"
-          ]
-        }, 
+          ],
+          "locn": "-28,6 +28,7"
+        },
         {
-          "locn": "-103,6 +104,8", 
           "lines": [
-            "             } catch (InterruptedException e) {\n", 
-            "                 log.error(\"Retrieving task was interrupted\", e);\n", 
-            "                 Thread.currentThread().interrupt();\n", 
-            "+            } catch (ShutdownSignalException e) {\n", 
-            "+                log.error(\"Shutdown signal was received for simple consumer task\", e);\n", 
-            "             }\n", 
-            "         }\n", 
+            "             } catch (InterruptedException e) {\n",
+            "                 log.error(\"Retrieving task was interrupted\", e);\n",
+            "                 Thread.currentThread().interrupt();\n",
+            "+            } catch (ShutdownSignalException e) {\n",
+            "+                log.error(\"Shutdown signal was received for simple consumer task\", e);\n",
+            "             }\n",
+            "         }\n",
             "     }\n"
-          ]
+          ],
+          "locn": "-103,6 +104,8"
         }
-      ], 
-      "to": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPSimpleConsumerTask.java", 
-      "from": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPSimpleConsumerTask.java"
+      ],
+      "from": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPSimpleConsumerTask.java",
+      "to": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPSimpleConsumerTask.java"
     }
-  ], 
-  "id": "1509531"
+  ],
+  "id": "1509531",
+  "message": "shut down signal for simple consumer.",
+  "when": "2013-08-02T00:12:37-04:00",
+  "who": "rajikak"
 }

@@ -1,260 +1,260 @@
 {
-  "when": "2013-07-12T16:54:34-04:00", 
-  "message": "Updated the Axis2 configuration with the proper builders and formatters. Re-enabling the integration tests. RM test enabled. MTOM test disabled temporarily.", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-1048,7 +1048,7", 
           "lines": [
-            "         <module>modules/distribution</module>\n", 
-            "         <module>modules/packaging/package-skeleton</module>\n", 
-            "         <module>modules/packaging/package-archetype</module>\n", 
-            "-        <!--module>modules/integration</module-->\n", 
-            "+        <module>modules/integration</module>\n", 
-            " \t<module>modules/documentation</module>\n", 
-            "     </modules>\n", 
+            "         <module>modules/distribution</module>\n",
+            "         <module>modules/packaging/package-skeleton</module>\n",
+            "         <module>modules/packaging/package-archetype</module>\n",
+            "-        <!--module>modules/integration</module-->\n",
+            "+        <module>modules/integration</module>\n",
+            " \t<module>modules/documentation</module>\n",
+            "     </modules>\n",
             " \n"
-          ]
+          ],
+          "locn": "-1048,7 +1048,7"
         }
-      ], 
-      "to": "java/pom.xml", 
-      "from": "java/pom.xml"
-    }, 
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-59,6 +59,7", 
           "lines": [
-            "             <source type=\"property\" property=\"REQUEST\"/>\n", 
-            "             <target type=\"body\"/>\n", 
-            "         </enrich>\n", 
-            "+        <header name=\"Action\" value=\"urn:getQuote\"/>\n", 
-            "         <send receive=\"ClientOutSeq\">\n", 
-            "             <endpoint name=\"SimpleStockQuoteService\">\n", 
+            "             <source type=\"property\" property=\"REQUEST\"/>\n",
+            "             <target type=\"body\"/>\n",
+            "         </enrich>\n",
+            "+        <header name=\"Action\" value=\"urn:getQuote\"/>\n",
+            "         <send receive=\"ClientOutSeq\">\n",
+            "             <endpoint name=\"SimpleStockQuoteService\">\n",
             "                 <address uri=\"http://localhost:9000/services/SimpleStockQuoteService\"/>\n"
-          ]
+          ],
+          "locn": "-59,6 +59,7"
         }
-      ], 
-      "to": "java/repository/conf/sample/synapse_sample_156.xml", 
-      "from": "java/repository/conf/sample/synapse_sample_156.xml"
-    }, 
+      ],
+      "from": "java/repository/conf/sample/synapse_sample_156.xml",
+      "to": "java/repository/conf/sample/synapse_sample_156.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-129,7 +129,7", 
           "lines": [
-            "     <!--Following content type to message formatter mapping can be used to implement support for different message -->\n", 
-            "     <!--format  serialization in Axis2. These message formats are expected to be resolved based on the content type. -->\n", 
-            "     <messageFormatters>\n", 
-            "-        <messageFormatter contentType=\"application/x-www-form-urlencoded\"\n", 
-            "+        <!--messageFormatter contentType=\"application/x-www-form-urlencoded\"\n", 
-            "                           class=\"org.apache.synapse.transport.passthru.util.ExpandingMessageFormatter\"/>\n", 
-            "         <messageFormatter contentType=\"multipart/form-data\"\n", 
+            "     <!--Following content type to message formatter mapping can be used to implement support for different message -->\n",
+            "     <!--format  serialization in Axis2. These message formats are expected to be resolved based on the content type. -->\n",
+            "     <messageFormatters>\n",
+            "-        <messageFormatter contentType=\"application/x-www-form-urlencoded\"\n",
+            "+        <!--messageFormatter contentType=\"application/x-www-form-urlencoded\"\n",
+            "                           class=\"org.apache.synapse.transport.passthru.util.ExpandingMessageFormatter\"/>\n",
+            "         <messageFormatter contentType=\"multipart/form-data\"\n",
             "                           class=\"org.apache.synapse.transport.passthru.util.ExpandingMessageFormatter\"/>\n"
-          ]
-        }, 
+          ],
+          "locn": "-129,7 +129,7"
+        },
         {
-          "locn": "-136,14 +136,14", 
           "lines": [
-            "         <messageFormatter contentType=\"application/xml\"\n", 
-            "                           class=\"org.apache.synapse.transport.passthru.util.ExpandingMessageFormatter\"/>\n", 
-            "         <messageFormatter contentType=\"text/xml\"\n", 
-            "-                          class=\"org.apache.synapse.transport.passthru.util.ExpandingMessageFormatter\"/>\n", 
-            "+                          class=\"org.apache.synapse.transport.passthru.util.ExpandingMessageFormatter\"/-->\n", 
-            " \n", 
-            "-        <!--messageFormatter contentType=\"application/x-www-form-urlencoded\"\n", 
-            "+        <messageFormatter contentType=\"application/x-www-form-urlencoded\"\n", 
-            "                          class=\"org.apache.axis2.transport.http.XFormURLEncodedFormatter\"/>\n", 
-            "         <messageFormatter contentType=\"multipart/form-data\"\n", 
-            "                          class=\"org.apache.axis2.transport.http.MultipartFormDataFormatter\"/>\n", 
-            "         <messageFormatter contentType=\"application/xml\"\n", 
-            "-                         class=\"org.apache.axis2.transport.http.ApplicationXMLFormatter\"/-->\n", 
-            "+                         class=\"org.apache.axis2.transport.http.ApplicationXMLFormatter\"/>\n", 
-            "         <!--<messageFormatter contentType=\"x-application/hessian\"\n", 
-            "                          class=\"org.apache.synapse.format.hessian.HessianMessageFormatter\"/>-->\n", 
+            "         <messageFormatter contentType=\"application/xml\"\n",
+            "                           class=\"org.apache.synapse.transport.passthru.util.ExpandingMessageFormatter\"/>\n",
+            "         <messageFormatter contentType=\"text/xml\"\n",
+            "-                          class=\"org.apache.synapse.transport.passthru.util.ExpandingMessageFormatter\"/>\n",
+            "+                          class=\"org.apache.synapse.transport.passthru.util.ExpandingMessageFormatter\"/-->\n",
+            " \n",
+            "-        <!--messageFormatter contentType=\"application/x-www-form-urlencoded\"\n",
+            "+        <messageFormatter contentType=\"application/x-www-form-urlencoded\"\n",
+            "                          class=\"org.apache.axis2.transport.http.XFormURLEncodedFormatter\"/>\n",
+            "         <messageFormatter contentType=\"multipart/form-data\"\n",
+            "                          class=\"org.apache.axis2.transport.http.MultipartFormDataFormatter\"/>\n",
+            "         <messageFormatter contentType=\"application/xml\"\n",
+            "-                         class=\"org.apache.axis2.transport.http.ApplicationXMLFormatter\"/-->\n",
+            "+                         class=\"org.apache.axis2.transport.http.ApplicationXMLFormatter\"/>\n",
+            "         <!--<messageFormatter contentType=\"x-application/hessian\"\n",
+            "                          class=\"org.apache.synapse.format.hessian.HessianMessageFormatter\"/>-->\n",
             "         <!--<messageFormatter contentType=\"\"\n"
-          ]
-        }, 
+          ],
+          "locn": "-136,14 +136,14"
+        },
         {
-          "locn": "-159,7 +159,7", 
           "lines": [
-            "     <!--Following content type to builder mapping can be used to implement support for different message -->\n", 
-            "     <!--formats in Axis2. These message formats are expected to be resolved based on the content type. -->\n", 
-            "     <messageBuilders>\n", 
-            "-        <messageBuilder contentType=\"application/xml\"\n", 
-            "+        <!--messageBuilder contentType=\"application/xml\"\n", 
-            "                         class=\"org.apache.synapse.transport.passthru.util.BinaryRelayBuilder\"/>\n", 
-            "         <messageBuilder contentType=\"application/x-www-form-urlencoded\"\n", 
+            "     <!--Following content type to builder mapping can be used to implement support for different message -->\n",
+            "     <!--formats in Axis2. These message formats are expected to be resolved based on the content type. -->\n",
+            "     <messageBuilders>\n",
+            "-        <messageBuilder contentType=\"application/xml\"\n",
+            "+        <!--messageBuilder contentType=\"application/xml\"\n",
+            "                         class=\"org.apache.synapse.transport.passthru.util.BinaryRelayBuilder\"/>\n",
+            "         <messageBuilder contentType=\"application/x-www-form-urlencoded\"\n",
             "                         class=\"org.apache.synapse.transport.passthru.util.BinaryRelayBuilder\"/>\n"
-          ]
-        }, 
+          ],
+          "locn": "-159,7 +159,7"
+        },
         {
-          "locn": "-166,14 +166,14", 
           "lines": [
-            "         <messageBuilder contentType=\"multipart/form-data\"\n", 
-            "                         class=\"org.apache.synapse.transport.passthru.util.BinaryRelayBuilder\"/>\n", 
-            "         <messageBuilder contentType=\"text/xml\"\n", 
-            "-                        class=\"org.apache.synapse.transport.passthru.util.BinaryRelayBuilder\"/>\n", 
-            "+                        class=\"org.apache.synapse.transport.passthru.util.BinaryRelayBuilder\"/-->\n", 
-            " \n", 
-            "-        <!--messageBuilder contentType=\"application/xml\"\n", 
-            "+        <messageBuilder contentType=\"application/xml\"\n", 
-            "                          class=\"org.apache.axis2.builder.ApplicationXMLBuilder\"/>\n", 
-            "         <messageBuilder contentType=\"application/x-www-form-urlencoded\"\n", 
-            "                          class=\"org.apache.axis2.builder.XFormURLEncodedBuilder\"/>\n", 
-            "         <messageBuilder contentType=\"multipart/form-data\"\n", 
-            "-                         class=\"org.apache.axis2.builder.MultipartFormDataBuilder\"/-->\n", 
-            "+                         class=\"org.apache.axis2.builder.MultipartFormDataBuilder\"/>\n", 
-            "         <!--<messageBuilder contentType=\"x-application/hessian\"\n", 
-            "                          class=\"org.apache.synapse.format.hessian.HessianMessageBuilder\"/>-->\n", 
+            "         <messageBuilder contentType=\"multipart/form-data\"\n",
+            "                         class=\"org.apache.synapse.transport.passthru.util.BinaryRelayBuilder\"/>\n",
+            "         <messageBuilder contentType=\"text/xml\"\n",
+            "-                        class=\"org.apache.synapse.transport.passthru.util.BinaryRelayBuilder\"/>\n",
+            "+                        class=\"org.apache.synapse.transport.passthru.util.BinaryRelayBuilder\"/-->\n",
+            " \n",
+            "-        <!--messageBuilder contentType=\"application/xml\"\n",
+            "+        <messageBuilder contentType=\"application/xml\"\n",
+            "                          class=\"org.apache.axis2.builder.ApplicationXMLBuilder\"/>\n",
+            "         <messageBuilder contentType=\"application/x-www-form-urlencoded\"\n",
+            "                          class=\"org.apache.axis2.builder.XFormURLEncodedBuilder\"/>\n",
+            "         <messageBuilder contentType=\"multipart/form-data\"\n",
+            "-                         class=\"org.apache.axis2.builder.MultipartFormDataBuilder\"/-->\n",
+            "+                         class=\"org.apache.axis2.builder.MultipartFormDataBuilder\"/>\n",
+            "         <!--<messageBuilder contentType=\"x-application/hessian\"\n",
+            "                          class=\"org.apache.synapse.format.hessian.HessianMessageBuilder\"/>-->\n",
             "         <!--<messageBuilder contentType=\"\"\n"
-          ]
+          ],
+          "locn": "-166,14 +166,14"
         }
-      ], 
-      "to": "java/repository/conf/axis2.xml", 
-      "from": "java/repository/conf/axis2.xml"
-    }, 
+      ],
+      "from": "java/repository/conf/axis2.xml",
+      "to": "java/repository/conf/axis2.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-126,7 +126,7", 
           "lines": [
-            "     <!--Following content type to message formatter mapping can be used to implement support for different message -->\n", 
-            "     <!--format  serialization in Axis2. These message formats are expected to be resolved based on the content type. -->\n", 
-            "     <messageFormatters>\n", 
-            "-        <messageFormatter contentType=\"application/x-www-form-urlencoded\"\n", 
-            "+        <!--messageFormatter contentType=\"application/x-www-form-urlencoded\"\n", 
-            "                          class=\"org.apache.synapse.transport.passthru.util.ExpandingMessageFormatter\"/>\n", 
-            "         <messageFormatter contentType=\"multipart/form-data\"\n", 
+            "     <!--Following content type to message formatter mapping can be used to implement support for different message -->\n",
+            "     <!--format  serialization in Axis2. These message formats are expected to be resolved based on the content type. -->\n",
+            "     <messageFormatters>\n",
+            "-        <messageFormatter contentType=\"application/x-www-form-urlencoded\"\n",
+            "+        <!--messageFormatter contentType=\"application/x-www-form-urlencoded\"\n",
+            "                          class=\"org.apache.synapse.transport.passthru.util.ExpandingMessageFormatter\"/>\n",
+            "         <messageFormatter contentType=\"multipart/form-data\"\n",
             "                          class=\"org.apache.synapse.transport.passthru.util.ExpandingMessageFormatter\"/>\n"
-          ]
-        }, 
+          ],
+          "locn": "-126,7 +126,7"
+        },
         {
-          "locn": "-135,14 +135,14", 
           "lines": [
-            "         <messageFormatter contentType=\"text/xml\"\n", 
-            "                          class=\"org.apache.synapse.transport.passthru.util.ExpandingMessageFormatter\"/>\n", 
-            "         <messageFormatter contentType=\"multipart/related\"\n", 
-            "-                         class=\"org.apache.synapse.transport.passthru.util.ExpandingMessageFormatter\"/>\n", 
-            "+                         class=\"org.apache.synapse.transport.passthru.util.ExpandingMessageFormatter\"/-->\n", 
-            " \n", 
-            "-        <!--messageFormatter contentType=\"application/x-www-form-urlencoded\"\n", 
-            "+        <messageFormatter contentType=\"application/x-www-form-urlencoded\"\n", 
-            "                          class=\"org.apache.axis2.transport.http.XFormURLEncodedFormatter\"/>\n", 
-            "         <messageFormatter contentType=\"multipart/form-data\"\n", 
-            "                          class=\"org.apache.axis2.transport.http.MultipartFormDataFormatter\"/>\n", 
-            "         <messageFormatter contentType=\"application/xml\"\n", 
-            "-                         class=\"org.apache.axis2.transport.http.ApplicationXMLFormatter\"/-->\n", 
-            "+                        class=\"org.apache.axis2.transport.http.ApplicationXMLFormatter\"/>\n", 
-            "         <!--<messageFormatter contentType=\"x-application/hessian\"\n", 
-            "                          class=\"org.apache.synapse.format.hessian.HessianMessageFormatter\"/>-->\n", 
+            "         <messageFormatter contentType=\"text/xml\"\n",
+            "                          class=\"org.apache.synapse.transport.passthru.util.ExpandingMessageFormatter\"/>\n",
+            "         <messageFormatter contentType=\"multipart/related\"\n",
+            "-                         class=\"org.apache.synapse.transport.passthru.util.ExpandingMessageFormatter\"/>\n",
+            "+                         class=\"org.apache.synapse.transport.passthru.util.ExpandingMessageFormatter\"/-->\n",
+            " \n",
+            "-        <!--messageFormatter contentType=\"application/x-www-form-urlencoded\"\n",
+            "+        <messageFormatter contentType=\"application/x-www-form-urlencoded\"\n",
+            "                          class=\"org.apache.axis2.transport.http.XFormURLEncodedFormatter\"/>\n",
+            "         <messageFormatter contentType=\"multipart/form-data\"\n",
+            "                          class=\"org.apache.axis2.transport.http.MultipartFormDataFormatter\"/>\n",
+            "         <messageFormatter contentType=\"application/xml\"\n",
+            "-                         class=\"org.apache.axis2.transport.http.ApplicationXMLFormatter\"/-->\n",
+            "+                        class=\"org.apache.axis2.transport.http.ApplicationXMLFormatter\"/>\n",
+            "         <!--<messageFormatter contentType=\"x-application/hessian\"\n",
+            "                          class=\"org.apache.synapse.format.hessian.HessianMessageFormatter\"/>-->\n",
             "         <!--<messageFormatter contentType=\"\"\n"
-          ]
-        }, 
+          ],
+          "locn": "-135,14 +135,14"
+        },
         {
-          "locn": "-158,7 +158,7", 
           "lines": [
-            "     <!--Following content type to builder mapping can be used to implement support for different message -->\n", 
-            "     <!--formats in Axis2. These message formats are expected to be resolved based on the content type. -->\n", 
-            "     <messageBuilders>\n", 
-            "-        <messageBuilder contentType=\"application/xml\"\n", 
-            "+        <!--messageBuilder contentType=\"application/xml\"\n", 
-            "                          class=\"org.apache.synapse.transport.passthru.util.BinaryRelayBuilder\"/>\n", 
-            "         <messageBuilder contentType=\"application/x-www-form-urlencoded\"\n", 
+            "     <!--Following content type to builder mapping can be used to implement support for different message -->\n",
+            "     <!--formats in Axis2. These message formats are expected to be resolved based on the content type. -->\n",
+            "     <messageBuilders>\n",
+            "-        <messageBuilder contentType=\"application/xml\"\n",
+            "+        <!--messageBuilder contentType=\"application/xml\"\n",
+            "                          class=\"org.apache.synapse.transport.passthru.util.BinaryRelayBuilder\"/>\n",
+            "         <messageBuilder contentType=\"application/x-www-form-urlencoded\"\n",
             "                          class=\"org.apache.synapse.transport.passthru.util.BinaryRelayBuilder\"/>\n"
-          ]
-        }, 
+          ],
+          "locn": "-158,7 +158,7"
+        },
         {
-          "locn": "-167,14 +167,14", 
           "lines": [
-            "         <messageBuilder contentType=\"text/xml\"\n", 
-            "                          class=\"org.apache.synapse.transport.passthru.util.BinaryRelayBuilder\"/>\n", 
-            "         <messageBuilder contentType=\"multipart/related\"\n", 
-            "-                         class=\"org.apache.synapse.transport.passthru.util.BinaryRelayBuilder\"/>\n", 
-            "+                         class=\"org.apache.synapse.transport.passthru.util.BinaryRelayBuilder\"/-->\n", 
-            " \n", 
-            "-        <!--messageBuilder contentType=\"application/xml\"\n", 
-            "+        <messageBuilder contentType=\"application/xml\"\n", 
-            "                          class=\"org.apache.axis2.builder.ApplicationXMLBuilder\"/>\n", 
-            "         <messageBuilder contentType=\"application/x-www-form-urlencoded\"\n", 
-            "                          class=\"org.apache.axis2.builder.XFormURLEncodedBuilder\"/>\n", 
-            "         <messageBuilder contentType=\"multipart/form-data\"\n", 
-            "-                         class=\"org.apache.axis2.builder.MultipartFormDataBuilder\"/-->\n", 
-            "+                         class=\"org.apache.axis2.builder.MultipartFormDataBuilder\"/>\n", 
-            "     </messageBuilders>\n", 
-            " \n", 
+            "         <messageBuilder contentType=\"text/xml\"\n",
+            "                          class=\"org.apache.synapse.transport.passthru.util.BinaryRelayBuilder\"/>\n",
+            "         <messageBuilder contentType=\"multipart/related\"\n",
+            "-                         class=\"org.apache.synapse.transport.passthru.util.BinaryRelayBuilder\"/>\n",
+            "+                         class=\"org.apache.synapse.transport.passthru.util.BinaryRelayBuilder\"/-->\n",
+            " \n",
+            "-        <!--messageBuilder contentType=\"application/xml\"\n",
+            "+        <messageBuilder contentType=\"application/xml\"\n",
+            "                          class=\"org.apache.axis2.builder.ApplicationXMLBuilder\"/>\n",
+            "         <messageBuilder contentType=\"application/x-www-form-urlencoded\"\n",
+            "                          class=\"org.apache.axis2.builder.XFormURLEncodedBuilder\"/>\n",
+            "         <messageBuilder contentType=\"multipart/form-data\"\n",
+            "-                         class=\"org.apache.axis2.builder.MultipartFormDataBuilder\"/-->\n",
+            "+                         class=\"org.apache.axis2.builder.MultipartFormDataBuilder\"/>\n",
+            "     </messageBuilders>\n",
+            " \n",
             "     <!-- ================================================= -->\n"
-          ]
+          ],
+          "locn": "-167,14 +167,14"
         }
-      ], 
-      "to": "java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_def.xml", 
-      "from": "java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_def.xml"
-    }, 
+      ],
+      "from": "java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_def.xml",
+      "to": "java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_def.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-177,7 +177,7", 
           "lines": [
-            " \n", 
-            "         //Endpoint\n", 
-            "         sampleClassRepo.put(\"50\", Sample50.class);\n", 
-            "-        sampleClassRepo.put(\"51\", Sample51.class);\n", 
-            "+        //sampleClassRepo.put(\"51\", Sample51.class);\n", 
-            "         sampleClassRepo.put(\"52\", Sample52.class);\n", 
-            "         sampleClassRepo.put(\"53\", Sample53.class);\n", 
+            " \n",
+            "         //Endpoint\n",
+            "         sampleClassRepo.put(\"50\", Sample50.class);\n",
+            "-        sampleClassRepo.put(\"51\", Sample51.class);\n",
+            "+        //sampleClassRepo.put(\"51\", Sample51.class);\n",
+            "         sampleClassRepo.put(\"52\", Sample52.class);\n",
+            "         sampleClassRepo.put(\"53\", Sample53.class);\n",
             "         sampleClassRepo.put(\"54\", Sample54.class);\n"
-          ]
-        }, 
+          ],
+          "locn": "-177,7 +177,7"
+        },
         {
-          "locn": "-188,7 +188,7", 
           "lines": [
-            "         sampleClassRepo.put(\"59\", Sample59.class);\n", 
-            " \n", 
-            "         //QoS\n", 
-            "-        //sampleClassRepo.put(\"100\", Sample100.class);\n", 
-            "+        sampleClassRepo.put(\"100\", Sample100.class);\n", 
-            "         sampleClassRepo.put(\"101\", Sample101.class);\n", 
-            " \n", 
+            "         sampleClassRepo.put(\"59\", Sample59.class);\n",
+            " \n",
+            "         //QoS\n",
+            "-        //sampleClassRepo.put(\"100\", Sample100.class);\n",
+            "+        sampleClassRepo.put(\"100\", Sample100.class);\n",
+            "         sampleClassRepo.put(\"101\", Sample101.class);\n",
+            " \n",
             "         //Proxy Service\n"
-          ]
-        }, 
+          ],
+          "locn": "-188,7 +188,7"
+        },
         {
-          "locn": "-198,7 +198,7", 
           "lines": [
-            "         //sampleClassRepo.put(\"153\", Sample153.class); // unable to load the JKS files\n", 
-            "         sampleClassRepo.put(\"154\", Sample154.class);\n", 
-            "         sampleClassRepo.put(\"155\", Sample155.class);\n", 
-            "-        //sampleClassRepo.put(\"156\", Sample156.class);\n", 
-            "+        sampleClassRepo.put(\"156\", Sample156.class);\n", 
-            "         sampleClassRepo.put(\"157\", Sample157.class);\n", 
-            " \n", 
+            "         //sampleClassRepo.put(\"153\", Sample153.class); // unable to load the JKS files\n",
+            "         sampleClassRepo.put(\"154\", Sample154.class);\n",
+            "         sampleClassRepo.put(\"155\", Sample155.class);\n",
+            "-        //sampleClassRepo.put(\"156\", Sample156.class);\n",
+            "+        sampleClassRepo.put(\"156\", Sample156.class);\n",
+            "         sampleClassRepo.put(\"157\", Sample157.class);\n",
+            " \n",
             "         //Advanced\n"
-          ]
+          ],
+          "locn": "-198,7 +198,7"
         }
-      ], 
-      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java", 
-      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java"
-    }, 
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-170,6 +170,7", 
           "lines": [
-            "             payload = StockQuoteHandler.createStandardQuoteRequest(\n", 
-            "                     symbol, 1);\n", 
-            "             serviceClient.getOptions().setAction(\"urn:getQuote\");\n", 
-            "+            serviceClient.getOptions().setUseSeparateListener(true);\n", 
-            "             setCompleted(false);\n", 
-            "             serviceClient.sendReceiveNonBlocking(payload, new StockQuoteCallback(this));\n", 
+            "             payload = StockQuoteHandler.createStandardQuoteRequest(\n",
+            "                     symbol, 1);\n",
+            "             serviceClient.getOptions().setAction(\"urn:getQuote\");\n",
+            "+            serviceClient.getOptions().setUseSeparateListener(true);\n",
+            "             setCompleted(false);\n",
+            "             serviceClient.sendReceiveNonBlocking(payload, new StockQuoteCallback(this));\n",
             " \n"
-          ]
+          ],
+          "locn": "-170,6 +170,7"
         }
-      ], 
-      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/StockQuoteSampleClient.java", 
-      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/StockQuoteSampleClient.java"
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/StockQuoteSampleClient.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/StockQuoteSampleClient.java"
     }
-  ], 
-  "id": "1502687"
+  ],
+  "id": "1502687",
+  "message": "Updated the Axis2 configuration with the proper builders and formatters. Re-enabling the integration tests. RM test enabled. MTOM test disabled temporarily.",
+  "when": "2013-07-12T16:54:34-04:00",
+  "who": "hiranya"
 }

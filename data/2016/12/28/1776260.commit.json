@@ -1,132 +1,132 @@
 {
-  "when": "2016-12-28T05:42:28-05:00", 
-  "message": "Update Maven dependencies to 3.0 to fix a weird compilation failure (related to raw types) that seems to occur only on Java 8.", 
-  "who": "veithen", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-43,6 +43,7", 
           "lines": [
-            " import org.apache.maven.artifact.resolver.ArtifactCollector;\n", 
-            " import org.apache.maven.artifact.resolver.ArtifactResolutionException;\n", 
-            " import org.apache.maven.artifact.resolver.DebugResolutionListener;\n", 
-            "+import org.apache.maven.artifact.resolver.ResolutionListener;\n", 
-            " import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;\n", 
-            " import org.apache.maven.artifact.resolver.filter.ArtifactFilter;\n", 
+            " import org.apache.maven.artifact.resolver.ArtifactCollector;\n",
+            " import org.apache.maven.artifact.resolver.ArtifactResolutionException;\n",
+            " import org.apache.maven.artifact.resolver.DebugResolutionListener;\n",
+            "+import org.apache.maven.artifact.resolver.ResolutionListener;\n",
+            " import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;\n",
+            " import org.apache.maven.artifact.resolver.filter.ArtifactFilter;\n",
             " import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;\n"
-          ]
-        }, 
+          ],
+          "locn": "-43,6 +43,7"
+        },
         {
-          "locn": "-358,15 +359,10", 
           "lines": [
-            "         logArtifacts(synapseRuntimeDeps);\n", 
-            "         \n", 
-            "         log.debug(\"Resolving transitive dependencies for \" + synapseCore + \" ...\");\n", 
-            "-        try {\n", 
-            "-            synapseRuntimeDeps = artifactCollector.collect(synapseRuntimeDeps,\n", 
-            "-                    synapseCoreProject.getArtifact(), synapseCoreProject.getManagedVersionMap(),\n", 
-            "-                    localRepository, remoteArtifactRepositories, artifactMetadataSource, null,\n", 
-            "-                    Collections.singletonList(new DebugResolutionListener(logger))).getArtifacts();\n", 
-            "-        } catch (ArtifactResolutionException e) {\n", 
-            "-            throw new MojoExecutionException(\"Unable to resolve transitive dependencies for \"\n", 
-            "-                    + synapseCore);\n", 
-            "-        }\n", 
-            "+        synapseRuntimeDeps = artifactCollector.collect(synapseRuntimeDeps,\n", 
-            "+                synapseCoreProject.getArtifact(), synapseCoreProject.getManagedVersionMap(),\n", 
-            "+                localRepository, remoteArtifactRepositories, artifactMetadataSource, null,\n", 
-            "+                Collections.<ResolutionListener>singletonList(new DebugResolutionListener(logger))).getArtifacts();\n", 
-            "         log.debug(\"All runtime dependencies for \" + synapseCore + \" :\");\n", 
-            "         logArtifacts(synapseRuntimeDeps);\n", 
+            "         logArtifacts(synapseRuntimeDeps);\n",
+            "         \n",
+            "         log.debug(\"Resolving transitive dependencies for \" + synapseCore + \" ...\");\n",
+            "-        try {\n",
+            "-            synapseRuntimeDeps = artifactCollector.collect(synapseRuntimeDeps,\n",
+            "-                    synapseCoreProject.getArtifact(), synapseCoreProject.getManagedVersionMap(),\n",
+            "-                    localRepository, remoteArtifactRepositories, artifactMetadataSource, null,\n",
+            "-                    Collections.singletonList(new DebugResolutionListener(logger))).getArtifacts();\n",
+            "-        } catch (ArtifactResolutionException e) {\n",
+            "-            throw new MojoExecutionException(\"Unable to resolve transitive dependencies for \"\n",
+            "-                    + synapseCore);\n",
+            "-        }\n",
+            "+        synapseRuntimeDeps = artifactCollector.collect(synapseRuntimeDeps,\n",
+            "+                synapseCoreProject.getArtifact(), synapseCoreProject.getManagedVersionMap(),\n",
+            "+                localRepository, remoteArtifactRepositories, artifactMetadataSource, null,\n",
+            "+                Collections.<ResolutionListener>singletonList(new DebugResolutionListener(logger))).getArtifacts();\n",
+            "         log.debug(\"All runtime dependencies for \" + synapseCore + \" :\");\n",
+            "         logArtifacts(synapseRuntimeDeps);\n",
             "         \n"
-          ]
+          ],
+          "locn": "-358,15 +359,10"
         }
-      ], 
-      "to": "java/modules/xar-maven-plugin/src/main/java/org/apache/synapse/maven/xar/AbstractXarMojo.java", 
-      "from": "java/modules/xar-maven-plugin/src/main/java/org/apache/synapse/maven/xar/AbstractXarMojo.java"
-    }, 
+      ],
+      "from": "java/modules/xar-maven-plugin/src/main/java/org/apache/synapse/maven/xar/AbstractXarMojo.java",
+      "to": "java/modules/xar-maven-plugin/src/main/java/org/apache/synapse/maven/xar/AbstractXarMojo.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-46,7 +46,7", 
           "lines": [
-            "         </dependency>\n", 
-            "         <dependency>\n", 
-            "             <groupId>org.apache.maven</groupId>\n", 
-            "-            <artifactId>maven-project</artifactId>\n", 
-            "+            <artifactId>maven-core</artifactId>\n", 
-            "         </dependency>\n", 
-            "         <dependency>\n", 
+            "         </dependency>\n",
+            "         <dependency>\n",
+            "             <groupId>org.apache.maven</groupId>\n",
+            "-            <artifactId>maven-project</artifactId>\n",
+            "+            <artifactId>maven-core</artifactId>\n",
+            "         </dependency>\n",
+            "         <dependency>\n",
             "             <groupId>org.apache.maven</groupId>\n"
-          ]
-        }, 
+          ],
+          "locn": "-46,7 +46,7"
+        },
         {
-          "locn": "-54,6 +54,10", 
           "lines": [
-            "         </dependency>\n", 
-            "         <dependency>\n", 
-            "             <groupId>org.apache.maven</groupId>\n", 
-            "+            <artifactId>maven-compat</artifactId>\n", 
-            "+        </dependency>\n", 
-            "+        <dependency>\n", 
-            "+            <groupId>org.apache.maven</groupId>\n", 
-            "             <artifactId>maven-archiver</artifactId>\n", 
-            "         </dependency>\n", 
+            "         </dependency>\n",
+            "         <dependency>\n",
+            "             <groupId>org.apache.maven</groupId>\n",
+            "+            <artifactId>maven-compat</artifactId>\n",
+            "+        </dependency>\n",
+            "+        <dependency>\n",
+            "+            <groupId>org.apache.maven</groupId>\n",
+            "             <artifactId>maven-archiver</artifactId>\n",
+            "         </dependency>\n",
             "         <dependency>\n"
-          ]
+          ],
+          "locn": "-54,6 +54,10"
         }
-      ], 
-      "to": "java/modules/xar-maven-plugin/pom.xml", 
-      "from": "java/modules/xar-maven-plugin/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/xar-maven-plugin/pom.xml",
+      "to": "java/modules/xar-maven-plugin/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-840,16 +840,21", 
           "lines": [
-            "             </dependency>\n", 
-            "             <dependency>\n", 
-            "                 <groupId>org.apache.maven</groupId>\n", 
-            "-                <artifactId>maven-project</artifactId>\n", 
-            "+                <artifactId>maven-core</artifactId>\n", 
-            "                 <version>${maven.version}</version>\n", 
-            "             </dependency>\n", 
-            "             <dependency>\n", 
-            "                 <groupId>org.apache.maven</groupId>\n", 
-            "                 <artifactId>maven-artifact</artifactId>\n", 
-            "-                <version>${maven.artifact.version}</version>\n", 
-            "+                <version>${maven.version}</version>\n", 
-            "             </dependency>\n", 
-            "             <dependency>\n", 
-            "                 <groupId>org.apache.maven</groupId>\n", 
-            "+                <artifactId>maven-compat</artifactId>\n", 
-            "+                <version>${maven.version}</version>\n", 
-            "+            </dependency>\n", 
-            "+            <dependency>\n", 
-            "+                <groupId>org.apache.maven</groupId>\n", 
-            "                 <artifactId>maven-archiver</artifactId>\n", 
-            "                 <version>${maven.archiver.version}</version>\n", 
+            "             </dependency>\n",
+            "             <dependency>\n",
+            "                 <groupId>org.apache.maven</groupId>\n",
+            "-                <artifactId>maven-project</artifactId>\n",
+            "+                <artifactId>maven-core</artifactId>\n",
+            "                 <version>${maven.version}</version>\n",
+            "             </dependency>\n",
+            "             <dependency>\n",
+            "                 <groupId>org.apache.maven</groupId>\n",
+            "                 <artifactId>maven-artifact</artifactId>\n",
+            "-                <version>${maven.artifact.version}</version>\n",
+            "+                <version>${maven.version}</version>\n",
+            "             </dependency>\n",
+            "             <dependency>\n",
+            "                 <groupId>org.apache.maven</groupId>\n",
+            "+                <artifactId>maven-compat</artifactId>\n",
+            "+                <version>${maven.version}</version>\n",
+            "+            </dependency>\n",
+            "+            <dependency>\n",
+            "+                <groupId>org.apache.maven</groupId>\n",
+            "                 <artifactId>maven-archiver</artifactId>\n",
+            "                 <version>${maven.archiver.version}</version>\n",
             "             </dependency>\n"
-          ]
-        }, 
+          ],
+          "locn": "-840,16 +840,21"
+        },
         {
-          "locn": "-1105,8 +1110,7", 
           "lines": [
-            "         <activation.version>1.1</activation.version>\n", 
-            " \n", 
-            "         <!-- Maven Tools -->\n", 
-            "-        <maven.version>2.0.7</maven.version>\n", 
-            "-        <maven.artifact.version>2.0.8</maven.artifact.version>\n", 
-            "+        <maven.version>3.0</maven.version>\n", 
-            "         <maven.archiver.version>2.2</maven.archiver.version>\n", 
-            "         <plexus.utils.version>1.5.4</plexus.utils.version>\n", 
+            "         <activation.version>1.1</activation.version>\n",
+            " \n",
+            "         <!-- Maven Tools -->\n",
+            "-        <maven.version>2.0.7</maven.version>\n",
+            "-        <maven.artifact.version>2.0.8</maven.artifact.version>\n",
+            "+        <maven.version>3.0</maven.version>\n",
+            "         <maven.archiver.version>2.2</maven.archiver.version>\n",
+            "         <plexus.utils.version>1.5.4</plexus.utils.version>\n",
             "     </properties>\n"
-          ]
+          ],
+          "locn": "-1105,8 +1110,7"
         }
-      ], 
-      "to": "java/pom.xml", 
-      "from": "java/pom.xml"
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
     }
-  ], 
-  "id": "1776260"
+  ],
+  "id": "1776260",
+  "message": "Update Maven dependencies to 3.0 to fix a weird compilation failure (related to raw types) that seems to occur only on Java 8.",
+  "when": "2016-12-28T05:42:28-05:00",
+  "who": "veithen"
 }

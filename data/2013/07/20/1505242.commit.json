@@ -1,199 +1,199 @@
 {
-  "when": "2013-07-20T20:05:51-04:00", 
-  "message": "Adding an integration test to verify the scenario in SYNAPSE-883", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-0,0 +1,19", 
           "lines": [
-            "+<synapseSample>\n", 
-            "+    <sampleID>10001</sampleID>\n", 
-            "+    <sampleName>Mediating SOAP Faults Through APIs</sampleName>\n", 
-            "+    <synapseConfig>\n", 
-            "+        <!--if we don't specify the optional values, framework will use defaults-->\n", 
-            "+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>\n", 
-            "+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>\n", 
-            "+        <synapseXml>modules/integration/src/test/resources/extras/synapse_sample_10001.xml</synapseXml>\n", 
-            "+    </synapseConfig>\n", 
-            "+    <backEndServerConfig>\n", 
-            "+        <axis2Server id='0'>\n", 
-            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
-            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
-            "+        </axis2Server>\n", 
-            "+    </backEndServerConfig>\n", 
-            "+    <clientConfig>\n", 
-            "+        <clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>\n", 
-            "+    </clientConfig>\n", 
+            "+<synapseSample>\n",
+            "+    <sampleID>10001</sampleID>\n",
+            "+    <sampleName>Mediating SOAP Faults Through APIs</sampleName>\n",
+            "+    <synapseConfig>\n",
+            "+        <!--if we don't specify the optional values, framework will use defaults-->\n",
+            "+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>\n",
+            "+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>\n",
+            "+        <synapseXml>modules/integration/src/test/resources/extras/synapse_sample_10001.xml</synapseXml>\n",
+            "+    </synapseConfig>\n",
+            "+    <backEndServerConfig>\n",
+            "+        <axis2Server id='0'>\n",
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n",
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n",
+            "+        </axis2Server>\n",
+            "+    </backEndServerConfig>\n",
+            "+    <clientConfig>\n",
+            "+        <clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>\n",
+            "+    </clientConfig>\n",
             "+</synapseSample>\n"
-          ]
+          ],
+          "locn": "-0,0 +1,19"
         }
-      ], 
-      "to": "java/modules/integration/src/test/resources/sample10001.xml", 
-      "from": "java/modules/integration/src/test/resources/sample10001.xml"
-    }, 
+      ],
+      "from": "java/modules/integration/src/test/resources/sample10001.xml",
+      "to": "java/modules/integration/src/test/resources/sample10001.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-0,0 +1,41", 
           "lines": [
-            "+<definitions xmlns=\"http://ws.apache.org/ns/synapse\">\n", 
-            "+    <api name=\"StockQuoteAPI\" context=\"/stockquote\">\n", 
-            "+        <resource uri-template=\"/view/{symbol}\" methods=\"GET\">\n", 
-            "+            <inSequence>\n", 
-            "+                <payloadFactory>\n", 
-            "+                    <format>\n", 
-            "+                        <m0:getQuote xmlns:m0=\"http://services.samples\">\n", 
-            "+                            <m0:request>\n", 
-            "+                                <m0:symbol>$1</m0:symbol>\n", 
-            "+                            </m0:request>\n", 
-            "+                        </m0:getQuote>\n", 
-            "+                    </format>\n", 
-            "+                    <args>\n", 
-            "+                        <arg expression=\"get-property('uri.var.symbol')\"/>\n", 
-            "+                    </args>\n", 
-            "+                </payloadFactory>\n", 
-            "+                <header name=\"Action\" value=\"urn:getQuote\"/>\n", 
-            "+                <send>\n", 
-            "+                    <endpoint>\n", 
-            "+                        <address uri=\"http://localhost:9000/services/BogusService\" format=\"soap11\"/>\n", 
-            "+                    </endpoint>\n", 
-            "+                </send>\n", 
-            "+            </inSequence>\n", 
-            "+            <outSequence>\n", 
-            "+                <send/>\n", 
-            "+            </outSequence>\n", 
-            "+        </resource>\n", 
-            "+        <resource url-pattern=\"/order/*\" methods=\"POST\">\n", 
-            "+            <inSequence>\n", 
-            "+                <property name=\"FORCE_SC_ACCEPTED\" value=\"true\" scope=\"axis2\"/>\n", 
-            "+                <property name=\"OUT_ONLY\" value=\"true\"/>\n", 
-            "+                <header name=\"Action\" value=\"urn:placeOrder\"/>\n", 
-            "+                <send>\n", 
-            "+                    <endpoint>\n", 
-            "+                        <address uri=\"http://localhost:9000/services/BogusService\" format=\"soap11\"/>\n", 
-            "+                    </endpoint>\n", 
-            "+                </send>\n", 
-            "+            </inSequence>\n", 
-            "+        </resource>\n", 
-            "+    </api>\n", 
-            "+</definitions>\n", 
+            "+<definitions xmlns=\"http://ws.apache.org/ns/synapse\">\n",
+            "+    <api name=\"StockQuoteAPI\" context=\"/stockquote\">\n",
+            "+        <resource uri-template=\"/view/{symbol}\" methods=\"GET\">\n",
+            "+            <inSequence>\n",
+            "+                <payloadFactory>\n",
+            "+                    <format>\n",
+            "+                        <m0:getQuote xmlns:m0=\"http://services.samples\">\n",
+            "+                            <m0:request>\n",
+            "+                                <m0:symbol>$1</m0:symbol>\n",
+            "+                            </m0:request>\n",
+            "+                        </m0:getQuote>\n",
+            "+                    </format>\n",
+            "+                    <args>\n",
+            "+                        <arg expression=\"get-property('uri.var.symbol')\"/>\n",
+            "+                    </args>\n",
+            "+                </payloadFactory>\n",
+            "+                <header name=\"Action\" value=\"urn:getQuote\"/>\n",
+            "+                <send>\n",
+            "+                    <endpoint>\n",
+            "+                        <address uri=\"http://localhost:9000/services/BogusService\" format=\"soap11\"/>\n",
+            "+                    </endpoint>\n",
+            "+                </send>\n",
+            "+            </inSequence>\n",
+            "+            <outSequence>\n",
+            "+                <send/>\n",
+            "+            </outSequence>\n",
+            "+        </resource>\n",
+            "+        <resource url-pattern=\"/order/*\" methods=\"POST\">\n",
+            "+            <inSequence>\n",
+            "+                <property name=\"FORCE_SC_ACCEPTED\" value=\"true\" scope=\"axis2\"/>\n",
+            "+                <property name=\"OUT_ONLY\" value=\"true\"/>\n",
+            "+                <header name=\"Action\" value=\"urn:placeOrder\"/>\n",
+            "+                <send>\n",
+            "+                    <endpoint>\n",
+            "+                        <address uri=\"http://localhost:9000/services/BogusService\" format=\"soap11\"/>\n",
+            "+                    </endpoint>\n",
+            "+                </send>\n",
+            "+            </inSequence>\n",
+            "+        </resource>\n",
+            "+    </api>\n",
+            "+</definitions>\n",
             "\\ No newline at end of file\n"
-          ]
+          ],
+          "locn": "-0,0 +1,41"
         }
-      ], 
-      "to": "java/modules/integration/src/test/resources/extras/synapse_sample_10001.xml", 
-      "from": "java/modules/integration/src/test/resources/extras/synapse_sample_10001.xml"
-    }, 
+      ],
+      "from": "java/modules/integration/src/test/resources/extras/synapse_sample_10001.xml",
+      "to": "java/modules/integration/src/test/resources/extras/synapse_sample_10001.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-20,8 +20,6", 
           "lines": [
-            " package org.apache.synapse.samples.framework.tests.rest;\n", 
-            " \n", 
-            " import org.apache.axiom.om.OMElement;\n", 
-            "-import org.apache.commons.logging.Log;\n", 
-            "-import org.apache.commons.logging.LogFactory;\n", 
-            " import org.apache.http.HttpStatus;\n", 
-            " import org.apache.synapse.samples.framework.SynapseTestCase;\n", 
+            " package org.apache.synapse.samples.framework.tests.rest;\n",
+            " \n",
+            " import org.apache.axiom.om.OMElement;\n",
+            "-import org.apache.commons.logging.Log;\n",
+            "-import org.apache.commons.logging.LogFactory;\n",
+            " import org.apache.http.HttpStatus;\n",
+            " import org.apache.synapse.samples.framework.SynapseTestCase;\n",
             " import org.apache.synapse.samples.framework.clients.BasicHttpClient;\n"
-          ]
-        }, 
+          ],
+          "locn": "-20,8 +20,6"
+        },
         {
-          "locn": "-29,8 +27,6", 
           "lines": [
-            " \n", 
-            " public class Sample800 extends SynapseTestCase {\n", 
-            " \n", 
-            "-    private static final Log log = LogFactory.getLog(Sample800.class);\n", 
-            "-\n", 
-            "     public Sample800() {\n", 
-            "         super(800);\n", 
+            " \n",
+            " public class Sample800 extends SynapseTestCase {\n",
+            " \n",
+            "-    private static final Log log = LogFactory.getLog(Sample800.class);\n",
+            "-\n",
+            "     public Sample800() {\n",
+            "         super(800);\n",
             "     }\n"
-          ]
+          ],
+          "locn": "-29,8 +27,6"
         }
-      ], 
-      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/rest/Sample800.java", 
-      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/rest/Sample800.java"
-    }, 
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/rest/Sample800.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/rest/Sample800.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-0,0 +1,22", 
           "lines": [
-            "+package org.apache.synapse.samples.framework.tests.rest;\n", 
-            "+\n", 
-            "+import org.apache.axiom.om.OMElement;\n", 
-            "+import org.apache.http.HttpStatus;\n", 
-            "+import org.apache.synapse.samples.framework.SynapseTestCase;\n", 
-            "+import org.apache.synapse.samples.framework.clients.BasicHttpClient;\n", 
-            "+import org.apache.synapse.samples.framework.clients.HttpResponse;\n", 
-            "+\n", 
-            "+public class Sample10001 extends SynapseTestCase {\n", 
-            "+\n", 
-            "+    public Sample10001() {\n", 
-            "+        super(10001);\n", 
-            "+    }\n", 
-            "+\n", 
-            "+    public void testGetQuote() throws Exception {\n", 
-            "+        BasicHttpClient client = new BasicHttpClient();\n", 
-            "+        HttpResponse response = client.doGet(\"http://127.0.0.1:8280/stockquote/view/IBM\");\n", 
-            "+        assertEquals(response.getStatus(), HttpStatus.SC_INTERNAL_SERVER_ERROR);\n", 
-            "+        OMElement body = response.getBodyAsXML();\n", 
-            "+        assertEquals(body.getLocalName(), \"Exception\");\n", 
-            "+    }\n", 
+            "+package org.apache.synapse.samples.framework.tests.rest;\n",
+            "+\n",
+            "+import org.apache.axiom.om.OMElement;\n",
+            "+import org.apache.http.HttpStatus;\n",
+            "+import org.apache.synapse.samples.framework.SynapseTestCase;\n",
+            "+import org.apache.synapse.samples.framework.clients.BasicHttpClient;\n",
+            "+import org.apache.synapse.samples.framework.clients.HttpResponse;\n",
+            "+\n",
+            "+public class Sample10001 extends SynapseTestCase {\n",
+            "+\n",
+            "+    public Sample10001() {\n",
+            "+        super(10001);\n",
+            "+    }\n",
+            "+\n",
+            "+    public void testGetQuote() throws Exception {\n",
+            "+        BasicHttpClient client = new BasicHttpClient();\n",
+            "+        HttpResponse response = client.doGet(\"http://127.0.0.1:8280/stockquote/view/IBM\");\n",
+            "+        assertEquals(response.getStatus(), HttpStatus.SC_INTERNAL_SERVER_ERROR);\n",
+            "+        OMElement body = response.getBodyAsXML();\n",
+            "+        assertEquals(body.getLocalName(), \"Exception\");\n",
+            "+    }\n",
             "+}\n"
-          ]
+          ],
+          "locn": "-0,0 +1,22"
         }
-      ], 
-      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/rest/Sample10001.java", 
-      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/rest/Sample10001.java"
-    }, 
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/rest/Sample10001.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/rest/Sample10001.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-28,6 +28,7", 
           "lines": [
-            " import org.apache.synapse.samples.framework.tests.proxy.*;\n", 
-            " import org.apache.synapse.samples.framework.tests.qos.Sample100;\n", 
-            " import org.apache.synapse.samples.framework.tests.qos.Sample101;\n", 
-            "+import org.apache.synapse.samples.framework.tests.rest.Sample10001;\n", 
-            " import org.apache.synapse.samples.framework.tests.rest.Sample800;\n", 
-            " \n", 
+            " import org.apache.synapse.samples.framework.tests.proxy.*;\n",
+            " import org.apache.synapse.samples.framework.tests.qos.Sample100;\n",
+            " import org.apache.synapse.samples.framework.tests.qos.Sample101;\n",
+            "+import org.apache.synapse.samples.framework.tests.rest.Sample10001;\n",
+            " import org.apache.synapse.samples.framework.tests.rest.Sample800;\n",
+            " \n",
             " import java.util.ArrayList;\n"
-          ]
-        }, 
+          ],
+          "locn": "-28,6 +28,7"
+        },
         {
-          "locn": "-139,7 +140,7", 
           "lines": [
-            "             }\n", 
-            "         } else {\n", 
-            "             suiteName = \"AllSamplesSuite\";\n", 
-            "-            for (int i = 0; i <= 1000; i++) {\n", 
-            "+            for (int i = 0; i <= 20000; i++) {\n", 
-            "                 Class testClass = (Class) sampleClassRepo.get(Integer.toString(i));\n", 
-            "                 if (testClass != null) {\n", 
+            "             }\n",
+            "         } else {\n",
+            "             suiteName = \"AllSamplesSuite\";\n",
+            "-            for (int i = 0; i <= 1000; i++) {\n",
+            "+            for (int i = 0; i <= 20000; i++) {\n",
+            "                 Class testClass = (Class) sampleClassRepo.get(Integer.toString(i));\n",
+            "                 if (testClass != null) {\n",
             "                     suiteClassesList.add(testClass);\n"
-          ]
-        }, 
+          ],
+          "locn": "-139,7 +140,7"
+        },
         {
-          "locn": "-225,5 +226,6", 
           "lines": [
-            "         sampleClassRepo.put(\"460\", Sample460.class);\n", 
-            " \n", 
-            "         sampleClassRepo.put(\"800\", Sample800.class);\n", 
-            "+        sampleClassRepo.put(\"10001\", Sample10001.class);\n", 
-            "     }\n", 
-            " }\n", 
+            "         sampleClassRepo.put(\"460\", Sample460.class);\n",
+            " \n",
+            "         sampleClassRepo.put(\"800\", Sample800.class);\n",
+            "+        sampleClassRepo.put(\"10001\", Sample10001.class);\n",
+            "     }\n",
+            " }\n",
             "\\ No newline at end of file\n"
-          ]
+          ],
+          "locn": "-225,5 +226,6"
         }
-      ], 
-      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java", 
-      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java"
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java"
     }
-  ], 
-  "id": "1505242"
+  ],
+  "id": "1505242",
+  "message": "Adding an integration test to verify the scenario in SYNAPSE-883",
+  "when": "2013-07-20T20:05:51-04:00",
+  "who": "hiranya"
 }

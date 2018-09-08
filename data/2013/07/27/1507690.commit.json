@@ -1,29 +1,29 @@
 {
-  "when": "2013-07-27T12:30:16-04:00", 
-  "message": "Fixing docs.\n", 
-  "who": "sadeep", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-217,8 +217,8", 
           "lines": [
-            "                 <h4>EJB Mediator</h4>\n", 
-            "                 <p>\n", 
-            "                     <ul>\n", 
-            "-                        <li><a href=\"samples/sample470.html\">Sample 470: Introduction to the EJB mediator: Invoking Stateless Session Beans</a></li>\n", 
-            "-                        <li><a href=\"samples/sample471.html\">Sample 471: Introduction to the EJB mediator: Invoking Stateful Session Beans</a></li>\n", 
-            "+                        <li><a href=\"samples/sample470.html\">Sample 470: Introduction to the EJB mediator I: Invoking Stateless Session Beans</a></li>\n", 
-            "+                        <li><a href=\"samples/sample471.html\">Sample 471: Introduction to the EJB mediator II: Invoking Stateful Session Beans</a></li>\n", 
-            "                     </ul>\n", 
-            "                 </p>\n", 
+            "                 <h4>EJB Mediator</h4>\n",
+            "                 <p>\n",
+            "                     <ul>\n",
+            "-                        <li><a href=\"samples/sample470.html\">Sample 470: Introduction to the EJB mediator: Invoking Stateless Session Beans</a></li>\n",
+            "-                        <li><a href=\"samples/sample471.html\">Sample 471: Introduction to the EJB mediator: Invoking Stateful Session Beans</a></li>\n",
+            "+                        <li><a href=\"samples/sample470.html\">Sample 470: Introduction to the EJB mediator I: Invoking Stateless Session Beans</a></li>\n",
+            "+                        <li><a href=\"samples/sample471.html\">Sample 471: Introduction to the EJB mediator II: Invoking Stateful Session Beans</a></li>\n",
+            "                     </ul>\n",
+            "                 </p>\n",
             "                 \n"
-          ]
+          ],
+          "locn": "-217,8 +217,8"
         }
-      ], 
-      "to": "java/modules/documentation/src/site/xdoc/userguide/samples.xml", 
-      "from": "java/modules/documentation/src/site/xdoc/userguide/samples.xml"
+      ],
+      "from": "java/modules/documentation/src/site/xdoc/userguide/samples.xml",
+      "to": "java/modules/documentation/src/site/xdoc/userguide/samples.xml"
     }
-  ], 
-  "id": "1507690"
+  ],
+  "id": "1507690",
+  "message": "Fixing docs.\n",
+  "when": "2013-07-27T12:30:16-04:00",
+  "who": "sadeep"
 }

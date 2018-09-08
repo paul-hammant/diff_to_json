@@ -1,27 +1,27 @@
 {
-  "when": "2017-11-30T16:56:43-05:00", 
-  "message": "Update Axis2 version.", 
-  "who": "veithen", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-1102,7 +1102,7", 
           "lines": [
-            "         <commons.codec.version>1.6</commons.codec.version>\n", 
-            " \n", 
-            "         <!-- Axis2 and its dependencies -->\n", 
-            "-        <axis2.version>1.7.7-SNAPSHOT</axis2.version>\n", 
-            "+        <axis2.version>1.7.8-SNAPSHOT</axis2.version>\n", 
-            "         <axiom.version>1.2.21-SNAPSHOT</axiom.version>\n", 
-            "         <wsdl4j.version>1.6.2</wsdl4j.version>\n", 
+            "         <commons.codec.version>1.6</commons.codec.version>\n",
+            " \n",
+            "         <!-- Axis2 and its dependencies -->\n",
+            "-        <axis2.version>1.7.7-SNAPSHOT</axis2.version>\n",
+            "+        <axis2.version>1.7.8-SNAPSHOT</axis2.version>\n",
+            "         <axiom.version>1.2.21-SNAPSHOT</axiom.version>\n",
+            "         <wsdl4j.version>1.6.2</wsdl4j.version>\n",
             "         <jettison.version>1.3.8</jettison.version>\n"
-          ]
+          ],
+          "locn": "-1102,7 +1102,7"
         }
-      ], 
-      "to": "java/pom.xml", 
-      "from": "java/pom.xml"
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
     }
-  ], 
-  "id": "1816767"
+  ],
+  "id": "1816767",
+  "message": "Update Axis2 version.",
+  "when": "2017-11-30T16:56:43-05:00",
+  "who": "veithen"
 }

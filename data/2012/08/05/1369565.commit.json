@@ -1,66 +1,66 @@
 {
-  "when": "2012-08-05T08:20:47-04:00", 
-  "message": "minor code change and java doc addtions for Message Store Serialization Test", 
-  "who": "charith", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-24,10 +24,12", 
           "lines": [
-            " \n", 
-            " import java.util.Properties;\n", 
-            " \n", 
-            "+/**\n", 
-            "+ * Class <code>MessageStoreSerializationTest</code> implements the test cases for XML serialization\n", 
-            "+ * scenarios for the synapse message store\n", 
-            "+ */\n", 
-            " public class MessageStoreSerializationTest extends AbstractTestCase {\n", 
-            " \n", 
-            "-    MessageStoreFactory messageStoreFactory;\n", 
-            "-\n", 
-            "     MessageStoreSerializer messageStoreSerializer;\n", 
-            " \n", 
+            " \n",
+            " import java.util.Properties;\n",
+            " \n",
+            "+/**\n",
+            "+ * Class <code>MessageStoreSerializationTest</code> implements the test cases for XML serialization\n",
+            "+ * scenarios for the synapse message store\n",
+            "+ */\n",
+            " public class MessageStoreSerializationTest extends AbstractTestCase {\n",
+            " \n",
+            "-    MessageStoreFactory messageStoreFactory;\n",
+            "-\n",
+            "     MessageStoreSerializer messageStoreSerializer;\n",
+            " \n",
             "     public MessageStoreSerializationTest() {\n"
-          ]
-        }, 
+          ],
+          "locn": "-24,10 +24,12"
+        },
         {
-          "locn": "-35,6 +37,10", 
           "lines": [
-            "         this.messageStoreSerializer = new MessageStoreSerializer();\n", 
-            "     }\n", 
-            " \n", 
-            "+    /**\n", 
-            "+     * Test case for InMemory Message Store Configuration Factory and serializer.\n", 
-            "+     * @throws Exception in case of a error while creating or in the serialize process.\n", 
-            "+     */\n", 
-            "     public void testMessageStoreSerialization() throws Exception {\n", 
-            "         String messageStoreConfiguration = \"<syn:messageStore xmlns:syn=\\\"\" +\n", 
+            "         this.messageStoreSerializer = new MessageStoreSerializer();\n",
+            "     }\n",
+            " \n",
+            "+    /**\n",
+            "+     * Test case for InMemory Message Store Configuration Factory and serializer.\n",
+            "+     * @throws Exception in case of a error while creating or in the serialize process.\n",
+            "+     */\n",
+            "     public void testMessageStoreSerialization() throws Exception {\n",
+            "         String messageStoreConfiguration = \"<syn:messageStore xmlns:syn=\\\"\" +\n",
             "                 \"http://ws.apache.org/ns/synapse\\\"\" +\n"
-          ]
-        }, 
+          ],
+          "locn": "-35,6 +37,10"
+        },
         {
-          "locn": "-47,12 +53,8", 
           "lines": [
-            "         OMElement serializedElement = MessageStoreSerializer.serializeMessageStore(null,\n", 
-            "                 messageStore);\n", 
-            " \n", 
-            "-        try {\n", 
-            "             assertTrue(compare(messageStoreElement, serializedElement));\n", 
-            "-        } catch (Exception e) {\n", 
-            "-            fail(\"Exception in test.\");\n", 
-            "-        }\n", 
-            "-        \n", 
-            "+\n", 
-            "     }\n", 
-            " \n", 
+            "         OMElement serializedElement = MessageStoreSerializer.serializeMessageStore(null,\n",
+            "                 messageStore);\n",
+            " \n",
+            "-        try {\n",
+            "             assertTrue(compare(messageStoreElement, serializedElement));\n",
+            "-        } catch (Exception e) {\n",
+            "-            fail(\"Exception in test.\");\n",
+            "-        }\n",
+            "-        \n",
+            "+\n",
+            "     }\n",
+            " \n",
             "    \n"
-          ]
+          ],
+          "locn": "-47,12 +53,8"
         }
-      ], 
-      "to": "java/modules/core/src/test/java/org/apache/synapse/config/xml/MessageStoreSerializationTest.java", 
-      "from": "java/modules/core/src/test/java/org/apache/synapse/config/xml/MessageStoreSerializationTest.java"
+      ],
+      "from": "java/modules/core/src/test/java/org/apache/synapse/config/xml/MessageStoreSerializationTest.java",
+      "to": "java/modules/core/src/test/java/org/apache/synapse/config/xml/MessageStoreSerializationTest.java"
     }
-  ], 
-  "id": "1369565"
+  ],
+  "id": "1369565",
+  "message": "minor code change and java doc addtions for Message Store Serialization Test",
+  "when": "2012-08-05T08:20:47-04:00",
+  "who": "charith"
 }

@@ -1,27 +1,27 @@
 {
-  "when": "2012-04-18T04:33:11-04:00", 
-  "message": "fixed SYNAPSE-845", 
-  "who": "miyuru", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-352,7 +352,7", 
           "lines": [
-            " \n", 
-            "     protected boolean isRetryDisabled(MessageContext synCtx) {\n", 
-            "         Integer errorCode = (Integer) synCtx.getProperty(SynapseConstants.ERROR_CODE);\n", 
-            "-        if (errorCode != null) {\n", 
-            "+        if (errorCode != null && definition != null) {\n", 
-            "             if (definition.getRetryDisabledErrorCodes().contains(errorCode)) {\n", 
-            "                 if (log.isDebugEnabled()) {\n", 
+            " \n",
+            "     protected boolean isRetryDisabled(MessageContext synCtx) {\n",
+            "         Integer errorCode = (Integer) synCtx.getProperty(SynapseConstants.ERROR_CODE);\n",
+            "-        if (errorCode != null) {\n",
+            "+        if (errorCode != null && definition != null) {\n",
+            "             if (definition.getRetryDisabledErrorCodes().contains(errorCode)) {\n",
+            "                 if (log.isDebugEnabled()) {\n",
             "                     log.debug(\"Encountered a retry disabled error : \" + errorCode\n"
-          ]
+          ],
+          "locn": "-352,7 +352,7"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/endpoints/AbstractEndpoint.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/endpoints/AbstractEndpoint.java"
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/endpoints/AbstractEndpoint.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/endpoints/AbstractEndpoint.java"
     }
-  ], 
-  "id": "1327424"
+  ],
+  "id": "1327424",
+  "message": "fixed SYNAPSE-845",
+  "when": "2012-04-18T04:33:11-04:00",
+  "who": "miyuru"
 }

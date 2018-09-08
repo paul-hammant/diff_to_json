@@ -1,66 +1,66 @@
 {
-  "when": "2016-12-28T03:46:33-05:00", 
-  "message": "Removing exclusion and version from child pom to parent pom", 
-  "who": "ravi", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-114,17 +114,10", 
           "lines": [
-            "         <dependency>\n", 
-            "             <groupId>org.apache.axis2</groupId>\n", 
-            "             <artifactId>axis2-json</artifactId>\n", 
-            "-            <exclusions>\n", 
-            "-                <exclusion>\n", 
-            "-                    <groupId>org.codehaus.jettison</groupId>\n", 
-            "-                    <artifactId>jettison</artifactId>\n", 
-            "-                </exclusion>\n", 
-            "-            </exclusions>\n", 
-            "         </dependency>\n", 
-            "         <dependency>\n", 
-            "             <groupId>org.codehaus.jettison</groupId>\n", 
-            "             <artifactId>jettison</artifactId>\n", 
-            "-            <version>${jettison.version}</version>\n", 
-            "         </dependency>\n", 
-            " \n", 
+            "         <dependency>\n",
+            "             <groupId>org.apache.axis2</groupId>\n",
+            "             <artifactId>axis2-json</artifactId>\n",
+            "-            <exclusions>\n",
+            "-                <exclusion>\n",
+            "-                    <groupId>org.codehaus.jettison</groupId>\n",
+            "-                    <artifactId>jettison</artifactId>\n",
+            "-                </exclusion>\n",
+            "-            </exclusions>\n",
+            "         </dependency>\n",
+            "         <dependency>\n",
+            "             <groupId>org.codehaus.jettison</groupId>\n",
+            "             <artifactId>jettison</artifactId>\n",
+            "-            <version>${jettison.version}</version>\n",
+            "         </dependency>\n",
+            " \n",
             "         <!-- Additional transports -->\n"
-          ]
+          ],
+          "locn": "-114,17 +114,10"
         }
-      ], 
-      "to": "java/modules/distribution/pom.xml", 
-      "from": "java/modules/distribution/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/distribution/pom.xml",
+      "to": "java/modules/distribution/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-432,8 +432,19", 
           "lines": [
-            "                 <groupId>org.apache.axis2</groupId>\n", 
-            "                 <artifactId>axis2-json</artifactId>\n", 
-            "                 <version>${axis2.version}</version>\n", 
-            "+                <exclusions>\n", 
-            "+                    <exclusion>\n", 
-            "+                        <groupId>org.codehaus.jettison</groupId>\n", 
-            "+                        <artifactId>jettison</artifactId>\n", 
-            "+                    </exclusion>\n", 
-            "+                </exclusions>\n", 
-            " \t    </dependency>\n", 
-            "             <dependency>\n", 
-            "+                <groupId>org.codehaus.jettison</groupId>\n", 
-            "+                <artifactId>jettison</artifactId>\n", 
-            "+                <version>${jettison.version}</version>\n", 
-            "+            </dependency>\n", 
-            "+            <dependency>\n", 
-            "                 <groupId>org.apache.axis2</groupId>\n", 
-            "                 <artifactId>axis2-adb</artifactId>\n", 
+            "                 <groupId>org.apache.axis2</groupId>\n",
+            "                 <artifactId>axis2-json</artifactId>\n",
+            "                 <version>${axis2.version}</version>\n",
+            "+                <exclusions>\n",
+            "+                    <exclusion>\n",
+            "+                        <groupId>org.codehaus.jettison</groupId>\n",
+            "+                        <artifactId>jettison</artifactId>\n",
+            "+                    </exclusion>\n",
+            "+                </exclusions>\n",
+            " \t    </dependency>\n",
+            "             <dependency>\n",
+            "+                <groupId>org.codehaus.jettison</groupId>\n",
+            "+                <artifactId>jettison</artifactId>\n",
+            "+                <version>${jettison.version}</version>\n",
+            "+            </dependency>\n",
+            "+            <dependency>\n",
+            "                 <groupId>org.apache.axis2</groupId>\n",
+            "                 <artifactId>axis2-adb</artifactId>\n",
             "                 <version>${axis2.version}</version>\n"
-          ]
+          ],
+          "locn": "-432,8 +432,19"
         }
-      ], 
-      "to": "java/pom.xml", 
-      "from": "java/pom.xml"
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
     }
-  ], 
-  "id": "1776242"
+  ],
+  "id": "1776242",
+  "message": "Removing exclusion and version from child pom to parent pom",
+  "when": "2016-12-28T03:46:33-05:00",
+  "who": "ravi"
 }

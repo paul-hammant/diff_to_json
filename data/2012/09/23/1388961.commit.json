@@ -1,127 +1,127 @@
 {
-  "when": "2012-09-23T03:05:54-04:00", 
-  "message": "Applied Sagara's patches for SYNAPSE-910 and SYNAPSE-912 to make Synapse compatible with the latest Axis2 trunk.\n", 
-  "who": "veithen", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-28,6 +28,7", 
           "lines": [
-            " \n", 
-            "     &lt;sequence name=\"main\"&gt;\n", 
-            "         &lt;!-- filtering of messages with XPath and regex matches --&gt;\n", 
-            "+        &lt;header name=\"Action\" value=\"urn:getQuote\"/&gt;\n", 
-            "         &lt;filter source=\"get-property('To')\" regex=\".*/StockQuote.*\"&gt;\n", 
-            "             &lt;then&gt;\n", 
+            " \n",
+            "     &lt;sequence name=\"main\"&gt;\n",
+            "         &lt;!-- filtering of messages with XPath and regex matches --&gt;\n",
+            "+        &lt;header name=\"Action\" value=\"urn:getQuote\"/&gt;\n",
+            "         &lt;filter source=\"get-property('To')\" regex=\".*/StockQuote.*\"&gt;\n",
+            "             &lt;then&gt;\n",
             "                 &lt;send&gt;\n"
-          ]
+          ],
+          "locn": "-28,6 +28,7"
         }
-      ], 
-      "to": "java/modules/documentation/src/site/xdoc/userguide/samples/sample50.xml", 
-      "from": "java/modules/documentation/src/site/xdoc/userguide/samples/sample50.xml"
-    }, 
+      ],
+      "from": "java/modules/documentation/src/site/xdoc/userguide/samples/sample50.xml",
+      "to": "java/modules/documentation/src/site/xdoc/userguide/samples/sample50.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-253,7 +253,7", 
           "lines": [
-            "         }\n", 
-            " \n", 
-            "         if (msgContext.isSOAP11() && soapAction != null &&\n", 
-            "-                soapAction.length() > 0) {\n", 
-            "+                soapAction.length() >= 0) {\n", 
-            "             Header existingHeader =\n", 
-            "                     httpRequest.getFirstHeader(HTTPConstants.HEADER_SOAP_ACTION);\n", 
+            "         }\n",
+            " \n",
+            "         if (msgContext.isSOAP11() && soapAction != null &&\n",
+            "-                soapAction.length() > 0) {\n",
+            "+                soapAction.length() >= 0) {\n",
+            "             Header existingHeader =\n",
+            "                     httpRequest.getFirstHeader(HTTPConstants.HEADER_SOAP_ACTION);\n",
             "             if (existingHeader != null) {\n"
-          ]
+          ],
+          "locn": "-253,7 +253,7"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Axis2HttpRequest.java", 
-      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Axis2HttpRequest.java"
-    }, 
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Axis2HttpRequest.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Axis2HttpRequest.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-21,7 +21,7", 
           "lines": [
-            " import org.apache.axis2.AxisFault;\n", 
-            " import org.apache.axis2.context.MessageContext;\n", 
-            " import org.apache.axis2.transport.MessageFormatter;\n", 
-            "-import org.apache.axis2.transport.TransportUtils;\n", 
-            "+import org.apache.axis2.util.MessageProcessorSelector;\n", 
-            " import org.apache.commons.logging.Log;\n", 
-            " import org.apache.commons.logging.LogFactory;\n", 
+            " import org.apache.axis2.AxisFault;\n",
+            " import org.apache.axis2.context.MessageContext;\n",
+            " import org.apache.axis2.transport.MessageFormatter;\n",
+            "-import org.apache.axis2.transport.TransportUtils;\n",
+            "+import org.apache.axis2.util.MessageProcessorSelector;\n",
+            " import org.apache.commons.logging.Log;\n",
+            " import org.apache.commons.logging.LogFactory;\n",
             " import org.apache.http.protocol.HTTP;\n"
-          ]
-        }, 
+          ],
+          "locn": "-21,7 +21,7"
+        },
         {
-          "locn": "-46,7 +46,7", 
           "lines": [
-            " \n", 
-            "         try {\n", 
-            "             // Get message formatter based on the content type\n", 
-            "-            MessageFormatter formatter = TransportUtils.getMessageFormatter(msgContext);\n", 
-            "+            MessageFormatter formatter = MessageProcessorSelector.getMessageFormatter(msgContext);\n", 
-            " \n", 
-            "             Object o = msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);\n", 
+            " \n",
+            "         try {\n",
+            "             // Get message formatter based on the content type\n",
+            "-            MessageFormatter formatter = TransportUtils.getMessageFormatter(msgContext);\n",
+            "+            MessageFormatter formatter = MessageProcessorSelector.getMessageFormatter(msgContext);\n",
+            " \n",
+            "             Object o = msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);\n",
             "             if (o != null && o instanceof Map) {\n"
-          ]
+          ],
+          "locn": "-46,7 +46,7"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/util/MessageFormatterDecoratorFactory.java", 
-      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/util/MessageFormatterDecoratorFactory.java"
-    }, 
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/util/MessageFormatterDecoratorFactory.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/util/MessageFormatterDecoratorFactory.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-26,7 +26,7", 
           "lines": [
-            " import org.apache.axis2.description.Parameter;\n", 
-            " import org.apache.axis2.transport.MessageFormatter;\n", 
-            " import org.apache.axis2.transport.OutTransportInfo;\n", 
-            "-import org.apache.axis2.transport.TransportUtils;\n", 
-            "+import org.apache.axis2.util.MessageProcessorSelector;\n", 
-            " import org.apache.axis2.transport.base.AbstractTransportSender;\n", 
-            " import org.apache.axis2.transport.base.BaseUtils;\n", 
+            " import org.apache.axis2.description.Parameter;\n",
+            " import org.apache.axis2.transport.MessageFormatter;\n",
+            " import org.apache.axis2.transport.OutTransportInfo;\n",
+            "-import org.apache.axis2.transport.TransportUtils;\n",
+            "+import org.apache.axis2.util.MessageProcessorSelector;\n",
+            " import org.apache.axis2.transport.base.AbstractTransportSender;\n",
+            " import org.apache.axis2.transport.base.BaseUtils;\n",
             " import org.apache.axis2.transport.base.ManagementSupport;\n"
-          ]
-        }, 
+          ],
+          "locn": "-26,7 +26,7"
+        },
         {
-          "locn": "-226,7 +226,7", 
           "lines": [
-            "     private void populateResponseFile(FileObject responseFile, MessageContext msgContext,\n", 
-            "                                       boolean append, boolean lockingEnabled) throws AxisFault {\n", 
-            "         \n", 
-            "-        MessageFormatter messageFormatter = TransportUtils.getMessageFormatter(msgContext);\n", 
-            "+        MessageFormatter messageFormatter = MessageProcessorSelector.getMessageFormatter(msgContext);\n", 
-            "         OMOutputFormat format = BaseUtils.getOMOutputFormat(msgContext);\n", 
-            "         \n", 
+            "     private void populateResponseFile(FileObject responseFile, MessageContext msgContext,\n",
+            "                                       boolean append, boolean lockingEnabled) throws AxisFault {\n",
+            "         \n",
+            "-        MessageFormatter messageFormatter = TransportUtils.getMessageFormatter(msgContext);\n",
+            "+        MessageFormatter messageFormatter = MessageProcessorSelector.getMessageFormatter(msgContext);\n",
+            "         OMOutputFormat format = BaseUtils.getOMOutputFormat(msgContext);\n",
+            "         \n",
             "         try {\n"
-          ]
+          ],
+          "locn": "-226,7 +226,7"
         }
-      ], 
-      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java", 
-      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java"
-    }, 
+      ],
+      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java",
+      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-23,6 +23,7", 
           "lines": [
-            " \n", 
-            "     <sequence name=\"main\">\n", 
-            "         <!-- filtering of messages with XPath and regex matches -->\n", 
-            "+        <header name=\"Action\" value=\"urn:getQuote\"/>\n", 
-            "         <filter source=\"get-property('To')\" regex=\".*/StockQuote.*\">\n", 
-            "             <then>\n", 
+            " \n",
+            "     <sequence name=\"main\">\n",
+            "         <!-- filtering of messages with XPath and regex matches -->\n",
+            "+        <header name=\"Action\" value=\"urn:getQuote\"/>\n",
+            "         <filter source=\"get-property('To')\" regex=\".*/StockQuote.*\">\n",
+            "             <then>\n",
             "                 <send>\n"
-          ]
+          ],
+          "locn": "-23,6 +23,7"
         }
-      ], 
-      "to": "java/repository/conf/sample/synapse_sample_50.xml", 
-      "from": "java/repository/conf/sample/synapse_sample_50.xml"
+      ],
+      "from": "java/repository/conf/sample/synapse_sample_50.xml",
+      "to": "java/repository/conf/sample/synapse_sample_50.xml"
     }
-  ], 
-  "id": "1388961"
+  ],
+  "id": "1388961",
+  "message": "Applied Sagara's patches for SYNAPSE-910 and SYNAPSE-912 to make Synapse compatible with the latest Axis2 trunk.\n",
+  "when": "2012-09-23T03:05:54-04:00",
+  "who": "veithen"
 }

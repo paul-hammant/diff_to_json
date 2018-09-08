@@ -1,27 +1,27 @@
 {
-  "when": "2011-12-11T09:07:03-05:00", 
-  "message": "refactoring comment", 
-  "who": "kasun", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-188,7 +188,7", 
           "lines": [
-            "                 }                \n", 
-            " \n", 
-            "             } else if (SynapseConstants.FORMAT_REST.equals(endpoint.getFormat())) {\n", 
-            "-                // format=rest is kept only backwards compatibility. We no longer needed that.\n", 
-            "+                // format=rest is kept only for backward compatibility. We no longer needed that.\n", 
-            "                 // Remove Message Type  for GET and DELETE Request\n", 
-            "                 if (originalInMsgCtx.getProperty(Constants.Configuration.HTTP_METHOD) != null) {\n", 
+            "                 }                \n",
+            " \n",
+            "             } else if (SynapseConstants.FORMAT_REST.equals(endpoint.getFormat())) {\n",
+            "-                // format=rest is kept only backwards compatibility. We no longer needed that.\n",
+            "+                // format=rest is kept only for backward compatibility. We no longer needed that.\n",
+            "                 // Remove Message Type  for GET and DELETE Request\n",
+            "                 if (originalInMsgCtx.getProperty(Constants.Configuration.HTTP_METHOD) != null) {\n",
             "                     Object method = originalInMsgCtx.getProperty(Constants.Configuration.HTTP_METHOD);\n"
-          ]
+          ],
+          "locn": "-188,7 +188,7"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java"
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java"
     }
-  ], 
-  "id": "1213002"
+  ],
+  "id": "1213002",
+  "message": "refactoring comment",
+  "when": "2011-12-11T09:07:03-05:00",
+  "who": "kasun"
 }

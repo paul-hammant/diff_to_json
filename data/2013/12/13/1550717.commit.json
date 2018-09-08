@@ -1,31 +1,31 @@
 {
-  "when": "2013-12-13T08:00:01-05:00", 
-  "message": "adding myself as a committer", 
-  "who": "isudana", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-1312,6 +1312,12", 
           "lines": [
-            "             <organization>ANU</organization>\n", 
-            "             <url>http://www.apache.org/~sadeep</url>\n", 
-            "         </developer>\n", 
-            "+        <developer>\n", 
-            "+            <name>Isuru Udana</name>\n", 
-            "+            <id>isudana</id>\n", 
-            "+            <email>isudana AT apache.org</email>\n", 
-            "+            <organization>WSO2</organization>\n", 
-            "+        </developer>\n", 
-            "     </developers>\n", 
-            " \n", 
+            "             <organization>ANU</organization>\n",
+            "             <url>http://www.apache.org/~sadeep</url>\n",
+            "         </developer>\n",
+            "+        <developer>\n",
+            "+            <name>Isuru Udana</name>\n",
+            "+            <id>isudana</id>\n",
+            "+            <email>isudana AT apache.org</email>\n",
+            "+            <organization>WSO2</organization>\n",
+            "+        </developer>\n",
+            "     </developers>\n",
+            " \n",
             "     <contributors>\n"
-          ]
+          ],
+          "locn": "-1312,6 +1312,12"
         }
-      ], 
-      "to": "java/pom.xml", 
-      "from": "java/pom.xml"
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
     }
-  ], 
-  "id": "1550717"
+  ],
+  "id": "1550717",
+  "message": "adding myself as a committer",
+  "when": "2013-12-13T08:00:01-05:00",
+  "who": "isudana"
 }

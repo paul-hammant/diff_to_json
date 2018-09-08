@@ -1,50 +1,50 @@
 {
-  "when": "2013-08-03T22:39:30-04:00", 
-  "message": "fixed the consumer client.", 
-  "who": "rajikak", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-90,7 +90,9", 
           "lines": [
-            " \n", 
-            "     private static void produce(String message, Channel channel, String queueName)\n", 
-            "             throws IOException {\n", 
-            "-        channel.basicPublish(\"\", queueName, null, message.getBytes());\n", 
-            "+        for (int i = 0; i < 1000000; i++) {\n", 
-            "+            channel.basicPublish(\"\", queueName, null, message.getBytes());\n", 
-            "+        }\n", 
-            "     }\n", 
-            " \n", 
+            " \n",
+            "     private static void produce(String message, Channel channel, String queueName)\n",
+            "             throws IOException {\n",
+            "-        channel.basicPublish(\"\", queueName, null, message.getBytes());\n",
+            "+        for (int i = 0; i < 1000000; i++) {\n",
+            "+            channel.basicPublish(\"\", queueName, null, message.getBytes());\n",
+            "+        }\n",
+            "     }\n",
+            " \n",
             "     private static void publish(String message, Channel channel, String exchangeName)\n"
-          ]
+          ],
+          "locn": "-90,7 +90,9"
         }
-      ], 
-      "to": "java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPProducerClient.java", 
-      "from": "java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPProducerClient.java"
-    }, 
+      ],
+      "from": "java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPProducerClient.java",
+      "to": "java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPProducerClient.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-22,8 +22,9", 
           "lines": [
-            "             System.out.println(\"Usage: java AMQPConsumerClient <queue-name>\");\n", 
-            "             System.out.println(\"Default arguments will be used\");\n", 
-            "             queueName = QUEUE_NAME;\n", 
-            "+        } else {\n", 
-            "+            queueName = args[1];\n", 
-            "         }\n", 
-            "-        queueName = args[1];\n", 
-            " \n", 
-            "         ConnectionFactory factory = new ConnectionFactory();\n", 
+            "             System.out.println(\"Usage: java AMQPConsumerClient <queue-name>\");\n",
+            "             System.out.println(\"Default arguments will be used\");\n",
+            "             queueName = QUEUE_NAME;\n",
+            "+        } else {\n",
+            "+            queueName = args[1];\n",
+            "         }\n",
+            "-        queueName = args[1];\n",
+            " \n",
+            "         ConnectionFactory factory = new ConnectionFactory();\n",
             "         factory.setHost(\"localhost\");\n"
-          ]
+          ],
+          "locn": "-22,8 +22,9"
         }
-      ], 
-      "to": "java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPConsumerClient.java", 
-      "from": "java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPConsumerClient.java"
+      ],
+      "from": "java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPConsumerClient.java",
+      "to": "java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPConsumerClient.java"
     }
-  ], 
-  "id": "1510090"
+  ],
+  "id": "1510090",
+  "message": "fixed the consumer client.",
+  "when": "2013-08-03T22:39:30-04:00",
+  "who": "rajikak"
 }

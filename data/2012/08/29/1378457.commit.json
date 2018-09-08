@@ -1,27 +1,27 @@
 {
-  "when": "2012-08-29T02:53:21-04:00", 
-  "message": "Masked the password in the file URL in log.", 
-  "who": "rajikak", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-270,7 +270,7", 
           "lines": [
-            "             } else {\n", 
-            "                 \n", 
-            "                 log.warn(\"Couldn't get the lock for the file : \"\n", 
-            "-                        + responseFile.getName() + \", retry : \" + tryNum\n", 
-            "+                        + VFSUtils.maskURLPassword(responseFile.getName().getURI()) + \", retry : \" + tryNum\n", 
-            "                         + \" scheduled after : \" + vfsOutInfo.getReconnectTimeout());\n", 
-            "                 try {\n", 
+            "             } else {\n",
+            "                 \n",
+            "                 log.warn(\"Couldn't get the lock for the file : \"\n",
+            "-                        + responseFile.getName() + \", retry : \" + tryNum\n",
+            "+                        + VFSUtils.maskURLPassword(responseFile.getName().getURI()) + \", retry : \" + tryNum\n",
+            "                         + \" scheduled after : \" + vfsOutInfo.getReconnectTimeout());\n",
+            "                 try {\n",
             "                     Thread.sleep(vfsOutInfo.getReconnectTimeout());\n"
-          ]
+          ],
+          "locn": "-270,7 +270,7"
         }
-      ], 
-      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java", 
-      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java"
+      ],
+      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java",
+      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java"
     }
-  ], 
-  "id": "1378457"
+  ],
+  "id": "1378457",
+  "message": "Masked the password in the file URL in log.",
+  "when": "2012-08-29T02:53:21-04:00",
+  "who": "rajikak"
 }

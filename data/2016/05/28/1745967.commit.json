@@ -1,75 +1,75 @@
 {
-  "when": "2016-05-28T23:06:31-04:00", 
-  "message": "merge fix https://issues.apache.org/jira/browse/SYNAPSE-1024", 
-  "who": "dushan", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-216,8 +216,8", 
           "lines": [
-            "                     PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {\n", 
-            "                 synchronized (msgContext) {\n", 
-            "                     OutputStream out = pipe.getOutputStream();\n", 
-            "-                    msgContext.setProperty(\"GET_ME_OUT\", out);\n", 
-            "-                    msgContext.setProperty(\"READY2ROCK\", Boolean.TRUE);\n", 
-            "+                    msgContext.setProperty(PassThroughConstants.BUILDER_OUTPUT_STREAM, out);\n", 
-            "+                    msgContext.setProperty(PassThroughConstants.WAIT_BUILDER_IN_STREAM_COMPLETE, Boolean.TRUE);\n", 
-            "                     msgContext.notifyAll();\n", 
-            "                 }\n", 
+            "                     PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {\n",
+            "                 synchronized (msgContext) {\n",
+            "                     OutputStream out = pipe.getOutputStream();\n",
+            "-                    msgContext.setProperty(\"GET_ME_OUT\", out);\n",
+            "-                    msgContext.setProperty(\"READY2ROCK\", Boolean.TRUE);\n",
+            "+                    msgContext.setProperty(PassThroughConstants.BUILDER_OUTPUT_STREAM, out);\n",
+            "+                    msgContext.setProperty(PassThroughConstants.WAIT_BUILDER_IN_STREAM_COMPLETE, Boolean.TRUE);\n",
+            "                     msgContext.notifyAll();\n",
+            "                 }\n",
             "                 return;\n"
-          ]
+          ],
+          "locn": "-216,8 +216,8"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/DeliveryAgent.java", 
-      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/DeliveryAgent.java"
-    }, 
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/DeliveryAgent.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/DeliveryAgent.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-125,7 +125,14", 
           "lines": [
-            " \tpublic static final String FORCE_PASS_THROUGH_BUILDER = \"force.passthrough.builder\";\n", 
-            " \t\n", 
-            " \tpublic static final String GET_REQUEST_HANDLED = \"GET_REQUEST_HANDLED\";\n", 
-            "+\t\n", 
-            "+\tpublic static final String WAIT_BUILDER_IN_STREAM_COMPLETE=\"WAIT_BUILDER_IN_STREAM_COMPLETE\"; \n", 
-            "+ \t\n", 
-            "+\tpublic static final String BUILDER_OUTPUT_STREAM=\"BUILDER_OUTPUT_STREAM\";\n", 
-            "+\t\n", 
-            "+\tpublic static final String PASSTHRU_CONNECT_ERROR=\"PASSTHRU_CONNECT_ERROR\";\n", 
-            " \n", 
-            "     public static final String COPY_CONTENT_LENGTH_FROM_INCOMING=\"COPY_CONTENT_LENGTH_FROM_INCOMING\";\n", 
-            "+    \n", 
-            "     public static final String ORIGINAL_CONTENT_LENGTH =\"ORIGINAL_CONTENT_LENGTH\";\n", 
+            " \tpublic static final String FORCE_PASS_THROUGH_BUILDER = \"force.passthrough.builder\";\n",
+            " \t\n",
+            " \tpublic static final String GET_REQUEST_HANDLED = \"GET_REQUEST_HANDLED\";\n",
+            "+\t\n",
+            "+\tpublic static final String WAIT_BUILDER_IN_STREAM_COMPLETE=\"WAIT_BUILDER_IN_STREAM_COMPLETE\"; \n",
+            "+ \t\n",
+            "+\tpublic static final String BUILDER_OUTPUT_STREAM=\"BUILDER_OUTPUT_STREAM\";\n",
+            "+\t\n",
+            "+\tpublic static final String PASSTHRU_CONNECT_ERROR=\"PASSTHRU_CONNECT_ERROR\";\n",
+            " \n",
+            "     public static final String COPY_CONTENT_LENGTH_FROM_INCOMING=\"COPY_CONTENT_LENGTH_FROM_INCOMING\";\n",
+            "+    \n",
+            "     public static final String ORIGINAL_CONTENT_LENGTH =\"ORIGINAL_CONTENT_LENGTH\";\n",
             " }\n"
-          ]
+          ],
+          "locn": "-125,7 +125,14"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughConstants.java", 
-      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughConstants.java"
-    }, 
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughConstants.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughConstants.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-375,8 +375,8", 
           "lines": [
-            " \n", 
-            " \t\tif (Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {\n", 
-            " \t\t\tsynchronized (msgContext) {\n", 
-            "-\t\t\t\twhile (!Boolean.TRUE.equals(msgContext.getProperty(\"READY2ROCK\")) &&\n", 
-            "-\t\t\t\t       !Boolean.TRUE.equals(msgContext.getProperty(\"PASSTHRU_CONNECT_ERROR\"))) {\n", 
-            "+\t\t\t\twhile (!Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.WAIT_BUILDER_IN_STREAM_COMPLETE)) &&\n", 
-            "+\t \t\t\t\t       !Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.PASSTHRU_CONNECT_ERROR))) {\n", 
-            " \t\t\t\t\ttry {\n", 
-            " \t\t\t\t\t\tmsgContext.wait();\n", 
+            " \n",
+            " \t\tif (Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {\n",
+            " \t\t\tsynchronized (msgContext) {\n",
+            "-\t\t\t\twhile (!Boolean.TRUE.equals(msgContext.getProperty(\"READY2ROCK\")) &&\n",
+            "-\t\t\t\t       !Boolean.TRUE.equals(msgContext.getProperty(\"PASSTHRU_CONNECT_ERROR\"))) {\n",
+            "+\t\t\t\twhile (!Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.WAIT_BUILDER_IN_STREAM_COMPLETE)) &&\n",
+            "+\t \t\t\t\t       !Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.PASSTHRU_CONNECT_ERROR))) {\n",
+            " \t\t\t\t\ttry {\n",
+            " \t\t\t\t\t\tmsgContext.wait();\n",
             " \t\t\t\t\t} catch (InterruptedException e) {\n"
-          ]
+          ],
+          "locn": "-375,8 +375,8"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java", 
-      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java"
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java"
     }
-  ], 
-  "id": "1745967"
+  ],
+  "id": "1745967",
+  "message": "merge fix https://issues.apache.org/jira/browse/SYNAPSE-1024",
+  "when": "2016-05-28T23:06:31-04:00",
+  "who": "dushan"
 }

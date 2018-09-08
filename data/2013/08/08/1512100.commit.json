@@ -1,59 +1,59 @@
 {
-  "when": "2013-08-08T19:43:10-04:00", 
-  "message": "Passing top level synapse properties to the AbstractRegistry, so SYNAPSE_HOME can be resolved proeprly by the subclasses. Fix applied from SYNAPSE-774", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-78,7 +78,8", 
           "lines": [
-            " \n", 
-            "     private static Properties getProperties(OMElement elem, Properties topLevelProps) {\n", 
-            "         Iterator params = elem.getChildrenWithName(PARAMETER_Q);\n", 
-            "-        Properties props = new Properties(topLevelProps);\n", 
-            "+        Properties props = new Properties();\n", 
-            "+        props.putAll(topLevelProps);\n", 
-            "         while (params.hasNext()) {\n", 
-            "             Object o = params.next();\n", 
+            " \n",
+            "     private static Properties getProperties(OMElement elem, Properties topLevelProps) {\n",
+            "         Iterator params = elem.getChildrenWithName(PARAMETER_Q);\n",
+            "-        Properties props = new Properties(topLevelProps);\n",
+            "+        Properties props = new Properties();\n",
+            "+        props.putAll(topLevelProps);\n",
+            "         while (params.hasNext()) {\n",
+            "             Object o = params.next();\n",
             "             if (o instanceof OMElement) {\n"
-          ]
+          ],
+          "locn": "-78,7 +78,8"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/RegistryFactory.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/RegistryFactory.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/RegistryFactory.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/RegistryFactory.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-27,7 +27,6", 
           "lines": [
-            " import org.apache.synapse.endpoints.Endpoint;\n", 
-            " import org.apache.synapse.mediators.base.SequenceMediator;\n", 
-            " \n", 
-            "-import java.util.Map;\n", 
-            " import java.util.Properties;\n", 
-            " \n", 
+            " import org.apache.synapse.endpoints.Endpoint;\n",
+            " import org.apache.synapse.mediators.base.SequenceMediator;\n",
+            " \n",
+            "-import java.util.Map;\n",
+            " import java.util.Properties;\n",
+            " \n",
             " /**\n"
-          ]
-        }, 
+          ],
+          "locn": "-27,7 +27,6"
+        },
         {
-          "locn": "-42,7 +41,7", 
           "lines": [
-            " \n", 
-            "     /**\n", 
-            "      * Get the resource for the given key from this registry\n", 
-            "-     * @param entry The Enrty instance that contains meta-data\n", 
-            "+     * @param entry The Entry instance that contains meta-data\n", 
-            "      * @param properties bag of properties with additional information\n", 
-            "      * @return the matching resultant object\n", 
+            " \n",
+            "     /**\n",
+            "      * Get the resource for the given key from this registry\n",
+            "-     * @param entry The Enrty instance that contains meta-data\n",
+            "+     * @param entry The Entry instance that contains meta-data\n",
+            "      * @param properties bag of properties with additional information\n",
+            "      * @return the matching resultant object\n",
             "      */\n"
-          ]
+          ],
+          "locn": "-42,7 +41,7"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/registry/AbstractRegistry.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/registry/AbstractRegistry.java"
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/registry/AbstractRegistry.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/registry/AbstractRegistry.java"
     }
-  ], 
-  "id": "1512100"
+  ],
+  "id": "1512100",
+  "message": "Passing top level synapse properties to the AbstractRegistry, so SYNAPSE_HOME can be resolved proeprly by the subclasses. Fix applied from SYNAPSE-774",
+  "when": "2013-08-08T19:43:10-04:00",
+  "who": "hiranya"
 }

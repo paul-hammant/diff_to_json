@@ -1,53 +1,53 @@
 {
-  "when": "2016-05-27T17:02:43-04:00", 
-  "message": "Removing unnecessary charset while decoding b64 string; SYNAPSE-1012", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-19,7 +19,6", 
           "lines": [
-            " \n", 
-            " package org.apache.synapse.util.xpath;\n", 
-            " \n", 
-            "-import junit.framework.Assert;\n", 
-            " import junit.framework.TestCase;\n", 
-            " import org.jaxen.Context;\n", 
+            " \n",
+            " package org.apache.synapse.util.xpath;\n",
+            " \n",
+            "-import junit.framework.Assert;\n",
+            " import junit.framework.TestCase;\n",
+            " import org.jaxen.Context;\n",
             " import org.jaxen.ContextSupport;\n"
-          ]
+          ],
+          "locn": "-19,7 +19,6"
         }
-      ], 
-      "to": "java/modules/core/src/test/java/org/apache/synapse/util/xpath/Base64DecodeFunctionTest.java", 
-      "from": "java/modules/core/src/test/java/org/apache/synapse/util/xpath/Base64DecodeFunctionTest.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/test/java/org/apache/synapse/util/xpath/Base64DecodeFunctionTest.java",
+      "to": "java/modules/core/src/test/java/org/apache/synapse/util/xpath/Base64DecodeFunctionTest.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-82,15 +82,7", 
           "lines": [
-            "             return SynapseXPathConstants.NULL_STRING;\n", 
-            "         }\n", 
-            " \n", 
-            "-        byte[] decodedValue;\n", 
-            "-        try {\n", 
-            "-            decodedValue = new Base64().decode(value.getBytes(charset));\n", 
-            "-        } catch (UnsupportedEncodingException e) {\n", 
-            "-            String msg = \"Unsupported Charset\";\n", 
-            "-            log.error(msg, e);\n", 
-            "-            throw new FunctionCallException(msg, e);\n", 
-            "-        }\n", 
-            "-\n", 
-            "+        byte[] decodedValue = new Base64().decode(value);\n", 
-            "         String decodedString;\n", 
-            "         try {\n", 
+            "             return SynapseXPathConstants.NULL_STRING;\n",
+            "         }\n",
+            " \n",
+            "-        byte[] decodedValue;\n",
+            "-        try {\n",
+            "-            decodedValue = new Base64().decode(value.getBytes(charset));\n",
+            "-        } catch (UnsupportedEncodingException e) {\n",
+            "-            String msg = \"Unsupported Charset\";\n",
+            "-            log.error(msg, e);\n",
+            "-            throw new FunctionCallException(msg, e);\n",
+            "-        }\n",
+            "-\n",
+            "+        byte[] decodedValue = new Base64().decode(value);\n",
+            "         String decodedString;\n",
+            "         try {\n",
             "             decodedString = new String(decodedValue, charset).trim();\n"
-          ]
+          ],
+          "locn": "-82,15 +82,7"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/util/xpath/Base64DecodeFunction.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/util/xpath/Base64DecodeFunction.java"
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/util/xpath/Base64DecodeFunction.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/util/xpath/Base64DecodeFunction.java"
     }
-  ], 
-  "id": "1745816"
+  ],
+  "id": "1745816",
+  "message": "Removing unnecessary charset while decoding b64 string; SYNAPSE-1012",
+  "when": "2016-05-27T17:02:43-04:00",
+  "who": "hiranya"
 }

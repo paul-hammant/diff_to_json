@@ -1,626 +1,626 @@
 {
-  "when": "2011-12-28T04:53:03-05:00", 
-  "message": "Setting the trunk up for Nexus", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-27,7 +27,7", 
           "lines": [
-            "     <parent>\n", 
-            "         <groupId>org.apache</groupId>\n", 
-            "         <artifactId>apache</artifactId>\n", 
-            "-        <version>7</version>\n", 
-            "+        <version>9</version>\n", 
-            "     </parent>\n", 
-            " \n", 
+            "     <parent>\n",
+            "         <groupId>org.apache</groupId>\n",
+            "         <artifactId>apache</artifactId>\n",
+            "-        <version>7</version>\n",
+            "+        <version>9</version>\n",
+            "     </parent>\n",
+            " \n",
             "     <groupId>org.apache.synapse</groupId>\n"
-          ]
-        }, 
+          ],
+          "locn": "-27,7 +27,7"
+        },
         {
-          "locn": "-59,7 +59,7", 
           "lines": [
-            "             <post>user@synapse.apache.org</post>\n", 
-            "             <archive>http://mail-archives.apache.org/mod_mbox/synapse-user/</archive>\n", 
-            "         </mailingList>\n", 
-            "-\t<mailingList>\n", 
-            "+\t    <mailingList>\n", 
-            "             <name>Apache Synapse Commits List</name>\n", 
-            "             <subscribe>commits-subscribe@synapse.apache.org</subscribe>\n", 
+            "             <post>user@synapse.apache.org</post>\n",
+            "             <archive>http://mail-archives.apache.org/mod_mbox/synapse-user/</archive>\n",
+            "         </mailingList>\n",
+            "-\t<mailingList>\n",
+            "+\t    <mailingList>\n",
+            "             <name>Apache Synapse Commits List</name>\n",
+            "             <subscribe>commits-subscribe@synapse.apache.org</subscribe>\n",
             "             <unsubscribe>commits-unsubscribe@synapse.apache.org</unsubscribe>\n"
-          ]
-        }, 
+          ],
+          "locn": "-59,7 +59,7"
+        },
         {
-          "locn": "-79,10 +79,8", 
           "lines": [
-            "     </licenses>\n", 
-            " \n", 
-            "     <scm>\n", 
-            "-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java\n", 
-            "-        </connection>\n", 
-            "-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java\n", 
-            "-        </developerConnection>\n", 
-            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java</connection>\n", 
-            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java</developerConnection>\n", 
-            "         <url>http://svn.apache.org/viewvc/synapse/trunk/java/</url>\n", 
-            "     </scm>\n", 
+            "     </licenses>\n",
+            " \n",
+            "     <scm>\n",
+            "-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java\n",
+            "-        </connection>\n",
+            "-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java\n",
+            "-        </developerConnection>\n",
+            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java</connection>\n",
+            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java</developerConnection>\n",
+            "         <url>http://svn.apache.org/viewvc/synapse/trunk/java/</url>\n",
+            "     </scm>\n",
             " \n"
-          ]
-        }, 
+          ],
+          "locn": "-79,10 +79,8"
+        },
         {
-          "locn": "-959,18 +957,8", 
           "lines": [
-            "     </reporting>\n", 
-            " \n", 
-            "     <distributionManagement>\n", 
-            "-        <snapshotRepository>\n", 
-            "-            <id>apache-snapshots</id>\n", 
-            "-            <name>Apache Development Repository</name>\n", 
-            "-            <url>scpexe://people.apache.org//www/people.apache.org/repo/m2-snapshot-repository</url>\n", 
-            "-        </snapshotRepository>\n", 
-            "-        <repository>\n", 
-            "-            <id>apache-releases</id>\n", 
-            "-            <name>Apache Ibiblio rsync Repository</name>\n", 
-            "-            <url>scpexe://people.apache.org/www/people.apache.org/repo/m2-ibiblio-rsync-repository</url>\n", 
-            "-        </repository>\n", 
-            "         <site>\n", 
-            "-            <id>website</id>\n", 
-            "+            <id>apache.website</id>\n", 
-            "             <url>scpexe://people.apache.org/www/synapse.apache.org/</url>\n", 
-            "         </site>\n", 
+            "     </reporting>\n",
+            " \n",
+            "     <distributionManagement>\n",
+            "-        <snapshotRepository>\n",
+            "-            <id>apache-snapshots</id>\n",
+            "-            <name>Apache Development Repository</name>\n",
+            "-            <url>scpexe://people.apache.org//www/people.apache.org/repo/m2-snapshot-repository</url>\n",
+            "-        </snapshotRepository>\n",
+            "-        <repository>\n",
+            "-            <id>apache-releases</id>\n",
+            "-            <name>Apache Ibiblio rsync Repository</name>\n",
+            "-            <url>scpexe://people.apache.org/www/people.apache.org/repo/m2-ibiblio-rsync-repository</url>\n",
+            "-        </repository>\n",
+            "         <site>\n",
+            "-            <id>website</id>\n",
+            "+            <id>apache.website</id>\n",
+            "             <url>scpexe://people.apache.org/www/synapse.apache.org/</url>\n",
+            "         </site>\n",
             "     </distributionManagement>\n"
-          ]
-        }, 
+          ],
+          "locn": "-959,18 +957,8"
+        },
         {
-          "locn": "-1082,7 +1070,7", 
           "lines": [
-            "         <truezip.version>6.6</truezip.version>\n", 
-            "         <jsch.version>0.1.31</jsch.version>\n", 
-            "         <jms-1.1-spec.version>1.1</jms-1.1-spec.version>\n", 
-            "-        <httpcore.nio.version>4.1</httpcore.nio.version>\n", 
-            "+        <httpcore.nio.version>4.1.4</httpcore.nio.version>\n", 
-            "         <http.client.version>4.1</http.client.version>\n", 
-            "         <aspectj.version>1.6.1</aspectj.version>\n", 
+            "         <truezip.version>6.6</truezip.version>\n",
+            "         <jsch.version>0.1.31</jsch.version>\n",
+            "         <jms-1.1-spec.version>1.1</jms-1.1-spec.version>\n",
+            "-        <httpcore.nio.version>4.1</httpcore.nio.version>\n",
+            "+        <httpcore.nio.version>4.1.4</httpcore.nio.version>\n",
+            "         <http.client.version>4.1</http.client.version>\n",
+            "         <aspectj.version>1.6.1</aspectj.version>\n",
             "         <qfj.version>1.4.0</qfj.version>\n"
-          ]
+          ],
+          "locn": "-1082,7 +1070,7"
         }
-      ], 
-      "to": "java/pom.xml", 
-      "from": "java/pom.xml"
-    }, 
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-37,6 +37,12", 
           "lines": [
-            "         the individual JAR files.\n", 
-            "     </description>\n", 
-            " \n", 
-            "+    <scm>\n", 
-            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/patches</connection>\n", 
-            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/patches</developerConnection>\n", 
-            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/patches</url>\n", 
-            "+    </scm>\n", 
-            "+\n", 
-            "     <build>\n", 
-            "         <plugins>\n", 
+            "         the individual JAR files.\n",
+            "     </description>\n",
+            " \n",
+            "+    <scm>\n",
+            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/patches</connection>\n",
+            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/patches</developerConnection>\n",
+            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/patches</url>\n",
+            "+    </scm>\n",
+            "+\n",
+            "     <build>\n",
+            "         <plugins>\n",
             "             <plugin>\n"
-          ]
+          ],
+          "locn": "-37,6 +37,12"
         }
-      ], 
-      "to": "java/modules/patches/pom.xml", 
-      "from": "java/modules/patches/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/patches/pom.xml",
+      "to": "java/modules/patches/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-38,6 +38,12", 
           "lines": [
-            "     <packaging>bundle</packaging>\n", 
-            "     <url>http://synapse.apache.org</url>\n", 
-            " \n", 
-            "+    <scm>\n", 
-            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/core</connection>\n", 
-            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/core</developerConnection>\n", 
-            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/core</url>\n", 
-            "+    </scm>\n", 
-            "+\n", 
-            "     <build>\n", 
-            "         <plugins>\n", 
+            "     <packaging>bundle</packaging>\n",
+            "     <url>http://synapse.apache.org</url>\n",
+            " \n",
+            "+    <scm>\n",
+            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/core</connection>\n",
+            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/core</developerConnection>\n",
+            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/core</url>\n",
+            "+    </scm>\n",
+            "+\n",
+            "     <build>\n",
+            "         <plugins>\n",
             " \n"
-          ]
+          ],
+          "locn": "-38,6 +38,12"
         }
-      ], 
-      "to": "java/modules/core/pom.xml", 
-      "from": "java/modules/core/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/core/pom.xml",
+      "to": "java/modules/core/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-32,11 +32,16", 
           "lines": [
-            " \n", 
-            "     <groupId>org.apache.synapse</groupId>\n", 
-            "     <artifactId>synapse-war</artifactId>\n", 
-            "-\n", 
-            "     <name>Apache Synapse - Web Application</name>\n", 
-            "     <description>Apache Synapse - Web Application</description>\n", 
-            "     <packaging>war</packaging>\n", 
-            " \n", 
-            "+    <scm>\n", 
-            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/war</connection>\n", 
-            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/war</developerConnection>\n", 
-            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/war</url>\n", 
-            "+    </scm>\n", 
-            "+\n", 
-            "     <dependencies>\n", 
-            "         <dependency>\n", 
+            " \n",
+            "     <groupId>org.apache.synapse</groupId>\n",
+            "     <artifactId>synapse-war</artifactId>\n",
+            "-\n",
+            "     <name>Apache Synapse - Web Application</name>\n",
+            "     <description>Apache Synapse - Web Application</description>\n",
+            "     <packaging>war</packaging>\n",
+            " \n",
+            "+    <scm>\n",
+            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/war</connection>\n",
+            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/war</developerConnection>\n",
+            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/war</url>\n",
+            "+    </scm>\n",
+            "+\n",
+            "     <dependencies>\n",
+            "         <dependency>\n",
             "             <groupId>org.apache.synapse</groupId>\n"
-          ]
+          ],
+          "locn": "-32,11 +32,16"
         }
-      ], 
-      "to": "java/modules/war/pom.xml", 
-      "from": "java/modules/war/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/war/pom.xml",
+      "to": "java/modules/war/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-32,6 +32,12", 
           "lines": [
-            "     <packaging>maven-plugin</packaging>\n", 
-            "     <name>Apache Synapse - XAR Maven Plugin</name>\n", 
-            "     <description>Maven 2 plugin to create Synapse extension archives</description>\n", 
-            "+\n", 
-            "+    <scm>\n", 
-            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/xar-maven-plugin</connection>\n", 
-            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/xar-maven-plugin</developerConnection>\n", 
-            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/xar-maven-plugin</url>\n", 
-            "+    </scm>\n", 
-            "     \n", 
-            "     <dependencies>\n", 
+            "     <packaging>maven-plugin</packaging>\n",
+            "     <name>Apache Synapse - XAR Maven Plugin</name>\n",
+            "     <description>Maven 2 plugin to create Synapse extension archives</description>\n",
+            "+\n",
+            "+    <scm>\n",
+            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/xar-maven-plugin</connection>\n",
+            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/xar-maven-plugin</developerConnection>\n",
+            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/xar-maven-plugin</url>\n",
+            "+    </scm>\n",
+            "     \n",
+            "     <dependencies>\n",
             "         <dependency>\n"
-          ]
+          ],
+          "locn": "-32,6 +32,12"
         }
-      ], 
-      "to": "java/modules/xar-maven-plugin/pom.xml", 
-      "from": "java/modules/xar-maven-plugin/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/xar-maven-plugin/pom.xml",
+      "to": "java/modules/xar-maven-plugin/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-37,6 +37,12", 
           "lines": [
-            "     <description>Apache Synapse - Experimental code (use at your own risk!)</description>\r\n", 
-            "     <packaging>bundle</packaging>\r\n", 
-            " \r\n", 
-            "+    <scm>\r\n", 
-            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/experimental</connection>\r\n", 
-            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/experimental</developerConnection>\r\n", 
-            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/experimental</url>\r\n", 
-            "+    </scm>\r\n", 
-            "+\r\n", 
-            "     <build>\r\n", 
-            "         <plugins>\r\n", 
+            "     <description>Apache Synapse - Experimental code (use at your own risk!)</description>\r\n",
+            "     <packaging>bundle</packaging>\r\n",
+            " \r\n",
+            "+    <scm>\r\n",
+            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/experimental</connection>\r\n",
+            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/experimental</developerConnection>\r\n",
+            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/experimental</url>\r\n",
+            "+    </scm>\r\n",
+            "+\r\n",
+            "     <build>\r\n",
+            "         <plugins>\r\n",
             "             <plugin>\r\n"
-          ]
+          ],
+          "locn": "-37,6 +37,12"
         }
-      ], 
-      "to": "java/modules/experimental/pom.xml", 
-      "from": "java/modules/experimental/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/experimental/pom.xml",
+      "to": "java/modules/experimental/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-37,14 +37,18", 
           "lines": [
-            "     <description>Apache Synapse - Extensions</description>\n", 
-            "     <packaging>bundle</packaging>\n", 
-            " \n", 
-            "+    <scm>\n", 
-            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/extensions</connection>\n", 
-            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/extensions</developerConnection>\n", 
-            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/extensions</url>\n", 
-            "+    </scm>\n", 
-            "+\n", 
-            "     <build>\n", 
-            "         <plugins>\n", 
-            "-\n", 
-            "             <plugin>\n", 
-            "                 <groupId>org.apache.maven.plugins</groupId>\n", 
-            "                 <artifactId>maven-surefire-plugin</artifactId>\n", 
-            "             </plugin>\n", 
-            "-\n", 
-            "             <plugin>\n", 
-            "                 <groupId>org.apache.felix</groupId>\n", 
+            "     <description>Apache Synapse - Extensions</description>\n",
+            "     <packaging>bundle</packaging>\n",
+            " \n",
+            "+    <scm>\n",
+            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/extensions</connection>\n",
+            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/extensions</developerConnection>\n",
+            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/extensions</url>\n",
+            "+    </scm>\n",
+            "+\n",
+            "     <build>\n",
+            "         <plugins>\n",
+            "-\n",
+            "             <plugin>\n",
+            "                 <groupId>org.apache.maven.plugins</groupId>\n",
+            "                 <artifactId>maven-surefire-plugin</artifactId>\n",
+            "             </plugin>\n",
+            "-\n",
+            "             <plugin>\n",
+            "                 <groupId>org.apache.felix</groupId>\n",
             "                 <artifactId>maven-bundle-plugin</artifactId>\n"
-          ]
-        }, 
+          ],
+          "locn": "-37,14 +37,18"
+        },
         {
-          "locn": "-77,7 +81,6", 
           "lines": [
-            "                     </instructions>\n", 
-            "                 </configuration>\n", 
-            "             </plugin>\n", 
-            "-\n", 
-            "         </plugins>\n", 
-            "     </build>\n", 
+            "                     </instructions>\n",
+            "                 </configuration>\n",
+            "             </plugin>\n",
+            "-\n",
+            "         </plugins>\n",
+            "     </build>\n",
             " \n"
-          ]
+          ],
+          "locn": "-77,7 +81,6"
         }
-      ], 
-      "to": "java/modules/extensions/pom.xml", 
-      "from": "java/modules/extensions/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/extensions/pom.xml",
+      "to": "java/modules/extensions/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-33,6 +33,13", 
           "lines": [
-            "     <name>Apache Synapse - Secure Vault</name>\r\n", 
-            "     <description>Apache Synapse - Secure vault</description>\r\n", 
-            "     <packaging>bundle</packaging>\r\n", 
-            "+\r\n", 
-            "+    <scm>\r\n", 
-            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/securevault</connection>\r\n", 
-            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/securevault</developerConnection>\r\n", 
-            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/securevault</url>\r\n", 
-            "+    </scm>\r\n", 
-            "+\r\n", 
-            "     <build>\r\n", 
-            "         <plugins>\r\n", 
+            "     <name>Apache Synapse - Secure Vault</name>\r\n",
+            "     <description>Apache Synapse - Secure vault</description>\r\n",
+            "     <packaging>bundle</packaging>\r\n",
+            "+\r\n",
+            "+    <scm>\r\n",
+            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/securevault</connection>\r\n",
+            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/securevault</developerConnection>\r\n",
+            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/securevault</url>\r\n",
+            "+    </scm>\r\n",
+            "+\r\n",
+            "     <build>\r\n",
+            "         <plugins>\r\n",
             "             <plugin>\r\n"
-          ]
+          ],
+          "locn": "-33,6 +33,13"
         }
-      ], 
-      "to": "java/modules/securevault/pom.xml", 
-      "from": "java/modules/securevault/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/securevault/pom.xml",
+      "to": "java/modules/securevault/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-37,6 +37,12", 
           "lines": [
-            "     <description>Apache Synapse - Samples</description>\n", 
-            "     <packaging>bundle</packaging>\n", 
-            " \n", 
-            "+    <scm>\n", 
-            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/samples</connection>\n", 
-            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/samples</developerConnection>\n", 
-            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/samples</url>\n", 
-            "+    </scm>\n", 
-            "+\n", 
-            "     <profiles>\n", 
-            "         <profile>\n", 
+            "     <description>Apache Synapse - Samples</description>\n",
+            "     <packaging>bundle</packaging>\n",
+            " \n",
+            "+    <scm>\n",
+            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/samples</connection>\n",
+            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/samples</developerConnection>\n",
+            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/samples</url>\n",
+            "+    </scm>\n",
+            "+\n",
+            "     <profiles>\n",
+            "         <profile>\n",
             "             <id>integration</id>\n"
-          ]
+          ],
+          "locn": "-37,6 +37,12"
         }
-      ], 
-      "to": "java/modules/samples/pom.xml", 
-      "from": "java/modules/samples/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/samples/pom.xml",
+      "to": "java/modules/samples/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-37,6 +37,12", 
           "lines": [
-            "     <description>Apache Synapse - Common Utilities</description>\n", 
-            "     <packaging>bundle</packaging>\n", 
-            " \n", 
-            "+    <scm>\n", 
-            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/commons</connection>\n", 
-            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/commons</developerConnection>\n", 
-            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/commons</url>\n", 
-            "+    </scm>\n", 
-            "+\n", 
-            "     <build>\n", 
-            "         <plugins>\n", 
+            "     <description>Apache Synapse - Common Utilities</description>\n",
+            "     <packaging>bundle</packaging>\n",
+            " \n",
+            "+    <scm>\n",
+            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/commons</connection>\n",
+            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/commons</developerConnection>\n",
+            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/commons</url>\n",
+            "+    </scm>\n",
+            "+\n",
+            "     <build>\n",
+            "         <plugins>\n",
             "             <plugin>\n"
-          ]
+          ],
+          "locn": "-37,6 +37,12"
         }
-      ], 
-      "to": "java/modules/commons/pom.xml", 
-      "from": "java/modules/commons/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/commons/pom.xml",
+      "to": "java/modules/commons/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-37,6 +37,12", 
           "lines": [
-            "     <description>Apache Synapse - Handler Module</description>\n", 
-            "     <packaging>bundle</packaging>\n", 
-            " \n", 
-            "+    <scm>\n", 
-            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/handler</connection>\n", 
-            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/handler</developerConnection>\n", 
-            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/handler</url>\n", 
-            "+    </scm>\n", 
-            "+\n", 
-            "     <build>\n", 
-            "         <plugins>\n", 
+            "     <description>Apache Synapse - Handler Module</description>\n",
+            "     <packaging>bundle</packaging>\n",
+            " \n",
+            "+    <scm>\n",
+            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/handler</connection>\n",
+            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/handler</developerConnection>\n",
+            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/handler</url>\n",
+            "+    </scm>\n",
+            "+\n",
+            "     <build>\n",
+            "         <plugins>\n",
             "             <plugin>\n"
-          ]
+          ],
+          "locn": "-37,6 +37,12"
         }
-      ], 
-      "to": "java/modules/handler/pom.xml", 
-      "from": "java/modules/handler/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/handler/pom.xml",
+      "to": "java/modules/handler/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-35,6 +35,13", 
           "lines": [
-            "     <name>Apache Synapse - Distribution</name>\n", 
-            "     <description>Apache Synapse - Distribution</description>\n", 
-            "     <packaging>pom</packaging>\n", 
-            "+\n", 
-            "+    <scm>\n", 
-            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/distribution</connection>\n", 
-            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/distribution</developerConnection>\n", 
-            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/distribution</url>\n", 
-            "+    </scm>\n", 
-            "+\n", 
-            "     <dependencies>\n", 
-            "         <dependency>\n", 
+            "     <name>Apache Synapse - Distribution</name>\n",
+            "     <description>Apache Synapse - Distribution</description>\n",
+            "     <packaging>pom</packaging>\n",
+            "+\n",
+            "+    <scm>\n",
+            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/distribution</connection>\n",
+            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/distribution</developerConnection>\n",
+            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/distribution</url>\n",
+            "+    </scm>\n",
+            "+\n",
+            "     <dependencies>\n",
+            "         <dependency>\n",
             "             <groupId>org.apache.synapse</groupId>\n"
-          ]
+          ],
+          "locn": "-35,6 +35,13"
         }
-      ], 
-      "to": "java/modules/distribution/pom.xml", 
-      "from": "java/modules/distribution/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/distribution/pom.xml",
+      "to": "java/modules/distribution/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-36,6 +36,12", 
           "lines": [
-            "     <description>Apache Synapse - FIX Transport</description>\n", 
-            "     <packaging>bundle</packaging>\n", 
-            " \n", 
-            "+    <scm>\n", 
-            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/optional/fix</connection>\n", 
-            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/optional/fix</developerConnection>\n", 
-            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports/core/optional/fix</url>\n", 
-            "+    </scm>\n", 
-            "+\n", 
-            "     <build>\n", 
-            "         <plugins>\n", 
+            "     <description>Apache Synapse - FIX Transport</description>\n",
+            "     <packaging>bundle</packaging>\n",
+            " \n",
+            "+    <scm>\n",
+            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/optional/fix</connection>\n",
+            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/optional/fix</developerConnection>\n",
+            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports/core/optional/fix</url>\n",
+            "+    </scm>\n",
+            "+\n",
+            "     <build>\n",
+            "         <plugins>\n",
             "             <plugin>\n"
-          ]
+          ],
+          "locn": "-36,6 +36,12"
         }
-      ], 
-      "to": "java/modules/transports/optional/fix/pom.xml", 
-      "from": "java/modules/transports/optional/fix/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/transports/optional/fix/pom.xml",
+      "to": "java/modules/transports/optional/fix/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-36,6 +36,12", 
           "lines": [
-            "     <description>Apache Synapse - Non-blocking HTTP/s Transport</description>\n", 
-            "     <packaging>bundle</packaging>\n", 
-            " \n", 
-            "+    <scm>\n", 
-            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/core/nhttp</connection>\n", 
-            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/core/nhttp</developerConnection>\n", 
-            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports/core/nhttp</url>\n", 
-            "+    </scm>\n", 
-            "+\n", 
-            "     <build>\n", 
-            "         <plugins>\n", 
+            "     <description>Apache Synapse - Non-blocking HTTP/s Transport</description>\n",
+            "     <packaging>bundle</packaging>\n",
+            " \n",
+            "+    <scm>\n",
+            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/core/nhttp</connection>\n",
+            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/core/nhttp</developerConnection>\n",
+            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports/core/nhttp</url>\n",
+            "+    </scm>\n",
+            "+\n",
+            "     <build>\n",
+            "         <plugins>\n",
             "             <plugin>\n"
-          ]
+          ],
+          "locn": "-36,6 +36,12"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/pom.xml", 
-      "from": "java/modules/transports/core/nhttp/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/transports/core/nhttp/pom.xml",
+      "to": "java/modules/transports/core/nhttp/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-36,6 +36,12", 
           "lines": [
-            "     <description>Apache Synapse - PIPE Transport</description>\n", 
-            "     <packaging>bundle</packaging>\n", 
-            " \n", 
-            "+    <scm>\n", 
-            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/core/pipe</connection>\n", 
-            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/core/pipe</developerConnection>\n", 
-            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports/core/pipe</url>\n", 
-            "+    </scm>\n", 
-            "+\n", 
-            "     <build>\n", 
-            "         <plugins>\n", 
+            "     <description>Apache Synapse - PIPE Transport</description>\n",
+            "     <packaging>bundle</packaging>\n",
+            " \n",
+            "+    <scm>\n",
+            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/core/pipe</connection>\n",
+            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/core/pipe</developerConnection>\n",
+            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports/core/pipe</url>\n",
+            "+    </scm>\n",
+            "+\n",
+            "     <build>\n",
+            "         <plugins>\n",
             "             <plugin>\n"
-          ]
+          ],
+          "locn": "-36,6 +36,12"
         }
-      ], 
-      "to": "java/modules/transports/core/pipe/pom.xml", 
-      "from": "java/modules/transports/core/pipe/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/transports/core/pipe/pom.xml",
+      "to": "java/modules/transports/core/pipe/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-36,6 +36,12", 
           "lines": [
-            "     <description>Apache Synapse - VFS Transport</description>\n", 
-            "     <packaging>bundle</packaging>\n", 
-            " \n", 
-            "+    <scm>\n", 
-            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/core/vfs</connection>\n", 
-            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/core/vfs</developerConnection>\n", 
-            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports/core/vfs</url>\n", 
-            "+    </scm>\n", 
-            "+\n", 
-            "     <build>\n", 
-            "         <plugins>\n", 
+            "     <description>Apache Synapse - VFS Transport</description>\n",
+            "     <packaging>bundle</packaging>\n",
+            " \n",
+            "+    <scm>\n",
+            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/core/vfs</connection>\n",
+            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/core/vfs</developerConnection>\n",
+            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports/core/vfs</url>\n",
+            "+    </scm>\n",
+            "+\n",
+            "     <build>\n",
+            "         <plugins>\n",
             "             <plugin>\n"
-          ]
+          ],
+          "locn": "-36,6 +36,12"
         }
-      ], 
-      "to": "java/modules/transports/core/vfs/pom.xml", 
-      "from": "java/modules/transports/core/vfs/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/transports/core/vfs/pom.xml",
+      "to": "java/modules/transports/core/vfs/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-36,6 +36,12", 
           "lines": [
-            "     <description>Apache Synapse - Transports</description>\n", 
-            "     <packaging>pom</packaging>\n", 
-            " \n", 
-            "+    <scm>\n", 
-            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports</connection>\n", 
-            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports</developerConnection>\n", 
-            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports</url>\n", 
-            "+    </scm>\n", 
-            "+\n", 
-            "     <modules>\n", 
-            "         <module>core/nhttp</module>\n", 
+            "     <description>Apache Synapse - Transports</description>\n",
+            "     <packaging>pom</packaging>\n",
+            " \n",
+            "+    <scm>\n",
+            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports</connection>\n",
+            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports</developerConnection>\n",
+            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports</url>\n",
+            "+    </scm>\n",
+            "+\n",
+            "     <modules>\n",
+            "         <module>core/nhttp</module>\n",
             "         <module>core/pipe</module>\n"
-          ]
+          ],
+          "locn": "-36,6 +36,12"
         }
-      ], 
-      "to": "java/modules/transports/pom.xml", 
-      "from": "java/modules/transports/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/transports/pom.xml",
+      "to": "java/modules/transports/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-37,6 +37,12", 
           "lines": [
-            "     <description>Apache Synapse - Sample Automation Framework</description>\n", 
-            "     <!--<packaging>bundle</packaging>-->\n", 
-            " \n", 
-            "+    <scm>\n", 
-            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/integration</connection>\n", 
-            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/integration</developerConnection>\n", 
-            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/integration</url>\n", 
-            "+    </scm>\n", 
-            "+\n", 
-            "     <build>\n", 
-            "         <plugins>\n", 
+            "     <description>Apache Synapse - Sample Automation Framework</description>\n",
+            "     <!--<packaging>bundle</packaging>-->\n",
+            " \n",
+            "+    <scm>\n",
+            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/integration</connection>\n",
+            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/integration</developerConnection>\n",
+            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/integration</url>\n",
+            "+    </scm>\n",
+            "+\n",
+            "     <build>\n",
+            "         <plugins>\n",
             "             <plugin>\n"
-          ]
-        }, 
+          ],
+          "locn": "-37,6 +37,12"
+        },
         {
-          "locn": "-49,7 +55,6", 
           "lines": [
-            "                         <configuration>\n", 
-            "                             <tasks>\n", 
-            "                                 <echo message=\"*** Creating testing repositories for synapse samples\"/>\n", 
-            "-\n", 
-            "                                 <mkdir dir=\"target/test_repos\"/>\n", 
-            "                                 <mkdir dir=\"target/test_repos/axis2Server\"/>\n", 
+            "                         <configuration>\n",
+            "                             <tasks>\n",
+            "                                 <echo message=\"*** Creating testing repositories for synapse samples\"/>\n",
+            "-\n",
+            "                                 <mkdir dir=\"target/test_repos\"/>\n",
+            "                                 <mkdir dir=\"target/test_repos/axis2Server\"/>\n",
             "                                 <mkdir dir=\"target/test_repos/axis2Client\"/>\n"
-          ]
+          ],
+          "locn": "-49,7 +55,6"
         }
-      ], 
-      "to": "java/modules/integration/pom.xml", 
-      "from": "java/modules/integration/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/integration/pom.xml",
+      "to": "java/modules/integration/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-39,6 +39,12", 
           "lines": [
-            "         compatible version\n", 
-            "     </description>\n", 
-            " \n", 
-            "+    <scm>\n", 
-            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/migrator</connection>\n", 
-            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/migrator</developerConnection>\n", 
-            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/migrator</url>\n", 
-            "+    </scm>\n", 
-            "+\n", 
-            "     <build>\n", 
-            "         <plugins>\n", 
+            "         compatible version\n",
+            "     </description>\n",
+            " \n",
+            "+    <scm>\n",
+            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/migrator</connection>\n",
+            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/migrator</developerConnection>\n",
+            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/migrator</url>\n",
+            "+    </scm>\n",
+            "+\n",
+            "     <build>\n",
+            "         <plugins>\n",
             "             <plugin>\n"
-          ]
+          ],
+          "locn": "-39,6 +39,12"
         }
-      ], 
-      "to": "java/modules/migrator/pom.xml", 
-      "from": "java/modules/migrator/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/migrator/pom.xml",
+      "to": "java/modules/migrator/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-35,6 +35,13", 
           "lines": [
-            "         This archetype can be used to create Maven projects that bundle a mediation\n", 
-            "         into a standalone distribution ready to be executed\n", 
-            "     </description>\n", 
-            "+\n", 
-            "+    <scm>\n", 
-            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/packaging/package-archetype</connection>\n", 
-            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/packaging/package-archetype</developerConnection>\n", 
-            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/packaging/package-archetype</url>\n", 
-            "+    </scm>\n", 
-            "+\n", 
-            "     <build>\n", 
-            "         <resources>\n", 
+            "         This archetype can be used to create Maven projects that bundle a mediation\n",
+            "         into a standalone distribution ready to be executed\n",
+            "     </description>\n",
+            "+\n",
+            "+    <scm>\n",
+            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/packaging/package-archetype</connection>\n",
+            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/packaging/package-archetype</developerConnection>\n",
+            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/packaging/package-archetype</url>\n",
+            "+    </scm>\n",
+            "+\n",
+            "     <build>\n",
+            "         <resources>\n",
             "             <resource>\n"
-          ]
+          ],
+          "locn": "-35,6 +35,13"
         }
-      ], 
-      "to": "java/modules/packaging/package-archetype/pom.xml", 
-      "from": "java/modules/packaging/package-archetype/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/packaging/package-archetype/pom.xml",
+      "to": "java/modules/packaging/package-archetype/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-36,6 +36,13", 
           "lines": [
-            "         configuration files to run Synapse. It can be used as a basis to bundle a mediation\n", 
-            "         into a standalone distribution ready to be executed.\n", 
-            "     </description>\n", 
-            "+\n", 
-            "+    <scm>\n", 
-            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/packaging/package-skeleton</connection>\n", 
-            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/packaging/package-skeleton</developerConnection>\n", 
-            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/packaging/package-skeleton</url>\n", 
-            "+    </scm>\n", 
-            "+\n", 
-            "     <dependencies>\n", 
-            "         <dependency>\n", 
+            "         configuration files to run Synapse. It can be used as a basis to bundle a mediation\n",
+            "         into a standalone distribution ready to be executed.\n",
+            "     </description>\n",
+            "+\n",
+            "+    <scm>\n",
+            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/packaging/package-skeleton</connection>\n",
+            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/packaging/package-skeleton</developerConnection>\n",
+            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/packaging/package-skeleton</url>\n",
+            "+    </scm>\n",
+            "+\n",
+            "     <dependencies>\n",
+            "         <dependency>\n",
             "             <groupId>org.apache.synapse</groupId>\n"
-          ]
+          ],
+          "locn": "-36,6 +36,13"
         }
-      ], 
-      "to": "java/modules/packaging/package-skeleton/pom.xml", 
-      "from": "java/modules/packaging/package-skeleton/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/packaging/package-skeleton/pom.xml",
+      "to": "java/modules/packaging/package-skeleton/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-32,14 +32,18", 
           "lines": [
-            " \r\n", 
-            "     <groupId>org.apache.synapse</groupId>\r\n", 
-            "     <artifactId>synapse-tasks</artifactId>\r\n", 
-            "-\r\n", 
-            "     <name>Apache Synapse - Tasks</name>\r\n", 
-            "     <description>Apache Synapse - Scheduled Tasks Core</description>\r\n", 
-            "     <packaging>bundle</packaging>\r\n", 
-            " \r\n", 
-            "+    <scm>\r\n", 
-            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/tasks</connection>\r\n", 
-            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/tasks</developerConnection>\r\n", 
-            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/tasks</url>\r\n", 
-            "+    </scm>\r\n", 
-            "+\r\n", 
-            "     <build>\r\n", 
-            "         <plugins>\r\n", 
-            "-\r\n", 
-            "             <plugin>\r\n", 
-            "                 <groupId>org.apache.maven.plugins</groupId>\r\n", 
+            " \r\n",
+            "     <groupId>org.apache.synapse</groupId>\r\n",
+            "     <artifactId>synapse-tasks</artifactId>\r\n",
+            "-\r\n",
+            "     <name>Apache Synapse - Tasks</name>\r\n",
+            "     <description>Apache Synapse - Scheduled Tasks Core</description>\r\n",
+            "     <packaging>bundle</packaging>\r\n",
+            " \r\n",
+            "+    <scm>\r\n",
+            "+        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/tasks</connection>\r\n",
+            "+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/tasks</developerConnection>\r\n",
+            "+        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/tasks</url>\r\n",
+            "+    </scm>\r\n",
+            "+\r\n",
+            "     <build>\r\n",
+            "         <plugins>\r\n",
+            "-\r\n",
+            "             <plugin>\r\n",
+            "                 <groupId>org.apache.maven.plugins</groupId>\r\n",
             "                 <artifactId>maven-surefire-plugin</artifactId>\r\n"
-          ]
+          ],
+          "locn": "-32,14 +32,18"
         }
-      ], 
-      "to": "java/modules/tasks/pom.xml", 
-      "from": "java/modules/tasks/pom.xml"
+      ],
+      "from": "java/modules/tasks/pom.xml",
+      "to": "java/modules/tasks/pom.xml"
     }
-  ], 
-  "id": "1225150"
+  ],
+  "id": "1225150",
+  "message": "Setting the trunk up for Nexus",
+  "when": "2011-12-28T04:53:03-05:00",
+  "who": "hiranya"
 }

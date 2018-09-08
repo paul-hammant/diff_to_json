@@ -1,42 +1,42 @@
 {
-  "when": "2012-09-17T14:57:09-04:00", 
-  "message": "Replaced tabs with spaces and fixed formatting.\n", 
-  "who": "veithen", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-18,13 +18,13", 
           "lines": [
-            "   -->\n", 
-            " \n", 
-            " <serviceGroup>\n", 
-            "-<service name=\"MTOMSwASampleService\">\n", 
-            "-\t<messageReceivers>\n", 
-            "-\t\t<messageReceiver mep=\"http://www.w3.org/ns/wsdl/robust-in-only\"\n", 
-            "-\t\t\t\tclass=\"org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver\" />\n", 
-            "-\t\t<messageReceiver mep=\"http://www.w3.org/ns/wsdl/in-out\"\n", 
-            "-\t\t\t\tclass=\"org.apache.axis2.receivers.RawXMLINOutMessageReceiver\" />\n", 
-            "-\t\t</messageReceivers>\n", 
-            "-\t\t<parameter locked=\"false\" name=\"ServiceClass\">samples.services.MTOMSwASampleService</parameter>\n", 
-            "-</service>\n", 
-            "+    <service name=\"MTOMSwASampleService\">\n", 
-            "+        <messageReceivers>\n", 
-            "+            <messageReceiver mep=\"http://www.w3.org/ns/wsdl/robust-in-only\"\n", 
-            "+                             class=\"org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver\" />\n", 
-            "+            <messageReceiver mep=\"http://www.w3.org/ns/wsdl/in-out\"\n", 
-            "+                             class=\"org.apache.axis2.receivers.RawXMLINOutMessageReceiver\" />\n", 
-            "+        </messageReceivers>\n", 
-            "+        <parameter locked=\"false\" name=\"ServiceClass\">samples.services.MTOMSwASampleService</parameter>\n", 
-            "+    </service>\n", 
-            " </serviceGroup>\n", 
+            "   -->\n",
+            " \n",
+            " <serviceGroup>\n",
+            "-<service name=\"MTOMSwASampleService\">\n",
+            "-\t<messageReceivers>\n",
+            "-\t\t<messageReceiver mep=\"http://www.w3.org/ns/wsdl/robust-in-only\"\n",
+            "-\t\t\t\tclass=\"org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver\" />\n",
+            "-\t\t<messageReceiver mep=\"http://www.w3.org/ns/wsdl/in-out\"\n",
+            "-\t\t\t\tclass=\"org.apache.axis2.receivers.RawXMLINOutMessageReceiver\" />\n",
+            "-\t\t</messageReceivers>\n",
+            "-\t\t<parameter locked=\"false\" name=\"ServiceClass\">samples.services.MTOMSwASampleService</parameter>\n",
+            "-</service>\n",
+            "+    <service name=\"MTOMSwASampleService\">\n",
+            "+        <messageReceivers>\n",
+            "+            <messageReceiver mep=\"http://www.w3.org/ns/wsdl/robust-in-only\"\n",
+            "+                             class=\"org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver\" />\n",
+            "+            <messageReceiver mep=\"http://www.w3.org/ns/wsdl/in-out\"\n",
+            "+                             class=\"org.apache.axis2.receivers.RawXMLINOutMessageReceiver\" />\n",
+            "+        </messageReceivers>\n",
+            "+        <parameter locked=\"false\" name=\"ServiceClass\">samples.services.MTOMSwASampleService</parameter>\n",
+            "+    </service>\n",
+            " </serviceGroup>\n",
             "\\ No newline at end of file\n"
-          ]
+          ],
+          "locn": "-18,13 +18,13"
         }
-      ], 
-      "to": "java/modules/samples/services/MTOMSwASampleService/conf/services.xml", 
-      "from": "java/modules/samples/services/MTOMSwASampleService/conf/services.xml"
+      ],
+      "from": "java/modules/samples/services/MTOMSwASampleService/conf/services.xml",
+      "to": "java/modules/samples/services/MTOMSwASampleService/conf/services.xml"
     }
-  ], 
-  "id": "1386771"
+  ],
+  "id": "1386771",
+  "message": "Replaced tabs with spaces and fixed formatting.\n",
+  "when": "2012-09-17T14:57:09-04:00",
+  "who": "veithen"
 }

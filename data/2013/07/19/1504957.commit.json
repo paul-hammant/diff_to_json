@@ -1,95 +1,95 @@
 {
-  "when": "2013-07-19T14:25:13-04:00", 
-  "message": "Applying the patch for SYNAPSE-911 with a test case. This patch adds support for selecting XML attributes in the enrich mediator using the target custom XPath", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-6,6 +6,7", 
           "lines": [
-            " import org.apache.axiom.om.OMFactory;\n", 
-            " import org.apache.synapse.MessageContext;\n", 
-            " import org.apache.synapse.mediators.TestUtils;\n", 
-            "+import org.apache.synapse.util.xpath.SynapseXPath;\n", 
-            " \n", 
-            " import javax.xml.namespace.QName;\n", 
+            " import org.apache.axiom.om.OMFactory;\n",
+            " import org.apache.synapse.MessageContext;\n",
+            " import org.apache.synapse.mediators.TestUtils;\n",
+            "+import org.apache.synapse.util.xpath.SynapseXPath;\n",
+            " \n",
+            " import javax.xml.namespace.QName;\n",
             " \n"
-          ]
-        }, 
+          ],
+          "locn": "-6,6 +6,7"
+        },
         {
-          "locn": "-63,4 +64,25", 
           "lines": [
-            "         assertEquals(\"property\", result.getLocalName());\n", 
-            "         assertEquals(\"test\", result.getFirstElement().getLocalName());\n", 
-            "     }\n", 
-            "+\n", 
-            "+    public void testEnrich3() throws Exception {\n", 
-            "+        EnrichMediator mediator = new EnrichMediator();\n", 
-            "+        Source source = new Source();\n", 
-            "+        source.setSourceType(EnrichMediator.PROPERTY);\n", 
-            "+        source.setProperty(\"gender\");\n", 
-            "+\n", 
-            "+        Target target = new Target();\n", 
-            "+        target.setTargetType(EnrichMediator.CUSTOM);\n", 
-            "+        target.setXpath(new SynapseXPath(\"//student/@gender\"));\n", 
-            "+        mediator.setSource(source);\n", 
-            "+        mediator.setTarget(target);\n", 
-            "+\n", 
-            "+        MessageContext msgContext = TestUtils.getTestContext(\"<student gender=\\\"female\\\"><name>John</name><age>15</age></student>\");\n", 
-            "+        msgContext.setProperty(\"gender\", \"male\");\n", 
-            "+\n", 
-            "+        mediator.mediate(msgContext);\n", 
-            "+        OMElement element = msgContext.getEnvelope().getBody().getFirstElement();\n", 
-            "+        String result = element.getAttributeValue(new QName(\"gender\"));\n", 
-            "+        assertEquals(\"male\", result);\n", 
-            "+    }\n", 
+            "         assertEquals(\"property\", result.getLocalName());\n",
+            "         assertEquals(\"test\", result.getFirstElement().getLocalName());\n",
+            "     }\n",
+            "+\n",
+            "+    public void testEnrich3() throws Exception {\n",
+            "+        EnrichMediator mediator = new EnrichMediator();\n",
+            "+        Source source = new Source();\n",
+            "+        source.setSourceType(EnrichMediator.PROPERTY);\n",
+            "+        source.setProperty(\"gender\");\n",
+            "+\n",
+            "+        Target target = new Target();\n",
+            "+        target.setTargetType(EnrichMediator.CUSTOM);\n",
+            "+        target.setXpath(new SynapseXPath(\"//student/@gender\"));\n",
+            "+        mediator.setSource(source);\n",
+            "+        mediator.setTarget(target);\n",
+            "+\n",
+            "+        MessageContext msgContext = TestUtils.getTestContext(\"<student gender=\\\"female\\\"><name>John</name><age>15</age></student>\");\n",
+            "+        msgContext.setProperty(\"gender\", \"male\");\n",
+            "+\n",
+            "+        mediator.mediate(msgContext);\n",
+            "+        OMElement element = msgContext.getEnvelope().getBody().getFirstElement();\n",
+            "+        String result = element.getAttributeValue(new QName(\"gender\"));\n",
+            "+        assertEquals(\"male\", result);\n",
+            "+    }\n",
             " }\n"
-          ]
+          ],
+          "locn": "-63,4 +64,25"
         }
-      ], 
-      "to": "java/modules/core/src/test/java/org/apache/synapse/mediators/elementary/EnrichMediatorTest.java", 
-      "from": "java/modules/core/src/test/java/org/apache/synapse/mediators/elementary/EnrichMediatorTest.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/test/java/org/apache/synapse/mediators/elementary/EnrichMediatorTest.java",
+      "to": "java/modules/core/src/test/java/org/apache/synapse/mediators/elementary/EnrichMediatorTest.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-18,6 +18,7", 
           "lines": [
-            "  */\n", 
-            " package org.apache.synapse.mediators.elementary;\n", 
-            " \n", 
-            "+import org.apache.axiom.om.OMAttribute;\n", 
-            " import org.apache.axiom.om.OMElement;\n", 
-            " import org.apache.axiom.om.OMNode;\n", 
+            "  */\n",
+            " package org.apache.synapse.mediators.elementary;\n",
+            " \n",
+            "+import org.apache.axiom.om.OMAttribute;\n",
+            " import org.apache.axiom.om.OMElement;\n",
+            " import org.apache.axiom.om.OMNode;\n",
             " import org.apache.axiom.om.OMText;\n"
-          ]
-        }, 
+          ],
+          "locn": "-18,6 +18,7"
+        },
         {
-          "locn": "-101,9 +102,14", 
           "lines": [
-            "                         ((OMElement)targetParent).addChild(sourceNodeList.get(0));\n", 
-            "                     }\n", 
-            "                 }\n", 
-            "+            } else if (targetObj instanceof OMAttribute){\n", 
-            "+                OMAttribute attribute = (OMAttribute)targetObj;\n", 
-            "+                if (sourceNodeList.get(0) instanceof OMText){\n", 
-            "+                    attribute.setAttributeValue(((OMText)sourceNodeList.get(0)).getText());\n", 
-            "+                }\n", 
-            "             } else {\n", 
-            "-                synLog.error(\"Invalid Target object to be enrich.\");\n", 
-            "-                throw new SynapseException(\"Invalid Target object to be enrich.\");\n", 
-            "+                synLog.error(\"Invalid Target object to enrich.\");\n", 
-            "+                throw new SynapseException(\"Invalid Target object to enrich.\");\n", 
-            "             }\n", 
-            "         } else if (targetType == EnrichMediator.BODY) {\n", 
+            "                         ((OMElement)targetParent).addChild(sourceNodeList.get(0));\n",
+            "                     }\n",
+            "                 }\n",
+            "+            } else if (targetObj instanceof OMAttribute){\n",
+            "+                OMAttribute attribute = (OMAttribute)targetObj;\n",
+            "+                if (sourceNodeList.get(0) instanceof OMText){\n",
+            "+                    attribute.setAttributeValue(((OMText)sourceNodeList.get(0)).getText());\n",
+            "+                }\n",
+            "             } else {\n",
+            "-                synLog.error(\"Invalid Target object to be enrich.\");\n",
+            "-                throw new SynapseException(\"Invalid Target object to be enrich.\");\n",
+            "+                synLog.error(\"Invalid Target object to enrich.\");\n",
+            "+                throw new SynapseException(\"Invalid Target object to enrich.\");\n",
+            "             }\n",
+            "         } else if (targetType == EnrichMediator.BODY) {\n",
             "             SOAPEnvelope env = synContext.getEnvelope();\n"
-          ]
+          ],
+          "locn": "-101,9 +102,14"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/Target.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/Target.java"
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/Target.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/Target.java"
     }
-  ], 
-  "id": "1504957"
+  ],
+  "id": "1504957",
+  "message": "Applying the patch for SYNAPSE-911 with a test case. This patch adds support for selecting XML attributes in the enrich mediator using the target custom XPath",
+  "when": "2013-07-19T14:25:13-04:00",
+  "who": "hiranya"
 }

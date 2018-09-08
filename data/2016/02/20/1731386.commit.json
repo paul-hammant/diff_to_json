@@ -1,31 +1,31 @@
 {
-  "when": "2016-02-20T07:13:40-05:00", 
-  "message": "Committing Roger Whitcomb's patch to fix a build problem.", 
-  "who": "veithen", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-1062,9 +1062,9", 
           "lines": [
-            "         <commons.codec.version>1.6</commons.codec.version>\n", 
-            " \n", 
-            "         <!-- Axis2 and its dependencies -->\n", 
-            "-        <axis2.version>1.7.0-SNAPSHOT</axis2.version>\n", 
-            "-        <axis2.transport.version>1.7.0-SNAPSHOT</axis2.transport.version>\n", 
-            "-        <axiom.version>1.2.16-SNAPSHOT</axiom.version>\n", 
-            "+        <axis2.version>1.7.0</axis2.version>\n", 
-            "+        <axis2.transport.version>1.7.0</axis2.transport.version>\n", 
-            "+        <axiom.version>1.2.17</axiom.version>\n", 
-            "         <wsdl4j.version>1.6.2</wsdl4j.version>\n", 
-            " \n", 
+            "         <commons.codec.version>1.6</commons.codec.version>\n",
+            " \n",
+            "         <!-- Axis2 and its dependencies -->\n",
+            "-        <axis2.version>1.7.0-SNAPSHOT</axis2.version>\n",
+            "-        <axis2.transport.version>1.7.0-SNAPSHOT</axis2.transport.version>\n",
+            "-        <axiom.version>1.2.16-SNAPSHOT</axiom.version>\n",
+            "+        <axis2.version>1.7.0</axis2.version>\n",
+            "+        <axis2.transport.version>1.7.0</axis2.transport.version>\n",
+            "+        <axiom.version>1.2.17</axiom.version>\n",
+            "         <wsdl4j.version>1.6.2</wsdl4j.version>\n",
+            " \n",
             "         <!-- addressing, rampart, neethi -->\n"
-          ]
+          ],
+          "locn": "-1062,9 +1062,9"
         }
-      ], 
-      "to": "java/pom.xml", 
-      "from": "java/pom.xml"
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
     }
-  ], 
-  "id": "1731386"
+  ],
+  "id": "1731386",
+  "message": "Committing Roger Whitcomb's patch to fix a build problem.",
+  "when": "2016-02-20T07:13:40-05:00",
+  "who": "veithen"
 }

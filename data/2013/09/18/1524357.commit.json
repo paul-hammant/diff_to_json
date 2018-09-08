@@ -1,506 +1,506 @@
 {
-  "when": "2013-09-18T06:28:40-04:00", 
-  "message": "Use the proper APIs to create and interact with builders.\n", 
-  "who": "veithen", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-22,9 +22,11", 
           "lines": [
-            " import net.sf.saxon.xqj.SaxonXQDataSource;\n", 
-            " import org.apache.axiom.om.OMAbstractFactory;\n", 
-            " import org.apache.axiom.om.OMElement;\n", 
-            "+import org.apache.axiom.om.OMException;\n", 
-            " import org.apache.axiom.om.OMNode;\n", 
-            " import org.apache.axiom.om.OMText;\n", 
-            "-import org.apache.axiom.om.impl.builder.StAXOMBuilder;\n", 
-            "+import org.apache.axiom.om.OMXMLBuilderFactory;\n", 
-            "+import org.apache.axiom.om.OMXMLParserWrapper;\n", 
-            " import org.apache.axiom.om.util.ElementHelper;\n", 
-            " import org.apache.synapse.MessageContext;\n", 
+            " import net.sf.saxon.xqj.SaxonXQDataSource;\n",
+            " import org.apache.axiom.om.OMAbstractFactory;\n",
+            " import org.apache.axiom.om.OMElement;\n",
+            "+import org.apache.axiom.om.OMException;\n",
+            " import org.apache.axiom.om.OMNode;\n",
+            " import org.apache.axiom.om.OMText;\n",
+            "-import org.apache.axiom.om.impl.builder.StAXOMBuilder;\n",
+            "+import org.apache.axiom.om.OMXMLBuilderFactory;\n",
+            "+import org.apache.axiom.om.OMXMLParserWrapper;\n",
+            " import org.apache.axiom.om.util.ElementHelper;\n",
+            " import org.apache.synapse.MessageContext;\n",
             " import org.apache.synapse.SynapseException;\n"
-          ]
-        }, 
+          ],
+          "locn": "-22,9 +22,11"
+        },
         {
-          "locn": "-41,8 +43,6", 
           "lines": [
-            " \n", 
-            " import javax.activation.DataHandler;\n", 
-            " import javax.xml.namespace.QName;\n", 
-            "-import javax.xml.stream.XMLInputFactory;\n", 
-            "-import javax.xml.stream.XMLStreamException;\n", 
-            " import javax.xml.transform.dom.DOMSource;\n", 
-            " import java.io.IOException;\n", 
+            " \n",
+            " import javax.activation.DataHandler;\n",
+            " import javax.xml.namespace.QName;\n",
+            "-import javax.xml.stream.XMLInputFactory;\n",
+            "-import javax.xml.stream.XMLStreamException;\n",
+            " import javax.xml.transform.dom.DOMSource;\n",
+            " import java.io.IOException;\n",
             " import java.io.InputStream;\n"
-          ]
-        }, 
+          ],
+          "locn": "-41,8 +43,6"
+        },
         {
-          "locn": "-352,9 +352,8", 
           "lines": [
-            "                     if (XQItemType.XQITEMKIND_DOCUMENT_ELEMENT == itemKind ||\n", 
-            "                             XQItemType.XQITEMKIND_ELEMENT == itemKind ||\n", 
-            "                             XQItemType.XQITEMKIND_DOCUMENT == itemKind) {\n", 
-            "-                        StAXOMBuilder builder = new StAXOMBuilder(\n", 
-            "-                                XMLInputFactory.newInstance().createXMLStreamReader(\n", 
-            "-                                        new StringReader(xqItem.getItemAsString())));\n", 
-            "+                        OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(\n", 
-            "+                                new StringReader(xqItem.getItemAsString()));\n", 
-            "                         OMElement resultOM = builder.getDocumentElement();\n", 
-            "                         if (resultOM != null) {\n", 
+            "                     if (XQItemType.XQITEMKIND_DOCUMENT_ELEMENT == itemKind ||\n",
+            "                             XQItemType.XQITEMKIND_ELEMENT == itemKind ||\n",
+            "                             XQItemType.XQITEMKIND_DOCUMENT == itemKind) {\n",
+            "-                        StAXOMBuilder builder = new StAXOMBuilder(\n",
+            "-                                XMLInputFactory.newInstance().createXMLStreamReader(\n",
+            "-                                        new StringReader(xqItem.getItemAsString())));\n",
+            "+                        OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(\n",
+            "+                                new StringReader(xqItem.getItemAsString()));\n",
+            "                         OMElement resultOM = builder.getDocumentElement();\n",
+            "                         if (resultOM != null) {\n",
             "                             //replace the target node from the result\n"
-          ]
-        }, 
+          ],
+          "locn": "-352,9 +352,8"
+        },
         {
-          "locn": "-393,9 +392,8", 
           "lines": [
-            "                     if (XQItemType.XQITEMKIND_DOCUMENT_ELEMENT == itemKind ||\n", 
-            "                             XQItemType.XQITEMKIND_ELEMENT == itemKind ||\n", 
-            "                             XQItemType.XQITEMKIND_DOCUMENT == itemKind) {\n", 
-            "-                        StAXOMBuilder builder = new StAXOMBuilder(\n", 
-            "-                                XMLInputFactory.newInstance().createXMLStreamReader(\n", 
-            "-                                        new StringReader(xqItem.getItemAsString())));\n", 
-            "+                        OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(\n", 
-            "+                                new StringReader(xqItem.getItemAsString()));\n", 
-            "                         OMElement resultOM = builder.getDocumentElement();\n", 
-            "                         if (resultOM != null) {\n", 
+            "                     if (XQItemType.XQITEMKIND_DOCUMENT_ELEMENT == itemKind ||\n",
+            "                             XQItemType.XQITEMKIND_ELEMENT == itemKind ||\n",
+            "                             XQItemType.XQITEMKIND_DOCUMENT == itemKind) {\n",
+            "-                        StAXOMBuilder builder = new StAXOMBuilder(\n",
+            "-                                XMLInputFactory.newInstance().createXMLStreamReader(\n",
+            "-                                        new StringReader(xqItem.getItemAsString())));\n",
+            "+                        OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(\n",
+            "+                                new StringReader(xqItem.getItemAsString()));\n",
+            "                         OMElement resultOM = builder.getDocumentElement();\n",
+            "                         if (resultOM != null) {\n",
             "                             ((OMElement) destination).addChild(resultOM);\n"
-          ]
-        }, 
+          ],
+          "locn": "-393,9 +392,8"
+        },
         {
-          "locn": "-409,7 +407,7", 
           "lines": [
-            "             resultSequence.close();  // closing the result sequence\n", 
-            "         } catch (XQException e) {\n", 
-            "             handleException(\"Error during the querying \" + e.getMessage(), e);\n", 
-            "-        } catch (XMLStreamException e) {\n", 
-            "+        } catch (OMException e) {\n", 
-            "             handleException(\"Error during retrieving  the Doument Node as  the result \"\n", 
-            "                     + e.getMessage(), e);\n", 
+            "             resultSequence.close();  // closing the result sequence\n",
+            "         } catch (XQException e) {\n",
+            "             handleException(\"Error during the querying \" + e.getMessage(), e);\n",
+            "-        } catch (XMLStreamException e) {\n",
+            "+        } catch (OMException e) {\n",
+            "             handleException(\"Error during retrieving  the Doument Node as  the result \"\n",
+            "                     + e.getMessage(), e);\n",
             "         }\n"
-          ]
+          ],
+          "locn": "-409,7 +407,7"
         }
-      ], 
-      "to": "java/modules/extensions/src/main/java/org/apache/synapse/mediators/xquery/XQueryMediator.java", 
-      "from": "java/modules/extensions/src/main/java/org/apache/synapse/mediators/xquery/XQueryMediator.java"
-    }, 
+      ],
+      "from": "java/modules/extensions/src/main/java/org/apache/synapse/mediators/xquery/XQueryMediator.java",
+      "to": "java/modules/extensions/src/main/java/org/apache/synapse/mediators/xquery/XQueryMediator.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-22,7 +22,8", 
           "lines": [
-            " import org.apache.axiom.om.OMAbstractFactory;\n", 
-            " import org.apache.axiom.om.OMDocument;\n", 
-            " import org.apache.axiom.om.OMElement;\n", 
-            "-import org.apache.axiom.om.impl.builder.StAXOMBuilder;\n", 
-            "+import org.apache.axiom.om.OMXMLBuilderFactory;\n", 
-            "+import org.apache.axiom.om.OMXMLParserWrapper;\n", 
-            " import org.apache.axiom.soap.SOAPEnvelope;\n", 
-            " import org.apache.synapse.MessageContext;\n", 
+            " import org.apache.axiom.om.OMAbstractFactory;\n",
+            " import org.apache.axiom.om.OMDocument;\n",
+            " import org.apache.axiom.om.OMElement;\n",
+            "-import org.apache.axiom.om.impl.builder.StAXOMBuilder;\n",
+            "+import org.apache.axiom.om.OMXMLBuilderFactory;\n",
+            "+import org.apache.axiom.om.OMXMLParserWrapper;\n",
+            " import org.apache.axiom.soap.SOAPEnvelope;\n",
+            " import org.apache.synapse.MessageContext;\n",
             " import org.apache.synapse.SynapseException;\n"
-          ]
-        }, 
+          ],
+          "locn": "-22,7 +22,8"
+        },
         {
-          "locn": "-34,10 +35,6", 
           "lines": [
-            " import org.apache.synapse.mediators.AbstractMediator;\n", 
-            " import org.wso2.throttle.*;\n", 
-            " \n", 
-            "-import javax.xml.stream.XMLInputFactory;\n", 
-            "-import javax.xml.stream.XMLStreamException;\n", 
-            "-import javax.xml.stream.XMLStreamReader;\n", 
-            "-import java.io.ByteArrayInputStream;\n", 
-            " import java.io.StringReader;\n", 
-            " \n", 
+            " import org.apache.synapse.mediators.AbstractMediator;\n",
+            " import org.wso2.throttle.*;\n",
+            " \n",
+            "-import javax.xml.stream.XMLInputFactory;\n",
+            "-import javax.xml.stream.XMLStreamException;\n",
+            "-import javax.xml.stream.XMLStreamReader;\n",
+            "-import java.io.ByteArrayInputStream;\n",
+            " import java.io.StringReader;\n",
+            " \n",
             " /**\n"
-          ]
-        }, 
+          ],
+          "locn": "-34,10 +35,6"
+        },
         {
-          "locn": "-168,27 +165,14", 
           "lines": [
-            "                 OMAbstractFactory.getSOAP11Factory().createOMDocument();\n", 
-            "         omDoc.addChild(envelope);\n", 
-            " \n", 
-            "-        envelope.getBody().addChild(createOMElement(payload));\n", 
-            "+        envelope.getBody().addChild(OMXMLBuilderFactory.createOMBuilder(new StringReader(payload)).getDocumentElement());\n", 
-            " \n", 
-            "         synMc.setEnvelope(envelope);\n", 
-            "         return synMc;\n", 
-            "     }\n", 
-            " \n", 
-            "-    public static OMElement createOMElement(String xml) {\n", 
-            "-        try {\n", 
-            "-            XMLStreamReader reader = XMLInputFactory\n", 
-            "-                    .newInstance().createXMLStreamReader(new StringReader(xml));\n", 
-            "-            StAXOMBuilder builder = new StAXOMBuilder(reader);\n", 
-            "-            return builder.getDocumentElement();\n", 
-            "-        }\n", 
-            "-        catch (XMLStreamException e) {\n", 
-            "-            throw new RuntimeException(e);\n", 
-            "-        }\n", 
-            "-    }\n", 
-            "-\n", 
-            "     public void testMediate() throws Exception {\n", 
-            "-        ByteArrayInputStream in = new ByteArrayInputStream(POLICY.getBytes());\n", 
-            "-        StAXOMBuilder builder = new StAXOMBuilder(in);\n", 
-            "+        OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(new StringReader(POLICY));\n", 
-            "         ThrottleTestMediator throttleMediator = new ThrottleTestMediator();\n", 
-            "         throttleMediator.setPolicyKey(\"throttlepolicy\");\n", 
+            "                 OMAbstractFactory.getSOAP11Factory().createOMDocument();\n",
+            "         omDoc.addChild(envelope);\n",
+            " \n",
+            "-        envelope.getBody().addChild(createOMElement(payload));\n",
+            "+        envelope.getBody().addChild(OMXMLBuilderFactory.createOMBuilder(new StringReader(payload)).getDocumentElement());\n",
+            " \n",
+            "         synMc.setEnvelope(envelope);\n",
+            "         return synMc;\n",
+            "     }\n",
+            " \n",
+            "-    public static OMElement createOMElement(String xml) {\n",
+            "-        try {\n",
+            "-            XMLStreamReader reader = XMLInputFactory\n",
+            "-                    .newInstance().createXMLStreamReader(new StringReader(xml));\n",
+            "-            StAXOMBuilder builder = new StAXOMBuilder(reader);\n",
+            "-            return builder.getDocumentElement();\n",
+            "-        }\n",
+            "-        catch (XMLStreamException e) {\n",
+            "-            throw new RuntimeException(e);\n",
+            "-        }\n",
+            "-    }\n",
+            "-\n",
+            "     public void testMediate() throws Exception {\n",
+            "-        ByteArrayInputStream in = new ByteArrayInputStream(POLICY.getBytes());\n",
+            "-        StAXOMBuilder builder = new StAXOMBuilder(in);\n",
+            "+        OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(new StringReader(POLICY));\n",
+            "         ThrottleTestMediator throttleMediator = new ThrottleTestMediator();\n",
+            "         throttleMediator.setPolicyKey(\"throttlepolicy\");\n",
             "         MessageContext synCtx = createLightweightSynapseMessageContext(\"<empty/>\");\n"
-          ]
-        }, 
+          ],
+          "locn": "-168,27 +165,14"
+        },
         {
-          "locn": "-222,10 +206,9", 
           "lines": [
-            "     }\n", 
-            " \n", 
-            "     public void testMediateWithInLineXML() throws Exception {\n", 
-            "-        ByteArrayInputStream in = new ByteArrayInputStream(POLICY.getBytes());\n", 
-            "-        StAXOMBuilder build = new StAXOMBuilder(in);\n", 
-            "+        OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(new StringReader(POLICY));\n", 
-            "         ThrottleTestMediator throttleMediator = new ThrottleTestMediator();\n", 
-            "-        throttleMediator.setInLinePolicy(build.getDocumentElement());\n", 
-            "+        throttleMediator.setInLinePolicy(builder.getDocumentElement());\n", 
-            "         MessageContext synCtx = createLightweightSynapseMessageContext(\"<empty/>\");\n", 
-            "         synCtx.setProperty(REMOTE_ADDR, \"192.168.8.212\");\n", 
+            "     }\n",
+            " \n",
+            "     public void testMediateWithInLineXML() throws Exception {\n",
+            "-        ByteArrayInputStream in = new ByteArrayInputStream(POLICY.getBytes());\n",
+            "-        StAXOMBuilder build = new StAXOMBuilder(in);\n",
+            "+        OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(new StringReader(POLICY));\n",
+            "         ThrottleTestMediator throttleMediator = new ThrottleTestMediator();\n",
+            "-        throttleMediator.setInLinePolicy(build.getDocumentElement());\n",
+            "+        throttleMediator.setInLinePolicy(builder.getDocumentElement());\n",
+            "         MessageContext synCtx = createLightweightSynapseMessageContext(\"<empty/>\");\n",
+            "         synCtx.setProperty(REMOTE_ADDR, \"192.168.8.212\");\n",
             "         SynapseConfiguration synCfg = new SynapseConfiguration();\n"
-          ]
+          ],
+          "locn": "-222,10 +206,9"
         }
-      ], 
-      "to": "java/modules/extensions/src/test/java/org/apache/synapse/mediators/throttle/ThrottleMediatorTest.java", 
-      "from": "java/modules/extensions/src/test/java/org/apache/synapse/mediators/throttle/ThrottleMediatorTest.java"
-    }, 
+      ],
+      "from": "java/modules/extensions/src/test/java/org/apache/synapse/mediators/throttle/ThrottleMediatorTest.java",
+      "to": "java/modules/extensions/src/test/java/org/apache/synapse/mediators/throttle/ThrottleMediatorTest.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-19,20 +19,19", 
           "lines": [
-            " package samples.userguide;\n", 
-            " \n", 
-            " import org.apache.axiom.om.OMElement;\n", 
-            "+import org.apache.axiom.om.OMXMLBuilderFactory;\n", 
-            " import org.apache.axiom.soap.SOAPBody;\n", 
-            " import org.apache.axiom.soap.SOAPEnvelope;\n", 
-            "-import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;\n", 
-            " \n", 
-            " import javax.jms.*;\n", 
-            " import javax.naming.Context;\n", 
-            " import javax.naming.InitialContext;\n", 
-            " import javax.xml.namespace.QName;\n", 
-            "-import javax.xml.stream.XMLInputFactory;\n", 
-            " import javax.xml.stream.XMLStreamException;\n", 
-            "-import java.io.ByteArrayInputStream;\n", 
-            " import java.io.File;\n", 
-            " import java.io.FileInputStream;\n", 
-            " import java.io.InputStream;\n", 
-            "+import java.io.StringReader;\n", 
-            " import java.util.Iterator;\n", 
-            " import java.util.Properties;\n", 
+            " package samples.userguide;\n",
+            " \n",
+            " import org.apache.axiom.om.OMElement;\n",
+            "+import org.apache.axiom.om.OMXMLBuilderFactory;\n",
+            " import org.apache.axiom.soap.SOAPBody;\n",
+            " import org.apache.axiom.soap.SOAPEnvelope;\n",
+            "-import org.apache.axiom.soap.impl.builder.StAXSOAPModelBuilder;\n",
+            " \n",
+            " import javax.jms.*;\n",
+            " import javax.naming.Context;\n",
+            " import javax.naming.InitialContext;\n",
+            " import javax.xml.namespace.QName;\n",
+            "-import javax.xml.stream.XMLInputFactory;\n",
+            " import javax.xml.stream.XMLStreamException;\n",
+            "-import java.io.ByteArrayInputStream;\n",
+            " import java.io.File;\n",
+            " import java.io.FileInputStream;\n",
+            " import java.io.InputStream;\n",
+            "+import java.io.StringReader;\n",
+            " import java.util.Iterator;\n",
+            " import java.util.Properties;\n",
             " \n"
-          ]
-        }, 
+          ],
+          "locn": "-19,20 +19,19"
+        },
         {
-          "locn": "-172,12 +171,7", 
           "lines": [
-            "      * @throws XMLStreamException on error\n", 
-            "      */\n", 
-            "     private void parseOrder(String payload) throws XMLStreamException {\n", 
-            "-        InputStream is = new ByteArrayInputStream(payload.getBytes());\n", 
-            "-        javax.xml.stream.XMLStreamReader parser = XMLInputFactory\n", 
-            "-                .newInstance().createXMLStreamReader(is);\n", 
-            "-        StAXSOAPModelBuilder builder = new StAXSOAPModelBuilder(parser,\n", 
-            "-                null);\n", 
-            "-        SOAPEnvelope envelope = (SOAPEnvelope) builder.getDocumentElement();\n", 
-            "+        SOAPEnvelope envelope = OMXMLBuilderFactory.createSOAPModelBuilder(new StringReader(payload)).getSOAPEnvelope();\n", 
-            "         // retrieve SOAP body\n", 
-            "         SOAPBody soapBody = envelope.getBody();\n", 
+            "      * @throws XMLStreamException on error\n",
+            "      */\n",
+            "     private void parseOrder(String payload) throws XMLStreamException {\n",
+            "-        InputStream is = new ByteArrayInputStream(payload.getBytes());\n",
+            "-        javax.xml.stream.XMLStreamReader parser = XMLInputFactory\n",
+            "-                .newInstance().createXMLStreamReader(is);\n",
+            "-        StAXSOAPModelBuilder builder = new StAXSOAPModelBuilder(parser,\n",
+            "-                null);\n",
+            "-        SOAPEnvelope envelope = (SOAPEnvelope) builder.getDocumentElement();\n",
+            "+        SOAPEnvelope envelope = OMXMLBuilderFactory.createSOAPModelBuilder(new StringReader(payload)).getSOAPEnvelope();\n",
+            "         // retrieve SOAP body\n",
+            "         SOAPBody soapBody = envelope.getBody();\n",
             "         OMElement messageNode = soapBody.getFirstChildWithName(new QName(\n"
-          ]
+          ],
+          "locn": "-172,12 +171,7"
         }
-      ], 
-      "to": "java/modules/samples/src/main/java/samples/userguide/AMQPConsumer.java", 
-      "from": "java/modules/samples/src/main/java/samples/userguide/AMQPConsumer.java"
-    }, 
+      ],
+      "from": "java/modules/samples/src/main/java/samples/userguide/AMQPConsumer.java",
+      "to": "java/modules/samples/src/main/java/samples/userguide/AMQPConsumer.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-21,7 +21,8", 
           "lines": [
-            " \n", 
-            " import org.apache.axiom.om.OMAttribute;\n", 
-            " import org.apache.axiom.om.OMElement;\n", 
-            "-import org.apache.axiom.om.impl.builder.StAXOMBuilder;\n", 
-            "+import org.apache.axiom.om.OMException;\n", 
-            "+import org.apache.axiom.om.OMXMLBuilderFactory;\n", 
-            " import org.apache.axis2.AxisFault;\n", 
-            " import org.apache.axis2.context.ConfigurationContext;\n", 
+            " \n",
+            " import org.apache.axiom.om.OMAttribute;\n",
+            " import org.apache.axiom.om.OMElement;\n",
+            "-import org.apache.axiom.om.impl.builder.StAXOMBuilder;\n",
+            "+import org.apache.axiom.om.OMException;\n",
+            "+import org.apache.axiom.om.OMXMLBuilderFactory;\n",
+            " import org.apache.axis2.AxisFault;\n",
+            " import org.apache.axis2.context.ConfigurationContext;\n",
             " import org.apache.axis2.description.Parameter;\n"
-          ]
-        }, 
+          ],
+          "locn": "-21,7 +21,8"
+        },
         {
-          "locn": "-165,13 +166,13", 
           "lines": [
-            "         OMElement definitions;\n", 
-            "         try {\n", 
-            "             FileInputStream fis = new FileInputStream(fileName);\n", 
-            "-            definitions = new StAXOMBuilder(fis).getDocumentElement();\n", 
-            "+            definitions = OMXMLBuilderFactory.createOMBuilder(fis).getDocumentElement();\n", 
-            "             assert definitions != null;\n", 
-            "             definitions.build();\n", 
-            "         } catch (FileNotFoundException e) {\n", 
-            "             handleException(\"Priority configuration file cannot be found : \" + fileName, e);\n", 
-            "             return;\n", 
-            "-        } catch (XMLStreamException e) {\n", 
-            "+        } catch (OMException e) {\n", 
-            "             handleException(\"Error parsing priority configuration xml file \" + fileName, e);\n", 
-            "             return;\n", 
+            "         OMElement definitions;\n",
+            "         try {\n",
+            "             FileInputStream fis = new FileInputStream(fileName);\n",
+            "-            definitions = new StAXOMBuilder(fis).getDocumentElement();\n",
+            "+            definitions = OMXMLBuilderFactory.createOMBuilder(fis).getDocumentElement();\n",
+            "             assert definitions != null;\n",
+            "             definitions.build();\n",
+            "         } catch (FileNotFoundException e) {\n",
+            "             handleException(\"Priority configuration file cannot be found : \" + fileName, e);\n",
+            "             return;\n",
+            "-        } catch (XMLStreamException e) {\n",
+            "+        } catch (OMException e) {\n",
+            "             handleException(\"Error parsing priority configuration xml file \" + fileName, e);\n",
+            "             return;\n",
             "         }\n"
-          ]
+          ],
+          "locn": "-165,13 +166,13"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java", 
-      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java"
-    }, 
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-21,7 +21,8", 
           "lines": [
-            " \n", 
-            " import junit.framework.TestCase;\n", 
-            " import org.apache.axiom.om.OMElement;\n", 
-            "-import org.apache.axiom.om.impl.builder.StAXOMBuilder;\n", 
-            "+import org.apache.axiom.om.OMXMLBuilderFactory;\n", 
-            "+import org.apache.axiom.om.OMXMLParserWrapper;\n", 
-            " import org.apache.commons.io.FileUtils;\n", 
-            " import org.apache.commons.io.FilenameUtils;\n", 
+            " \n",
+            " import junit.framework.TestCase;\n",
+            " import org.apache.axiom.om.OMElement;\n",
+            "-import org.apache.axiom.om.impl.builder.StAXOMBuilder;\n",
+            "+import org.apache.axiom.om.OMXMLBuilderFactory;\n",
+            "+import org.apache.axiom.om.OMXMLParserWrapper;\n",
+            " import org.apache.commons.io.FileUtils;\n",
+            " import org.apache.commons.io.FilenameUtils;\n",
             " import org.apache.commons.logging.Log;\n"
-          ]
-        }, 
+          ],
+          "locn": "-21,7 +21,8"
+        },
         {
-          "locn": "-192,7 +193,7", 
           "lines": [
-            "             if (in == null) {\n", 
-            "                 fail(\"Cannot read sample descriptor file\");\n", 
-            "             }\n", 
-            "-            StAXOMBuilder builder = new StAXOMBuilder(in);\n", 
-            "+            OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(in);\n", 
-            "             return builder.getDocumentElement();\n", 
-            "         } catch (Exception e) {\n", 
+            "             if (in == null) {\n",
+            "                 fail(\"Cannot read sample descriptor file\");\n",
+            "             }\n",
+            "-            StAXOMBuilder builder = new StAXOMBuilder(in);\n",
+            "+            OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(in);\n",
+            "             return builder.getDocumentElement();\n",
+            "         } catch (Exception e) {\n",
             "             log.error(\"Error loading test descriptor\", e);\n"
-          ]
+          ],
+          "locn": "-192,7 +193,7"
         }
-      ], 
-      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java", 
-      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java"
-    }, 
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-20,7 +20,6", 
           "lines": [
-            " package org.apache.synapse.samples.framework.clients;\n", 
-            " \n", 
-            " import org.apache.axiom.om.*;\n", 
-            "-import org.apache.axiom.om.impl.builder.StAXOMBuilder;\n", 
-            " import org.apache.axiom.soap.SOAPBody;\n", 
-            " import org.apache.axiom.soap.SOAPEnvelope;\n", 
+            " package org.apache.synapse.samples.framework.clients;\n",
+            " \n",
+            " import org.apache.axiom.om.*;\n",
+            "-import org.apache.axiom.om.impl.builder.StAXOMBuilder;\n",
+            " import org.apache.axiom.soap.SOAPBody;\n",
+            " import org.apache.axiom.soap.SOAPEnvelope;\n",
             " import org.apache.axiom.soap.SOAPFactory;\n"
-          ]
-        }, 
+          ],
+          "locn": "-20,7 +20,6"
+        },
         {
-          "locn": "-48,6 +47,8", 
           "lines": [
-            " import samples.common.StockQuoteHandler;\n", 
-            " \n", 
-            " import javax.xml.namespace.QName;\n", 
-            "+\n", 
-            "+import java.io.FileInputStream;\n", 
-            " import java.net.URL;\n", 
-            " import java.util.HashMap;\n", 
+            " import samples.common.StockQuoteHandler;\n",
+            " \n",
+            " import javax.xml.namespace.QName;\n",
+            "+\n",
+            "+import java.io.FileInputStream;\n",
+            " import java.net.URL;\n",
+            " import java.util.HashMap;\n",
             " import java.util.Map;\n"
-          ]
-        }, 
+          ],
+          "locn": "-48,6 +47,8"
+        },
         {
-          "locn": "-106,7 +107,7", 
           "lines": [
-            "             log.info(\"Using WS-Security\");\n", 
-            "             serviceClient.engageModule(\"addressing\");\n", 
-            "             serviceClient.engageModule(\"rampart\");\n", 
-            "-            StAXOMBuilder builder = new StAXOMBuilder(policyKey);\n", 
-            "+            OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(new FileInputStream(policyKey));\n", 
-            "             Policy policy = PolicyEngine.getPolicy(builder.getDocumentElement());\n", 
-            "             options.setProperty(RampartMessageData.KEY_RAMPART_POLICY, policy);\n", 
+            "             log.info(\"Using WS-Security\");\n",
+            "             serviceClient.engageModule(\"addressing\");\n",
+            "             serviceClient.engageModule(\"rampart\");\n",
+            "-            StAXOMBuilder builder = new StAXOMBuilder(policyKey);\n",
+            "+            OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(new FileInputStream(policyKey));\n",
+            "             Policy policy = PolicyEngine.getPolicy(builder.getDocumentElement());\n",
+            "             options.setProperty(RampartMessageData.KEY_RAMPART_POLICY, policy);\n",
             "         }\n"
-          ]
+          ],
+          "locn": "-106,7 +107,7"
         }
-      ], 
-      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/StockQuoteSampleClient.java", 
-      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/StockQuoteSampleClient.java"
-    }, 
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/StockQuoteSampleClient.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/StockQuoteSampleClient.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-20,7 +20,8", 
           "lines": [
-            " \n", 
-            " import org.apache.axiom.om.OMAttribute;\n", 
-            " import org.apache.axiom.om.OMElement;\n", 
-            "-import org.apache.axiom.om.impl.builder.StAXOMBuilder;\n", 
-            "+import org.apache.axiom.om.OMException;\n", 
-            "+import org.apache.axiom.om.OMXMLBuilderFactory;\n", 
-            " import org.apache.axis2.deployment.DeploymentException;\n", 
-            " import org.apache.axis2.deployment.util.Utils;\n", 
+            " \n",
+            " import org.apache.axiom.om.OMAttribute;\n",
+            " import org.apache.axiom.om.OMElement;\n",
+            "-import org.apache.axiom.om.impl.builder.StAXOMBuilder;\n",
+            "+import org.apache.axiom.om.OMException;\n",
+            "+import org.apache.axiom.om.OMXMLBuilderFactory;\n",
+            " import org.apache.axis2.deployment.DeploymentException;\n",
+            " import org.apache.axis2.deployment.util.Utils;\n",
             " import org.apache.commons.logging.Log;\n"
-          ]
-        }, 
+          ],
+          "locn": "-20,7 +20,8"
+        },
         {
-          "locn": "-33,7 +34,6", 
           "lines": [
-            " import org.apache.synapse.libraries.model.SynapseLibrary;\n", 
-            " \n", 
-            " import javax.xml.namespace.QName;\n", 
-            "-import javax.xml.stream.XMLStreamException;\n", 
-            " import java.io.*;\n", 
-            " import java.util.*;\n", 
+            " import org.apache.synapse.libraries.model.SynapseLibrary;\n",
+            " \n",
+            " import javax.xml.namespace.QName;\n",
+            "-import javax.xml.stream.XMLStreamException;\n",
+            " import java.io.*;\n",
+            " import java.util.*;\n",
             " import java.util.zip.ZipEntry;\n"
-          ]
-        }, 
+          ],
+          "locn": "-33,7 +34,6"
+        },
         {
-          "locn": "-100,7 +100,7", 
           "lines": [
-            "         InputStream xmlInputStream = null;\n", 
-            "         try {\n", 
-            "             xmlInputStream = new FileInputStream(f);\n", 
-            "-            OMElement documentElement = new StAXOMBuilder(xmlInputStream).getDocumentElement();\n", 
-            "+            OMElement documentElement = OMXMLBuilderFactory.createOMBuilder(xmlInputStream).getDocumentElement();\n", 
-            "             if (documentElement == null) {\n", 
-            "                 throw new SynapseArtifactDeploymentException(\"Document element for artifacts.xml is \" +\n", 
+            "         InputStream xmlInputStream = null;\n",
+            "         try {\n",
+            "             xmlInputStream = new FileInputStream(f);\n",
+            "-            OMElement documentElement = new StAXOMBuilder(xmlInputStream).getDocumentElement();\n",
+            "+            OMElement documentElement = OMXMLBuilderFactory.createOMBuilder(xmlInputStream).getDocumentElement();\n",
+            "             if (documentElement == null) {\n",
+            "                 throw new SynapseArtifactDeploymentException(\"Document element for artifacts.xml is \" +\n",
             "                                                              \"null. Can't build \" +\n"
-          ]
-        }, 
+          ],
+          "locn": "-100,7 +100,7"
+        },
         {
-          "locn": "-117,7 +117,7", 
           "lines": [
-            "         } catch (FileNotFoundException e) {\n", 
-            "             throw new SynapseArtifactDeploymentException(\"artifacts.xml File cannot be loaded from \" + libXmlPath, e);\n", 
-            " \n", 
-            "-        } catch (XMLStreamException e) {\n", 
-            "+        } catch (OMException e) {\n", 
-            "             throw new SynapseArtifactDeploymentException(\"Error while parsing the artifacts.xml file \", e);\n", 
-            "         } finally {\n", 
+            "         } catch (FileNotFoundException e) {\n",
+            "             throw new SynapseArtifactDeploymentException(\"artifacts.xml File cannot be loaded from \" + libXmlPath, e);\n",
+            " \n",
+            "-        } catch (XMLStreamException e) {\n",
+            "+        } catch (OMException e) {\n",
+            "             throw new SynapseArtifactDeploymentException(\"Error while parsing the artifacts.xml file \", e);\n",
+            "         } finally {\n",
             "             if (xmlInputStream != null) {\n"
-          ]
-        }, 
+          ],
+          "locn": "-117,7 +117,7"
+        },
         {
-          "locn": "-238,7 +238,7", 
           "lines": [
-            "     private static LibraryArtifact buildArtifact(SynapseLibrary library, InputStream artifactXmlStream, String directoryPath) {\n", 
-            "         LibraryArtifact artifact = null;\n", 
-            "         try {\n", 
-            "-            OMElement artElement = new StAXOMBuilder(artifactXmlStream).getDocumentElement();\n", 
-            "+            OMElement artElement = OMXMLBuilderFactory.createOMBuilder(artifactXmlStream).getDocumentElement();\n", 
-            " \n", 
-            "             if (LibDeployerConstants.ARTIFACT.equals(artElement.getLocalName())) {\n", 
+            "     private static LibraryArtifact buildArtifact(SynapseLibrary library, InputStream artifactXmlStream, String directoryPath) {\n",
+            "         LibraryArtifact artifact = null;\n",
+            "         try {\n",
+            "-            OMElement artElement = new StAXOMBuilder(artifactXmlStream).getDocumentElement();\n",
+            "+            OMElement artElement = OMXMLBuilderFactory.createOMBuilder(artifactXmlStream).getDocumentElement();\n",
+            " \n",
+            "             if (LibDeployerConstants.ARTIFACT.equals(artElement.getLocalName())) {\n",
             "                 artifact = populateLibraryArtifact(artElement, directoryPath, null, library);\n"
-          ]
-        }, 
+          ],
+          "locn": "-238,7 +238,7"
+        },
         {
-          "locn": "-247,7 +247,7", 
           "lines": [
-            "                           + library.getQName());\n", 
-            "                 return null;\n", 
-            "             }\n", 
-            "-        } catch (XMLStreamException e) {\n", 
-            "+        } catch (OMException e) {\n", 
-            "             throw new SynapseArtifactDeploymentException(\"Error parsing artifact.xml for path : \" +\n", 
-            "                                                          directoryPath ,e);\n", 
+            "                           + library.getQName());\n",
+            "                 return null;\n",
+            "             }\n",
+            "-        } catch (XMLStreamException e) {\n",
+            "+        } catch (OMException e) {\n",
+            "             throw new SynapseArtifactDeploymentException(\"Error parsing artifact.xml for path : \" +\n",
+            "                                                          directoryPath ,e);\n",
             "         }\n"
-          ]
+          ],
+          "locn": "-247,7 +247,7"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/libraries/util/LibDeployerUtils.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/libraries/util/LibDeployerUtils.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/libraries/util/LibDeployerUtils.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/libraries/util/LibDeployerUtils.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-20,13 +20,13", 
           "lines": [
-            " package org.apache.synapse.libraries.model;\n", 
-            " \n", 
-            " import org.apache.axiom.om.OMElement;\n", 
-            "-import org.apache.axiom.om.impl.builder.StAXOMBuilder;\n", 
-            "+import org.apache.axiom.om.OMException;\n", 
-            "+import org.apache.axiom.om.OMXMLBuilderFactory;\n", 
-            " import org.apache.commons.logging.Log;\n", 
-            " import org.apache.commons.logging.LogFactory;\n", 
-            " import org.apache.synapse.SynapseException;\n", 
-            " import org.apache.synapse.deployers.SynapseArtifactDeploymentException;\n", 
-            " \n", 
-            "-import javax.xml.stream.XMLStreamException;\n", 
-            " import java.io.*;\n", 
-            " import java.util.Properties;\n", 
+            " package org.apache.synapse.libraries.model;\n",
+            " \n",
+            " import org.apache.axiom.om.OMElement;\n",
+            "-import org.apache.axiom.om.impl.builder.StAXOMBuilder;\n",
+            "+import org.apache.axiom.om.OMException;\n",
+            "+import org.apache.axiom.om.OMXMLBuilderFactory;\n",
+            " import org.apache.commons.logging.Log;\n",
+            " import org.apache.commons.logging.LogFactory;\n",
+            " import org.apache.synapse.SynapseException;\n",
+            " import org.apache.synapse.deployers.SynapseArtifactDeploymentException;\n",
+            " \n",
+            "-import javax.xml.stream.XMLStreamException;\n",
+            " import java.io.*;\n",
+            " import java.util.Properties;\n",
             " \n"
-          ]
-        }, 
+          ],
+          "locn": "-20,13 +20,13"
+        },
         {
-          "locn": "-51,10 +51,10", 
           "lines": [
-            "         InputStream xmlInputStream = null;\n", 
-            "         try {\n", 
-            "             xmlInputStream = new FileInputStream(f);\n", 
-            "-            configurationElement = new StAXOMBuilder(xmlInputStream).getDocumentElement();\n", 
-            "+            configurationElement = OMXMLBuilderFactory.createOMBuilder(xmlInputStream).getDocumentElement();\n", 
-            "         } catch (FileNotFoundException e) {\n", 
-            "                throw new SynapseArtifactDeploymentException(\"file not found at : \" + fileXmlPath);\n", 
-            "-        } catch (XMLStreamException e) {\n", 
-            "+        } catch (OMException e) {\n", 
-            "             throw new SynapseArtifactDeploymentException(\"Error while parsing the artifacts.xml file : \" + fileXmlPath , e);\n", 
-            "         } finally {\n", 
+            "         InputStream xmlInputStream = null;\n",
+            "         try {\n",
+            "             xmlInputStream = new FileInputStream(f);\n",
+            "-            configurationElement = new StAXOMBuilder(xmlInputStream).getDocumentElement();\n",
+            "+            configurationElement = OMXMLBuilderFactory.createOMBuilder(xmlInputStream).getDocumentElement();\n",
+            "         } catch (FileNotFoundException e) {\n",
+            "                throw new SynapseArtifactDeploymentException(\"file not found at : \" + fileXmlPath);\n",
+            "-        } catch (XMLStreamException e) {\n",
+            "+        } catch (OMException e) {\n",
+            "             throw new SynapseArtifactDeploymentException(\"Error while parsing the artifacts.xml file : \" + fileXmlPath , e);\n",
+            "         } finally {\n",
             "             if (xmlInputStream != null) {\n"
-          ]
+          ],
+          "locn": "-51,10 +51,10"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/libraries/model/ArtifactFile.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/libraries/model/ArtifactFile.java"
-    }, 
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/libraries/model/ArtifactFile.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/libraries/model/ArtifactFile.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-20,7 +20,8", 
           "lines": [
-            " \n", 
-            " import org.apache.axiom.om.OMAttribute;\n", 
-            " import org.apache.axiom.om.OMElement;\n", 
-            "-import org.apache.axiom.om.impl.builder.StAXOMBuilder;\n", 
-            "+import org.apache.axiom.om.OMXMLBuilderFactory;\n", 
-            "+import org.apache.axiom.om.OMXMLParserWrapper;\n", 
-            " import org.apache.synapse.SynapseConstants;\n", 
-            " import org.apache.synapse.config.xml.XMLConfigConstants;\n", 
+            " \n",
+            " import org.apache.axiom.om.OMAttribute;\n",
+            " import org.apache.axiom.om.OMElement;\n",
+            "-import org.apache.axiom.om.impl.builder.StAXOMBuilder;\n",
+            "+import org.apache.axiom.om.OMXMLBuilderFactory;\n",
+            "+import org.apache.axiom.om.OMXMLParserWrapper;\n",
+            " import org.apache.synapse.SynapseConstants;\n",
+            " import org.apache.synapse.config.xml.XMLConfigConstants;\n",
             " import org.apache.synapse.config.xml.endpoints.utils.LoadbalanceAlgorithmFactory;\n"
-          ]
-        }, 
+          ],
+          "locn": "-20,7 +20,8"
+        },
         {
-          "locn": "-100,9 +101,9", 
           "lines": [
-            "                 configuration = System.getProperty(configuration.substring(\"$system:\".length()));\n", 
-            "             }\n", 
-            "             // Load the file\n", 
-            "-            StAXOMBuilder builder = null;\n", 
-            "+            OMXMLParserWrapper builder = null;\n", 
-            "             try {\n", 
-            "-                builder = new StAXOMBuilder(new URL(configuration).openStream());\n", 
-            "+                builder = OMXMLBuilderFactory.createOMBuilder(new URL(configuration).openStream());\n", 
-            "             } catch (Exception e) {\n", 
-            "                 handleException(\"Could not load ServiceDynamicLoadbalanceEndpoint configuration file \" +\n", 
+            "                 configuration = System.getProperty(configuration.substring(\"$system:\".length()));\n",
+            "             }\n",
+            "             // Load the file\n",
+            "-            StAXOMBuilder builder = null;\n",
+            "+            OMXMLParserWrapper builder = null;\n",
+            "             try {\n",
+            "-                builder = new StAXOMBuilder(new URL(configuration).openStream());\n",
+            "+                builder = OMXMLBuilderFactory.createOMBuilder(new URL(configuration).openStream());\n",
+            "             } catch (Exception e) {\n",
+            "                 handleException(\"Could not load ServiceDynamicLoadbalanceEndpoint configuration file \" +\n",
             "                                 configuration);\n"
-          ]
+          ],
+          "locn": "-100,9 +101,9"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/ServiceDynamicLoadbalanceEndpointFactory.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/ServiceDynamicLoadbalanceEndpointFactory.java"
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/ServiceDynamicLoadbalanceEndpointFactory.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/ServiceDynamicLoadbalanceEndpointFactory.java"
     }
-  ], 
-  "id": "1524357"
+  ],
+  "id": "1524357",
+  "message": "Use the proper APIs to create and interact with builders.\n",
+  "when": "2013-09-18T06:28:40-04:00",
+  "who": "veithen"
 }

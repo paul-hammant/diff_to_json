@@ -1,33 +1,33 @@
 {
-  "when": "2016-12-25T02:32:15-05:00", 
-  "message": "Add new contributors", 
-  "who": "isudana", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-1307,5 +1307,14", 
           "lines": [
-            "         <contributor>\n", 
-            "             <name>Dave Irving</name>\n", 
-            "         </contributor>\n", 
-            "+        <contributor>\n", 
-            "+            <name>Vanjikumaran Sivajothy</name>\n", 
-            "+        </contributor>\n", 
-            "+        <contributor>\n", 
-            "+            <name>Prabath Ariyarathna</name>\n", 
-            "+        </contributor>\n", 
-            "+        <contributor>\n", 
-            "+            <name>Senduran Balasubramaniyam</name>\n", 
-            "+        </contributor>\n", 
-            "     </contributors>\n", 
+            "         <contributor>\n",
+            "             <name>Dave Irving</name>\n",
+            "         </contributor>\n",
+            "+        <contributor>\n",
+            "+            <name>Vanjikumaran Sivajothy</name>\n",
+            "+        </contributor>\n",
+            "+        <contributor>\n",
+            "+            <name>Prabath Ariyarathna</name>\n",
+            "+        </contributor>\n",
+            "+        <contributor>\n",
+            "+            <name>Senduran Balasubramaniyam</name>\n",
+            "+        </contributor>\n",
+            "     </contributors>\n",
             " </project>\n"
-          ]
+          ],
+          "locn": "-1307,5 +1307,14"
         }
-      ], 
-      "to": "java/pom.xml", 
-      "from": "java/pom.xml"
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
     }
-  ], 
-  "id": "1775997"
+  ],
+  "id": "1775997",
+  "message": "Add new contributors",
+  "when": "2016-12-25T02:32:15-05:00",
+  "who": "isudana"
 }

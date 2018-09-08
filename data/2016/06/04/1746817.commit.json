@@ -1,27 +1,27 @@
 {
-  "when": "2016-06-04T09:05:57-04:00", 
-  "message": "Moving to Axis2 released 1.7.3", 
-  "who": "ravi", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-1035,7 +1035,7", 
           "lines": [
-            "         <commons.codec.version>1.6</commons.codec.version>\n", 
-            " \n", 
-            "         <!-- Axis2 and its dependencies -->\n", 
-            "-        <axis2.version>1.7.3-SNAPSHOT</axis2.version>\n", 
-            "+        <axis2.version>1.7.3</axis2.version>\n", 
-            "         <axiom.version>1.2.19</axiom.version>\n", 
-            "         <wsdl4j.version>1.6.2</wsdl4j.version>\n", 
+            "         <commons.codec.version>1.6</commons.codec.version>\n",
+            " \n",
+            "         <!-- Axis2 and its dependencies -->\n",
+            "-        <axis2.version>1.7.3-SNAPSHOT</axis2.version>\n",
+            "+        <axis2.version>1.7.3</axis2.version>\n",
+            "         <axiom.version>1.2.19</axiom.version>\n",
+            "         <wsdl4j.version>1.6.2</wsdl4j.version>\n",
             " \n"
-          ]
+          ],
+          "locn": "-1035,7 +1035,7"
         }
-      ], 
-      "to": "java/pom.xml", 
-      "from": "java/pom.xml"
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
     }
-  ], 
-  "id": "1746817"
+  ],
+  "id": "1746817",
+  "message": "Moving to Axis2 released 1.7.3",
+  "when": "2016-06-04T09:05:57-04:00",
+  "who": "ravi"
 }

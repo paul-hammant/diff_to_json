@@ -1,256 +1,256 @@
 {
-  "when": "2014-09-20T18:09:11-04:00", 
-  "message": "Fixing SYNAPSE-926 OPTIONS support in the PT transport -- Added integration test 10003 to cover the scenario", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-120,8 +120,8", 
           "lines": [
-            "             TargetContext.get(conn).setWriter(pipe);\n", 
-            "         }\n", 
-            " \n", 
-            "-        String path = fullUrl ?\n", 
-            "-                    url.toString() : url.getPath() +\n", 
-            "+        String path = fullUrl ? url.toString() :\n", 
-            "+                (\"\".equals(url.getPath()) ? \"/\" : url.getPath()) +\n", 
-            "                     (url.getQuery() != null ? \"?\" + url.getQuery() : \"\");\n", 
-            " \n", 
+            "             TargetContext.get(conn).setWriter(pipe);\n",
+            "         }\n",
+            " \n",
+            "-        String path = fullUrl ?\n",
+            "-                    url.toString() : url.getPath() +\n",
+            "+        String path = fullUrl ? url.toString() :\n",
+            "+                (\"\".equals(url.getPath()) ? \"/\" : url.getPath()) +\n",
+            "                     (url.getQuery() != null ? \"?\" + url.getQuery() : \"\");\n",
+            " \n",
             "         long contentLength = -1;\n"
-          ]
+          ],
+          "locn": "-120,8 +120,8"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetRequest.java", 
-      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetRequest.java"
-    }, 
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetRequest.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetRequest.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-408,10 +408,7", 
           "lines": [
-            " \t\t\t\t\t\tformatter.writeTo(msgContext, format, out, false);\n", 
-            " \t\t\t\t\t}\n", 
-            " \t\t\t\t\t\n", 
-            "-\t\t\t\t\tif ((msgContext.getProperty(\n", 
-            "-                            PassThroughConstants.REST_GET_DELETE_INVOKE) != null &&\n", 
-            "-\t\t\t\t\t\t    (Boolean) msgContext.getProperty(\n", 
-            "-                                    PassThroughConstants.REST_GET_DELETE_INVOKE))) {\n", 
-            "+\t\t\t\t\tif (isCompleteWithoutData(msgContext)) {\n", 
-            " \t\t\t\t\t\t\tpipe.setSerializationCompleteWithoutData(true);\n", 
-            " \t\t\t\t\t} else {\n", 
+            " \t\t\t\t\t\tformatter.writeTo(msgContext, format, out, false);\n",
+            " \t\t\t\t\t}\n",
+            " \t\t\t\t\t\n",
+            "-\t\t\t\t\tif ((msgContext.getProperty(\n",
+            "-                            PassThroughConstants.REST_GET_DELETE_INVOKE) != null &&\n",
+            "-\t\t\t\t\t\t    (Boolean) msgContext.getProperty(\n",
+            "-                                    PassThroughConstants.REST_GET_DELETE_INVOKE))) {\n",
+            "+\t\t\t\t\tif (isCompleteWithoutData(msgContext)) {\n",
+            " \t\t\t\t\t\t\tpipe.setSerializationCompleteWithoutData(true);\n",
+            " \t\t\t\t\t} else {\n",
             " \t\t\t\t\t\tpipe.setSerializationComplete(true);\n"
-          ]
-        }, 
+          ],
+          "locn": "-408,10 +408,7"
+        },
         {
-          "locn": "-421,6 +418,15", 
           "lines": [
-            " \t\t}\n", 
-            " \t}\n", 
-            " \n", 
-            "+    private boolean isCompleteWithoutData(MessageContext msgContext) {\n", 
-            "+        if (Boolean.TRUE.equals(msgContext.getProperty(\n", 
-            "+                PassThroughConstants.REST_GET_DELETE_INVOKE))) {\n", 
-            "+            return true;\n", 
-            "+        }\n", 
-            "+\n", 
-            "+        return Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.NO_ENTITY_BODY));\n", 
-            "+    }\n", 
-            "+\n", 
-            "     /**\n", 
-            "      * Return the IOEventDispatch implementation to be used. This is overridden by the\n", 
+            " \t\t}\n",
+            " \t}\n",
+            " \n",
+            "+    private boolean isCompleteWithoutData(MessageContext msgContext) {\n",
+            "+        if (Boolean.TRUE.equals(msgContext.getProperty(\n",
+            "+                PassThroughConstants.REST_GET_DELETE_INVOKE))) {\n",
+            "+            return true;\n",
+            "+        }\n",
+            "+\n",
+            "+        return Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.NO_ENTITY_BODY));\n",
+            "+    }\n",
+            "+\n",
+            "     /**\n",
+            "      * Return the IOEventDispatch implementation to be used. This is overridden by the\n",
             "      * SSL sender\n"
-          ]
+          ],
+          "locn": "-421,6 +418,15"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java", 
-      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java"
-    }, 
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-0,0 +1,18", 
           "lines": [
-            "+<synapseSample>\n", 
-            "+    <sampleID>10003</sampleID>\n", 
-            "+    <sampleName>Pass Through Transport OPTIONS Method Support</sampleName>\n", 
-            "+    <synapseConfig>\n", 
-            "+        <!--if we don't specify the optional values, framework will use defaults-->\n", 
-            "+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>\n", 
-            "+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>\n", 
-            "+        <synapseXml>modules/integration/src/test/resources/extras/synapse_sample_10003.xml</synapseXml>\n", 
-            "+    </synapseConfig>\n", 
-            "+    <backEndServerConfig>\n", 
-            "+        <echoServer id=\"0\">\n", 
-            "+            <httpPort>9000</httpPort>\n", 
-            "+        </echoServer>\n", 
-            "+    </backEndServerConfig>\n", 
-            "+    <clientConfig>\n", 
-            "+        <clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>\n", 
-            "+    </clientConfig>\n", 
-            "+</synapseSample>\n", 
+            "+<synapseSample>\n",
+            "+    <sampleID>10003</sampleID>\n",
+            "+    <sampleName>Pass Through Transport OPTIONS Method Support</sampleName>\n",
+            "+    <synapseConfig>\n",
+            "+        <!--if we don't specify the optional values, framework will use defaults-->\n",
+            "+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>\n",
+            "+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>\n",
+            "+        <synapseXml>modules/integration/src/test/resources/extras/synapse_sample_10003.xml</synapseXml>\n",
+            "+    </synapseConfig>\n",
+            "+    <backEndServerConfig>\n",
+            "+        <echoServer id=\"0\">\n",
+            "+            <httpPort>9000</httpPort>\n",
+            "+        </echoServer>\n",
+            "+    </backEndServerConfig>\n",
+            "+    <clientConfig>\n",
+            "+        <clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>\n",
+            "+    </clientConfig>\n",
+            "+</synapseSample>\n",
             "\\ No newline at end of file\n"
-          ]
+          ],
+          "locn": "-0,0 +1,18"
         }
-      ], 
-      "to": "java/modules/integration/src/test/resources/sample10003.xml", 
-      "from": "java/modules/integration/src/test/resources/sample10003.xml"
-    }, 
+      ],
+      "from": "java/modules/integration/src/test/resources/sample10003.xml",
+      "to": "java/modules/integration/src/test/resources/sample10003.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-0,0 +1,16", 
           "lines": [
-            "+<syn:definitions xmlns:syn=\"http://ws.apache.org/ns/synapse\">\n", 
-            "+    <syn:api name=\"TestAPI\" context=\"/test\">\n", 
-            "+        <syn:resource methods=\"OPTIONS\">\n", 
-            "+            <syn:inSequence>\n", 
-            "+                <syn:send>\n", 
-            "+                    <syn:endpoint>\n", 
-            "+                        <syn:address uri=\"http://localhost:9000/services/EchoService\"/>\n", 
-            "+                    </syn:endpoint>\n", 
-            "+                </syn:send>\n", 
-            "+            </syn:inSequence>\n", 
-            "+            <syn:outSequence>\n", 
-            "+                <syn:send/>\n", 
-            "+            </syn:outSequence>\n", 
-            "+        </syn:resource>\n", 
-            "+    </syn:api>\n", 
-            "+</syn:definitions>\n", 
+            "+<syn:definitions xmlns:syn=\"http://ws.apache.org/ns/synapse\">\n",
+            "+    <syn:api name=\"TestAPI\" context=\"/test\">\n",
+            "+        <syn:resource methods=\"OPTIONS\">\n",
+            "+            <syn:inSequence>\n",
+            "+                <syn:send>\n",
+            "+                    <syn:endpoint>\n",
+            "+                        <syn:address uri=\"http://localhost:9000/services/EchoService\"/>\n",
+            "+                    </syn:endpoint>\n",
+            "+                </syn:send>\n",
+            "+            </syn:inSequence>\n",
+            "+            <syn:outSequence>\n",
+            "+                <syn:send/>\n",
+            "+            </syn:outSequence>\n",
+            "+        </syn:resource>\n",
+            "+    </syn:api>\n",
+            "+</syn:definitions>\n",
             "\\ No newline at end of file\n"
-          ]
+          ],
+          "locn": "-0,0 +1,16"
         }
-      ], 
-      "to": "java/modules/integration/src/test/resources/extras/synapse_sample_10003.xml", 
-      "from": "java/modules/integration/src/test/resources/extras/synapse_sample_10003.xml"
-    }, 
+      ],
+      "from": "java/modules/integration/src/test/resources/extras/synapse_sample_10003.xml",
+      "to": "java/modules/integration/src/test/resources/extras/synapse_sample_10003.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-20,6 +20,7", 
           "lines": [
-            " package org.apache.synapse.samples.framework.clients;\n", 
-            " \n", 
-            " import org.apache.http.client.methods.HttpGet;\n", 
-            "+import org.apache.http.client.methods.HttpOptions;\n", 
-            " import org.apache.http.client.methods.HttpPost;\n", 
-            " import org.apache.http.entity.BasicHttpEntity;\n", 
+            " package org.apache.synapse.samples.framework.clients;\n",
+            " \n",
+            " import org.apache.http.client.methods.HttpGet;\n",
+            "+import org.apache.http.client.methods.HttpOptions;\n",
+            " import org.apache.http.client.methods.HttpPost;\n",
+            " import org.apache.http.entity.BasicHttpEntity;\n",
             " import org.apache.http.impl.client.CloseableHttpClient;\n"
-          ]
-        }, 
+          ],
+          "locn": "-20,6 +20,7"
+        },
         {
-          "locn": "-52,6 +53,23", 
           "lines": [
-            "     }\n", 
-            " \n", 
-            "     /**\n", 
-            "+     * Make a HTTP OPTIONS request on the specified URL.\n", 
-            "+     *\n", 
-            "+     * @param url A valid HTTP URL\n", 
-            "+     * @return A HttpResponse object\n", 
-            "+     * @throws Exception If an error occurs while making the HTTP call\n", 
-            "+     */\n", 
-            "+    public HttpResponse doOptions(String url) throws Exception {\n", 
-            "+        CloseableHttpClient client = HttpClientBuilder.create().build();\n", 
-            "+        try {\n", 
-            "+            HttpOptions options = new HttpOptions(url);\n", 
-            "+            return new HttpResponse(client.execute(options));\n", 
-            "+        } finally {\n", 
-            "+            client.close();\n", 
-            "+        }\n", 
-            "+    }\n", 
-            "+\n", 
-            "+    /**\n", 
-            "      * Make a HTTP POST request on the specified URL.\n", 
-            "      *\n", 
+            "     }\n",
+            " \n",
+            "     /**\n",
+            "+     * Make a HTTP OPTIONS request on the specified URL.\n",
+            "+     *\n",
+            "+     * @param url A valid HTTP URL\n",
+            "+     * @return A HttpResponse object\n",
+            "+     * @throws Exception If an error occurs while making the HTTP call\n",
+            "+     */\n",
+            "+    public HttpResponse doOptions(String url) throws Exception {\n",
+            "+        CloseableHttpClient client = HttpClientBuilder.create().build();\n",
+            "+        try {\n",
+            "+            HttpOptions options = new HttpOptions(url);\n",
+            "+            return new HttpResponse(client.execute(options));\n",
+            "+        } finally {\n",
+            "+            client.close();\n",
+            "+        }\n",
+            "+    }\n",
+            "+\n",
+            "+    /**\n",
+            "      * Make a HTTP POST request on the specified URL.\n",
+            "      *\n",
             "      * @param url A valid HTTP URL\n"
-          ]
+          ],
+          "locn": "-52,6 +53,23"
         }
-      ], 
-      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/BasicHttpClient.java", 
-      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/BasicHttpClient.java"
-    }, 
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/BasicHttpClient.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/BasicHttpClient.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-0,0 +1,40", 
           "lines": [
-            "+/*\n", 
-            "+ *  Licensed to the Apache Software Foundation (ASF) under one\n", 
-            "+ *  or more contributor license agreements.  See the NOTICE file\n", 
-            "+ *  distributed with this work for additional information\n", 
-            "+ *  regarding copyright ownership.  The ASF licenses this file\n", 
-            "+ *  to you under the Apache License, Version 2.0 (the\n", 
-            "+ *  \"License\"); you may not use this file except in compliance\n", 
-            "+ *  with the License.  You may obtain a copy of the License at\n", 
-            "+ *\n", 
-            "+ *   http://www.apache.org/licenses/LICENSE-2.0\n", 
-            "+ *\n", 
-            "+ *  Unless required by applicable law or agreed to in writing,\n", 
-            "+ *  software distributed under the License is distributed on an\n", 
-            "+ *   * \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n", 
-            "+ *  KIND, either express or implied.  See the License for the\n", 
-            "+ *  specific language governing permissions and limitations\n", 
-            "+ *  under the License.\n", 
-            "+ */\n", 
-            "+\n", 
-            "+package org.apache.synapse.samples.framework.tests.rest;\n", 
-            "+\n", 
-            "+import org.apache.http.HttpStatus;\n", 
-            "+import org.apache.synapse.samples.framework.SynapseTestCase;\n", 
-            "+import org.apache.synapse.samples.framework.clients.BasicHttpClient;\n", 
-            "+import org.apache.synapse.samples.framework.clients.HttpResponse;\n", 
-            "+\n", 
-            "+public class Sample10003 extends SynapseTestCase {\n", 
-            "+\n", 
-            "+    public Sample10003() {\n", 
-            "+        super(10003);\n", 
-            "+    }\n", 
-            "+\n", 
-            "+    public void testOptionsMethod() throws Exception {\n", 
-            "+        BasicHttpClient client = new BasicHttpClient();\n", 
-            "+        HttpResponse response = client.doOptions(\"http://127.0.0.1:8280/test\");\n", 
-            "+        // The echo server considers OPTIONS request to be entity non-enclosing,\n", 
-            "+        // and hence will reply with a 204\n", 
-            "+        assertEquals(HttpStatus.SC_NO_CONTENT, response.getStatus());\n", 
-            "+    }\n", 
+            "+/*\n",
+            "+ *  Licensed to the Apache Software Foundation (ASF) under one\n",
+            "+ *  or more contributor license agreements.  See the NOTICE file\n",
+            "+ *  distributed with this work for additional information\n",
+            "+ *  regarding copyright ownership.  The ASF licenses this file\n",
+            "+ *  to you under the Apache License, Version 2.0 (the\n",
+            "+ *  \"License\"); you may not use this file except in compliance\n",
+            "+ *  with the License.  You may obtain a copy of the License at\n",
+            "+ *\n",
+            "+ *   http://www.apache.org/licenses/LICENSE-2.0\n",
+            "+ *\n",
+            "+ *  Unless required by applicable law or agreed to in writing,\n",
+            "+ *  software distributed under the License is distributed on an\n",
+            "+ *   * \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n",
+            "+ *  KIND, either express or implied.  See the License for the\n",
+            "+ *  specific language governing permissions and limitations\n",
+            "+ *  under the License.\n",
+            "+ */\n",
+            "+\n",
+            "+package org.apache.synapse.samples.framework.tests.rest;\n",
+            "+\n",
+            "+import org.apache.http.HttpStatus;\n",
+            "+import org.apache.synapse.samples.framework.SynapseTestCase;\n",
+            "+import org.apache.synapse.samples.framework.clients.BasicHttpClient;\n",
+            "+import org.apache.synapse.samples.framework.clients.HttpResponse;\n",
+            "+\n",
+            "+public class Sample10003 extends SynapseTestCase {\n",
+            "+\n",
+            "+    public Sample10003() {\n",
+            "+        super(10003);\n",
+            "+    }\n",
+            "+\n",
+            "+    public void testOptionsMethod() throws Exception {\n",
+            "+        BasicHttpClient client = new BasicHttpClient();\n",
+            "+        HttpResponse response = client.doOptions(\"http://127.0.0.1:8280/test\");\n",
+            "+        // The echo server considers OPTIONS request to be entity non-enclosing,\n",
+            "+        // and hence will reply with a 204\n",
+            "+        assertEquals(HttpStatus.SC_NO_CONTENT, response.getStatus());\n",
+            "+    }\n",
             "+}\n"
-          ]
+          ],
+          "locn": "-0,0 +1,40"
         }
-      ], 
-      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/rest/Sample10003.java", 
-      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/rest/Sample10003.java"
-    }, 
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/rest/Sample10003.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/rest/Sample10003.java"
+    },
     {
       "chunks": [
         {
-          "locn": "-23,6 +23,7", 
           "lines": [
-            " import org.apache.commons.logging.Log;\n", 
-            " import org.apache.commons.logging.LogFactory;\n", 
-            " import org.apache.synapse.samples.framework.tests.rest.Sample10002;\n", 
-            "+import org.apache.synapse.samples.framework.tests.rest.Sample10003;\n", 
-            " import org.apache.synapse.samples.framework.tests.tasks.*;\n", 
-            " import org.apache.synapse.samples.framework.tests.transport.Sample250;\n", 
+            " import org.apache.commons.logging.Log;\n",
+            " import org.apache.commons.logging.LogFactory;\n",
+            " import org.apache.synapse.samples.framework.tests.rest.Sample10002;\n",
+            "+import org.apache.synapse.samples.framework.tests.rest.Sample10003;\n",
+            " import org.apache.synapse.samples.framework.tests.tasks.*;\n",
+            " import org.apache.synapse.samples.framework.tests.transport.Sample250;\n",
             " import org.apache.synapse.samples.framework.tests.advanced.*;\n"
-          ]
-        }, 
+          ],
+          "locn": "-23,6 +23,7"
+        },
         {
-          "locn": "-244,5 +245,6", 
           "lines": [
-            "         sampleClassRepo.put(\"800\", Sample800.class);\n", 
-            "         sampleClassRepo.put(\"10001\", Sample10001.class);\n", 
-            "         sampleClassRepo.put(\"10002\", Sample10002.class);\n", 
-            "+        sampleClassRepo.put(\"10003\", Sample10003.class);\n", 
-            "     }\n", 
-            " }\n", 
+            "         sampleClassRepo.put(\"800\", Sample800.class);\n",
+            "         sampleClassRepo.put(\"10001\", Sample10001.class);\n",
+            "         sampleClassRepo.put(\"10002\", Sample10002.class);\n",
+            "+        sampleClassRepo.put(\"10003\", Sample10003.class);\n",
+            "     }\n",
+            " }\n",
             "\\ No newline at end of file\n"
-          ]
+          ],
+          "locn": "-244,5 +245,6"
         }
-      ], 
-      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java", 
-      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java"
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java"
     }
-  ], 
-  "id": "1626502"
+  ],
+  "id": "1626502",
+  "message": "Fixing SYNAPSE-926 OPTIONS support in the PT transport -- Added integration test 10003 to cover the scenario",
+  "when": "2014-09-20T18:09:11-04:00",
+  "who": "hiranya"
 }

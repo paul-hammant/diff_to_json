@@ -1,53 +1,53 @@
 {
-  "when": "2013-07-19T18:32:40-04:00", 
-  "message": "Fixing SYNAPSE-853 - Concurrency issue in endpoint stat collection. Used a ConcurrentLinkedQueue instead of the ArrayList to collect stat logs in a thread safe manner.", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-23,6 +23,8", 
           "lines": [
-            " import java.util.ArrayList;\r\n", 
-            " import java.util.Iterator;\r\n", 
-            " import java.util.List;\r\n", 
-            "+import java.util.Queue;\r\n", 
-            "+import java.util.concurrent.ConcurrentLinkedQueue;\r\n", 
-            " \r\n", 
-            " /**\r\n", 
+            " import java.util.ArrayList;\r\n",
+            " import java.util.Iterator;\r\n",
+            " import java.util.List;\r\n",
+            "+import java.util.Queue;\r\n",
+            "+import java.util.concurrent.ConcurrentLinkedQueue;\r\n",
+            " \r\n",
+            " /**\r\n",
             "  * Holds a record for statistics for current message\r\n"
-          ]
-        }, 
+          ],
+          "locn": "-23,6 +23,8"
+        },
         {
-          "locn": "-31,7 +33,7", 
           "lines": [
-            " public class StatisticsRecord {\r\n", 
-            " \r\n", 
-            "     private String id;\r\n", 
-            "-    private final List<StatisticsLog> statisticsLogs = new ArrayList<StatisticsLog>();\r\n", 
-            "+    private final Queue<StatisticsLog> statisticsLogs = new ConcurrentLinkedQueue<StatisticsLog>();\r\n", 
-            "     private String clientIP;\r\n", 
-            "     private String clientHost;\r\n", 
+            " public class StatisticsRecord {\r\n",
+            " \r\n",
+            "     private String id;\r\n",
+            "-    private final List<StatisticsLog> statisticsLogs = new ArrayList<StatisticsLog>();\r\n",
+            "+    private final Queue<StatisticsLog> statisticsLogs = new ConcurrentLinkedQueue<StatisticsLog>();\r\n",
+            "     private String clientIP;\r\n",
+            "     private String clientHost;\r\n",
             "     private ComponentType owner;\r\n"
-          ]
-        }, 
+          ],
+          "locn": "-31,7 +33,7"
+        },
         {
-          "locn": "-118,7 +120,7", 
           "lines": [
-            "     }\r\n", 
-            " \r\n", 
-            "     public String toString() {\r\n", 
-            "-        return new StringBuffer()\r\n", 
-            "+        return new StringBuilder()\r\n", 
-            "                 .append(\"[Message id : \").append(id).append(\" ]\")\r\n", 
-            "                 .append(\"[Remote  IP : \").append(clientIP).append(\" ]\")\r\n", 
+            "     }\r\n",
+            " \r\n",
+            "     public String toString() {\r\n",
+            "-        return new StringBuffer()\r\n",
+            "+        return new StringBuilder()\r\n",
+            "                 .append(\"[Message id : \").append(id).append(\" ]\")\r\n",
+            "                 .append(\"[Remote  IP : \").append(clientIP).append(\" ]\")\r\n",
             "                 .append(\"[Remote host : \").append(clientHost).append(\" ]\")\r\n"
-          ]
+          ],
+          "locn": "-118,7 +120,7"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/aspects/statistics/StatisticsRecord.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/aspects/statistics/StatisticsRecord.java"
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/aspects/statistics/StatisticsRecord.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/aspects/statistics/StatisticsRecord.java"
     }
-  ], 
-  "id": "1505057"
+  ],
+  "id": "1505057",
+  "message": "Fixing SYNAPSE-853 - Concurrency issue in endpoint stat collection. Used a ConcurrentLinkedQueue instead of the ArrayList to collect stat logs in a thread safe manner.",
+  "when": "2013-07-19T18:32:40-04:00",
+  "who": "hiranya"
 }

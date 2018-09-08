@@ -1,123 +1,123 @@
 {
-  "when": "2016-12-28T22:20:54-05:00", 
-  "message": "Patch by Chanaka for SYNAPSE-1088", 
-  "who": "isudana", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-59,8 +59,8", 
           "lines": [
-            " \n", 
-            "             <p>\n", 
-            "                 Synapse requires Java 1.6 or higher and has been tested on Java runtime environments\n", 
-            "-                from Sun, IBM and Apple. Note that the recommended Java version is 1.7. Synapse is\n", 
-            "-                used on various operation systems, including Linux, Mac OS X, Solaris, Windows and AIX,\n", 
-            "+                from Sun, IBM and Apple.Synapse is used on various operation systems,\n", 
-            "+                including Linux, Mac OS X, Solaris, Windows and AIX,\n", 
-            "                 as well as mainframe environments. The recommended operation system for production use\n", 
-            "                 is Linux since it offers a wider range of options to tune the TCP/IP stack. This is\n", 
+            " \n",
+            "             <p>\n",
+            "                 Synapse requires Java 1.6 or higher and has been tested on Java runtime environments\n",
+            "-                from Sun, IBM and Apple. Note that the recommended Java version is 1.7. Synapse is\n",
+            "-                used on various operation systems, including Linux, Mac OS X, Solaris, Windows and AIX,\n",
+            "+                from Sun, IBM and Apple.Synapse is used on various operation systems,\n",
+            "+                including Linux, Mac OS X, Solaris, Windows and AIX,\n",
+            "                 as well as mainframe environments. The recommended operation system for production use\n",
+            "                 is Linux since it offers a wider range of options to tune the TCP/IP stack. This is\n",
             "                 important to optimize the performance of the NIO HTTP transport.\n"
-          ]
+          ],
+          "locn": "-59,8 +59,8"
         }
-      ], 
-      "to": "java/modules/documentation/src/site/xdoc/userguide/deployment.xml", 
-      "from": "java/modules/documentation/src/site/xdoc/userguide/deployment.xml"
-    }, 
+      ],
+      "from": "java/modules/documentation/src/site/xdoc/userguide/deployment.xml",
+      "to": "java/modules/documentation/src/site/xdoc/userguide/deployment.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-64,7 +64,7", 
           "lines": [
-            "                             </a>\n", 
-            "                         </td>\n", 
-            "                         <td>\n", 
-            "-                            1.6.0_23 or higher - recommended JDK 1.7.x, untested on JDK 1.8.x (For instructions on setting up the JDK on different\n", 
-            "+                            1.6.0_23 or higher (For instructions on setting up the JDK on different\n", 
-            "                             operating systems, visit<a\n", 
-            "                                 href=\"http://www.oracle.com/technetwork/java/index.html\">\n", 
+            "                             </a>\n",
+            "                         </td>\n",
+            "                         <td>\n",
+            "-                            1.6.0_23 or higher - recommended JDK 1.7.x, untested on JDK 1.8.x (For instructions on setting up the JDK on different\n",
+            "+                            1.6.0_23 or higher (For instructions on setting up the JDK on different\n",
+            "                             operating systems, visit<a\n",
+            "                                 href=\"http://www.oracle.com/technetwork/java/index.html\">\n",
             "                             Java homepage.\n"
-          ]
+          ],
+          "locn": "-64,7 +64,7"
         }
-      ], 
-      "to": "java/modules/documentation/src/site/xdoc/userguide/installation.xml", 
-      "from": "java/modules/documentation/src/site/xdoc/userguide/installation.xml"
-    }, 
+      ],
+      "from": "java/modules/documentation/src/site/xdoc/userguide/installation.xml",
+      "to": "java/modules/documentation/src/site/xdoc/userguide/installation.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-49,8 +49,8", 
           "lines": [
-            "                 Please make sure you have them properly installed and configured in your system.\n", 
-            "             </p>\n", 
-            "             <ul>\n", 
-            "-                <li>A Java runtime - JDK or JRE of version 1.6.x or higher\n", 
-            "-                    (1.6.x or 1.7.x is recommended. 1.8.x has not been tested enough)</li>\n", 
-            "+                <li>A Java runtime - JDK or JRE of version 1.6.0_23 or higher\n", 
-            "+                    </li>\n", 
-            "                 <li><a href=\"http://ant.apache.org\">Apache Ant</a> version 1.6.5 or higher</li>\n", 
-            "                 <li>\n", 
+            "                 Please make sure you have them properly installed and configured in your system.\n",
+            "             </p>\n",
+            "             <ul>\n",
+            "-                <li>A Java runtime - JDK or JRE of version 1.6.x or higher\n",
+            "-                    (1.6.x or 1.7.x is recommended. 1.8.x has not been tested enough)</li>\n",
+            "+                <li>A Java runtime - JDK or JRE of version 1.6.0_23 or higher\n",
+            "+                    </li>\n",
+            "                 <li><a href=\"http://ant.apache.org\">Apache Ant</a> version 1.6.5 or higher</li>\n",
+            "                 <li>\n",
             "                     A command line interface such as 'Command Prompt' on Windows and the Bash shell\n"
-          ]
+          ],
+          "locn": "-49,8 +49,8"
         }
-      ], 
-      "to": "java/modules/documentation/src/site/xdoc/userguide/samples/setup/index.xml", 
-      "from": "java/modules/documentation/src/site/xdoc/userguide/samples/setup/index.xml"
-    }, 
+      ],
+      "from": "java/modules/documentation/src/site/xdoc/userguide/samples/setup/index.xml",
+      "to": "java/modules/documentation/src/site/xdoc/userguide/samples/setup/index.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-40,8 +40,7", 
           "lines": [
-            "             </p>\n", 
-            "             <ul>\n", 
-            "                 <li>\n", 
-            "-                    A Java runtime - JDK or JRE of version 1.6.x or higher\n", 
-            "-                    (1.6.x or 1.7.x is recommended. 1.8.x is not tested enough)\n", 
-            "+                    A Java runtime - JDK or JRE of version 1.6.0_23 or higher\n", 
-            "                 </li>\n", 
-            "                 <li>\n", 
+            "             </p>\n",
+            "             <ul>\n",
+            "                 <li>\n",
+            "-                    A Java runtime - JDK or JRE of version 1.6.x or higher\n",
+            "-                    (1.6.x or 1.7.x is recommended. 1.8.x is not tested enough)\n",
+            "+                    A Java runtime - JDK or JRE of version 1.6.0_23 or higher\n",
+            "                 </li>\n",
+            "                 <li>\n",
             "                     Apache Ant <a href=\"http://ant.apache.org\">http://ant.apache.org</a>\n"
-          ]
+          ],
+          "locn": "-40,8 +40,7"
         }
-      ], 
-      "to": "java/modules/documentation/src/site/xdoc/userguide/quick_start.xml", 
-      "from": "java/modules/documentation/src/site/xdoc/userguide/quick_start.xml"
-    }, 
+      ],
+      "from": "java/modules/documentation/src/site/xdoc/userguide/quick_start.xml",
+      "to": "java/modules/documentation/src/site/xdoc/userguide/quick_start.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-100,8 +100,9", 
           "lines": [
-            " #jdk_15=`$JAVA_HOME/bin/java -version 2>&1 | grep 1.5`\n", 
-            " jdk_16=`$JAVA_HOME/bin/java -version 2>&1 | grep 1.6`\n", 
-            " jdk_17=`$JAVA_HOME/bin/java -version 2>&1 | grep 1.7`\n", 
-            "+jdk_18=`$JAVA_HOME/bin/java -version 2>&1 | grep 1.8`\n", 
-            " \n", 
-            "-if [ \"$jdk_16\" -o \"$jdk_17\" ]; then\n", 
-            "+if [ \"$jdk_16\" -o \"$jdk_17\" -o \"$jdk_18\" ]; then\n", 
-            " #    echo \" Using Bouncy castle JAR for Java 1.5\"\n", 
-            "     for f in $SYNAPSE_HOME/lib/bcprov-jdk15*.jar\n", 
+            " #jdk_15=`$JAVA_HOME/bin/java -version 2>&1 | grep 1.5`\n",
+            " jdk_16=`$JAVA_HOME/bin/java -version 2>&1 | grep 1.6`\n",
+            " jdk_17=`$JAVA_HOME/bin/java -version 2>&1 | grep 1.7`\n",
+            "+jdk_18=`$JAVA_HOME/bin/java -version 2>&1 | grep 1.8`\n",
+            " \n",
+            "-if [ \"$jdk_16\" -o \"$jdk_17\" ]; then\n",
+            "+if [ \"$jdk_16\" -o \"$jdk_17\" -o \"$jdk_18\" ]; then\n",
+            " #    echo \" Using Bouncy castle JAR for Java 1.5\"\n",
+            "     for f in $SYNAPSE_HOME/lib/bcprov-jdk15*.jar\n",
             "     do\n"
-          ]
-        }, 
+          ],
+          "locn": "-100,8 +100,9"
+        },
         {
-          "locn": "-108,7 +109,7", 
           "lines": [
-            "       SYNAPSE_CLASSPATH=$f:$SYNAPSE_CLASSPATH\n", 
-            "     done\n", 
-            " else\n", 
-            "-    echo \" [Warn] Synapse is tested only with Java 1.6 and 1.7\"\n", 
-            "+    echo \" [Warn] Synapse is tested only with Java 1.8 and prior versions (till 1.6)\"\n", 
-            " fi\n", 
-            " \n", 
+            "       SYNAPSE_CLASSPATH=$f:$SYNAPSE_CLASSPATH\n",
+            "     done\n",
+            " else\n",
+            "-    echo \" [Warn] Synapse is tested only with Java 1.6 and 1.7\"\n",
+            "+    echo \" [Warn] Synapse is tested only with Java 1.8 and prior versions (till 1.6)\"\n",
+            " fi\n",
+            " \n",
             " # For Cygwin, switch paths to Windows format before running java\n"
-          ]
+          ],
+          "locn": "-108,7 +109,7"
         }
-      ], 
-      "to": "java/modules/distribution/src/main/bin/synapse.sh", 
-      "from": "java/modules/distribution/src/main/bin/synapse.sh"
+      ],
+      "from": "java/modules/distribution/src/main/bin/synapse.sh",
+      "to": "java/modules/distribution/src/main/bin/synapse.sh"
     }
-  ], 
-  "id": "1776372"
+  ],
+  "id": "1776372",
+  "message": "Patch by Chanaka for SYNAPSE-1088",
+  "when": "2016-12-28T22:20:54-05:00",
+  "who": "isudana"
 }

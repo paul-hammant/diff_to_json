@@ -1,41 +1,41 @@
 {
-  "when": "2016-12-30T03:58:05-05:00", 
-  "message": "Why are we explicitly deleting artifacts from target folder during install phase? This is causing mvn deploy to fail.", 
-  "who": "ravi", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-162,21 +162,7", 
           "lines": [
-            "                             <goal>run</goal>\n", 
-            "                         </goals>\n", 
-            "                     </execution>\n", 
-            "-                    <execution>\n", 
-            "-                        <id>remove_test_lib</id>\n", 
-            "-                        <phase>install</phase>\n", 
-            "-                        <configuration>\n", 
-            "-                            <tasks>\n", 
-            "-                                <delete file=\"target/synapse-test-lib.zip\"/>\n", 
-            "-                                <delete file=\"target/synapse-eiptest-lib.zip\"/>\n", 
-            "-                                <delete file=\"target/synapse-eipcore-lib.zip\"/>\n", 
-            "-                            </tasks>\n", 
-            "-                        </configuration>\n", 
-            "-                        <goals>\n", 
-            "-                            <goal>run</goal>\n", 
-            "-                        </goals>\n", 
-            "-                    </execution>\n", 
-            "-                </executions>\n", 
-            "+\t    </executions>\n", 
-            "             </plugin>\n", 
-            "             <plugin>\n", 
+            "                             <goal>run</goal>\n",
+            "                         </goals>\n",
+            "                     </execution>\n",
+            "-                    <execution>\n",
+            "-                        <id>remove_test_lib</id>\n",
+            "-                        <phase>install</phase>\n",
+            "-                        <configuration>\n",
+            "-                            <tasks>\n",
+            "-                                <delete file=\"target/synapse-test-lib.zip\"/>\n",
+            "-                                <delete file=\"target/synapse-eiptest-lib.zip\"/>\n",
+            "-                                <delete file=\"target/synapse-eipcore-lib.zip\"/>\n",
+            "-                            </tasks>\n",
+            "-                        </configuration>\n",
+            "-                        <goals>\n",
+            "-                            <goal>run</goal>\n",
+            "-                        </goals>\n",
+            "-                    </execution>\n",
+            "-                </executions>\n",
+            "+\t    </executions>\n",
+            "             </plugin>\n",
+            "             <plugin>\n",
             "                 <groupId>org.apache.maven.plugins</groupId>\n"
-          ]
+          ],
+          "locn": "-162,21 +162,7"
         }
-      ], 
-      "to": "java/modules/core/pom.xml", 
-      "from": "java/modules/core/pom.xml"
+      ],
+      "from": "java/modules/core/pom.xml",
+      "to": "java/modules/core/pom.xml"
     }
-  ], 
-  "id": "1776530"
+  ],
+  "id": "1776530",
+  "message": "Why are we explicitly deleting artifacts from target folder during install phase? This is causing mvn deploy to fail.",
+  "when": "2016-12-30T03:58:05-05:00",
+  "who": "ravi"
 }

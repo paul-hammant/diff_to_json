@@ -1,330 +1,330 @@
 {
-  "when": "2012-01-02T06:21:27-05:00", 
-  "message": "Fixing some maven warnings", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-51,7 +51,7", 
           "lines": [
-            "                 <extensions>true</extensions>\r\n", 
-            "                 <configuration>\r\n", 
-            "                     <instructions>\r\n", 
-            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\r\n", 
-            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\r\n", 
-            "                         <Export-Package>\r\n", 
-            "                             org.apache.synapse.experimental.*,\r\n", 
+            "                 <extensions>true</extensions>\r\n",
+            "                 <configuration>\r\n",
+            "                     <instructions>\r\n",
+            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\r\n",
+            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\r\n",
+            "                         <Export-Package>\r\n",
+            "                             org.apache.synapse.experimental.*,\r\n",
             "                         </Export-Package>\r\n"
-          ]
+          ],
+          "locn": "-51,7 +51,7"
         }
-      ], 
-      "to": "java/modules/experimental/pom.xml", 
-      "from": "java/modules/experimental/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/experimental/pom.xml",
+      "to": "java/modules/experimental/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-55,7 +55,7", 
           "lines": [
-            "                 <extensions>true</extensions>\n", 
-            "                 <configuration>\n", 
-            "                     <instructions>\n", 
-            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\n", 
-            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\n", 
-            "                         <Export-Package>\n", 
-            "                             org.apache.synapse.format.hessian.*,\n", 
+            "                 <extensions>true</extensions>\n",
+            "                 <configuration>\n",
+            "                     <instructions>\n",
+            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\n",
+            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\n",
+            "                         <Export-Package>\n",
+            "                             org.apache.synapse.format.hessian.*,\n",
             "                             org.apache.synapse.format.syslog.*,\n"
-          ]
+          ],
+          "locn": "-55,7 +55,7"
         }
-      ], 
-      "to": "java/modules/extensions/pom.xml", 
-      "from": "java/modules/extensions/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/extensions/pom.xml",
+      "to": "java/modules/extensions/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-54,7 +54,7", 
           "lines": [
-            "                 <extensions>true</extensions>\r\n", 
-            "                 <configuration>\r\n", 
-            "                     <instructions>\r\n", 
-            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\r\n", 
-            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\r\n", 
-            "                         <Export-Package>\r\n", 
-            "                             org.apache.synapse.securevault.*,\r\n", 
+            "                 <extensions>true</extensions>\r\n",
+            "                 <configuration>\r\n",
+            "                     <instructions>\r\n",
+            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\r\n",
+            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\r\n",
+            "                         <Export-Package>\r\n",
+            "                             org.apache.synapse.securevault.*,\r\n",
             "                         </Export-Package>\r\n"
-          ]
+          ],
+          "locn": "-54,7 +54,7"
         }
-      ], 
-      "to": "java/modules/securevault/pom.xml", 
-      "from": "java/modules/securevault/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/securevault/pom.xml",
+      "to": "java/modules/securevault/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-398,7 +398,7", 
           "lines": [
-            "                 <extensions>true</extensions>\n", 
-            "                 <configuration>\n", 
-            "                     <instructions>\n", 
-            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\n", 
-            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\n", 
-            "                         <Private-Package>samples.*</Private-Package>\n", 
-            "                         <Import-Package>\n", 
+            "                 <extensions>true</extensions>\n",
+            "                 <configuration>\n",
+            "                     <instructions>\n",
+            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\n",
+            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\n",
+            "                         <Private-Package>samples.*</Private-Package>\n",
+            "                         <Import-Package>\n",
             "                             !org.apache.commons.logging,\n"
-          ]
+          ],
+          "locn": "-398,7 +398,7"
         }
-      ], 
-      "to": "java/modules/samples/pom.xml", 
-      "from": "java/modules/samples/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/samples/pom.xml",
+      "to": "java/modules/samples/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-54,7 +54,7", 
           "lines": [
-            "                 <extensions>true</extensions>\n", 
-            "                 <configuration>\n", 
-            "                     <instructions>\n", 
-            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\n", 
-            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\n", 
-            "                         <Export-Package>\n", 
-            "                             org.apache.synapse.commons.*,\n", 
+            "                 <extensions>true</extensions>\n",
+            "                 <configuration>\n",
+            "                     <instructions>\n",
+            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\n",
+            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\n",
+            "                         <Export-Package>\n",
+            "                             org.apache.synapse.commons.*,\n",
             "                         </Export-Package>\n"
-          ]
+          ],
+          "locn": "-54,7 +54,7"
         }
-      ], 
-      "to": "java/modules/commons/pom.xml", 
-      "from": "java/modules/commons/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/commons/pom.xml",
+      "to": "java/modules/commons/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-51,7 +51,7", 
           "lines": [
-            "                 <extensions>true</extensions>\n", 
-            "                 <configuration>\n", 
-            "                     <instructions>\n", 
-            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\n", 
-            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\n", 
-            "                         <Private-Package>\n", 
-            "                             org.apache.synapse.handler.util,\n", 
+            "                 <extensions>true</extensions>\n",
+            "                 <configuration>\n",
+            "                     <instructions>\n",
+            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\n",
+            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\n",
+            "                         <Private-Package>\n",
+            "                             org.apache.synapse.handler.util,\n",
             "                             org.apache.synapse.handler,\n"
-          ]
+          ],
+          "locn": "-51,7 +51,7"
         }
-      ], 
-      "to": "java/modules/handler/pom.xml", 
-      "from": "java/modules/handler/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/handler/pom.xml",
+      "to": "java/modules/handler/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-50,7 +50,7", 
           "lines": [
-            "                 <extensions>true</extensions>\n", 
-            "                 <configuration>\n", 
-            "                     <instructions>\n", 
-            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\n", 
-            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\n", 
-            "                         <Export-Package>\n", 
-            "                             org.apache.synapse.transport.fix.*,\n", 
+            "                 <extensions>true</extensions>\n",
+            "                 <configuration>\n",
+            "                     <instructions>\n",
+            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\n",
+            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\n",
+            "                         <Export-Package>\n",
+            "                             org.apache.synapse.transport.fix.*,\n",
             "                         </Export-Package>\n"
-          ]
+          ],
+          "locn": "-50,7 +50,7"
         }
-      ], 
-      "to": "java/modules/transports/optional/fix/pom.xml", 
-      "from": "java/modules/transports/optional/fix/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/transports/optional/fix/pom.xml",
+      "to": "java/modules/transports/optional/fix/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-50,7 +50,7", 
           "lines": [
-            "                 <extensions>true</extensions>\n", 
-            "                 <configuration>\n", 
-            "                     <instructions>\n", 
-            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\n", 
-            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\n", 
-            "                         <Export-Package>\n", 
-            "                             org.apache.synapse.transport.vfs.*,\n", 
+            "                 <extensions>true</extensions>\n",
+            "                 <configuration>\n",
+            "                     <instructions>\n",
+            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\n",
+            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\n",
+            "                         <Export-Package>\n",
+            "                             org.apache.synapse.transport.vfs.*,\n",
             "                         </Export-Package>\n"
-          ]
+          ],
+          "locn": "-50,7 +50,7"
         }
-      ], 
-      "to": "java/modules/transports/core/vfs/pom.xml", 
-      "from": "java/modules/transports/core/vfs/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/transports/core/vfs/pom.xml",
+      "to": "java/modules/transports/core/vfs/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-50,7 +50,7", 
           "lines": [
-            "                 <extensions>true</extensions>\n", 
-            "                 <configuration>\n", 
-            "                     <instructions>\n", 
-            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\n", 
-            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\n", 
-            "                         <Export-Package>\n", 
-            "                             org.apache.synapse.transport.nhttp.*,\n", 
+            "                 <extensions>true</extensions>\n",
+            "                 <configuration>\n",
+            "                     <instructions>\n",
+            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\n",
+            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\n",
+            "                         <Export-Package>\n",
+            "                             org.apache.synapse.transport.nhttp.*,\n",
             "                         </Export-Package>\n"
-          ]
+          ],
+          "locn": "-50,7 +50,7"
         }
-      ], 
-      "to": "java/modules/transports/core/nhttp/pom.xml", 
-      "from": "java/modules/transports/core/nhttp/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/transports/core/nhttp/pom.xml",
+      "to": "java/modules/transports/core/nhttp/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-50,7 +50,7", 
           "lines": [
-            "                 <extensions>true</extensions>\n", 
-            "                 <configuration>\n", 
-            "                     <instructions>\n", 
-            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\n", 
-            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\n", 
-            "                         <Export-Package>\n", 
-            "                             org.apache.synapse.transport.pipe.*,\n", 
+            "                 <extensions>true</extensions>\n",
+            "                 <configuration>\n",
+            "                     <instructions>\n",
+            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\n",
+            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\n",
+            "                         <Export-Package>\n",
+            "                             org.apache.synapse.transport.pipe.*,\n",
             "                         </Export-Package>\n"
-          ]
+          ],
+          "locn": "-50,7 +50,7"
         }
-      ], 
-      "to": "java/modules/transports/core/pipe/pom.xml", 
-      "from": "java/modules/transports/core/pipe/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/transports/core/pipe/pom.xml",
+      "to": "java/modules/transports/core/pipe/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-352,6 +352,7", 
           "lines": [
-            "             <plugin>\n", 
-            "                 <groupId>org.apache.maven.plugins</groupId>\n", 
-            "                 <artifactId>maven-surefire-report-plugin</artifactId>\n", 
-            "+                <version>2.11</version>\n", 
-            "                 <configuration>\n", 
-            "                     <outputName>sample_automation</outputName>\n", 
+            "             <plugin>\n",
+            "                 <groupId>org.apache.maven.plugins</groupId>\n",
+            "                 <artifactId>maven-surefire-report-plugin</artifactId>\n",
+            "+                <version>2.11</version>\n",
+            "                 <configuration>\n",
+            "                     <outputName>sample_automation</outputName>\n",
             "                 </configuration>\n"
-          ]
+          ],
+          "locn": "-352,6 +352,7"
         }
-      ], 
-      "to": "java/modules/integration/pom.xml", 
-      "from": "java/modules/integration/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/integration/pom.xml",
+      "to": "java/modules/integration/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-53,7 +53,7", 
           "lines": [
-            "                 <extensions>true</extensions>\n", 
-            "                 <configuration>\n", 
-            "                     <instructions>\n", 
-            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\n", 
-            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\n", 
-            "                         <Export-Package>\n", 
-            "                             org.apache.synapse.migrator.*,\n", 
+            "                 <extensions>true</extensions>\n",
+            "                 <configuration>\n",
+            "                     <instructions>\n",
+            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\n",
+            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\n",
+            "                         <Export-Package>\n",
+            "                             org.apache.synapse.migrator.*,\n",
             "                         </Export-Package>\n"
-          ]
+          ],
+          "locn": "-53,7 +53,7"
         }
-      ], 
-      "to": "java/modules/migrator/pom.xml", 
-      "from": "java/modules/migrator/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/migrator/pom.xml",
+      "to": "java/modules/migrator/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-54,7 +54,7", 
           "lines": [
-            "                 <extensions>true</extensions>\r\n", 
-            "                 <configuration>\r\n", 
-            "                     <instructions>\r\n", 
-            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\r\n", 
-            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\r\n", 
-            "                         <Export-Package>\r\n", 
-            "                             org.apache.synapse.task.*,\r\n", 
+            "                 <extensions>true</extensions>\r\n",
+            "                 <configuration>\r\n",
+            "                     <instructions>\r\n",
+            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\r\n",
+            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\r\n",
+            "                         <Export-Package>\r\n",
+            "                             org.apache.synapse.task.*,\r\n",
             "                         </Export-Package>\r\n"
-          ]
+          ],
+          "locn": "-54,7 +54,7"
         }
-      ], 
-      "to": "java/modules/tasks/pom.xml", 
-      "from": "java/modules/tasks/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/tasks/pom.xml",
+      "to": "java/modules/tasks/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-136,7 +136,7", 
           "lines": [
-            "                 <extensions>true</extensions>\n", 
-            "                 <configuration>\n", 
-            "                     <instructions>\n", 
-            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\n", 
-            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\n", 
-            "                         <Export-Package>\n", 
-            "                             org.apache.synapse,\n", 
+            "                 <extensions>true</extensions>\n",
+            "                 <configuration>\n",
+            "                     <instructions>\n",
+            "-                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>\n",
+            "+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>\n",
+            "                         <Export-Package>\n",
+            "                             org.apache.synapse,\n",
             "                             org.apache.synapse.aspects.*,\n"
-          ]
+          ],
+          "locn": "-136,7 +136,7"
         }
-      ], 
-      "to": "java/modules/core/pom.xml", 
-      "from": "java/modules/core/pom.xml"
-    }, 
+      ],
+      "from": "java/modules/core/pom.xml",
+      "to": "java/modules/core/pom.xml"
+    },
     {
       "chunks": [
         {
-          "locn": "-234,14 +234,14", 
           "lines": [
-            "                     <configuration>\n", 
-            "                         <archive>\n", 
-            "                             <manifestEntries>\n", 
-            "-                                <Extension-Name>${pom.groupId}</Extension-Name>\n", 
-            "-                                <Specification-Title>${pom.artifactId}</Specification-Title>\n", 
-            "+                                <Extension-Name>${project.groupId}</Extension-Name>\n", 
-            "+                                <Specification-Title>${project.artifactId}</Specification-Title>\n", 
-            "                                 <Specification-Vendor>Apache Software Foundation</Specification-Vendor>\n", 
-            "-                                <Specification-Version>${pom.version}</Specification-Version>\n", 
-            "+                                <Specification-Version>${project.version}</Specification-Version>\n", 
-            "                                 <Implementation-Title>Apache Synapse</Implementation-Title>\n", 
-            "                                 <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>\n", 
-            "                                 <Implementation-Vendor>Apache Software Foundation</Implementation-Vendor>\n", 
-            "-                                <Implementation-Version>${pom.version}</Implementation-Version>\n", 
-            "+                                <Implementation-Version>${project.version}</Implementation-Version>\n", 
-            "                             </manifestEntries>\n", 
-            "                         </archive>\n", 
+            "                     <configuration>\n",
+            "                         <archive>\n",
+            "                             <manifestEntries>\n",
+            "-                                <Extension-Name>${pom.groupId}</Extension-Name>\n",
+            "-                                <Specification-Title>${pom.artifactId}</Specification-Title>\n",
+            "+                                <Extension-Name>${project.groupId}</Extension-Name>\n",
+            "+                                <Specification-Title>${project.artifactId}</Specification-Title>\n",
+            "                                 <Specification-Vendor>Apache Software Foundation</Specification-Vendor>\n",
+            "-                                <Specification-Version>${pom.version}</Specification-Version>\n",
+            "+                                <Specification-Version>${project.version}</Specification-Version>\n",
+            "                                 <Implementation-Title>Apache Synapse</Implementation-Title>\n",
+            "                                 <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>\n",
+            "                                 <Implementation-Vendor>Apache Software Foundation</Implementation-Vendor>\n",
+            "-                                <Implementation-Version>${pom.version}</Implementation-Version>\n",
+            "+                                <Implementation-Version>${project.version}</Implementation-Version>\n",
+            "                             </manifestEntries>\n",
+            "                         </archive>\n",
             "                     </configuration>\n"
-          ]
-        }, 
+          ],
+          "locn": "-234,14 +234,14"
+        },
         {
-          "locn": "-439,11 +439,6", 
           "lines": [
-            "             </dependency>\n", 
-            "             <dependency>\n", 
-            "                 <groupId>org.apache.axis2</groupId>\n", 
-            "-                <artifactId>axis2-transport-local</artifactId>\n", 
-            "-                <version>${axis2.transport.version}</version>\n", 
-            "-            </dependency>\n", 
-            "-            <dependency>\n", 
-            "-                <groupId>org.apache.axis2</groupId>\n", 
-            "                 <artifactId>axis2-transport-mail</artifactId>\n", 
-            "                 <version>${axis2.transport.version}</version>\n", 
+            "             </dependency>\n",
+            "             <dependency>\n",
+            "                 <groupId>org.apache.axis2</groupId>\n",
+            "-                <artifactId>axis2-transport-local</artifactId>\n",
+            "-                <version>${axis2.transport.version}</version>\n",
+            "-            </dependency>\n",
+            "-            <dependency>\n",
+            "-                <groupId>org.apache.axis2</groupId>\n",
+            "                 <artifactId>axis2-transport-mail</artifactId>\n",
+            "                 <version>${axis2.transport.version}</version>\n",
             "             </dependency>\n"
-          ]
-        }, 
+          ],
+          "locn": "-439,11 +439,6"
+        },
         {
-          "locn": "-967,6 +962,7", 
           "lines": [
-            "         <plugins>\n", 
-            "             <plugin>\n", 
-            "                 <artifactId>maven-site-plugin</artifactId>\n", 
-            "+                <version>3.0</version>\n", 
-            "                 <inherited>false</inherited>\n", 
-            "             </plugin>\n", 
+            "         <plugins>\n",
+            "             <plugin>\n",
+            "                 <artifactId>maven-site-plugin</artifactId>\n",
+            "+                <version>3.0</version>\n",
+            "                 <inherited>false</inherited>\n",
+            "             </plugin>\n",
             "             <plugin>\n"
-          ]
+          ],
+          "locn": "-967,6 +962,7"
         }
-      ], 
-      "to": "java/pom.xml", 
-      "from": "java/pom.xml"
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
     }
-  ], 
-  "id": "1226392"
+  ],
+  "id": "1226392",
+  "message": "Fixing some maven warnings",
+  "when": "2012-01-02T06:21:27-05:00",
+  "who": "hiranya"
 }

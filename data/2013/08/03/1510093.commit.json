@@ -1,27 +1,27 @@
 {
-  "when": "2013-08-03T23:24:07-04:00", 
-  "message": "added low thread pool size to avoid OOM.", 
-  "who": "rajikak", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-339,7 +339,7", 
           "lines": [
-            " \n", 
-            "     public static final String PARAM_WORKER_POOL_SIZE = \"worker-pool-size\";\n", 
-            " \n", 
-            "-    public static final int WORKER_POOL_DEFAULT = 1000;\n", 
-            "+    public static final int WORKER_POOL_DEFAULT = 75;\n", 
-            " \n", 
-            "     public static final String PARAM_SEMAPHORE_TIME_OUT = \"semaphore-time-out\";\n", 
+            " \n",
+            "     public static final String PARAM_WORKER_POOL_SIZE = \"worker-pool-size\";\n",
+            " \n",
+            "-    public static final int WORKER_POOL_DEFAULT = 1000;\n",
+            "+    public static final int WORKER_POOL_DEFAULT = 75;\n",
+            " \n",
+            "     public static final String PARAM_SEMAPHORE_TIME_OUT = \"semaphore-time-out\";\n",
             " \n"
-          ]
+          ],
+          "locn": "-339,7 +339,7"
         }
-      ], 
-      "to": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportConstant.java", 
-      "from": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportConstant.java"
+      ],
+      "from": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportConstant.java",
+      "to": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportConstant.java"
     }
-  ], 
-  "id": "1510093"
+  ],
+  "id": "1510093",
+  "message": "added low thread pool size to avoid OOM.",
+  "when": "2013-08-03T23:24:07-04:00",
+  "who": "rajikak"
 }

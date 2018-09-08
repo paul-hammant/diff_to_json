@@ -1,26 +1,26 @@
 {
-  "when": "2012-06-24T00:55:46-04:00", 
-  "message": "Renaming API error handler sequence", 
-  "who": "hiranya", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-46,6 +46,6", 
           "lines": [
-            " \n", 
-            "     public static final String DEFAULT_ENCODING = \"UTF-8\";\n", 
-            " \n", 
-            "-    public static final String NO_MATCHING_RESOURCE_HANDLER = \"NO_MATCHING_RESOURCE_HANDLER\";\n", 
-            "+    public static final String NO_MATCHING_RESOURCE_HANDLER = \"_resource_mismatch_handler_\";\n", 
-            " \n", 
+            " \n",
+            "     public static final String DEFAULT_ENCODING = \"UTF-8\";\n",
+            " \n",
+            "-    public static final String NO_MATCHING_RESOURCE_HANDLER = \"NO_MATCHING_RESOURCE_HANDLER\";\n",
+            "+    public static final String NO_MATCHING_RESOURCE_HANDLER = \"_resource_mismatch_handler_\";\n",
+            " \n",
             " }\n"
-          ]
+          ],
+          "locn": "-46,6 +46,6"
         }
-      ], 
-      "to": "java/modules/core/src/main/java/org/apache/synapse/rest/RESTConstants.java", 
-      "from": "java/modules/core/src/main/java/org/apache/synapse/rest/RESTConstants.java"
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/rest/RESTConstants.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/rest/RESTConstants.java"
     }
-  ], 
-  "id": "1353224"
+  ],
+  "id": "1353224",
+  "message": "Renaming API error handler sequence",
+  "when": "2012-06-24T00:55:46-04:00",
+  "who": "hiranya"
 }

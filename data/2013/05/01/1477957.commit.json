@@ -1,36 +1,36 @@
 {
-  "when": "2013-05-01T07:43:30-04:00", 
-  "message": "Updating project list", 
-  "who": "kasun", 
   "changes": [
     {
       "chunks": [
         {
-          "locn": "-1288,6 +1288,17", 
           "lines": [
-            "             <email>rajikak AT apache.org</email>\n", 
-            "         </developer>\n", 
-            "         <developer>\n", 
-            "+            <name>Kasun Indrasiri</name>\n", 
-            "+            <id>kasun</id>\n", 
-            "+            <email>kasun AT apache.org</email>\n", 
-            "+\t    <organization>WSO2</organization>\n", 
-            "+        </developer> \n", 
-            "+\t<developer>\n", 
-            "+            <name>Udayanga Wickramasinghe</name>\n", 
-            "+            <id>uswick</id>\n", 
-            "+            <email>uswick AT apache.org</email>\n", 
-            "+        </developer>\n", 
-            "+        <developer>\n", 
-            "             <name>Miyuru Wanninayaka</name>\n", 
-            "             <id>miyuru</id>\n", 
+            "             <email>rajikak AT apache.org</email>\n",
+            "         </developer>\n",
+            "         <developer>\n",
+            "+            <name>Kasun Indrasiri</name>\n",
+            "+            <id>kasun</id>\n",
+            "+            <email>kasun AT apache.org</email>\n",
+            "+\t    <organization>WSO2</organization>\n",
+            "+        </developer> \n",
+            "+\t<developer>\n",
+            "+            <name>Udayanga Wickramasinghe</name>\n",
+            "+            <id>uswick</id>\n",
+            "+            <email>uswick AT apache.org</email>\n",
+            "+        </developer>\n",
+            "+        <developer>\n",
+            "             <name>Miyuru Wanninayaka</name>\n",
+            "             <id>miyuru</id>\n",
             "             <email>miyuru AT apache.org</email>\n"
-          ]
+          ],
+          "locn": "-1288,6 +1288,17"
         }
-      ], 
-      "to": "java/pom.xml", 
-      "from": "java/pom.xml"
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
     }
-  ], 
-  "id": "1477957"
+  ],
+  "id": "1477957",
+  "message": "Updating project list",
+  "when": "2013-05-01T07:43:30-04:00",
+  "who": "kasun"
 }
