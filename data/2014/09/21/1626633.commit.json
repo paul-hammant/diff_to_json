@@ -1,0 +1,103 @@
+{
+  "when": "2014-09-21T17:04:21-04:00", 
+  "message": "Fixing SYNAPSE-875 Applying patch from Dushan to support loading properties files from arbitrary locations", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-30,6 +30,8", 
+          "lines": [
+            "  */\n", 
+            " public class MiscellaneousUtil {\n", 
+            " \n", 
+            "+\tprivate static final String CONF_LOCATION = \"conf.location\";\n", 
+            "+\t\n", 
+            "     private static Log log = LogFactory.getLog(MiscellaneousUtil.class);\n", 
+            " \n", 
+            "     private MiscellaneousUtil() {\n"
+          ]
+        }, 
+        {
+          "locn": "-105,12 +107,12", 
+          "lines": [
+            "     }\n", 
+            " \n", 
+            "     /**\n", 
+            "-     * Loads the properties from a given property file path\n", 
+            "-     *\n", 
+            "-     * @param filePath Path of the property file\n", 
+            "-     * @return Properties loaded from given file\n", 
+            "-     */\n", 
+            "-    public static Properties loadProperties(String filePath) {\n", 
+            "+\t * Loads the properties from a given property file path\n", 
+            "+\t * \n", 
+            "+\t * @param filePath Path of the property file\n", 
+            "+\t * @return Properties loaded from given file\n", 
+            "+\t */\n", 
+            "+\tpublic static Properties loadProperties(String filePath) {\n", 
+            " \n", 
+            "         Properties properties = new Properties();\n", 
+            "         ClassLoader cl = Thread.currentThread().getContextClassLoader();\n"
+          ]
+        }, 
+        {
+          "locn": "-118,15 +120,32", 
+          "lines": [
+            "         if (log.isDebugEnabled()) {\n", 
+            "             log.debug(\"Loading a file '\" + filePath + \"' from classpath\");\n", 
+            "         }\n", 
+            "-\n", 
+            "-        InputStream in = cl.getResourceAsStream(filePath);\n", 
+            "+        \n", 
+            "+        InputStream in  = null;\n", 
+            "+        \n", 
+            "+        // if we reach this point assume that we may have to look into the user provided\n", 
+            "+        // external location for the given properties\n", 
+            "+\t\tif (System.getProperty(CONF_LOCATION) != null) {\n", 
+            "+\t\t\ttry {\n", 
+            "+\t\t\t\tin = new FileInputStream(System.getProperty(CONF_LOCATION) + File.separator + filePath);\n", 
+            "+\t\t\t} catch (FileNotFoundException e) {\n", 
+            "+\t\t\t\tlog.warn(\"Error loading properties from a file at the System \" +\n", 
+            "+                        \"defined location: \" + filePath, e);\n", 
+            "+\t\t\t}\n", 
+            "+\t\t}\n", 
+            "+\t\t\n", 
+            "+\t\tif (in == null){\n", 
+            "+\t\t\t// if cannot find with system path definition look into the class path for the\n", 
+            "+\t\t\t// given property file\n", 
+            "+\t\t\tin = cl.getResourceAsStream(filePath);\n", 
+            "+\t\t}\n", 
+            "+       \n", 
+            "         if (in == null) {\n", 
+            "             if (log.isDebugEnabled()) {\n", 
+            "                 log.debug(\"Unable to load file  '\" + filePath + \"'\");\n", 
+            "             }\n", 
+            " \n", 
+            "-            filePath = \"conf\" +\n", 
+            "-                    File.separatorChar + filePath;\n", 
+            "+            filePath = \"conf\" + File.separatorChar + filePath;\n", 
+            "             if (log.isDebugEnabled()) {\n", 
+            "                 log.debug(\"Loading a file '\" + filePath + \"' from classpath\");\n", 
+            "             }\n"
+          ]
+        }, 
+        {
+          "locn": "-138,6 +157,7", 
+          "lines": [
+            "                 }\n", 
+            "             }\n", 
+            "         }\n", 
+            "+\n", 
+            "         if (in != null) {\n", 
+            "             try {\n", 
+            "                 properties.load(in);\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/commons/src/main/java/org/apache/synapse/commons/util/MiscellaneousUtil.java", 
+      "from": "java/modules/commons/src/main/java/org/apache/synapse/commons/util/MiscellaneousUtil.java"
+    }
+  ], 
+  "id": "1626633"
+}

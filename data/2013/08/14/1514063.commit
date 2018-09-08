@@ -1,3 +1,50 @@
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetContext.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetContext.java	(revision 1514062)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetContext.java	(revision 1514063)
+@@ -108,7 +108,10 @@
+     public void reset() {
+         request = null;
+         response = null;
+-        state = ProtocolState.REQUEST_READY;
++        if (state != ProtocolState.CLOSED) {
++            // The connection is still not closed - Prepare to send more requests on this
++            state = ProtocolState.REQUEST_READY;
++        }
+ 
+         if (writer != null) {
+             ByteBuffer buffer = writer.getBuffer();
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java	(revision 1514062)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java	(revision 1514063)
+@@ -261,14 +261,14 @@
+ 
+         if (state == ProtocolState.REQUEST_READY || state == ProtocolState.RESPONSE_DONE) {
+             if (log.isDebugEnabled()) {
+-                log.debug("Keep-Alive connection was closed at the remote end: " + conn);
++                log.debug("Keep-Alive connection was closed by the client: " + conn);
+             }
+         } else if (state == ProtocolState.REQUEST_BODY || state == ProtocolState.REQUEST_HEAD) {
+             informReaderError(conn);
+-            log.warn("Connection closed at the remote end while reading the request: " + conn);
++            log.warn("Connection closed by the client while reading the request: " + conn);
+         } else if (state == ProtocolState.RESPONSE_BODY || state == ProtocolState.RESPONSE_HEAD) {
+             informWriterError(conn);
+-            log.warn("Connection closed at the remote end while writing the response: " + conn);
++            log.warn("Connection closed by the client end while writing the response: " + conn);
+         } else if (state == ProtocolState.REQUEST_DONE) {
+             log.warn("Connection closed by the client after request is read: " + conn);
+         }
+@@ -424,7 +424,7 @@
+             informWriterError(conn);
+             log.warn("Connection closed while writing the response: " + conn);
+         } else if (state == ProtocolState.REQUEST_DONE) {
+-            log.warn("Connection closed by the client after request is read: " + conn);
++            log.warn("Connection closed after request is read: " + conn);
+         }
+ 
+         metrics.disconnected();
 Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetHandler.java
 ===================================================================
 --- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetHandler.java	(revision 1514062)
@@ -103,53 +150,6 @@ Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/trans
      }
  
      public void exception(NHttpClientConnection conn, Exception e) {
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetContext.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetContext.java	(revision 1514062)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetContext.java	(revision 1514063)
-@@ -108,7 +108,10 @@
-     public void reset() {
-         request = null;
-         response = null;
--        state = ProtocolState.REQUEST_READY;
-+        if (state != ProtocolState.CLOSED) {
-+            // The connection is still not closed - Prepare to send more requests on this
-+            state = ProtocolState.REQUEST_READY;
-+        }
- 
-         if (writer != null) {
-             ByteBuffer buffer = writer.getBuffer();
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java	(revision 1514062)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java	(revision 1514063)
-@@ -261,14 +261,14 @@
- 
-         if (state == ProtocolState.REQUEST_READY || state == ProtocolState.RESPONSE_DONE) {
-             if (log.isDebugEnabled()) {
--                log.debug("Keep-Alive connection was closed at the remote end: " + conn);
-+                log.debug("Keep-Alive connection was closed by the client: " + conn);
-             }
-         } else if (state == ProtocolState.REQUEST_BODY || state == ProtocolState.REQUEST_HEAD) {
-             informReaderError(conn);
--            log.warn("Connection closed at the remote end while reading the request: " + conn);
-+            log.warn("Connection closed by the client while reading the request: " + conn);
-         } else if (state == ProtocolState.RESPONSE_BODY || state == ProtocolState.RESPONSE_HEAD) {
-             informWriterError(conn);
--            log.warn("Connection closed at the remote end while writing the response: " + conn);
-+            log.warn("Connection closed by the client end while writing the response: " + conn);
-         } else if (state == ProtocolState.REQUEST_DONE) {
-             log.warn("Connection closed by the client after request is read: " + conn);
-         }
-@@ -424,7 +424,7 @@
-             informWriterError(conn);
-             log.warn("Connection closed while writing the response: " + conn);
-         } else if (state == ProtocolState.REQUEST_DONE) {
--            log.warn("Connection closed by the client after request is read: " + conn);
-+            log.warn("Connection closed after request is read: " + conn);
-         }
- 
-         metrics.disconnected();
 -*-*-*-
 Message: Handled the endOfInput event properly in the PT TargetHandler
 -*-*-*-

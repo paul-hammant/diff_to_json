@@ -1,0 +1,110 @@
+{
+  "when": "2013-07-22T18:40:28-04:00", 
+  "message": "Applying the patch for SYNAPSE-902. Supporting the responseAction=discard option correctly for endpoints.", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-97,7 +97,7", 
+          "lines": [
+            "     }\n", 
+            " \n", 
+            "     /**\n", 
+            "-     * Everytime a response message is received this method gets invoked. It will then select\n", 
+            "+     * Every time a response message is received this method gets invoked. It will then select\n", 
+            "      * the outgoing *Synapse* message context for the reply we received, and determine what action\n", 
+            "      * to take at the Synapse level\n", 
+            "      *\n"
+          ]
+        }, 
+        {
+          "locn": "-157,7 +157,8", 
+          "lines": [
+            "             }\n", 
+            "             \n", 
+            "             if (callback != null) {\n", 
+            "-                handleMessage(messageID, messageCtx, ((AsyncCallback) callback).getSynapseOutMsgCtx());\n", 
+            "+                handleMessage(messageID, messageCtx, ((AsyncCallback) callback).getSynapseOutMsgCtx(),\n", 
+            "+                        (AsyncCallback)callback);\n", 
+            "                 \n", 
+            "             } else {\n", 
+            "                 // TODO invoke a generic synapse error handler for this message\n"
+          ]
+        }, 
+        {
+          "locn": "-182,7 +183,7", 
+          "lines": [
+            "      * @throws AxisFault       if the message cannot be processed\n", 
+            "      */\n", 
+            "     private void handleMessage(String messageID ,MessageContext response,\n", 
+            "-        org.apache.synapse.MessageContext synapseOutMsgCtx) throws AxisFault {\n", 
+            "+        org.apache.synapse.MessageContext synapseOutMsgCtx, AsyncCallback callback) throws AxisFault {\n", 
+            " \n", 
+            "         Object o = response.getProperty(SynapseConstants.SENDING_FAULT);\n", 
+            "         if (o != null && Boolean.TRUE.equals(o)) {\n"
+          ]
+        }, 
+        {
+          "locn": "-218,9 +219,21", 
+          "lines": [
+            "                     log.debug(\"[Failed Request Message ID : \" + messageID + \"]\" +\n", 
+            "                             \" [New to be Retried Request Message ID : \" +\n", 
+            "                             synapseOutMsgCtx.getMessageID() + \"]\");\n", 
+            "-                }                   \n", 
+            "+                }  \n", 
+            "+                \n", 
+            "+                int errorCode = (Integer)response.getProperty(SynapseConstants.ERROR_CODE);\n", 
+            " \n", 
+            "-                ((FaultHandler) faultStack.pop()).handleFault(synapseOutMsgCtx, null);\n", 
+            "+                // If a timeout has occurred and the timeout action of the callback is to\n", 
+            "+                // discard the message\n", 
+            "+                if (errorCode == SynapseConstants.NHTTP_CONNECTION_TIMEOUT &&\n", 
+            "+                        callback.getTimeOutAction() == SynapseConstants.DISCARD) {\n", 
+            "+                    // Do not execute any fault sequences. Discard message\n", 
+            "+                    log.warn(\"Synapse timed out for the request with Message ID : \" + messageID +\n", 
+            "+                            \". Ignoring fault handlers since the timeout action is DISCARD.\");\n", 
+            "+                    faultStack.removeAllElements();\n", 
+            "+                } else {\n", 
+            "+                    ((FaultHandler) faultStack.pop()).handleFault(synapseOutMsgCtx, null);\n", 
+            "+                }\n", 
+            "             }\n", 
+            " \n", 
+            "         } else {\n"
+          ]
+        }, 
+        {
+          "locn": "-288,10 +301,10", 
+          "lines": [
+            "             // when axis2 receives a soap message without addressing headers it users\n", 
+            "             // DISABLE_ADDRESSING_FOR_OUT_MESSAGES property to keep it and hence avoid addressing\n", 
+            "             // headers on the response. this causes a problem for synapse if the original message\n", 
+            "-            // it receivs (from client) has addressing and the synaspse service invocation has not\n", 
+            "+            // it receives (from client) has addressing and the synapse service invocation has not\n", 
+            "             // engage addressing. in this case when synapse receives the response from the server\n", 
+            "-            // addessing In handler dissable addressing since that response does not have addressing\n", 
+            "-            // headers. synapse sends the response to its orignal client using the same message\n", 
+            "+            // addressing In handler disable addressing since that response does not have addressing\n", 
+            "+            // headers. synapse sends the response to its original client using the same message\n", 
+            "             // context. Then this response does not have addressing headers since it already\n", 
+            "             // disable. to avoid this we need to set the DISABLE_ADDRESSING_FOR_OUT_MESSAGES\n", 
+            "             // property state to original state.\n"
+          ]
+        }, 
+        {
+          "locn": "-412,4 +425,5", 
+          "lines": [
+            "         System.arraycopy(newRelates, 0, trimmedRelates, 0, insertPos);\n", 
+            "         mc.setRelationships(trimmedRelates);\n", 
+            "     }\n", 
+            "+\n", 
+            " }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/SynapseCallbackReceiver.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/SynapseCallbackReceiver.java"
+    }
+  ], 
+  "id": "1505841"
+}

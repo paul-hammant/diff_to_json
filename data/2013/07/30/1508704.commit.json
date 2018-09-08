@@ -1,0 +1,452 @@
+{
+  "when": "2013-07-30T21:41:52-04:00", 
+  "message": "Some cleanup and refactoring", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-71,7 +71,7", 
+          "lines": [
+            "             synchronized (CRLCache.class) {\n", 
+            "                 if (cacheManager == null) {\n", 
+            "                     cacheManager = new CacheManager(cache, size, delay);\n", 
+            "-                    CacheController mbean = new CacheController(cache,cacheManager);\n", 
+            "+                    CacheController mbean = new CacheController(cache, cacheManager);\n", 
+            "                     MBeanRegistrar.getInstance().registerMBean(mbean, \"CacheController\",\n", 
+            "                             \"CRLCacheController\");\n", 
+            "                 }\n"
+          ]
+        }, 
+        {
+          "locn": "-103,7 +103,7", 
+          "lines": [
+            "         return hashMap.size();\n", 
+            "     }\n", 
+            " \n", 
+            "-    public void resetIterator() {\n", 
+            "+    public synchronized void resetIterator() {\n", 
+            "         iterator = hashMap.entrySet().iterator();\n", 
+            "     }\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-136,14 +136,14", 
+          "lines": [
+            "             }\n", 
+            " \n", 
+            "             return cacheValue.getValue();\n", 
+            "-        } else\n", 
+            "-            return null;\n", 
+            "+        }\n", 
+            "+        return null;\n", 
+            "     }\n", 
+            " \n", 
+            "     public synchronized void setCacheValue(String crlUrl, X509CRL crl) {\n", 
+            "         CRLCacheValue cacheValue = new CRLCacheValue(crlUrl, crl);\n", 
+            "         if (log.isDebugEnabled()) {\n", 
+            "-            log.debug(\"Before set- HashMap size \" + hashMap.size());\n", 
+            "+            log.debug(\"Before set - HashMap size \" + hashMap.size());\n", 
+            "         }\n", 
+            "         hashMap.put(crlUrl, cacheValue);\n", 
+            "         if (log.isDebugEnabled()) {\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/crl/CRLCache.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/crl/CRLCache.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-42,9 +42,10", 
+          "lines": [
+            "  */\n", 
+            " public class CRLVerifier implements RevocationVerifier {\n", 
+            " \n", 
+            "-    private CRLCache cache;\n", 
+            "     private static final Log log = LogFactory.getLog(CRLVerifier.class);\n", 
+            " \n", 
+            "+    private CRLCache cache;\n", 
+            "+\n", 
+            "     public CRLVerifier(CRLCache cache) {\n", 
+            "         this.cache = cache;\n", 
+            "     }\n"
+          ]
+        }, 
+        {
+          "locn": "-82,8 +83,9", 
+          "lines": [
+            "             try {\n", 
+            "                 X509CRL x509CRL = downloadCRLFromWeb(crlUrl);\n", 
+            "                 if (x509CRL != null) {\n", 
+            "-                    if (cache != null)\n", 
+            "+                    if (cache != null) {\n", 
+            "                         cache.setCacheValue(crlUrl, x509CRL);\n", 
+            "+                    }\n", 
+            "                     return getRevocationStatus(x509CRL, peerCert);\n", 
+            "                 }\n", 
+            "             } catch (Exception e) {\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/crl/CRLVerifier.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/crl/CRLVerifier.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-35,12 +35,12", 
+          "lines": [
+            "  * Delay should be configured such that cacheManager is not too much involved with the cache,\n", 
+            "  * but manages it optimally.\n", 
+            "  */\n", 
+            "-\n", 
+            " public class CacheManager {\n", 
+            " \n", 
+            "     private static final Log log = LogFactory.getLog(CacheManager.class);\n", 
+            " \n", 
+            "     private final boolean DO_NOT_INTERRUPT_IF_RUNNING = false;\n", 
+            "+\n", 
+            "     private ScheduledExecutorService scheduler;\n", 
+            "     private ScheduledFuture scheduledFuture = null;\n", 
+            "     private ManageableCache cache;\n"
+          ]
+        }, 
+        {
+          "locn": "-56,8 +56,7", 
+          "lines": [
+            "      *                     will be removed\n", 
+            "      */\n", 
+            "     public CacheManager(ManageableCache cache, int cacheMaxSize, int delay) {\n", 
+            "-        int NUM_THREADS = 1;\n", 
+            "-        scheduler = Executors.newScheduledThreadPool(NUM_THREADS);\n", 
+            "+        scheduler = Executors.newSingleThreadScheduledExecutor();\n", 
+            "         this.cache = cache;\n", 
+            "         this.cacheMaxSize = cacheMaxSize;\n", 
+            "         this.cacheManagingTask = new CacheManagingTask();\n"
+          ]
+        }, 
+        {
+          "locn": "-70,7 +69,7", 
+          "lines": [
+            "      * constructor. CacheManager will run its scheduled task every \"delay\" number of minutes.\n", 
+            "      */\n", 
+            "     private boolean start() {\n", 
+            "-        if(scheduledFuture == null || (scheduledFuture.isCancelled())) {\n", 
+            "+        if (scheduledFuture == null || (scheduledFuture.isCancelled())) {\n", 
+            "             scheduledFuture = scheduler.scheduleWithFixedDelay(cacheManagingTask,\n", 
+            "                     delay, delay, TimeUnit.MINUTES);\n", 
+            "             log.info(cache.getClass().getSimpleName()+\" Cache Manager Started\");\n"
+          ]
+        }, 
+        {
+          "locn": "-85,8 +84,8", 
+          "lines": [
+            "      * @return true if successfully waken up. false otherwise.\n", 
+            "      */\n", 
+            "     public boolean wakeUpNow(){\n", 
+            "-        if(scheduledFuture !=null) {\n", 
+            "-            if(!scheduledFuture.isCancelled()) {\n", 
+            "+        if (scheduledFuture !=null) {\n", 
+            "+            if (!scheduledFuture.isCancelled()) {\n", 
+            "                 scheduledFuture.cancel(DO_NOT_INTERRUPT_IF_RUNNING);\n", 
+            "             }\n", 
+            "             scheduledFuture = scheduler.scheduleWithFixedDelay(cacheManagingTask,\n"
+          ]
+        }, 
+        {
+          "locn": "-106,7 +105,7", 
+          "lines": [
+            "     public boolean changeDelay(int delay) throws IllegalArgumentException {\n", 
+            "         int min = Constants.CACHE_MIN_DELAY_MINS;\n", 
+            "         int max = Constants.CACHE_MAX_DELAY_MINS;\n", 
+            "-        if(delay < min || delay > max) {\n", 
+            "+        if (delay < min || delay > max) {\n", 
+            "             throw new IllegalArgumentException(\"Delay time should should be between \" + min +\n", 
+            "                     \" and \" + max + \" minutes\");\n", 
+            "         }\n"
+          ]
+        }, 
+        {
+          "locn": "-122,7 +121,7", 
+          "lines": [
+            "      * Gracefully stop cacheManager.\n", 
+            "      */\n", 
+            "     public boolean stop(){\n", 
+            "-        if(scheduledFuture !=null && !scheduledFuture.isCancelled()){\n", 
+            "+        if (scheduledFuture !=null && !scheduledFuture.isCancelled()){\n", 
+            "             scheduledFuture.cancel(DO_NOT_INTERRUPT_IF_RUNNING);\n", 
+            "             log.info(cache.getClass().getSimpleName()+\" Cache Manager Stopped.....\");\n", 
+            "             return true;\n"
+          ]
+        }, 
+        {
+          "locn": "-157,8 +156,7", 
+          "lines": [
+            "             //Start looking at cache entries from the beginning.\n", 
+            "             cache.resetIterator();\n", 
+            "             //Iteration through the cache entries.\n", 
+            "-            while ((cacheSize--)>0) {\n", 
+            "-\n", 
+            "+            while ((cacheSize--) > 0) {\n", 
+            "                 nextCacheValue = cache.getNextCacheValue();\n", 
+            "                 if (nextCacheValue == null) {\n", 
+            "                     log.debug(\"Cache manager iteration through Cache values done\");\n"
+          ]
+        }, 
+        {
+          "locn": "-172,13 +170,13", 
+          "lines": [
+            "                 }\n", 
+            " \n", 
+            "                 //There are LRU entries to be removed since cacheSize > maxCacheSize. So collect them.\n", 
+            "-                if(numberToRemove>0) {\n", 
+            "+                if (numberToRemove > 0) {\n", 
+            "                     lruEntryCollector.collectEntriesToRemove(nextCacheValue);\n", 
+            "                 }\n", 
+            "             }\n", 
+            " \n", 
+            "             //LRU entries removing\n", 
+            "-            for(ManageableCacheValue oldCacheValue: entriesToRemove) {\n", 
+            "+            for (ManageableCacheValue oldCacheValue: entriesToRemove) {\n", 
+            "                 log.debug(\"Removing LRU value from cache\");\n", 
+            "                 oldCacheValue.removeThisCacheValue();\n", 
+            "             }\n"
+          ]
+        }, 
+        {
+          "locn": "-210,21 +208,21", 
+          "lines": [
+            "             private void collectEntriesToRemove(ManageableCacheValue value) {\n", 
+            " \n", 
+            "                 entriesToRemove.add(value);\n", 
+            "-                int i = entriesToRemove.size()-1;\n", 
+            "+                int i = entriesToRemove.size() - 1;\n", 
+            " \n", 
+            "-                for(; i>0 && (value.getTimeStamp() < entriesToRemove.get(i-1).getTimeStamp()); i--) {\n", 
+            "+                for(; i > 0 && (value.getTimeStamp() < entriesToRemove.get(i - 1).getTimeStamp()); i--) {\n", 
+            "                     entriesToRemove.remove(i);\n", 
+            "-                    entriesToRemove.add(i,(entriesToRemove.get(i-1)));\n", 
+            "+                    entriesToRemove.add(i,(entriesToRemove.get(i - 1)));\n", 
+            "                 }\n", 
+            "                 entriesToRemove.remove(i);\n", 
+            "                 entriesToRemove.add(i,value);\n", 
+            "-                /**\n", 
+            "+                /*\n", 
+            "                  * First entry in the list will be the oldest. Last will be the earliest in the list.\n", 
+            "                  * So remove the earliest since we need to collect the old (LRU) values to remove\n", 
+            "                  * from cache later\n", 
+            "                  */\n", 
+            "-                if(entriesToRemove.size() > listMaxSize) {\n", 
+            "-                    entriesToRemove.remove(entriesToRemove.size() -1);\n", 
+            "+                if (entriesToRemove.size() > listMaxSize) {\n", 
+            "+                    entriesToRemove.remove(entriesToRemove.size() - 1);\n", 
+            "                 }\n", 
+            "             }\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/cache/CacheManager.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/cache/CacheManager.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-19,7 +19,7", 
+          "lines": [
+            " \n", 
+            " package org.apache.synapse.transport.utils.sslcert.cache;\n", 
+            " \n", 
+            "-public class CacheController implements CacheControllerMBean{\n", 
+            "+public class CacheController implements CacheControllerMBean {\n", 
+            " \n", 
+            "     private ManageableCache cache;\n", 
+            "     private CacheManager cacheManager;\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/cache/CacheController.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/cache/CacheController.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-102,7 +102,7", 
+          "lines": [
+            "         return hashMap.size();\n", 
+            "     }\n", 
+            " \n", 
+            "-    public void resetIterator(){\n", 
+            "+    public synchronized void resetIterator(){\n", 
+            "         iterator = hashMap.entrySet().iterator();\n", 
+            "     }\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-117,7 +117,7", 
+          "lines": [
+            "         try {\n", 
+            "             String serviceUrl = cacheValue.serviceUrl;\n", 
+            "             OCSPReq request = cacheValue.request;\n", 
+            "-            OCSPResp response= ocspVerifier.getOCSPResponce(serviceUrl, request);\n", 
+            "+            OCSPResp response= ocspVerifier.getOCSPResponse(serviceUrl, request);\n", 
+            " \n", 
+            "             if (OCSPRespStatus.SUCCESSFUL != response.getStatus())\n", 
+            "                 throw new CertificateVerificationException(\"OCSP response status not SUCCESSFUL\");\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/ocsp/OCSPCache.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/ocsp/OCSPCache.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-43,9 +43,10", 
+          "lines": [
+            "  */\n", 
+            " public class OCSPVerifier implements RevocationVerifier {\n", 
+            " \n", 
+            "-    private OCSPCache cache;\n", 
+            "     private static final Log log = LogFactory.getLog(OCSPVerifier.class);\n", 
+            " \n", 
+            "+    private OCSPCache cache;\n", 
+            "+\n", 
+            "     public OCSPVerifier(OCSPCache cache) {\n", 
+            "         this.cache = cache;\n", 
+            "     }\n"
+          ]
+        }, 
+        {
+          "locn": "-81,7 +82,7", 
+          "lines": [
+            " \n", 
+            "             SingleResp[] responses;\n", 
+            "             try {\n", 
+            "-                OCSPResp ocspResponse = getOCSPResponce(serviceUrl, request);\n", 
+            "+                OCSPResp ocspResponse = getOCSPResponse(serviceUrl, request);\n", 
+            "                 if (OCSPRespStatus.SUCCESSFUL != ocspResponse.getStatus()) {\n", 
+            "                     continue; // Server didn't give the response right.\n", 
+            "                 }\n"
+          ]
+        }, 
+        {
+          "locn": "-126,8 +127,8", 
+          "lines": [
+            "      * @throws CertificateVerificationException\n", 
+            "      *\n", 
+            "      */\n", 
+            "-    protected OCSPResp getOCSPResponce(String serviceUrl, OCSPReq request) throws CertificateVerificationException {\n", 
+            "-\n", 
+            "+    protected OCSPResp getOCSPResponse(String serviceUrl,\n", 
+            "+                                       OCSPReq request) throws CertificateVerificationException {\n", 
+            "         try {\n", 
+            "             //Todo: Use http client.\n", 
+            "             byte[] array = request.getEncoded();\n"
+          ]
+        }, 
+        {
+          "locn": "-178,7 +179,8", 
+          "lines": [
+            "         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());\n", 
+            "         try {\n", 
+            "             //  CertID structure is used to uniquely identify certificates that are the subject of\n", 
+            "-            // an OCSP request or response and has an ASN.1 definition. CertID structure is defined in RFC 2560\n", 
+            "+            // an OCSP request or response and has an ASN.1 definition. CertID structure is defined\n", 
+            "+            // in RFC 2560\n", 
+            "             CertificateID id = new CertificateID(CertificateID.HASH_SHA1, issuerCert, serialNumber);\n", 
+            " \n", 
+            "             // basic request generation with nonce\n"
+          ]
+        }, 
+        {
+          "locn": "-187,7 +189,8", 
+          "lines": [
+            " \n", 
+            "             // create details for nonce extension. The nonce extension is used to bind\n", 
+            "             // a request to a response to prevent replay attacks. As the name implies,\n", 
+            "-            // the nonce value is something that the client should only use once within a reasonably small period.\n", 
+            "+            // the nonce value is something that the client should only use once within a reasonably\n", 
+            "+            // small period.\n", 
+            "             BigInteger nonce = BigInteger.valueOf(System.currentTimeMillis());\n", 
+            "             Vector<ASN1ObjectIdentifier> objectIdentifiers = new Vector<ASN1ObjectIdentifier>();\n", 
+            "             Vector<X509Extension> values = new Vector<X509Extension>();\n"
+          ]
+        }, 
+        {
+          "locn": "-199,7 +202,8", 
+          "lines": [
+            " \n", 
+            "             return generator.generate();\n", 
+            "         } catch (OCSPException e) {\n", 
+            "-            throw new CertificateVerificationException(\"Cannot generate OSCP Request with the given certificate\", e);\n", 
+            "+            throw new CertificateVerificationException(\"Cannot generate OCSP Request with the \" +\n", 
+            "+                    \"given certificate\", e);\n", 
+            "         }\n", 
+            "     }\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-217,8 +221,10", 
+          "lines": [
+            " \n", 
+            "         //Gets the DER-encoded OCTET string for the extension value for Authority information access Points\n", 
+            "         byte[] aiaExtensionValue = cert.getExtensionValue(X509Extensions.AuthorityInfoAccess.getId());\n", 
+            "-        if (aiaExtensionValue == null)\n", 
+            "-            throw new CertificateVerificationException(\"Certificate Doesnt have Authority Information Access points\");\n", 
+            "+        if (aiaExtensionValue == null) {\n", 
+            "+            throw new CertificateVerificationException(\"Certificate doesn't have authority \" +\n", 
+            "+                    \"information access points\");\n", 
+            "+        }\n", 
+            "         //might have to pass an ByteArrayInputStream(aiaExtensionValue)\n", 
+            "         ASN1InputStream asn1In = new ASN1InputStream(aiaExtensionValue);\n", 
+            "         AuthorityInformationAccess authorityInformationAccess;\n"
+          ]
+        }, 
+        {
+          "locn": "-225,11 +231,11", 
+          "lines": [
+            " \n", 
+            "         try {\n", 
+            "             DEROctetString aiaDEROctetString = (DEROctetString) (asn1In.readObject());\n", 
+            "-            ASN1InputStream asn1Inoctets = new ASN1InputStream(aiaDEROctetString.getOctets());\n", 
+            "-            ASN1Sequence aiaASN1Sequence = (ASN1Sequence) asn1Inoctets.readObject();\n", 
+            "-            authorityInformationAccess = AuthorityInformationAccess.getInstance(aiaASN1Sequence);//new AuthorityInformationAccess(aiaASN1Sequence);\n", 
+            "+            ASN1InputStream asn1InOctets = new ASN1InputStream(aiaDEROctetString.getOctets());\n", 
+            "+            ASN1Sequence aiaASN1Sequence = (ASN1Sequence) asn1InOctets.readObject();\n", 
+            "+            authorityInformationAccess = AuthorityInformationAccess.getInstance(aiaASN1Sequence);\n", 
+            "         } catch (IOException e) {\n", 
+            "-            throw new CertificateVerificationException(\"Cannot read certificate to get OSCP urls\", e);\n", 
+            "+            throw new CertificateVerificationException(\"Cannot read certificate to get OCSP URLs\", e);\n", 
+            "         }\n", 
+            " \n", 
+            "         List<String> ocspUrlList = new ArrayList<String>();\n"
+          ]
+        }, 
+        {
+          "locn": "-243,8 +249,9", 
+          "lines": [
+            "                 ocspUrlList.add(accessLocation);\n", 
+            "             }\n", 
+            "         }\n", 
+            "-        if(ocspUrlList.isEmpty())\n", 
+            "+        if (ocspUrlList.isEmpty()) {\n", 
+            "             throw new CertificateVerificationException(\"Cant get OCSP urls from certificate\");\n", 
+            "+        }\n", 
+            " \n", 
+            "         return ocspUrlList;\n", 
+            "     }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/ocsp/OCSPVerifier.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/ocsp/OCSPVerifier.java"
+    }
+  ], 
+  "id": "1508704"
+}

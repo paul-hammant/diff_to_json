@@ -1,0 +1,32 @@
+{
+  "when": "2013-07-19T14:51:04-04:00", 
+  "message": "Applying the patch for SYNAPSE-872. VFS transport adding URL query parameters to the response file name.", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-53,7 +53,12", 
+          "lines": [
+            "     VFSOutTransportInfo(String outFileURI, boolean fileLocking) {\n", 
+            "         \n", 
+            "         if (outFileURI.startsWith(VFSConstants.VFS_PREFIX)) {\n", 
+            "-            this.outFileURI = outFileURI.substring(VFSConstants.VFS_PREFIX.length());\n", 
+            "+            int qIndex = outFileURI.indexOf(\"?\");\n", 
+            "+            if (qIndex < 0) {\n", 
+            "+                this.outFileURI = outFileURI.substring(VFSConstants.VFS_PREFIX.length());\n", 
+            "+            } else {\n", 
+            "+                this.outFileURI = outFileURI.substring(VFSConstants.VFS_PREFIX.length(), qIndex);\n", 
+            "+            }\n", 
+            "         } else {\n", 
+            "             this.outFileURI = outFileURI;\n", 
+            "         }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSOutTransportInfo.java", 
+      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSOutTransportInfo.java"
+    }
+  ], 
+  "id": "1504964"
+}

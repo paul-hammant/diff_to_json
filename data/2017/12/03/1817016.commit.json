@@ -1,0 +1,45 @@
+{
+  "when": "2017-12-03T02:13:31-05:00", 
+  "message": "Add prabath as a committer", 
+  "who": "isudana", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-1368,6 +1368,12", 
+          "lines": [
+            "             <organization>WSO2</organization>\n", 
+            "             <url>https://www.linkedin.com/in/vanjikumaran</url>\n", 
+            "         </developer>\n", 
+            "+        <developer>\n", 
+            "+            <name>Prabath Ariyarathna</name>\n", 
+            "+            <id>prabathar</id>\n", 
+            "+            <email>prabathar AT apache.org</email>\n", 
+            "+            <organization>Apache</organization>\n", 
+            "+        </developer>\n", 
+            "     </developers>\n", 
+            " \n", 
+            "     <contributors>\n"
+          ]
+        }, 
+        {
+          "locn": "-1384,9 +1390,6", 
+          "lines": [
+            "             <name>Dave Irving</name>\n", 
+            "         </contributor>\n", 
+            "         <contributor>\n", 
+            "-            <name>Prabath Ariyarathna</name>\n", 
+            "-        </contributor>\n", 
+            "-        <contributor>\n", 
+            "             <name>Senduran Balasubramaniyam</name>\n", 
+            "         </contributor>\n", 
+            "         <contributor>\n"
+          ]
+        }
+      ], 
+      "to": "java/pom.xml", 
+      "from": "java/pom.xml"
+    }
+  ], 
+  "id": "1817016"
+}

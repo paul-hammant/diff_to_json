@@ -1,16 +1,3 @@
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/TargetConfiguration.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/TargetConfiguration.java	(revision 1513374)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/TargetConfiguration.java	(revision 1513375)
-@@ -59,7 +59,7 @@
-                 new RequestContent(),
-                 new RequestTargetHost(),
-                 new RequestConnControl(),
--                new RequestUserAgent(),
-+                new RequestUserAgent("Synapse-PT-HttpComponents-NIO"),
-                 new RequestExpectContinue(false));
-     }
- 
 Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/TargetRequestFactory.java
 ===================================================================
 --- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/TargetRequestFactory.java	(revision 1513374)
@@ -59,6 +46,19 @@ Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/trans
          context.setAttribute(HttpCoreContext.HTTP_REQUEST, request);
  
          // start the request
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/TargetConfiguration.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/TargetConfiguration.java	(revision 1513374)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/TargetConfiguration.java	(revision 1513375)
+@@ -59,7 +59,7 @@
+                 new RequestContent(),
+                 new RequestTargetHost(),
+                 new RequestConnControl(),
+-                new RequestUserAgent(),
++                new RequestUserAgent("Synapse-PT-HttpComponents-NIO"),
+                 new RequestExpectContinue(false));
+     }
+ 
 -*-*-*-
 Message: Using the RequestUserAgent API to set the User-Agent header on outgoing messages.
 -*-*-*-

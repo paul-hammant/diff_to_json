@@ -1,0 +1,22 @@
+Index: java/modules/commons/pom.xml
+===================================================================
+--- java/modules/commons/pom.xml	(revision 1678576)
++++ java/modules/commons/pom.xml	(revision 1678577)
+@@ -80,6 +80,11 @@
+           <artifactId>axis2-transport-base</artifactId>
+         </dependency>
+         <dependency>
++            <groupId>org.apache.ws.commons.axiom</groupId>
++            <artifactId>axiom-compat</artifactId>
++            <version>${axiom.version}</version>
++        </dependency>
++        <dependency>
+           <groupId>org.apache.synapse</groupId>
+           <artifactId>synapse-securevault</artifactId>
+         </dependency>
+-*-*-*-
+Message: Quick fix to prevent build failure caused by the deprecation of an Axiom API.
+-*-*-*-
+When: 2015-05-10 12:45:30 -0400 
+-*-*-*-
+Who: veithen

@@ -1,31 +1,3 @@
-Index: java/modules/core/src/main/java/org/apache/synapse/mediators/db/AbstractDBMediator.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/mediators/db/AbstractDBMediator.java	(revision 1505249)
-+++ java/modules/core/src/main/java/org/apache/synapse/mediators/db/AbstractDBMediator.java	(revision 1505250)
-@@ -200,12 +200,13 @@
- 
-     /**
-      * Return a Prepared statement for the given Statement object, which is ready to be executed
--     * @param stmnt SQL stataement to be executed
-+     * @param stmnt SQL statement to be executed
-+     * @param con The connection to be used
-      * @param msgCtx Current message context
-      * @return a PreparedStatement
-      * @throws SQLException on error
-      */
--    protected PreparedStatement getPreparedStatement(Statement stmnt,
-+    protected PreparedStatement getPreparedStatement(Statement stmnt, Connection con,
-                                                      MessageContext msgCtx) throws SQLException {
- 
-         SynapseLog synLog = getLog(msgCtx);
-@@ -215,7 +216,6 @@
-                 " and preparing statement : " + stmnt.getRawStatement());
-         }
- 
--        Connection con = getDataSource().getConnection();
-         if (con == null) {
-             String msg = "Connection from DataSource " + getDSName() + " is null.";
-             log.error(msg);
 Index: java/modules/core/src/main/java/org/apache/synapse/mediators/db/DBLookupMediator.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/mediators/db/DBLookupMediator.java	(revision 1505249)
@@ -64,6 +36,34 @@ Index: java/modules/core/src/main/java/org/apache/synapse/mediators/db/DBReportM
              con = ps.getConnection();
              int count = ps.executeUpdate();
  
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/db/AbstractDBMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/db/AbstractDBMediator.java	(revision 1505249)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/db/AbstractDBMediator.java	(revision 1505250)
+@@ -200,12 +200,13 @@
+ 
+     /**
+      * Return a Prepared statement for the given Statement object, which is ready to be executed
+-     * @param stmnt SQL stataement to be executed
++     * @param stmnt SQL statement to be executed
++     * @param con The connection to be used
+      * @param msgCtx Current message context
+      * @return a PreparedStatement
+      * @throws SQLException on error
+      */
+-    protected PreparedStatement getPreparedStatement(Statement stmnt,
++    protected PreparedStatement getPreparedStatement(Statement stmnt, Connection con,
+                                                      MessageContext msgCtx) throws SQLException {
+ 
+         SynapseLog synLog = getLog(msgCtx);
+@@ -215,7 +216,6 @@
+                 " and preparing statement : " + stmnt.getRawStatement());
+         }
+ 
+-        Connection con = getDataSource().getConnection();
+         if (con == null) {
+             String msg = "Connection from DataSource " + getDSName() + " is null.";
+             log.error(msg);
 -*-*-*-
 Message: Applying the patch for SYNAPSE-871. Prevent calling the datasource.getConnection() twice for a single DB interaction.
 -*-*-*-

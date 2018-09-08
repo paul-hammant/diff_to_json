@@ -1,0 +1,119 @@
+{
+  "when": "2016-06-07T09:13:32-04:00", 
+  "message": "Patch by Isuru Janith Ranawaka that fixes send mediator inside a fault mediator from hanging when SSL exception occurs. SYNAPSE-1039", 
+  "who": "ravi", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-33,6 +33,7", 
+          "lines": [
+            " import org.apache.axis2.wsdl.WSDLConstants;\n", 
+            " import org.apache.commons.logging.Log;\n", 
+            " import org.apache.commons.logging.LogFactory;\n", 
+            "+import org.apache.http.nio.NHttpServerConnection;\n", 
+            " import org.apache.synapse.FaultHandler;\n", 
+            " import org.apache.synapse.SynapseConstants;\n", 
+            " import org.apache.synapse.SynapseException;\n"
+          ]
+        }, 
+        {
+          "locn": "-45,6 +46,9", 
+          "lines": [
+            " import org.apache.synapse.endpoints.Endpoint;\n", 
+            " import org.apache.synapse.endpoints.dispatch.Dispatcher;\n", 
+            " import org.apache.synapse.transport.nhttp.NhttpConstants;\n", 
+            "+import org.apache.synapse.transport.passthru.PassThroughConstants;\n", 
+            "+import org.apache.synapse.transport.passthru.Pipe;\n", 
+            "+import org.apache.synapse.transport.passthru.config.SourceConfiguration;\n", 
+            " import org.apache.synapse.util.ResponseAcceptEncodingProcessor;\n", 
+            " \n", 
+            " import java.util.*;\n"
+          ]
+        }, 
+        {
+          "locn": "-249,6 +253,19", 
+          "lines": [
+            "         Object o = response.getProperty(SynapseConstants.SENDING_FAULT);\n", 
+            "         if (o != null && Boolean.TRUE.equals(o)) {\n", 
+            " \n", 
+            "+            Pipe pipe = (Pipe) ((Axis2MessageContext) synapseOutMsgCtx).getAxis2MessageContext()\n", 
+            "+                    .getProperty(PassThroughConstants.PASS_THROUGH_PIPE);\n", 
+            "+            if (pipe != null && pipe.isSerializationComplete()) {\n", 
+            "+                NHttpServerConnection conn = (NHttpServerConnection) ((Axis2MessageContext) synapseOutMsgCtx).\n", 
+            "+                        getAxis2MessageContext().getProperty(PassThroughConstants.PASS_THROUGH_SOURCE_CONNECTION);\n", 
+            "+                SourceConfiguration sourceConfiguration = (SourceConfiguration) ((Axis2MessageContext) synapseOutMsgCtx)\n", 
+            "+                        .getAxis2MessageContext().getProperty(PassThroughConstants.PASS_THROUGH_SOURCE_CONFIGURATION);\n", 
+            "+                Pipe newPipe = new Pipe(conn, sourceConfiguration.getBufferFactory().getBuffer(),\n", 
+            "+                        PassThroughConstants.SOURCE, sourceConfiguration);\n", 
+            "+                ((Axis2MessageContext) synapseOutMsgCtx).getAxis2MessageContext()\n", 
+            "+                        .setProperty(PassThroughConstants.PASS_THROUGH_PIPE, newPipe);\n", 
+            "+            }\n", 
+            "+\n", 
+            "             StatisticsReporter.reportFaultForAll(synapseOutMsgCtx,\n", 
+            "                     ErrorLogFactory.createErrorLog(response));\n", 
+            "             // there is a sending fault. propagate the fault to fault handlers.\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/SynapseCallbackReceiver.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/SynapseCallbackReceiver.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-288,6 +288,10", 
+          "lines": [
+            "         return buffer;\n", 
+            "     }\n", 
+            " \n", 
+            "+    public synchronized boolean isSerializationComplete(){\n", 
+            "+        return serializationComplete;\n", 
+            "+    }\n", 
+            "+\n", 
+            "     private void setInputMode(ByteBuffer buffer, AtomicBoolean inputMode) {\n", 
+            "         if (inputMode.compareAndSet(false, true)) {\n", 
+            "             if (buffer.hasRemaining()) {\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/Pipe.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/Pipe.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-74,9 +74,9", 
+          "lines": [
+            " \n", 
+            "     protected static final String PASS_THROUGH_TRANSPORT_WORKER_POOL =\n", 
+            "             \"PASS_THROUGH_TRANSPORT_WORKER_POOL\";\n", 
+            "-    protected static final String PASS_THROUGH_SOURCE_CONFIGURATION =\n", 
+            "+    public static final String PASS_THROUGH_SOURCE_CONFIGURATION =\n", 
+            "             \"PASS_THROUGH_SOURCE_CONFIGURATION\";\n", 
+            "-    protected static final String PASS_THROUGH_SOURCE_CONNECTION = \"pass-through.Source-Connection\";\n", 
+            "+    public static final String PASS_THROUGH_SOURCE_CONNECTION = \"pass-through.Source-Connection\";\n", 
+            "     protected static final String PASS_THROUGH_SOURCE_REQUEST = \"pass-through.Source-Request\";\n", 
+            " \n", 
+            "     protected static final String PASS_THROUGH_TARGET_CONNECTION = \"pass-through.Target-Connection\";\n"
+          ]
+        }, 
+        {
+          "locn": "-138,4 +138,7", 
+          "lines": [
+            "     \n", 
+            "     //Http method type constants to be used in synapse\n", 
+            "     public static final String HTTP_HEAD = \"HEAD\";\n", 
+            "+\n", 
+            "+    //use to create source buffer in passthrough transport\n", 
+            "+    public static final String SOURCE =\"source\";\n", 
+            " }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughConstants.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughConstants.java"
+    }
+  ], 
+  "id": "1747219"
+}

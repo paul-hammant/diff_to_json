@@ -1,0 +1,33 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/algorithms/WeightedRRLCAlgorithm.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/endpoints/algorithms/WeightedRRLCAlgorithm.java	(revision 1770904)
++++ java/modules/core/src/main/java/org/apache/synapse/endpoints/algorithms/WeightedRRLCAlgorithm.java	(revision 1770905)
+@@ -237,6 +237,7 @@
+         return WeightedRRLCAlgorithm.class.getName();
+     }
+ 
++    @Override
+     public LoadbalanceAlgorithm clone() {
+         return null;
+     }
+@@ -392,13 +393,7 @@
+         public void reCalcuateWeight() {
+             if (totalConnections > 0) {
+                 double weightRatio = (double) fixedWeight / totalWeight;
+-                double connectionRatio;
+-                if (totalConnections != 0) {
+-                    connectionRatio = (double) currentConnectionCount / totalConnections;
+-                } else {
+-                    connectionRatio = 0;
+-                }
+-
++                double connectionRatio = (double) currentConnectionCount / totalConnections;
+                 double diff = weightRatio - connectionRatio;
+                 double multiple = diff * totalConnections;
+                 double floor = Math.floor(multiple);
+-*-*-*-
+Message: applying patch by vanji to fix SYNAPSE-1061
+-*-*-*-
+When: 2016-11-22 21:10:46 -0500 
+-*-*-*-
+Who: isudana

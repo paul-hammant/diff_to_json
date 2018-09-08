@@ -1,0 +1,350 @@
+{
+  "when": "2013-08-01T20:27:32-04:00", 
+  "message": "added ha implementations.", 
+  "who": "rajikak", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-98,8 +98,10", 
+          "lines": [
+            "             } catch (IOException e) {\n", 
+            "                 throw new AMQPTransportException(\"Could not remove the connection '\" + name + \"'\", e);\n", 
+            "             }\n", 
+            "+        } else {\n", 
+            "+            throw new AMQPTransportException(\"No connection factory found with the name '\"\n", 
+            "+                    + name + \"'\");\n", 
+            "         }\n", 
+            "-        throw new AMQPTransportException(\"No connection factory found with the name '\" + name + \"'\");\n", 
+            "     }\n", 
+            " \n", 
+            "     /**\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/connectionfactory/AMQPTransportConnectionFactoryManager.java", 
+      "from": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/connectionfactory/AMQPTransportConnectionFactoryManager.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-29,6 +29,9", 
+          "lines": [
+            " import org.apache.commons.logging.Log;\n", 
+            " import org.apache.commons.logging.LogFactory;\n", 
+            " import org.apache.synapse.transport.amqp.*;\n", 
+            "+import org.apache.synapse.transport.amqp.ha.AMQPTransportHABrokerEntry;\n", 
+            "+import org.apache.synapse.transport.amqp.ha.AMQPTransportHAEntry;\n", 
+            "+import org.apache.synapse.transport.amqp.ha.AMQPTransportReconnectHandler;\n", 
+            " \n", 
+            " import java.io.ByteArrayInputStream;\n", 
+            " import java.io.ByteArrayOutputStream;\n"
+          ]
+        }, 
+        {
+          "locn": "-35,10 +38,8", 
+          "lines": [
+            " import java.io.IOException;\n", 
+            " import java.io.InputStream;\n", 
+            " import java.util.Map;\n", 
+            "-import java.util.concurrent.ExecutorService;\n", 
+            "-import java.util.concurrent.ScheduledExecutorService;\n", 
+            "-import java.util.concurrent.ScheduledFuture;\n", 
+            "-import java.util.concurrent.TimeUnit;\n", 
+            "+import java.util.UUID;\n", 
+            "+import java.util.concurrent.*;\n", 
+            " \n", 
+            " /**\n", 
+            "  * The polling task deploy for each services exposed on AMQP transport. This task\n"
+          ]
+        }, 
+        {
+          "locn": "-207,6 +208,8", 
+          "lines": [
+            " \n", 
+            "     private ScheduledFuture<?> pollingTaskFuture;\n", 
+            " \n", 
+            "+    private AMQPTransportReconnectHandler haHandler;\n", 
+            "+\n", 
+            "     public void setUseTx(boolean useTx) {\n", 
+            "         isUseTx = useTx;\n", 
+            "     }\n"
+          ]
+        }, 
+        {
+          "locn": "-383,6 +386,10", 
+          "lines": [
+            "         this.responseConnectionFactory = responseConnectionFactory;\n", 
+            "     }\n", 
+            " \n", 
+            "+    public void setHaHandler(AMQPTransportReconnectHandler haHandler) {\n", 
+            "+        this.haHandler = haHandler;\n", 
+            "+    }\n", 
+            "+\n", 
+            "     /**\n", 
+            "      * Start the polling task for this service\n", 
+            "      */\n"
+          ]
+        }, 
+        {
+          "locn": "-507,6 +514,26", 
+          "lines": [
+            "             } catch (ShutdownSignalException e) {\n", 
+            "                 log.error(\"Polling task for service '\" + serviceName + \"' received a \" +\n", 
+            "                         \"shutdown signal\", e);\n", 
+            "+                Semaphore available = new Semaphore(0, true);\n", 
+            "+                String key = UUID.randomUUID().toString();\n", 
+            "+                haHandler.getBlockedTasks().add(new AMQPTransportHAEntry(\n", 
+            "+                        available, key, connectionFactoryName));\n", 
+            "+                try {\n", 
+            "+                    available.acquire();\n", 
+            "+                } catch (InterruptedException ie) {\n", 
+            "+                    log.error(\"The blocking semaphore received an interrupted\", e);\n", 
+            "+                    Thread.currentThread().interrupt();\n", 
+            "+                    return;\n", 
+            "+                }\n", 
+            "+\n", 
+            "+                AMQPTransportHABrokerEntry brokerEntry = haHandler.getConnectionMap().get(key);\n", 
+            "+                if (brokerEntry == null) {\n", 
+            "+                    log.error(\"No new connection factory were found for key '\" + key + \"'\");\n", 
+            "+                } else {\n", 
+            "+                    setChannel(brokerEntry.getChannel());\n", 
+            "+                    this.queueingConsumer = new QueueingConsumer(channel);\n", 
+            "+                }\n", 
+            "+\n", 
+            "             } catch (ConsumerCancelledException e) {\n", 
+            "                 log.error(\"Polling task for service '\" + serviceName + \"' received a \" +\n", 
+            "                         \"cancellation signal\");\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTask.java", 
+      "from": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTask.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-19,6 +19,7", 
+          "lines": [
+            " import org.apache.commons.logging.LogFactory;\n", 
+            " import org.apache.synapse.transport.amqp.*;\n", 
+            " import org.apache.synapse.transport.amqp.connectionfactory.AMQPTransportConnectionFactory;\n", 
+            "+import org.apache.synapse.transport.amqp.ha.AMQPTransportReconnectHandler;\n", 
+            " \n", 
+            " import java.util.Map;\n", 
+            " import java.util.concurrent.ScheduledExecutorService;\n"
+          ]
+        }, 
+        {
+          "locn": "-36,7 +37,8", 
+          "lines": [
+            "             AxisService service,\n", 
+            "             ScheduledExecutorService pool,\n", 
+            "             AMQPTransportEndpoint endpoint,\n", 
+            "-            AMQPTransportConnectionFactory connectionFactory) throws AxisFault {\n", 
+            "+            AMQPTransportConnectionFactory connectionFactory,\n", 
+            "+            AMQPTransportReconnectHandler haHandler) throws AxisFault {\n", 
+            " \n", 
+            "         Map<String, String> svcParam =\n", 
+            "                 AMQPTransportUtils.getServiceStringParameters(service.getParameters());\n"
+          ]
+        }, 
+        {
+          "locn": "-48,6 +50,7", 
+          "lines": [
+            "         pt.setServiceName(service.getName());\n", 
+            "         pt.setEndpoint(endpoint);\n", 
+            "         pt.setPollingTaskScheduler(pool);\n", 
+            "+        pt.setHaHandler(haHandler);\n", 
+            " \n", 
+            "         // set buffers to hold request/response messages for this task\n", 
+            "         pt.setBuffers(new AMQPTransportBuffers());\n"
+          ]
+        }, 
+        {
+          "locn": "-89,7 +92,6", 
+          "lines": [
+            "             pt.setInternalExchange(isInternalExchange);\n", 
+            "         }\n", 
+            " \n", 
+            "-\n", 
+            "         pt.setChannel(connectionFactory.getChannel());\n", 
+            "         pt.setConnectionFactoryName(connectionFactory.getName());\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTaskFactory.java", 
+      "from": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTaskFactory.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-97,7 +97,7", 
+          "lines": [
+            "                                     \" The retry duration is set to initial reconnection duration \" +\n", 
+            "                                     \"value(\" + initialReconnectDuration + \"s)\");\n", 
+            "                         }\n", 
+            "-                        log.error(\"The reconnection attempt number '\" + count++ + \"' failed. Next \" +\n", 
+            "+                        log.info(\"The reconnection attempt number '\" + count++ + \"' failed. Next \" +\n", 
+            "                                 \"re-try will be after '\" + (retryDuration / 1000) + \"' seconds\");\n", 
+            "                         try {\n", 
+            "                             Thread.sleep(retryDuration);\n"
+          ]
+        }, 
+        {
+          "locn": "-117,6 +117,7", 
+          "lines": [
+            "                     connectionFactoryManager.removeConnectionFactory(name);\n", 
+            "                     connectionFactoryManager.addConnectionFactory(\n", 
+            "                             name, new AMQPTransportConnectionFactory(param, es));\n", 
+            "+                    log.info(\"A new connection factory was created for -> '\" + name + \"'\");\n", 
+            "                 }\n", 
+            " \n", 
+            "                 String conFacName = entry.getConnectionFactoryName();\n"
+          ]
+        }, 
+        {
+          "locn": "-127,7 +128,6", 
+          "lines": [
+            "                         new AMQPTransportHABrokerEntry(cf.getChannel(), cf.getConnection()));\n", 
+            "                 entry.getLock().release();\n", 
+            " \n", 
+            "-\n", 
+            "                 while (blockedTasks.isEmpty()) {\n", 
+            "                     entry = blockedTasks.take();\n", 
+            "                     conFacName = entry.getConnectionFactoryName();\n"
+          ]
+        }, 
+        {
+          "locn": "-136,6 +136,8", 
+          "lines": [
+            "                     connectionMap.put(\n", 
+            "                             entry.getKey(),\n", 
+            "                             new AMQPTransportHABrokerEntry(cf.getChannel(), cf.getConnection()));\n", 
+            "+                    log.info(\"The task with key '\" + entry.getKey() + \"' was combined with a new \" +\n", 
+            "+                            \"connection factory\");\n", 
+            "                     entry.getLock().release();\n", 
+            "                 }\n", 
+            "             }\n"
+          ]
+        }, 
+        {
+          "locn": "-142,7 +144,15", 
+          "lines": [
+            "         } catch (InterruptedException e) {\n", 
+            "             Thread.currentThread().interrupt();\n", 
+            "         } catch (AMQPTransportException e) {\n", 
+            "-            log.error(\"High Availability handler just died!. It's time to re-start\", e);\n", 
+            "+            log.error(\"High Availability handler just died!. It's time to reboot the system.\", e);\n", 
+            "         }\n", 
+            "     }\n", 
+            "+\n", 
+            "+    public BlockingQueue<AMQPTransportHAEntry> getBlockedTasks() {\n", 
+            "+        return blockedTasks;\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public ConcurrentMap<String, AMQPTransportHABrokerEntry> getConnectionMap() {\n", 
+            "+        return connectionMap;\n", 
+            "+    }\n", 
+            " }\n", 
+            "\\ No newline at end of file\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/ha/AMQPTransportReconnectHandler.java", 
+      "from": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/ha/AMQPTransportReconnectHandler.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-24,7 +24,6", 
+          "lines": [
+            " \n", 
+            " import java.util.HashSet;\n", 
+            " import java.util.Set;\n", 
+            "-import java.util.concurrent.ExecutorService;\n", 
+            " import java.util.concurrent.ScheduledExecutorService;\n", 
+            " \n", 
+            " /**\n"
+          ]
+        }, 
+        {
+          "locn": "-77,7 +76,8", 
+          "lines": [
+            "                     service,\n", 
+            "                     workerPool,\n", 
+            "                     this,\n", 
+            "-                    conFac);\n", 
+            "+                    conFac,\n", 
+            "+                    transportReceiver.getHaHandler());\n", 
+            " \n", 
+            "         } catch (AMQPTransportException e) {\n", 
+            "             throw new AxisFault(\"Could not load the AMQP endpoint configuration, \" + e.getMessage(), e);\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportEndpoint.java", 
+      "from": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportEndpoint.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-41,7 +41,7", 
+          "lines": [
+            " \n", 
+            "     private ExecutorService connectionFactoryES;\n", 
+            " \n", 
+            "-    private AMQPTransportReconnectHandler haHandler;\n", 
+            "+    private AMQPTransportReconnectHandler haHandlerTask;\n", 
+            " \n", 
+            "     @Override\n", 
+            "     protected void doInit() throws AxisFault {\n"
+          ]
+        }, 
+        {
+          "locn": "-71,7 +71,7", 
+          "lines": [
+            "         int maxReconnectionDuration = AMQPTransportUtils.getIntProperty(\n", 
+            "                 AMQPTransportConstant.PARAM_MAX_RE_CONNECTION_DURATION, 1000 * 60 * 10);\n", 
+            " \n", 
+            "-        haHandler = new AMQPTransportReconnectHandler(\n", 
+            "+        haHandlerTask = new AMQPTransportReconnectHandler(\n", 
+            "                 connectionFactoryES,\n", 
+            "                 maxReconnectionDuration,\n", 
+            "                 reconnectionProgressionFactor,\n"
+          ]
+        }, 
+        {
+          "locn": "-78,7 +78,7", 
+          "lines": [
+            "                 initialReconnectDuration,\n", 
+            "                 connectionFactoryManager);\n", 
+            " \n", 
+            "-        new Thread(haHandler, \"AMQP-HA-handler-task\").start();\n", 
+            "+        new Thread(haHandlerTask, \"AMQP-HA-handler-task\").start();\n", 
+            " \n", 
+            "         log.info(\"AMQP transport listener initializing..\");\n", 
+            "     }\n"
+          ]
+        }, 
+        {
+          "locn": "-137,4 +137,8", 
+          "lines": [
+            "         return connectionFactoryManager.getConnectionFactory(\n", 
+            "                 AMQPTransportConstant.DEFAULT_CONNECTION_FACTORY_NAME);\n", 
+            "     }\n", 
+            "+\n", 
+            "+    public AMQPTransportReconnectHandler getHaHandler(){\n", 
+            "+        return haHandlerTask;\n", 
+            "+    }\n", 
+            " }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportListener.java", 
+      "from": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportListener.java"
+    }
+  ], 
+  "id": "1509495"
+}

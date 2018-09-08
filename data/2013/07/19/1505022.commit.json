@@ -1,0 +1,79 @@
+{
+  "when": "2013-07-19T17:12:52-04:00", 
+  "message": "Applying the patch for SYNAPSE-892 with a test case. Script mediator doesn't parse and serialize includes properly.", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-29,10 +29,7", 
+          "lines": [
+            " import org.apache.synapse.config.xml.ValueFactory;\n", 
+            " \n", 
+            " import javax.xml.namespace.QName;\n", 
+            "-import java.util.Iterator;\n", 
+            "-import java.util.Map;\n", 
+            "-import java.util.Properties;\n", 
+            "-import java.util.TreeMap;\n", 
+            "+import java.util.*;\n", 
+            " \n", 
+            " /**\n", 
+            "  * Creates an instance of a Script mediator for inline or external script mediation for BSF\n"
+          ]
+        }, 
+        {
+          "locn": "-112,7 +109,7", 
+          "lines": [
+            "         // from void ScriptMediator.prepareExternalScript(MessageContext synCtx)\n", 
+            " \n", 
+            "         // TreeMap used to keep given scripts order if needed\n", 
+            "-        Map<Value, Object> includeKeysMap = new TreeMap<Value, Object>();\n", 
+            "+        Map<Value, Object> includeKeysMap = new LinkedHashMap<Value, Object>();\n", 
+            "         Iterator itr = elem.getChildrenWithName(INCLUDE_Q);\n", 
+            "         while (itr.hasNext()) {\n", 
+            "             OMElement includeElem = (OMElement) itr.next();\n"
+          ]
+        }, 
+        {
+          "locn": "-121,7 +118,7", 
+          "lines": [
+            "             // ValueFactory for creating dynamic or static Value\n", 
+            "             ValueFactory keyFac = new ValueFactory();\n", 
+            "             // create dynamic or static key based on OMElement\n", 
+            "-            Value generatedKey = keyFac.createValue(XMLConfigConstants.KEY, elem);\n", 
+            "+            Value generatedKey = keyFac.createValue(XMLConfigConstants.KEY, includeElem);\n", 
+            " \n", 
+            "             if (key == null) {\n", 
+            "                 throw new SynapseException(\"Cannot use 'include' element without 'key'\" +\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMediatorFactory.java", 
+      "from": "java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMediatorFactory.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-42,6 +42,12", 
+          "lines": [
+            "         assertTrue(serialization(inputXml, scriptMediatorSerializer));\n", 
+            "     }\n", 
+            " \n", 
+            "+    public void testScriptMediatorSerializationScenarioThree() {\n", 
+            "+        String inputXml = \"<script xmlns=\\\"http://ws.apache.org/ns/synapse\\\" language=\\\"js\\\" key=\\\"jsMaster\\\" function=\\\"functionFoo\\\"><include key=\\\"jschild1\\\"/><include key=\\\"jschild2\\\"/></script>\";\n", 
+            "+        assertTrue(serialization(inputXml, mediatorFactory, scriptMediatorSerializer));\n", 
+            "+        assertTrue(serialization(inputXml, scriptMediatorSerializer));\n", 
+            "+    }\n", 
+            "+\n", 
+            "     public void testInlineScriptMediatorSerializationScenarioOne() {\n", 
+            "         String inputXml = \"<syn:script xmlns:syn=\\\"http://ws.apache.org/ns/synapse\\\" language='js'>\" +\n", 
+            "                 \"<![CDATA[var symbol = mc.getPayloadXML()..*::Code.toString();mc.setPayloadXML(<m:getQuote xmlns:m=\\\"http://services.samples/xsd\\\">\\n\" +\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/extensions/src/test/java/org/apache/synapse/mediators/bsf/ScriptMediatorSerializationTest.java", 
+      "from": "java/modules/extensions/src/test/java/org/apache/synapse/mediators/bsf/ScriptMediatorSerializationTest.java"
+    }
+  ], 
+  "id": "1505022"
+}

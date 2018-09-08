@@ -24,6 +24,28 @@ Index: java/modules/integration/src/test/resources/sample300.xml
 +    </clientConfig>
 +</synapseSample>
 \ No newline at end of file
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1507748)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1507749)
+@@ -22,6 +22,7 @@
+ import junit.framework.TestSuite;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.samples.framework.tests.tasks.Sample300;
+ import org.apache.synapse.samples.framework.tests.transport.Sample250;
+ import org.apache.synapse.samples.framework.tests.advanced.*;
+ import org.apache.synapse.samples.framework.tests.endpoint.*;
+@@ -209,6 +210,9 @@
+         sampleClassRepo.put("250", Sample250.class);
+         sampleClassRepo.put("251", Sample251.class);
+ 
++        //Tasks
++        sampleClassRepo.put("300", Sample300.class);
++
+         //Advanced
+         sampleClassRepo.put("350", Sample350.class);
+         sampleClassRepo.put("351", Sample351.class);
 Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/tasks/Sample300.java
 ===================================================================
 --- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/tasks/Sample300.java	(nonexistent)
@@ -47,28 +69,6 @@ Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framewo
 +        assertTrue(messageCount >= 2);
 +    }
 +}
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1507748)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1507749)
-@@ -22,6 +22,7 @@
- import junit.framework.TestSuite;
- import org.apache.commons.logging.Log;
- import org.apache.commons.logging.LogFactory;
-+import org.apache.synapse.samples.framework.tests.tasks.Sample300;
- import org.apache.synapse.samples.framework.tests.transport.Sample250;
- import org.apache.synapse.samples.framework.tests.advanced.*;
- import org.apache.synapse.samples.framework.tests.endpoint.*;
-@@ -209,6 +210,9 @@
-         sampleClassRepo.put("250", Sample250.class);
-         sampleClassRepo.put("251", Sample251.class);
- 
-+        //Tasks
-+        sampleClassRepo.put("300", Sample300.class);
-+
-         //Advanced
-         sampleClassRepo.put("350", Sample350.class);
-         sampleClassRepo.put("351", Sample351.class);
 -*-*-*-
 Message: Adding sample300 (scheduled tasks) to the integration test suite.
 -*-*-*-

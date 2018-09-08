@@ -1,3 +1,29 @@
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java	(revision 1514541)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java	(revision 1514542)
+@@ -1111,7 +1111,7 @@
+         return new ImmutableHttpProcessor(new RequestContent(),
+                 new RequestTargetHost(),
+                 new RequestConnControl(),
+-                new RequestUserAgent(),
++                new RequestUserAgent("Synapse-HttpComponents-NIO"),
+                 new RequestExpectContinue(false));
+     }
+ 
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java	(revision 1514541)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java	(revision 1514542)
+@@ -182,7 +182,7 @@
+         final IOEventDispatch ioEventDispatch = getEventDispatch(
+             handler, sslContext, sslSetupHandler, getConnectionConfig(), transportOut);
+ 
+-        // start the Sender in a new seperate thread
++        // start the Sender in a new separate thread
+         Thread t = new Thread(new Runnable() {
+             public void run() {
+                 try {
 Index: java/modules/documentation/src/site/xdoc/userguide/transports/pass_through.xml
 ===================================================================
 --- java/modules/documentation/src/site/xdoc/userguide/transports/pass_through.xml	(revision 1514541)
@@ -433,32 +459,6 @@ Index: java/modules/documentation/src/site/xdoc/userguide/transports/nhttp.xml
      </body>
  </document>
 \ No newline at end of file
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java	(revision 1514541)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java	(revision 1514542)
-@@ -182,7 +182,7 @@
-         final IOEventDispatch ioEventDispatch = getEventDispatch(
-             handler, sslContext, sslSetupHandler, getConnectionConfig(), transportOut);
- 
--        // start the Sender in a new seperate thread
-+        // start the Sender in a new separate thread
-         Thread t = new Thread(new Runnable() {
-             public void run() {
-                 try {
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java	(revision 1514541)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java	(revision 1514542)
-@@ -1111,7 +1111,7 @@
-         return new ImmutableHttpProcessor(new RequestContent(),
-                 new RequestTargetHost(),
-                 new RequestConnControl(),
--                new RequestUserAgent(),
-+                new RequestUserAgent("Synapse-HttpComponents-NIO"),
-                 new RequestExpectContinue(false));
-     }
- 
 -*-*-*-
 Message: Documentation update
 -*-*-*-

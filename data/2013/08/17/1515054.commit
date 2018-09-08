@@ -1,51 +1,3 @@
-Index: java/modules/documentation/src/site/xdoc/userguide/transports/pass_through.xml
-===================================================================
---- java/modules/documentation/src/site/xdoc/userguide/transports/pass_through.xml	(revision 1515053)
-+++ java/modules/documentation/src/site/xdoc/userguide/transports/pass_through.xml	(revision 1515054)
-@@ -749,10 +749,11 @@
-                         <th>Default</th>
-                     </tr>
-                     <tr>
--                        <td>http.socket.timeout</td>
-+                        <td>http.socket.timeout <a name="http.socket.timeout"/></td>
-                         <td>
-                             Sets the TCP socket timeout in milliseconds
-                             (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_TIMEOUT">SO_TIMEOUT</a>).
-+                            This applies to sockets opened by both transport listener and sender.
-                             <div class="xmlConf">http.socket.timeout=20000</div>
-                         </td>
-                         <td>No</td>
-@@ -759,6 +760,30 @@
-                         <td>60000</td>
-                     </tr>
-                     <tr>
-+                        <td>http.socket.timeout.listener</td>
-+                        <td>
-+                            Sets the timeout in milliseconds for all the TCP sockets opened by the
-+                            transport listener. This overrides the value of
-+                            <a href="#http.socket.timeout">http.socket.timeout</a> for the transport
-+                            listener.
-+                            <div class="xmlConf">http.socket.timeout.listener=20000</div>
-+                        </td>
-+                        <td>No</td>
-+                        <td>Value of <a href="#http.socket.timeout">http.socket.timeout</a></td>
-+                    </tr>
-+                    <tr>
-+                        <td>http.socket.timeout.sender</td>
-+                        <td>
-+                            Sets the timeout in milliseconds for all the TCP sockets opened by the
-+                            transport sender. This overrides the value of
-+                            <a href="#http.socket.timeout">http.socket.timeout</a> for the transport
-+                            sender.
-+                            <div class="xmlConf">http.socket.timeout.sender=20000</div>
-+                        </td>
-+                        <td>No</td>
-+                        <td>Value of <a href="#http.socket.timeout">http.socket.timeout</a></td>
-+                    </tr>
-+                    <tr>
-                         <td>http.connection.timeout</td>
-                         <td>
-                             Sets the TCP connection timeout in milliseconds. This determines the timeout
 Index: java/modules/documentation/src/site/xdoc/userguide/transports/nhttp.xml
 ===================================================================
 --- java/modules/documentation/src/site/xdoc/userguide/transports/nhttp.xml	(revision 1515053)
@@ -94,6 +46,198 @@ Index: java/modules/documentation/src/site/xdoc/userguide/transports/nhttp.xml
                          <td>http.connection.timeout</td>
                          <td>
                              Sets the TCP connection timeout in milliseconds. This determines the timeout
+Index: java/modules/documentation/src/site/xdoc/userguide/transports/pass_through.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/transports/pass_through.xml	(revision 1515053)
++++ java/modules/documentation/src/site/xdoc/userguide/transports/pass_through.xml	(revision 1515054)
+@@ -749,10 +749,11 @@
+                         <th>Default</th>
+                     </tr>
+                     <tr>
+-                        <td>http.socket.timeout</td>
++                        <td>http.socket.timeout <a name="http.socket.timeout"/></td>
+                         <td>
+                             Sets the TCP socket timeout in milliseconds
+                             (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_TIMEOUT">SO_TIMEOUT</a>).
++                            This applies to sockets opened by both transport listener and sender.
+                             <div class="xmlConf">http.socket.timeout=20000</div>
+                         </td>
+                         <td>No</td>
+@@ -759,6 +760,30 @@
+                         <td>60000</td>
+                     </tr>
+                     <tr>
++                        <td>http.socket.timeout.listener</td>
++                        <td>
++                            Sets the timeout in milliseconds for all the TCP sockets opened by the
++                            transport listener. This overrides the value of
++                            <a href="#http.socket.timeout">http.socket.timeout</a> for the transport
++                            listener.
++                            <div class="xmlConf">http.socket.timeout.listener=20000</div>
++                        </td>
++                        <td>No</td>
++                        <td>Value of <a href="#http.socket.timeout">http.socket.timeout</a></td>
++                    </tr>
++                    <tr>
++                        <td>http.socket.timeout.sender</td>
++                        <td>
++                            Sets the timeout in milliseconds for all the TCP sockets opened by the
++                            transport sender. This overrides the value of
++                            <a href="#http.socket.timeout">http.socket.timeout</a> for the transport
++                            sender.
++                            <div class="xmlConf">http.socket.timeout.sender=20000</div>
++                        </td>
++                        <td>No</td>
++                        <td>Value of <a href="#http.socket.timeout">http.socket.timeout</a></td>
++                    </tr>
++                    <tr>
+                         <td>http.connection.timeout</td>
+                         <td>
+                             Sets the TCP connection timeout in milliseconds. This determines the timeout
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java	(revision 1515053)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java	(revision 1515054)
+@@ -243,7 +243,7 @@
+ 
+     public IOReactorConfig getReactorConfig() {
+         NHttpConfiguration cfg = NHttpConfiguration.getInstance();
+-        return cfg.getReactorConfig();
++        return cfg.getListeningReactorConfig();
+     }
+ 
+     public ConfigurationContext getCfgCtx() {
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java	(revision 1515053)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java	(revision 1515054)
+@@ -255,7 +255,7 @@
+ 
+     private IOReactorConfig getReactorConfig() {
+         NHttpConfiguration cfg = NHttpConfiguration.getInstance();
+-        return cfg.getReactorConfig();
++        return cfg.getConnectingReactorConfig();
+     }
+ 
+     /**
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/config/HttpConfigConstants.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/config/HttpConfigConstants.java	(revision 1515053)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/config/HttpConfigConstants.java	(revision 1515054)
+@@ -30,6 +30,8 @@
+     public static final String SO_LINGER = "http.socket.linger";
+     public static final String SO_REUSEADDR = "http.socket.reuseaddr";
+     public static final String SO_TIMEOUT = "http.socket.timeout";
++    public static final String LISTENER_SO_TIMEOUT = "http.socket.timeout.listener";
++    public static final String SENDER_SO_TIMEOUT = "http.socket.timeout.sender";
+     public static final String SELECT_INTERVAL = "http.nio.select-interval";
+ 
+     public static final String HTTP_MALFORMED_INPUT_ACTION = "http.malformed.input.action";
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/config/HttpTransportConfiguration.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/config/HttpTransportConfiguration.java	(revision 1515053)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/config/HttpTransportConfiguration.java	(revision 1515054)
+@@ -58,14 +58,15 @@
+     abstract protected int getThreadsPerReactor();
+ 
+     /**
+-     * Get the IOReactor configuration
++     * Get the listening I/O reactor configuration
+      *
+      * @return A fully initialized IOReactorConfig instance
+      */
+-    public IOReactorConfig getReactorConfig() {
++    public IOReactorConfig getListeningReactorConfig() {
+         IOReactorConfig.Builder builder = IOReactorConfig.custom()
+                 .setIoThreadCount(getThreadsPerReactor())
+-                .setSoTimeout(getIntProperty(HttpConfigConstants.SO_TIMEOUT, 60000))
++                .setSoTimeout(getIntProperty(HttpConfigConstants.LISTENER_SO_TIMEOUT,
++                        getIntProperty(HttpConfigConstants.SO_TIMEOUT, 60000)))
+                 .setConnectTimeout(getIntProperty(HttpConfigConstants.CONNECTION_TIMEOUT, 0))
+                 .setInterestOpQueued(getBooleanProperty(HttpConfigConstants.INTEREST_OPS_QUEUEING, false))
+                 .setTcpNoDelay(getBooleanProperty(HttpConfigConstants.TCP_NODELAY, true))
+@@ -87,6 +88,36 @@
+     }
+ 
+     /**
++     * Get the connecting I/O reactor configuration
++     *
++     * @return A fully initialized IOReactorConfig instance
++     */
++    public IOReactorConfig getConnectingReactorConfig() {
++        IOReactorConfig.Builder builder = IOReactorConfig.custom()
++                .setIoThreadCount(getThreadsPerReactor())
++                .setSoTimeout(getIntProperty(HttpConfigConstants.SENDER_SO_TIMEOUT,
++                        getIntProperty(HttpConfigConstants.SO_TIMEOUT, 60000)))
++                .setConnectTimeout(getIntProperty(HttpConfigConstants.CONNECTION_TIMEOUT, 0))
++                .setInterestOpQueued(getBooleanProperty(HttpConfigConstants.INTEREST_OPS_QUEUEING, false))
++                .setTcpNoDelay(getBooleanProperty(HttpConfigConstants.TCP_NODELAY, true))
++                .setRcvBufSize(getIntProperty(HttpConfigConstants.SOCKET_RCV_BUFFER_SIZE, 8 * 1024))
++                .setSndBufSize(getIntProperty(HttpConfigConstants.SOCKET_SND_BUFFER_SIZE, 8 * 1024));
++
++        if (getIntProperty(HttpConfigConstants.SO_LINGER) != null) {
++            builder.setSoLinger(getIntProperty(HttpConfigConstants.SO_LINGER));
++        }
++
++        if (getBooleanProperty(HttpConfigConstants.SO_REUSEADDR) != null) {
++            builder.setSoReuseAddress(getBooleanProperty(HttpConfigConstants.SO_REUSEADDR));
++        }
++
++        if (getIntProperty(HttpConfigConstants.SELECT_INTERVAL) != null) {
++            builder.setSelectInterval(getIntProperty(HttpConfigConstants.SELECT_INTERVAL));
++        }
++        return builder.build();
++    }
++
++    /**
+      * Get the connection configuration
+      *
+      * @return A fully initialized ConnectionConfig instance
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java	(revision 1515053)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java	(revision 1515054)
+@@ -174,7 +174,7 @@
+             String prefix = namePrefix + "-PT-Sender I/O Dispatcher";
+ 
+             ioReactor = new DefaultConnectingIOReactor(
+-                            targetConfiguration.getReactorConfig(),
++                            targetConfiguration.getReactorConfig(false),
+                             new NativeThreadFactory(new ThreadGroup(prefix + " Thread Group"), prefix));
+ 
+             ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpListener.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpListener.java	(revision 1515053)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpListener.java	(revision 1515054)
+@@ -143,7 +143,7 @@
+         try {
+             String prefix = namePrefix + "-PT-Listener I/O Dispatcher";
+             ioReactor = new DefaultListeningIOReactor(
+-                            sourceConfiguration.getReactorConfig(),
++                            sourceConfiguration.getReactorConfig(true),
+                             new NativeThreadFactory(new ThreadGroup(prefix + " Thread Group"), prefix));
+             
+             ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/BaseConfiguration.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/BaseConfiguration.java	(revision 1515053)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/BaseConfiguration.java	(revision 1515054)
+@@ -78,8 +78,12 @@
+ 
+     abstract protected HttpProcessor initHttpProcessor();
+ 
+-    public IOReactorConfig getReactorConfig() {
+-        return conf.getReactorConfig();
++    public IOReactorConfig getReactorConfig(boolean listener) {
++        if (listener) {
++            return conf.getListeningReactorConfig();
++        } else {
++            return conf.getConnectingReactorConfig();
++        }
+     }
+ 
+     public ConnectionConfig getConnectionConfig() {
 Index: java/modules/transports/core/nhttp/src/test/resources/test-http.properties
 ===================================================================
 --- java/modules/transports/core/nhttp/src/test/resources/test-http.properties	(nonexistent)
@@ -175,150 +319,6 @@ Index: java/modules/transports/core/nhttp/src/test/java/org/apache/synapse/trans
      class SimpleHttpTransportConfiguration extends HttpTransportConfiguration {
          public SimpleHttpTransportConfiguration(String fileName) {
              super(fileName);
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/BaseConfiguration.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/BaseConfiguration.java	(revision 1515053)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/BaseConfiguration.java	(revision 1515054)
-@@ -78,8 +78,12 @@
- 
-     abstract protected HttpProcessor initHttpProcessor();
- 
--    public IOReactorConfig getReactorConfig() {
--        return conf.getReactorConfig();
-+    public IOReactorConfig getReactorConfig(boolean listener) {
-+        if (listener) {
-+            return conf.getListeningReactorConfig();
-+        } else {
-+            return conf.getConnectingReactorConfig();
-+        }
-     }
- 
-     public ConnectionConfig getConnectionConfig() {
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java	(revision 1515053)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java	(revision 1515054)
-@@ -174,7 +174,7 @@
-             String prefix = namePrefix + "-PT-Sender I/O Dispatcher";
- 
-             ioReactor = new DefaultConnectingIOReactor(
--                            targetConfiguration.getReactorConfig(),
-+                            targetConfiguration.getReactorConfig(false),
-                             new NativeThreadFactory(new ThreadGroup(prefix + " Thread Group"), prefix));
- 
-             ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpListener.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpListener.java	(revision 1515053)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpListener.java	(revision 1515054)
-@@ -143,7 +143,7 @@
-         try {
-             String prefix = namePrefix + "-PT-Listener I/O Dispatcher";
-             ioReactor = new DefaultListeningIOReactor(
--                            sourceConfiguration.getReactorConfig(),
-+                            sourceConfiguration.getReactorConfig(true),
-                             new NativeThreadFactory(new ThreadGroup(prefix + " Thread Group"), prefix));
-             
-             ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java	(revision 1515053)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java	(revision 1515054)
-@@ -243,7 +243,7 @@
- 
-     public IOReactorConfig getReactorConfig() {
-         NHttpConfiguration cfg = NHttpConfiguration.getInstance();
--        return cfg.getReactorConfig();
-+        return cfg.getListeningReactorConfig();
-     }
- 
-     public ConfigurationContext getCfgCtx() {
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java	(revision 1515053)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java	(revision 1515054)
-@@ -255,7 +255,7 @@
- 
-     private IOReactorConfig getReactorConfig() {
-         NHttpConfiguration cfg = NHttpConfiguration.getInstance();
--        return cfg.getReactorConfig();
-+        return cfg.getConnectingReactorConfig();
-     }
- 
-     /**
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/config/HttpTransportConfiguration.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/config/HttpTransportConfiguration.java	(revision 1515053)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/config/HttpTransportConfiguration.java	(revision 1515054)
-@@ -58,14 +58,15 @@
-     abstract protected int getThreadsPerReactor();
- 
-     /**
--     * Get the IOReactor configuration
-+     * Get the listening I/O reactor configuration
-      *
-      * @return A fully initialized IOReactorConfig instance
-      */
--    public IOReactorConfig getReactorConfig() {
-+    public IOReactorConfig getListeningReactorConfig() {
-         IOReactorConfig.Builder builder = IOReactorConfig.custom()
-                 .setIoThreadCount(getThreadsPerReactor())
--                .setSoTimeout(getIntProperty(HttpConfigConstants.SO_TIMEOUT, 60000))
-+                .setSoTimeout(getIntProperty(HttpConfigConstants.LISTENER_SO_TIMEOUT,
-+                        getIntProperty(HttpConfigConstants.SO_TIMEOUT, 60000)))
-                 .setConnectTimeout(getIntProperty(HttpConfigConstants.CONNECTION_TIMEOUT, 0))
-                 .setInterestOpQueued(getBooleanProperty(HttpConfigConstants.INTEREST_OPS_QUEUEING, false))
-                 .setTcpNoDelay(getBooleanProperty(HttpConfigConstants.TCP_NODELAY, true))
-@@ -87,6 +88,36 @@
-     }
- 
-     /**
-+     * Get the connecting I/O reactor configuration
-+     *
-+     * @return A fully initialized IOReactorConfig instance
-+     */
-+    public IOReactorConfig getConnectingReactorConfig() {
-+        IOReactorConfig.Builder builder = IOReactorConfig.custom()
-+                .setIoThreadCount(getThreadsPerReactor())
-+                .setSoTimeout(getIntProperty(HttpConfigConstants.SENDER_SO_TIMEOUT,
-+                        getIntProperty(HttpConfigConstants.SO_TIMEOUT, 60000)))
-+                .setConnectTimeout(getIntProperty(HttpConfigConstants.CONNECTION_TIMEOUT, 0))
-+                .setInterestOpQueued(getBooleanProperty(HttpConfigConstants.INTEREST_OPS_QUEUEING, false))
-+                .setTcpNoDelay(getBooleanProperty(HttpConfigConstants.TCP_NODELAY, true))
-+                .setRcvBufSize(getIntProperty(HttpConfigConstants.SOCKET_RCV_BUFFER_SIZE, 8 * 1024))
-+                .setSndBufSize(getIntProperty(HttpConfigConstants.SOCKET_SND_BUFFER_SIZE, 8 * 1024));
-+
-+        if (getIntProperty(HttpConfigConstants.SO_LINGER) != null) {
-+            builder.setSoLinger(getIntProperty(HttpConfigConstants.SO_LINGER));
-+        }
-+
-+        if (getBooleanProperty(HttpConfigConstants.SO_REUSEADDR) != null) {
-+            builder.setSoReuseAddress(getBooleanProperty(HttpConfigConstants.SO_REUSEADDR));
-+        }
-+
-+        if (getIntProperty(HttpConfigConstants.SELECT_INTERVAL) != null) {
-+            builder.setSelectInterval(getIntProperty(HttpConfigConstants.SELECT_INTERVAL));
-+        }
-+        return builder.build();
-+    }
-+
-+    /**
-      * Get the connection configuration
-      *
-      * @return A fully initialized ConnectionConfig instance
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/config/HttpConfigConstants.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/config/HttpConfigConstants.java	(revision 1515053)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/config/HttpConfigConstants.java	(revision 1515054)
-@@ -30,6 +30,8 @@
-     public static final String SO_LINGER = "http.socket.linger";
-     public static final String SO_REUSEADDR = "http.socket.reuseaddr";
-     public static final String SO_TIMEOUT = "http.socket.timeout";
-+    public static final String LISTENER_SO_TIMEOUT = "http.socket.timeout.listener";
-+    public static final String SENDER_SO_TIMEOUT = "http.socket.timeout.sender";
-     public static final String SELECT_INTERVAL = "http.nio.select-interval";
- 
-     public static final String HTTP_MALFORMED_INPUT_ACTION = "http.malformed.input.action";
 -*-*-*-
 Message: Fixing SYNAPSE-824 for nhttp and pt transports
 -*-*-*-

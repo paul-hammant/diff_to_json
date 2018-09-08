@@ -1,0 +1,190 @@
+Index: java/modules/documentation/src/site/xdoc/userguide/transports/pass_through.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/transports/pass_through.xml	(revision 1545105)
++++ java/modules/documentation/src/site/xdoc/userguide/transports/pass_through.xml	(revision 1545106)
+@@ -838,10 +838,11 @@
+                             suggestion to the OS kernel from Synapse about the size of buffers to
+                             use for the data to be received over the socket
+                             (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_RCVBUF">SO_RCVBUF</a>).
+-                            <div class="xmlConf">http.socket.rcv-buffer-size=4096</div>
++                            If no value is specified, Synapse will use the platform (OS) default.
++                            <div class="xmlConf">http.socket.rcv-buffer-size=8192</div>
+                         </td>
+                         <td>No</td>
+-                        <td>8192</td>
++                        <td>Platform default</td>
+                     </tr>
+                     <tr>
+                         <td>http.socket.snd-buffer-size</td>
+@@ -851,10 +852,11 @@
+                             suggestion to the OS kernel from Synapse about the size of buffers to
+                             use for the data to be sent over the socket
+                             (See <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/SocketOptions.html#SO_SNDBUF">SO_SNDBUF</a>).
+-                            <div class="xmlConf">http.socket.snd-buffer-size=4096</div>
++                            If no value is specified, Synapse will use the platform (OS) default.
++                            <div class="xmlConf">http.socket.snd-buffer-size=8192</div>
+                         </td>
+                         <td>No</td>
+-                        <td>8192</td>
++                        <td>Platform default</td>
+                     </tr>
+                     <tr>
+                         <td>http.socket.linger</td>
+Index: java/modules/transports/core/nhttp/src/test/resources/test-http.properties
+===================================================================
+--- java/modules/transports/core/nhttp/src/test/resources/test-http.properties	(revision 1545105)
++++ java/modules/transports/core/nhttp/src/test/resources/test-http.properties	(revision 1545106)
+@@ -7,3 +7,7 @@
+ http.socket.buffer-size=8192
+ http.tcp.nodelay=true
+ http.nio.interest-ops-queueing=false
++
++http.socket.rcv-buffer-size=8192
++http.socket.snd-buffer-size=8192
++
+Index: java/modules/transports/core/nhttp/src/test/java/org/apache/synapse/transport/utils/config/HttpTransportConfigurationTest.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/test/java/org/apache/synapse/transport/utils/config/HttpTransportConfigurationTest.java	(revision 1545105)
++++ java/modules/transports/core/nhttp/src/test/java/org/apache/synapse/transport/utils/config/HttpTransportConfigurationTest.java	(revision 1545106)
+@@ -36,8 +36,6 @@
+         IOReactorConfig reactorConfig = config.getListeningReactorConfig();
+         assertEquals(2, reactorConfig.getIoThreadCount());
+         assertEquals(0, reactorConfig.getConnectTimeout());
+-        assertEquals(1024 * 8, reactorConfig.getRcvBufSize());
+-        assertEquals(1024 * 8, reactorConfig.getSndBufSize());
+         assertEquals(60000, reactorConfig.getSoTimeout());
+         assertEquals(true, reactorConfig.isTcpNoDelay());
+         assertEquals(false, reactorConfig.isInterestOpQueued());
+@@ -45,8 +43,6 @@
+         reactorConfig = config.getConnectingReactorConfig();
+         assertEquals(2, reactorConfig.getIoThreadCount());
+         assertEquals(0, reactorConfig.getConnectTimeout());
+-        assertEquals(1024 * 8, reactorConfig.getRcvBufSize());
+-        assertEquals(1024 * 8, reactorConfig.getSndBufSize());
+         assertEquals(60000, reactorConfig.getSoTimeout());
+         assertEquals(true, reactorConfig.isTcpNoDelay());
+         assertEquals(false, reactorConfig.isInterestOpQueued());
+@@ -67,8 +63,6 @@
+         assertEquals(true, reactorConfig.isSoReuseAddress());
+         assertEquals(2, reactorConfig.getIoThreadCount());
+         assertEquals(0, reactorConfig.getConnectTimeout());
+-        assertEquals(1024 * 8, reactorConfig.getRcvBufSize());
+-        assertEquals(1024 * 8, reactorConfig.getSndBufSize());
+         assertEquals(60000, reactorConfig.getSoTimeout());
+         assertEquals(true, reactorConfig.isTcpNoDelay());
+         assertEquals(false, reactorConfig.isInterestOpQueued());
+@@ -79,7 +73,7 @@
+         assertEquals(CodingErrorAction.REPORT, connConfig.getUnmappableInputAction());
+     }
+ 
+-    public void testTimeoutConfig() {
++    public void testTimeoutAndBufferSizeConfig() {
+         HttpTransportConfiguration config = new SimpleHttpTransportConfiguration("test-http");
+ 
+         IOReactorConfig reactorConfig = config.getListeningReactorConfig();
+@@ -86,6 +80,7 @@
+         assertEquals(30000, reactorConfig.getSoTimeout());
+         assertEquals(2, reactorConfig.getIoThreadCount());
+         assertEquals(0, reactorConfig.getConnectTimeout());
++        // Should be able to override platform default buffer sizes if needed
+         assertEquals(1024 * 8, reactorConfig.getRcvBufSize());
+         assertEquals(1024 * 8, reactorConfig.getSndBufSize());
+         assertEquals(true, reactorConfig.isTcpNoDelay());
+@@ -95,6 +90,7 @@
+         assertEquals(20000, reactorConfig.getSoTimeout());
+         assertEquals(2, reactorConfig.getIoThreadCount());
+         assertEquals(0, reactorConfig.getConnectTimeout());
++        // Should be able to override platform default buffer sizes if needed
+         assertEquals(1024 * 8, reactorConfig.getRcvBufSize());
+         assertEquals(1024 * 8, reactorConfig.getSndBufSize());
+         assertEquals(true, reactorConfig.isTcpNoDelay());
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/config/HttpTransportConfiguration.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/config/HttpTransportConfiguration.java	(revision 1545105)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/config/HttpTransportConfiguration.java	(revision 1545106)
+@@ -69,10 +69,16 @@
+                         getIntProperty(HttpConfigConstants.SO_TIMEOUT, 60000)))
+                 .setConnectTimeout(getIntProperty(HttpConfigConstants.CONNECTION_TIMEOUT, 0))
+                 .setInterestOpQueued(getBooleanProperty(HttpConfigConstants.INTEREST_OPS_QUEUEING, false))
+-                .setTcpNoDelay(getBooleanProperty(HttpConfigConstants.TCP_NODELAY, true))
+-                .setRcvBufSize(getIntProperty(HttpConfigConstants.SOCKET_RCV_BUFFER_SIZE, 8 * 1024))
+-                .setSndBufSize(getIntProperty(HttpConfigConstants.SOCKET_SND_BUFFER_SIZE, 8 * 1024));
++                .setTcpNoDelay(getBooleanProperty(HttpConfigConstants.TCP_NODELAY, true));
+ 
++        if (getIntProperty(HttpConfigConstants.SOCKET_RCV_BUFFER_SIZE) != null) {
++            builder.setRcvBufSize(getIntProperty(HttpConfigConstants.SOCKET_RCV_BUFFER_SIZE));
++        }
++
++        if (getIntProperty(HttpConfigConstants.SOCKET_SND_BUFFER_SIZE) != null) {
++            builder.setSndBufSize(getIntProperty(HttpConfigConstants.SOCKET_SND_BUFFER_SIZE));
++        }
++
+         if (getIntProperty(HttpConfigConstants.SO_LINGER) != null) {
+             builder.setSoLinger(getIntProperty(HttpConfigConstants.SO_LINGER));
+         }
+@@ -99,10 +105,16 @@
+                         getIntProperty(HttpConfigConstants.SO_TIMEOUT, 60000)))
+                 .setConnectTimeout(getIntProperty(HttpConfigConstants.CONNECTION_TIMEOUT, 0))
+                 .setInterestOpQueued(getBooleanProperty(HttpConfigConstants.INTEREST_OPS_QUEUEING, false))
+-                .setTcpNoDelay(getBooleanProperty(HttpConfigConstants.TCP_NODELAY, true))
+-                .setRcvBufSize(getIntProperty(HttpConfigConstants.SOCKET_RCV_BUFFER_SIZE, 8 * 1024))
+-                .setSndBufSize(getIntProperty(HttpConfigConstants.SOCKET_SND_BUFFER_SIZE, 8 * 1024));
++                .setTcpNoDelay(getBooleanProperty(HttpConfigConstants.TCP_NODELAY, true));
+ 
++        if (getIntProperty(HttpConfigConstants.SOCKET_RCV_BUFFER_SIZE) != null) {
++            builder.setRcvBufSize(getIntProperty(HttpConfigConstants.SOCKET_RCV_BUFFER_SIZE));
++        }
++
++        if (getIntProperty(HttpConfigConstants.SOCKET_SND_BUFFER_SIZE) != null) {
++            builder.setSndBufSize(getIntProperty(HttpConfigConstants.SOCKET_SND_BUFFER_SIZE));
++        }
++
+         if (getIntProperty(HttpConfigConstants.SO_LINGER) != null) {
+             builder.setSoLinger(getIntProperty(HttpConfigConstants.SO_LINGER));
+         }
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/EchoHttpServerController.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/EchoHttpServerController.java	(revision 1545105)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/EchoHttpServerController.java	(revision 1545106)
+@@ -33,6 +33,7 @@
+ 
+ import java.io.IOException;
+ import java.io.InterruptedIOException;
++import java.net.InetSocketAddress;
+ import java.net.ServerSocket;
+ import java.net.Socket;
+ import java.util.concurrent.atomic.AtomicInteger;
+@@ -98,7 +99,9 @@
+ 
+         public RequestListenerThread(final int port) throws IOException {
+             this.connFactory = DefaultBHttpServerConnectionFactory.INSTANCE;
+-            this.serversocket = new ServerSocket(port);
++            this.serversocket = new ServerSocket();
++            this.serversocket.setReuseAddress(true);
++            this.serversocket.bind(new InetSocketAddress(port));
+ 
+             // Set up the HTTP protocol processor
+             HttpProcessor httpProcessor = HttpProcessorBuilder.create()
+@@ -146,6 +149,12 @@
+             try {
+                 this.interrupt();
+                 this.serversocket.close();
++                while (this.isAlive() || !this.serversocket.isClosed()) {
++                    try {
++                        Thread.sleep(100);
++                    } catch (InterruptedException ignored) {
++                    }
++                }
+             } catch (IOException e) {
+                 log.warn("Error while shutting down echo server", e);
+             }
+-*-*-*-
+Message: * Not setting the http.socket.rcv-buffer-size and http.socket.snd-buffer-size properties unless the user has specified them explicitly. This will cause Synapse to use platform defaults when appropriate. (see the thread: HTTP Core Performance and Reactor Buffer Size)
+* Updated the relevant documentation and test cases.
+* Changed the EchoHttpServerController to reuse server sockets when appopriate.
+
+
+-*-*-*-
+When: 2013-11-24 18:14:04 -0500 
+-*-*-*-
+Who: hiranya

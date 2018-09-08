@@ -1,3 +1,29 @@
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1505450)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1505451)
+@@ -219,7 +219,7 @@
+         sampleClassRepo.put("390", Sample390.class);
+         sampleClassRepo.put("391", Sample391.class);
+         sampleClassRepo.put("420", Sample420.class);
+-        //sampleClassRepo.put("430", Sample430.class);  // Problem with repo path
++        sampleClassRepo.put("430", Sample430.class);
+         sampleClassRepo.put("431", Sample431.class);
+         sampleClassRepo.put("450", Sample450.class);
+         sampleClassRepo.put("451", Sample451.class);
+Index: java/modules/integration/src/test/resources/sample430.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample430.xml	(revision 1505450)
++++ java/modules/integration/src/test/resources/sample430.xml	(revision 1505451)
+@@ -4,7 +4,7 @@
+     <synapseConfig>
+         <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
+         <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
+-        <synapseXml>repository/conf/sample/synapse_sample_430.xml</synapseXml>
++        <synapseXml>modules/integration/src/test/resources/extras/synapse_sample_430_altered.xml</synapseXml>
+     </synapseConfig>
+     <backEndServerConfig>
+         <axis2Server id='0'>
 Index: java/modules/integration/src/test/resources/extras/synapse_sample_430_altered.xml
 ===================================================================
 --- java/modules/integration/src/test/resources/extras/synapse_sample_430_altered.xml	(nonexistent)
@@ -44,32 +70,6 @@ Index: java/modules/integration/src/test/resources/extras/synapse_sample_430_alt
 +    </sequence>
 +
 +</definitions>
-Index: java/modules/integration/src/test/resources/sample430.xml
-===================================================================
---- java/modules/integration/src/test/resources/sample430.xml	(revision 1505450)
-+++ java/modules/integration/src/test/resources/sample430.xml	(revision 1505451)
-@@ -4,7 +4,7 @@
-     <synapseConfig>
-         <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
-         <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
--        <synapseXml>repository/conf/sample/synapse_sample_430.xml</synapseXml>
-+        <synapseXml>modules/integration/src/test/resources/extras/synapse_sample_430_altered.xml</synapseXml>
-     </synapseConfig>
-     <backEndServerConfig>
-         <axis2Server id='0'>
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1505450)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1505451)
-@@ -219,7 +219,7 @@
-         sampleClassRepo.put("390", Sample390.class);
-         sampleClassRepo.put("391", Sample391.class);
-         sampleClassRepo.put("420", Sample420.class);
--        //sampleClassRepo.put("430", Sample430.class);  // Problem with repo path
-+        sampleClassRepo.put("430", Sample430.class);
-         sampleClassRepo.put("431", Sample431.class);
-         sampleClassRepo.put("450", Sample450.class);
-         sampleClassRepo.put("451", Sample451.class);
 -*-*-*-
 Message: Applying the patch for SYNAPSE-949. Enabling the callout mediator integration test.
 -*-*-*-

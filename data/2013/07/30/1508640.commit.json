@@ -1,0 +1,54 @@
+{
+  "when": "2013-07-30T17:35:27-04:00", 
+  "message": "added sample 269.", 
+  "who": "rajikak", 
+  "changes": [
+    {
+      "chunks": [], 
+      "to": "java/repository/conf/sample/synapse_sample_269.xml", 
+      "from": "java/repository/conf/sample/synapse_sample_269.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-64,7 +64,6", 
+          "lines": [
+            "         Channel channel = null;\n", 
+            "         try {\n", 
+            "             connection = factory.newConnection();\n", 
+            "-\n", 
+            "             channel = connection.createChannel();\n", 
+            " \n", 
+            "             if (mode == null) {\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/samples/src/main/java/samples/userguide/RabbitMQAMQPClient.java", 
+      "from": "java/modules/samples/src/main/java/samples/userguide/RabbitMQAMQPClient.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-120,6 +120,7", 
+          "lines": [
+            "                         <li><a href=\"samples/sample264.html\">Sample 264: Request-response invocations with the JMS transport</a></li>\n", 
+            "                         <li><a href=\"samples/sample265.html\">Sample 265: Switching from TCP to HTTP/S</a></li>\n", 
+            "                         <li><a href=\"samples/sample266.html\">Sample 266: Switching from UDP to HTTP/S</a></li>\n", 
+            "+                        <li><a href=\"samples/sample269.html\">Sample 269: AMQP transport-consumer proxy</a></li>\n", 
+            "                     </ul>\n", 
+            "                 </p>\n", 
+            "             </subsection>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/documentation/src/site/xdoc/userguide/samples.xml", 
+      "from": "java/modules/documentation/src/site/xdoc/userguide/samples.xml"
+    }, 
+    {
+      "chunks": [], 
+      "to": "java/modules/documentation/src/site/xdoc/userguide/samples/sample269.xml", 
+      "from": "java/modules/documentation/src/site/xdoc/userguide/samples/sample269.xml"
+    }
+  ], 
+  "id": "1508640"
+}

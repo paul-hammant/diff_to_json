@@ -1,0 +1,40 @@
+{
+  "when": "2013-08-03T15:24:37-04:00", 
+  "message": "Fixing a couple of minor typos", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-467,7 +467,7", 
+          "lines": [
+            "     \n", 
+            "     /**\n", 
+            "      * Commit the response to the connection. Processes the response through the configured\n", 
+            "-     * HttpProcessor and submits it to be sent out. This method hides any exceptions and is targetted\n", 
+            "+     * HttpProcessor and submits it to be sent out. This method hides any exceptions and is targeted\n", 
+            "      * for non critical (i.e. browser requests etc) requests, which are not core messages\n", 
+            "      * @param conn the connection being processed\n", 
+            "      * @param response the response to commit over the connection\n"
+          ]
+        }, 
+        {
+          "locn": "-481,7 +481,7", 
+          "lines": [
+            "         } catch (HttpException e) {\n", 
+            "             handleException(\"Unexpected HTTP protocol error : \" + e.getMessage(), e, conn);\n", 
+            "         } catch (IOException e) {\n", 
+            "-            handleException(\"IO error submiting response : \" + e.getMessage(), e, conn);\n", 
+            "+            handleException(\"IO error submitting response : \" + e.getMessage(), e, conn);\n", 
+            "         }\n", 
+            "     }\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java"
+    }
+  ], 
+  "id": "1510061"
+}

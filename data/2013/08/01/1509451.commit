@@ -1,22 +1,3 @@
-Index: java/modules/core/src/main/java/org/apache/synapse/registry/RegistryEntryImpl.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/registry/RegistryEntryImpl.java	(revision 1509450)
-+++ java/modules/core/src/main/java/org/apache/synapse/registry/RegistryEntryImpl.java	(revision 1509451)
-@@ -19,12 +19,12 @@
- 
- package org.apache.synapse.registry;
- 
-+import org.apache.axiom.mime.ContentType;
- import org.apache.commons.logging.Log;
- import org.apache.commons.logging.LogFactory;
- import org.apache.synapse.SynapseException;
- 
--import javax.mail.internet.ContentType;
--import javax.mail.internet.ParseException;
-+import java.text.ParseException;
- import java.util.Date;
- 
- public class RegistryEntryImpl implements RegistryEntry {
 Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java
 ===================================================================
 --- java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java	(revision 1509450)
@@ -42,6 +23,25 @@ Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transpo
  import java.util.*;
  
  /**
+Index: java/modules/core/src/main/java/org/apache/synapse/registry/RegistryEntryImpl.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/registry/RegistryEntryImpl.java	(revision 1509450)
++++ java/modules/core/src/main/java/org/apache/synapse/registry/RegistryEntryImpl.java	(revision 1509451)
+@@ -19,12 +19,12 @@
+ 
+ package org.apache.synapse.registry;
+ 
++import org.apache.axiom.mime.ContentType;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.SynapseException;
+ 
+-import javax.mail.internet.ContentType;
+-import javax.mail.internet.ParseException;
++import java.text.ParseException;
+ import java.util.Date;
+ 
+ public class RegistryEntryImpl implements RegistryEntry {
 -*-*-*-
 Message: Avoid the dependency on JavaMail (which is no longer a dependency of Axiom; see AXIOM-418).
 -*-*-*-

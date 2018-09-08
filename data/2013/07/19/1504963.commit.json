@@ -1,0 +1,369 @@
+{
+  "when": "2013-07-19T14:46:49-04:00", 
+  "message": "Applying the patches for SYNAPSE-882", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-30,8 +30,7", 
+          "lines": [
+            "     private EqualFactory fac = new EqualFactory();\n", 
+            " \n", 
+            "     public void testHeaderEqualSerializer() {\n", 
+            "-        String input = \"<equal type=\\\"header\\\" source=\\\"foo\\\" value=\\\"bar\\\"/>\";\n", 
+            "-\n", 
+            "+        String input = \"<equal xmlns=\\\"http://ws.apache.org/ns/synapse\\\" type=\\\"header\\\" source=\\\"foo\\\" value=\\\"bar\\\"/>\";\n", 
+            "         try {\n", 
+            "             Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));\n", 
+            "             OMElement output = serializer.serialize(null, eval);\n"
+          ]
+        }, 
+        {
+          "locn": "-42,7 +41,7", 
+          "lines": [
+            "     }\n", 
+            " \n", 
+            "     public void testParameterEqualSerializer() {\n", 
+            "-        String input = \"<equal type=\\\"param\\\" source=\\\"foo\\\" value=\\\"bar\\\"/>\";\n", 
+            "+        String input = \"<equal xmlns=\\\"http://ws.apache.org/ns/synapse\\\" type=\\\"param\\\" source=\\\"foo\\\" value=\\\"bar\\\"/>\";\n", 
+            " \n", 
+            "         try {\n", 
+            "             Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));\n"
+          ]
+        }, 
+        {
+          "locn": "-54,7 +53,7", 
+          "lines": [
+            "     }\n", 
+            " \n", 
+            "     public void testURLEqualSerializer() {\n", 
+            "-        String input = \"<equal type=\\\"url\\\" value=\\\"http://foo.org\\\"/>\";\n", 
+            "+        String input = \"<equal xmlns=\\\"http://ws.apache.org/ns/synapse\\\" type=\\\"url\\\" value=\\\"http://foo.org\\\"/>\";\n", 
+            " \n", 
+            "         try {\n", 
+            "             Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));\n"
+          ]
+        }, 
+        {
+          "locn": "-66,7 +65,7", 
+          "lines": [
+            "     }\n", 
+            " \n", 
+            "     public void testURLEqualSerializer2() {\n", 
+            "-        String input = \"<equal type=\\\"url\\\" value=\\\"http://foo.org\\\" source=\\\"protocol\\\"/>\";\n", 
+            "+        String input = \"<equal xmlns=\\\"http://ws.apache.org/ns/synapse\\\" type=\\\"url\\\" value=\\\"http://foo.org\\\" source=\\\"protocol\\\"/>\";\n", 
+            " \n", 
+            "         try {\n", 
+            "             Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/commons/src/test/java/org/apache/synapse/commons/evaluators/config/EqualSerializerTest.java", 
+      "from": "java/modules/commons/src/test/java/org/apache/synapse/commons/evaluators/config/EqualSerializerTest.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-30,7 +30,7", 
+          "lines": [
+            "     private MatchFactory fac = new MatchFactory();\n", 
+            " \n", 
+            "     public void testHeaderMatchSerializer() {\n", 
+            "-        String input = \"<match type=\\\"header\\\" source=\\\"foo\\\" regex=\\\"bar\\\"/>\";\n", 
+            "+        String input = \"<match xmlns=\\\"http://ws.apache.org/ns/synapse\\\" type=\\\"header\\\" source=\\\"foo\\\" regex=\\\"bar\\\"/>\";\n", 
+            " \n", 
+            "         try {\n", 
+            "             Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));\n"
+          ]
+        }, 
+        {
+          "locn": "-42,7 +42,7", 
+          "lines": [
+            "     }\n", 
+            " \n", 
+            "     public void testParameterMatchSerializer() {\n", 
+            "-        String input = \"<match type=\\\"param\\\" source=\\\"foo\\\" regex=\\\"bar\\\"/>\";\n", 
+            "+        String input = \"<match xmlns=\\\"http://ws.apache.org/ns/synapse\\\" type=\\\"param\\\" source=\\\"foo\\\" regex=\\\"bar\\\"/>\";\n", 
+            " \n", 
+            "         try {\n", 
+            "             Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));\n"
+          ]
+        }, 
+        {
+          "locn": "-54,7 +54,7", 
+          "lines": [
+            "     }\n", 
+            " \n", 
+            "     public void testURLMatchSerializer() {\n", 
+            "-        String input = \"<match type=\\\"url\\\" regex=\\\"http://foo.org\\\"/>\";\n", 
+            "+        String input = \"<match xmlns=\\\"http://ws.apache.org/ns/synapse\\\" type=\\\"url\\\" regex=\\\"http://foo.org\\\"/>\";\n", 
+            " \n", 
+            "         try {\n", 
+            "             Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));\n"
+          ]
+        }, 
+        {
+          "locn": "-66,7 +66,7", 
+          "lines": [
+            "     }\n", 
+            " \n", 
+            "     public void testURLMatchSerializer2() {\n", 
+            "-        String input = \"<match type=\\\"url\\\" regex=\\\"http://foo.org\\\" source=\\\"protocol\\\"/>\";\n", 
+            "+        String input = \"<match xmlns=\\\"http://ws.apache.org/ns/synapse\\\" type=\\\"url\\\" regex=\\\"http://foo.org\\\" source=\\\"protocol\\\"/>\";\n", 
+            " \n", 
+            "         try {\n", 
+            "             Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/commons/src/test/java/org/apache/synapse/commons/evaluators/config/MatchSerializerTest.java", 
+      "from": "java/modules/commons/src/test/java/org/apache/synapse/commons/evaluators/config/MatchSerializerTest.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-47,6 +47,9", 
+          "lines": [
+            "     public static final String PRIORITY = \"priority\";\n", 
+            "     public static final String DEFAULT_PRIORITY = \"defaultPriority\";\n", 
+            " \n", 
+            "+    public static final String SYNAPSE_NAMESPACE = \"http://ws.apache.org/ns/synapse\";\n", 
+            "+    public static final String EMPTY_PREFIX = \"\";\n", 
+            "+\n", 
+            "     public static enum URI_FRAGMENTS {\n", 
+            "         protocol,\n", 
+            "         user,\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/commons/src/main/java/org/apache/synapse/commons/evaluators/EvaluatorConstants.java", 
+      "from": "java/modules/commons/src/main/java/org/apache/synapse/commons/evaluators/EvaluatorConstants.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-16,11 +16,12", 
+          "lines": [
+            " \n", 
+            "     public OMElement serialize(OMElement parent, Evaluator evaluator) throws EvaluatorException {\n", 
+            "         if (!(evaluator instanceof MatchEvaluator)) {\n", 
+            "-            throw new IllegalArgumentException(\"Evalutor must be a NotEvalutor\");\n", 
+            "+            throw new IllegalArgumentException(\"Evaluator must be a NotEvaluator\");\n", 
+            "         }\n", 
+            " \n", 
+            "         MatchEvaluator matchEvaluator = (MatchEvaluator) evaluator;\n", 
+            "-        OMElement matchElement = fac.createOMElement(new QName(EvaluatorConstants.MATCH));\n", 
+            "+        OMElement matchElement  = fac.createOMElement(EvaluatorConstants.MATCH,\n", 
+            "+                EvaluatorConstants.SYNAPSE_NAMESPACE, EvaluatorConstants.EMPTY_PREFIX);\n", 
+            "         serializeSourceTextRetriever(matchEvaluator.getTextRetriever(), matchElement);\n", 
+            " \n", 
+            "         matchElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.REGEX, nullNS,\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/commons/src/main/java/org/apache/synapse/commons/evaluators/config/MatchSerializer.java", 
+      "from": "java/modules/commons/src/main/java/org/apache/synapse/commons/evaluators/config/MatchSerializer.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-35,12 +35,13", 
+          "lines": [
+            " \n", 
+            "     public OMElement serialize(OMElement parent, Evaluator evaluator) throws EvaluatorException {\n", 
+            "         if (!(evaluator instanceof NotEvaluator)) {\n", 
+            "-            throw new IllegalArgumentException(\"Evalutor should be a NotEvalutor\");\n", 
+            "+            throw new IllegalArgumentException(\"Evaluator should be a NotEvaluator\");\n", 
+            "         }\n", 
+            " \n", 
+            "         NotEvaluator notEvaluator = (NotEvaluator) evaluator;\n", 
+            " \n", 
+            "-        OMElement notElement = fac.createOMElement(new QName(EvaluatorConstants.NOT));\n", 
+            "+        OMElement notElement  = fac.createOMElement(EvaluatorConstants.NOT,\n", 
+            "+                EvaluatorConstants.SYNAPSE_NAMESPACE, EvaluatorConstants.EMPTY_PREFIX);\n", 
+            "         serializeChild(notElement, notEvaluator.getEvaluator());\n", 
+            " \n", 
+            "         if (parent != null) {\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/commons/src/main/java/org/apache/synapse/commons/evaluators/config/NotSerializer.java", 
+      "from": "java/modules/commons/src/main/java/org/apache/synapse/commons/evaluators/config/NotSerializer.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-34,12 +34,13", 
+          "lines": [
+            " public class AndSerializer extends AbstractEvaluatorSerializer {    \n", 
+            "     public OMElement serialize(OMElement parent, Evaluator evaluator) throws EvaluatorException {        \n", 
+            "         if (!(evaluator instanceof AndEvaluator)) {           \n", 
+            "-            throw new IllegalArgumentException(\"Evalutor should be a AndEvalutor\");\n", 
+            "+            throw new IllegalArgumentException(\"Evaluator should be an AndEvaluator\");\n", 
+            "         }\n", 
+            " \n", 
+            "         AndEvaluator andEvaluator = (AndEvaluator) evaluator;\n", 
+            " \n", 
+            "-        OMElement andElement = fac.createOMElement(new QName((EvaluatorConstants.AND)));\n", 
+            "+        OMElement andElement  = fac.createOMElement(EvaluatorConstants.AND,\n", 
+            "+                EvaluatorConstants.SYNAPSE_NAMESPACE, EvaluatorConstants.EMPTY_PREFIX);\n", 
+            "         serializeChildren(andElement, andEvaluator.getEvaluators());\n", 
+            " \n", 
+            "         if (parent != null) {\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/commons/src/main/java/org/apache/synapse/commons/evaluators/config/AndSerializer.java", 
+      "from": "java/modules/commons/src/main/java/org/apache/synapse/commons/evaluators/config/AndSerializer.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-33,11 +33,12", 
+          "lines": [
+            "     public OMElement serialize(OMElement parent, Evaluator evaluator) throws EvaluatorException {\n", 
+            " \n", 
+            "         if (!(evaluator instanceof EqualEvaluator)) {\n", 
+            "-            throw new IllegalArgumentException(\"Evalutor must be an EqualEvalutor\");\n", 
+            "+            throw new IllegalArgumentException(\"Evaluator must be an EqualEvaluator\");\n", 
+            "         }\n", 
+            " \n", 
+            "         EqualEvaluator equalEvaluator = (EqualEvaluator) evaluator;\n", 
+            "-        OMElement equalElement = fac.createOMElement(new QName(EvaluatorConstants.EQUAL));\n", 
+            "+        OMElement equalElement  = fac.createOMElement(EvaluatorConstants.EQUAL,\n", 
+            "+                EvaluatorConstants.SYNAPSE_NAMESPACE, EvaluatorConstants.EMPTY_PREFIX);\n", 
+            "         serializeSourceTextRetriever(equalEvaluator.getTextRetriever(), equalElement);\n", 
+            " \n", 
+            "         equalElement.addAttribute(fac.createOMAttribute(EvaluatorConstants.VALUE, nullNS,\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/commons/src/main/java/org/apache/synapse/commons/evaluators/config/EqualSerializer.java", 
+      "from": "java/modules/commons/src/main/java/org/apache/synapse/commons/evaluators/config/EqualSerializer.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-34,12 +34,13", 
+          "lines": [
+            " public class OrSerializer extends AbstractEvaluatorSerializer {\n", 
+            "     public OMElement serialize(OMElement parent, Evaluator evaluator) throws EvaluatorException {\n", 
+            "         if (!(evaluator instanceof OrEvaluator)) {\n", 
+            "-            throw new IllegalArgumentException(\"Evalutor should be a OrEvalutor\");\n", 
+            "+            throw new IllegalArgumentException(\"Evaluator should be an OrEvaluator\");\n", 
+            "         }\n", 
+            " \n", 
+            "         OrEvaluator orEvaluator = (OrEvaluator) evaluator;\n", 
+            " \n", 
+            "-        OMElement orElement = fac.createOMElement(new QName((EvaluatorConstants.OR)));\n", 
+            "+        OMElement orElement  = fac.createOMElement(EvaluatorConstants.OR,\n", 
+            "+                EvaluatorConstants.SYNAPSE_NAMESPACE, EvaluatorConstants.EMPTY_PREFIX);\n", 
+            "         serializeChildren(orElement, orEvaluator.getEvaluators());\n", 
+            " \n", 
+            "         if (parent != null) {\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/commons/src/main/java/org/apache/synapse/commons/evaluators/config/OrSerializer.java", 
+      "from": "java/modules/commons/src/main/java/org/apache/synapse/commons/evaluators/config/OrSerializer.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-32,7 +32,7", 
+          "lines": [
+            " \n", 
+            "     public void testRouterMediatorSerializationSenarioOne() throws Exception {\n", 
+            "         String inputXml = \"<conditionalRouter xmlns=\\\"http://ws.apache.org/ns/synapse\\\">\" +\n", 
+            "-                \"<conditionalRoute><condition><equal xmlns=\\\"\\\" type=\\\"url\\\" value=\\\"http://localhost:9000.*\\\"/></condition>\" +\n", 
+            "+                \"<conditionalRoute><condition><equal type=\\\"url\\\" value=\\\"http://localhost:9000.*\\\"/></condition>\" +\n", 
+            "                 \"<target><sequence><log level=\\\"full\\\"/></sequence></target></conditionalRoute>\" +\n", 
+            "                 \"</conditionalRouter>\";\n", 
+            "         \n"
+          ]
+        }, 
+        {
+          "locn": "-42,7 +42,7", 
+          "lines": [
+            " \n", 
+            "     public void testRouterMediatorSerializationSenarioTwo() throws Exception {\n", 
+            "         String inputXml = \"<conditionalRouter xmlns=\\\"http://ws.apache.org/ns/synapse\\\">\" +\n", 
+            "-                \"<conditionalRoute><condition><and xmlns=\\\"\\\" ><equal type=\\\"url\\\" value=\\\"http://localhost:9000.*\\\"/>\" +\n", 
+            "+                \"<conditionalRoute><condition><and><equal type=\\\"url\\\" value=\\\"http://localhost:9000.*\\\"/>\" +\n", 
+            "                 \"<match type=\\\"url\\\" regex=\\\"http://localhost:9000.*\\\"/></and></condition>\" +\n", 
+            "                 \"<target><sequence><log level=\\\"full\\\"/></sequence></target></conditionalRoute>\" +\n", 
+            "                 \"</conditionalRouter>\";\n"
+          ]
+        }, 
+        {
+          "locn": "-53,7 +53,7", 
+          "lines": [
+            " \n", 
+            "     public void testRouterMediatorSerializationSenarioThree() throws Exception {\n", 
+            "         String inputXml = \"<conditionalRouter xmlns=\\\"http://ws.apache.org/ns/synapse\\\">\" +\n", 
+            "-                \"<conditionalRoute><condition><or xmlns=\\\"\\\" ><equal type=\\\"url\\\" value=\\\"http://localhost:9000.*\\\"/>\" +\n", 
+            "+                \"<conditionalRoute><condition><or><equal type=\\\"url\\\" value=\\\"http://localhost:9000.*\\\"/>\" +\n", 
+            "                 \"<match type=\\\"url\\\" regex=\\\"http://localhost:9000.*\\\"/></or></condition><target>\" +\n", 
+            "                 \"<sequence><log level=\\\"full\\\"/></sequence></target></conditionalRoute>\" +\n", 
+            "                 \"</conditionalRouter>\";\n"
+          ]
+        }, 
+        {
+          "locn": "-64,7 +64,7", 
+          "lines": [
+            " \n", 
+            "     public void testRouterMediatorSerializationSenarioFour() throws Exception {\n", 
+            "         String inputXml = \"<conditionalRouter xmlns=\\\"http://ws.apache.org/ns/synapse\\\">\" +\n", 
+            "-                \"<conditionalRoute><condition><not xmlns=\\\"\\\"><equal type=\\\"url\\\" value=\\\"http://localhost:9000.*\\\"/></not>\" +\n", 
+            "+                \"<conditionalRoute><condition><not><equal type=\\\"url\\\" value=\\\"http://localhost:9000.*\\\"/></not>\" +\n", 
+            "                 \"</condition><target><sequence><log level=\\\"full\\\"/></sequence></target></conditionalRoute>\" +\n", 
+            "                 \"</conditionalRouter>\";\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/test/java/org/apache/synapse/config/xml/ConditionalRouterMediatorSerializationTest.java", 
+      "from": "java/modules/core/src/test/java/org/apache/synapse/config/xml/ConditionalRouterMediatorSerializationTest.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-40,7 +40,7", 
+          "lines": [
+            " \n", 
+            "     public void testSerializationScenario2() {\n", 
+            "         String xml = \"<rewrite xmlns=\\\"http://ws.apache.org/ns/synapse\\\">\" +\n", 
+            "-                \"<rewriterule><condition><match xmlns=\\\"\\\" type=\\\"url\\\" source=\\\"host\\\" regex=\\\"localhost\\\"/>\" +\n", 
+            "+                \"<rewriterule><condition><match type=\\\"url\\\" source=\\\"host\\\" regex=\\\"localhost\\\"/>\" +\n", 
+            "                 \"</condition><action fragment=\\\"protocol\\\" value=\\\"https\\\" type=\\\"set\\\"/>\" +\n", 
+            "                 \"<action fragment=\\\"host\\\" value=\\\"www.test.com\\\" type=\\\"set\\\"/><action \" +\n", 
+            "                 \"fragment=\\\"port\\\" value=\\\"9090\\\" type=\\\"set\\\"/><action fragment=\\\"path\\\" \" +\n"
+          ]
+        }, 
+        {
+          "locn": "-52,12 +52,12", 
+          "lines": [
+            "     public void testSerializationScenario3() {\n", 
+            "         String xml = \"<rewrite xmlns=\\\"http://ws.apache.org/ns/synapse\\\"><rewriterule>\" +\n", 
+            "                 \"<action fragment=\\\"full\\\" value=\\\"http://localhost:8080/synapse\\\" type=\\\"set\\\"/></rewriterule>\" +\n", 
+            "-                \"<rewriterule><condition><match xmlns=\\\"\\\" type=\\\"url\\\" source=\\\"host\\\" regex=\\\"localhost\\\"/>\" +\n", 
+            "+                \"<rewriterule><condition><match type=\\\"url\\\" source=\\\"host\\\" regex=\\\"localhost\\\"/>\" +\n", 
+            "                 \"</condition><action fragment=\\\"protocol\\\" value=\\\"https\\\" type=\\\"set\\\"/>\" +\n", 
+            "                 \"<action fragment=\\\"host\\\" value=\\\"www.test.com\\\" type=\\\"set\\\"/>\" +\n", 
+            "                 \"<action fragment=\\\"port\\\" xpath=\\\"get-property('port')\\\" type=\\\"set\\\"/>\" +\n", 
+            "                 \"<action fragment=\\\"path\\\" value=\\\"/services\\\" type=\\\"prepend\\\"/></rewriterule><rewriterule>\" +\n", 
+            "-                \"<condition><and xmlns=\\\"\\\"><match type=\\\"url\\\" source=\\\"host\\\" regex=\\\"www.test.com\\\"/>\" +\n", 
+            "+                \"<condition><and><match type=\\\"url\\\" source=\\\"host\\\" regex=\\\"www.test.com\\\"/>\" +\n", 
+            "                 \"<equal type=\\\"url\\\" source=\\\"port\\\" value=\\\"9090\\\"/></and></condition>\" +\n", 
+            "                 \"<action fragment=\\\"path\\\" regex=\\\".*/FooService\\\" type=\\\"replace\\\" \" +\n", 
+            "                 \"value=\\\"/BarService\\\"/></rewriterule>\" +\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/test/java/org/apache/synapse/config/xml/URLRewriteMediatorSerializationTest.java", 
+      "from": "java/modules/core/src/test/java/org/apache/synapse/config/xml/URLRewriteMediatorSerializationTest.java"
+    }
+  ], 
+  "id": "1504963"
+}

@@ -1,0 +1,256 @@
+{
+  "when": "2016-02-20T11:17:57-05:00", 
+  "message": "Moving error infromation of Subscription from SubscriptionMessageBuilder to SynapseSubscription - static variables are not suitable for storing error information as error information must be per subscription based and not something applicable globally for all the subscriptions", 
+  "who": "isudana", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-81,9 +81,9", 
+          "lines": [
+            "             assertEquals(filterDialect, sub.getFilterDialect());\n", 
+            "             assertEquals(filter, sub.getFilterValue());\n", 
+            "             assertEquals(date, sub.getExpires().getTime());\n", 
+            "-            assertNull(SubscriptionMessageBuilder.getErrorCode());\n", 
+            "-            assertNull(SubscriptionMessageBuilder.getErrorReason());\n", 
+            "-            assertNull(SubscriptionMessageBuilder.getErrorSubCode());\n", 
+            "+            assertNull(sub.getErrorCode());\n", 
+            "+            assertNull(sub.getErrorReason());\n", 
+            "+            assertNull(sub.getErrorSubCode());\n", 
+            "         } catch (Exception e) {\n", 
+            "             fail(\"Error while constructing the sample subscription request: \" + e.getMessage());\n", 
+            "         }\n"
+          ]
+        }, 
+        {
+          "locn": "-102,9 +102,9", 
+          "lines": [
+            "             SynapseSubscription sub = SubscriptionMessageBuilder.createUnSubscribeMessage(msgCtx);\n", 
+            "             assertEquals(id, sub.getId());\n", 
+            "             assertEquals(addressUrl, sub.getAddressUrl());\n", 
+            "-            assertNull(SubscriptionMessageBuilder.getErrorCode());\n", 
+            "-            assertNull(SubscriptionMessageBuilder.getErrorReason());\n", 
+            "-            assertNull(SubscriptionMessageBuilder.getErrorSubCode());\n", 
+            "+            assertNull(sub.getErrorCode());\n", 
+            "+            assertNull(sub.getErrorReason());\n", 
+            "+            assertNull(sub.getErrorSubCode());\n", 
+            " \n", 
+            "         } catch (Exception e) {\n", 
+            "             e.printStackTrace();\n"
+          ]
+        }, 
+        {
+          "locn": "-133,9 +133,9", 
+          "lines": [
+            "             assertEquals(id, sub.getId());\n", 
+            "             assertEquals(addressUrl, sub.getAddressUrl());\n", 
+            "             assertEquals(date, sub.getExpires().getTime());\n", 
+            "-            assertNull(SubscriptionMessageBuilder.getErrorCode());\n", 
+            "-            assertNull(SubscriptionMessageBuilder.getErrorReason());\n", 
+            "-            assertNull(SubscriptionMessageBuilder.getErrorSubCode());\n", 
+            "+            assertNull(sub.getErrorCode());\n", 
+            "+            assertNull(sub.getErrorReason());\n", 
+            "+            assertNull(sub.getErrorSubCode());\n", 
+            " \n", 
+            "         } catch (Exception e) {\n", 
+            "             e.printStackTrace();\n"
+          ]
+        }, 
+        {
+          "locn": "-157,9 +157,9", 
+          "lines": [
+            "             SynapseSubscription sub = SubscriptionMessageBuilder.createGetStatusMessage(msgCtx);\n", 
+            "             assertEquals(id, sub.getId());\n", 
+            "             assertEquals(addressUrl, sub.getAddressUrl());\n", 
+            "-            assertNull(SubscriptionMessageBuilder.getErrorCode());\n", 
+            "-            assertNull(SubscriptionMessageBuilder.getErrorReason());\n", 
+            "-            assertNull(SubscriptionMessageBuilder.getErrorSubCode());\n", 
+            "+            assertNull(sub.getErrorCode());\n", 
+            "+            assertNull(sub.getErrorReason());\n", 
+            "+            assertNull(sub.getErrorSubCode());\n", 
+            " \n", 
+            "         } catch (Exception e) {\n", 
+            "             e.printStackTrace();\n"
+          ]
+        }, 
+        {
+          "locn": "-184,9 +184,9", 
+          "lines": [
+            "                     createRenewSubscribeMessage(msgCtx);\n", 
+            "             assertNull(id, sub.getId());\n", 
+            "             assertEquals(addressUrl, sub.getAddressUrl());\n", 
+            "-            assertNotNull(SubscriptionMessageBuilder.getErrorCode());\n", 
+            "-            assertNotNull(SubscriptionMessageBuilder.getErrorReason());\n", 
+            "-            assertNotNull(SubscriptionMessageBuilder.getErrorSubCode());\n", 
+            "+            assertNotNull(sub.getErrorCode());\n", 
+            "+            assertNotNull(sub.getErrorReason());\n", 
+            "+            assertNotNull(sub.getErrorSubCode());\n", 
+            " \n", 
+            "         } catch (Exception e) {\n", 
+            "             e.printStackTrace();\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/test/java/org/apache/synapse/eventing/builders/MessageBuilderTest.java", 
+      "from": "java/modules/core/src/test/java/org/apache/synapse/eventing/builders/MessageBuilderTest.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-273,9 +273,9", 
+          "lines": [
+            "                 log.debug(\"SynapseSubscription Failed, sending fault response\");\n", 
+            "             }\n", 
+            "             SOAPEnvelope soapEnvelope = messageBuilder.genFaultResponse(mc,\n", 
+            "-                    SubscriptionMessageBuilder.getErrorCode(),\n", 
+            "-                    SubscriptionMessageBuilder.getErrorSubCode(),\n", 
+            "-                    SubscriptionMessageBuilder.getErrorReason(), \"\");\n", 
+            "+                                                                        subscription.getErrorCode(),\n", 
+            "+                                                                        subscription.getErrorSubCode(),\n", 
+            "+                                                                        subscription.getErrorReason(), \"\");\n", 
+            "             dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, mc,\n", 
+            "                     true);\n", 
+            "         }\n"
+          ]
+        }, 
+        {
+          "locn": "-402,9 +402,9", 
+          "lines": [
+            "             }\n", 
+            "         } else {\n", 
+            "             SOAPEnvelope soapEnvelope = messageBuilder.genFaultResponse(mc,\n", 
+            "-                    SubscriptionMessageBuilder.getErrorCode(),\n", 
+            "-                    SubscriptionMessageBuilder.getErrorSubCode(),\n", 
+            "-                    SubscriptionMessageBuilder.getErrorReason(), \"\");\n", 
+            "+                                                                        subscription.getErrorCode(),\n", 
+            "+                                                                        subscription.getErrorSubCode(),\n", 
+            "+                                                                        subscription.getErrorReason(), \"\");\n", 
+            "             dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, mc, true);\n", 
+            "         }\n", 
+            "     }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/eventing/SynapseEventSource.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/eventing/SynapseEventSource.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-32,6 +32,10", 
+          "lines": [
+            " public class SynapseSubscription extends Subscription {\n", 
+            " \n", 
+            " \n", 
+            "+    private String errorSubCode = null;\n", 
+            "+    private String errorReason = null;\n", 
+            "+    private String errorCode = null;\n", 
+            "+\n", 
+            "     public SynapseSubscription() {\n", 
+            "         this.setId(UIDGenerator.generateURNString());\n", 
+            "         this.setDeliveryMode(EventingConstants.WSE_DEFAULT_DELIVERY_MODE);\n"
+          ]
+        }, 
+        {
+          "locn": "-44,4 +48,28", 
+          "lines": [
+            "         this.setId(UIDGenerator.generateURNString());\n", 
+            "         this.setDeliveryMode(deliveryMode);\n", 
+            "     }\n", 
+            "+\n", 
+            "+    public String getErrorSubCode() {\n", 
+            "+        return errorSubCode;\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public void setErrorSubCode(String errorCode) {\n", 
+            "+        errorSubCode = errorCode;\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public String getErrorReason() {\n", 
+            "+        return errorReason;\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public void setErrorReason(String errorReasons) {\n", 
+            "+        errorReason = errorReasons;\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public String getErrorCode() {\n", 
+            "+        return errorCode;\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public void setErrorCode(String errorCodes) {\n", 
+            "+        errorCode = errorCodes;\n", 
+            "+    }\n", 
+            " }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/eventing/SynapseSubscription.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/eventing/SynapseSubscription.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-57,10 +57,6", 
+          "lines": [
+            "     private static final QName RENEW =\n", 
+            "             new QName(EventingConstants.WSE_EVENTING_NS, EventingConstants.WSE_EN_RENEW);\n", 
+            " \n", 
+            "-    private static String errorSubCode = null;\n", 
+            "-    private static String errorReason = null;\n", 
+            "-    private static String errorCode = null;\n", 
+            "-\n", 
+            "     /**\n", 
+            "      * (01) <s12:Envelope\n", 
+            "      * (02)     xmlns:s12=\"http://www.w3.org/2003/05/soap-envelope\"\n"
+          ]
+        }, 
+        {
+          "locn": "-336,34 +332,10", 
+          "lines": [
+            "         throw new SynapseException(message);\n", 
+            "     }\n", 
+            " \n", 
+            "-    public static String getErrorSubCode() {\n", 
+            "-        return errorSubCode;\n", 
+            "-    }\n", 
+            "-\n", 
+            "-    public static void setErrorSubCode(String errorCode) {\n", 
+            "-        errorSubCode = errorCode;\n", 
+            "-    }\n", 
+            "-\n", 
+            "-    public static String getErrorReason() {\n", 
+            "-        return errorReason;\n", 
+            "-    }\n", 
+            "-\n", 
+            "-    public static void setErrorReason(String errorReasons) {\n", 
+            "-        errorReason = errorReasons;\n", 
+            "-    }\n", 
+            "-\n", 
+            "-    public static String getErrorCode() {\n", 
+            "-        return errorCode;\n", 
+            "-    }\n", 
+            "-\n", 
+            "-    public static void setErrorCode(String errorCodes) {\n", 
+            "-        errorCode = errorCodes;\n", 
+            "-    }\n", 
+            "-\n", 
+            "     private static void setExpirationFault(SynapseSubscription subscription) {\n", 
+            "-        setErrorCode(EventingConstants.WSE_FAULT_CODE_SENDER);\n", 
+            "-        setErrorSubCode(\"InvalidExpirationTime\");\n", 
+            "-        setErrorReason(\"The expiration time requested is invalid\");\n", 
+            "+        subscription.setErrorCode(EventingConstants.WSE_FAULT_CODE_SENDER);\n", 
+            "+        subscription.setErrorSubCode(\"InvalidExpirationTime\");\n", 
+            "+        subscription.setErrorReason(\"The expiration time requested is invalid\");\n", 
+            "         subscription.setId(null);\n", 
+            "     }\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/eventing/builders/SubscriptionMessageBuilder.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/eventing/builders/SubscriptionMessageBuilder.java"
+    }
+  ], 
+  "id": "1731418"
+}

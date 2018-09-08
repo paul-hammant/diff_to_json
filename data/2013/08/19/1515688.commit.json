@@ -1,0 +1,103 @@
+{
+  "when": "2013-08-19T22:36:43-04:00", 
+  "message": "Documentation update", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-36,6 +36,9", 
+          "lines": [
+            "                         <li><a href=\"#Sender\">FIX Transport Sender</a></li>\n", 
+            "                     </ul>\n", 
+            "                 </li>\n", 
+            "+                <li>\n", 
+            "+                    <a href=\"#Mediation\">Mediation FIX Messages</a>\n", 
+            "+                </li>\n", 
+            "             </ul>\n", 
+            "         </section>\n", 
+            "         <section name=\"Introduction\" id=\"Introduction\">\n"
+          ]
+        }, 
+        {
+          "locn": "-387,8 +390,8", 
+          "lines": [
+            "                     <li>SessionQualifier</li>\n", 
+            "                 </ul>\n", 
+            "                 <p>\n", 
+            "-                    The DeliverTo* fields will be actually set on the messages, as they are forwarded\n", 
+            "-                    to the remote FIX endpoint.\n", 
+            "+                    The DeliverTo* fields will be actually set on the messages, as the messages are\n", 
+            "+                    forwarded to the remote FIX endpoint.\n", 
+            "                 </p>\n", 
+            "                 <p>\n", 
+            "                     There are several parameters that can be set at the proxy service level to\n"
+          ]
+        }, 
+        {
+          "locn": "-479,5 +482,54", 
+          "lines": [
+            "                 </table>\n", 
+            "             </subsection>\n", 
+            "         </section>\n", 
+            "+        <section name=\"Mediating FIX Messages\" id=\"Mediation\">\n", 
+            "+            <p>\n", 
+            "+                The FIX transport converts all received messages into SOAP (XML). Therefore, you can\n", 
+            "+                treat a FIX message as any other XML message at the mediation level. You may use\n", 
+            "+                XPath to extract individual fields from the FIX messages, and use XSLT or XQuery to\n", 
+            "+                transform them into other formats. An example FIX message and its equivalent SOAP\n", 
+            "+                infoset as constructed by the FIX transport are shown below.\n", 
+            "+            </p>\n", 
+            "+            <div class=\"xmlConf\">8=FIX.4.0[SOH]\u00019=105[SOH]\u000135=D[SOH]\u000134=2\u0001[SOH]49=BANZAI[SOH]\u000152=20080711-06:42:26[SOH]56=SYNAPSE[SOH]11=1215758546278[SOH]21=1[SOH]38=90000000\u000140=1\u000154=1\u000155=DEL\u000159=0\u000110=121\u0001</div>\n", 
+            "+            <div class=\"xmlConf\">&lt;message&gt;\n", 
+            "+    &lt;header&gt;\n", 
+            "+        &lt;field id=\"8\"&gt;FIX.4.0&lt;/field&gt;\n", 
+            "+        &lt;field id=\"9\"&gt;105&lt;/field&gt;\n", 
+            "+        &lt;field id=\"34\"&gt;2&lt;/field&gt;\n", 
+            "+        &lt;field id=\"35\"&gt;D&lt;/field&gt;\n", 
+            "+        &lt;field id=\"49\"&gt;BANZAI&lt;/field&gt;\n", 
+            "+        &lt;field id=\"52\"&gt;20080711-06:42:26&lt;/field&gt;\n", 
+            "+        &lt;field id=\"56\"&gt;SYNAPSE&lt;/field&gt;\n", 
+            "+    &lt;/header&gt;\n", 
+            "+    &lt;body&gt;\n", 
+            "+        &lt;field id=\"11\"&gt;1215758546278&lt;/field&gt;\n", 
+            "+        &lt;field id=\"21\"&gt;1&lt;/field&gt;\n", 
+            "+        &lt;field id=\"38\"&gt;90000000&lt;/field&gt;\n", 
+            "+        &lt;field id=\"40\"&gt;1&lt;/field&gt;\n", 
+            "+        &lt;field id=\"54\"&gt;1&lt;/field&gt;\n", 
+            "+        &lt;field id=\"55\"&gt;DEL&lt;/field&gt;\n", 
+            "+        &lt;field id=\"59\"&gt;0&lt;/field&gt;\n", 
+            "+    &lt;/body&gt;\n", 
+            "+    &lt;trailer&gt;\n", 
+            "+        &lt;field id=\"10\"&gt;121&lt;/field&gt;\n", 
+            "+    &lt;/trailer&gt;\n", 
+            "+&lt;/message&gt;</div>\n", 
+            "+            <p>\n", 
+            "+                Notice how the FIX header, body and trailer sections are grouped under separate\n", 
+            "+                parent XML elements. To extract the BeginString field (field no. 8), you may use\n", 
+            "+                the following XPath expression:\n", 
+            "+            </p>\n", 
+            "+            <div class=\"xmlConf\">//header/field[@id='8']</div>\n", 
+            "+            <p>\n", 
+            "+                Similarly to extract the value of field 55 from the FIX message body, you may use\n", 
+            "+                the following XPath expression:\n", 
+            "+            </p>\n", 
+            "+            <div class=\"xmlConf\">//body/field[@id='55']</div>\n", 
+            "+            <p>\n", 
+            "+                Representing FIX messages as XML enables you to use some of the most powerful\n", 
+            "+                mediation features of Synapse with FIX message flows. This includes content-based\n", 
+            "+                routing, message transformation and protocol switching.\n", 
+            "+            </p>\n", 
+            "+        </section>\n", 
+            "     </body>\n", 
+            " </document>\n", 
+            "\\ No newline at end of file\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/documentation/src/site/xdoc/userguide/transports/fix.xml", 
+      "from": "java/modules/documentation/src/site/xdoc/userguide/transports/fix.xml"
+    }
+  ], 
+  "id": "1515688"
+}

@@ -1,0 +1,111 @@
+{
+  "when": "2017-01-14T04:34:30-05:00", 
+  "message": "Prevent the build from attempting to access the dead Codehaus snapshot repository.", 
+  "who": "veithen", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-225,6 +225,10", 
+          "lines": [
+            "     \n", 
+            "     <dependencies>\n", 
+            "         <dependency>\n", 
+            "+            <groupId>org.apache.axis2</groupId>\n", 
+            "+            <artifactId>axis2-clustering</artifactId>\n", 
+            "+        </dependency>\n", 
+            "+        <dependency>\n", 
+            "             <groupId>org.apache.synapse</groupId>\n", 
+            "             <artifactId>synapse-securevault</artifactId>\n", 
+            "         </dependency>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/pom.xml", 
+      "from": "java/modules/core/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-647,11 +647,38", 
+          "lines": [
+            "                 <version>${wso2caching.version}</version>\n", 
+            "                 <type>jar</type>\n", 
+            "                 <exclusions>\n", 
+            "+                    <!-- Don't let wso2caching impose a logging implementation -->\n", 
+            "                     <exclusion>\n", 
+            "                         <groupId>log4j</groupId>\n", 
+            "                         <artifactId>log4j</artifactId>\n", 
+            "                     </exclusion>\n", 
+            "+                    <!-- The wso2caching POM declares a snapshot repository that is now dead\n", 
+            "+                         (snapshots.maven.codehaus.org). If we use snapshot versions of\n", 
+            "+                         Axis2/Axiom/Neethi, then Maven will start attempting to download them\n", 
+            "+                         from the dead repository, causing the build to get stuck. To work\n", 
+            "+                         around this, exclude dependencies that we might want to switch to\n", 
+            "+                         snapshot versions. -->\n", 
+            "                     <exclusion>\n", 
+            "+                        <groupId>org.apache.axis2</groupId>\n", 
+            "+                        <artifactId>axis2-kernel</artifactId>\n", 
+            "+                    </exclusion>\n", 
+            "+                    <exclusion>\n", 
+            "+                        <groupId>org.apache.axis2</groupId>\n", 
+            "+                        <artifactId>axis2-saaj</artifactId>\n", 
+            "+                    </exclusion>\n", 
+            "+                    <exclusion>\n", 
+            "+                        <groupId>org.apache.axis2</groupId>\n", 
+            "+                        <artifactId>axis2-clustering</artifactId>\n", 
+            "+                    </exclusion>\n", 
+            "+                    <exclusion>\n", 
+            "+                        <groupId>org.apache.ws.commons.axiom</groupId>\n", 
+            "+                        <artifactId>axiom-api</artifactId>\n", 
+            "+                    </exclusion>\n", 
+            "+                    <exclusion>\n", 
+            "+                        <groupId>org.apache.ws.commons.axiom</groupId>\n", 
+            "+                        <artifactId>axiom-impl</artifactId>\n", 
+            "+                    </exclusion>\n", 
+            "+                    <exclusion>\n", 
+            "                         <groupId>org.apache.neethi</groupId>\n", 
+            "                         <artifactId>neethi</artifactId>\n", 
+            "                     </exclusion>\n"
+          ]
+        }, 
+        {
+          "locn": "-688,6 +715,28", 
+          "lines": [
+            "                         <groupId>org.apache.ant</groupId>\n", 
+            "                         <artifactId>ant-nodeps</artifactId>\n", 
+            "                     </exclusion>\n", 
+            "+                    <!-- Work around issues with snapshot dependencies\n", 
+            "+                         (see the entry for wso2caching for more details). -->\n", 
+            "+                    <exclusion>\n", 
+            "+                        <groupId>org.apache.axis2</groupId>\n", 
+            "+                        <artifactId>axis2-kernel</artifactId>\n", 
+            "+                    </exclusion>\n", 
+            "+                    <exclusion>\n", 
+            "+                        <groupId>org.apache.axis2</groupId>\n", 
+            "+                        <artifactId>axis2-clustering</artifactId>\n", 
+            "+                    </exclusion>\n", 
+            "+                    <exclusion>\n", 
+            "+                        <groupId>org.apache.ws.commons.axiom</groupId>\n", 
+            "+                        <artifactId>axiom-api</artifactId>\n", 
+            "+                    </exclusion>\n", 
+            "+                    <exclusion>\n", 
+            "+                        <groupId>org.apache.ws.commons.axiom</groupId>\n", 
+            "+                        <artifactId>axiom-impl</artifactId>\n", 
+            "+                    </exclusion>\n", 
+            "+                    <exclusion>\n", 
+            "+                        <groupId>org.apache.neethi</groupId>\n", 
+            "+                        <artifactId>neethi</artifactId>\n", 
+            "+                    </exclusion>\n", 
+            "                 </exclusions>\n", 
+            "             </dependency>\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/pom.xml", 
+      "from": "java/pom.xml"
+    }
+  ], 
+  "id": "1778743"
+}

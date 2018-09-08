@@ -1,0 +1,27 @@
+{
+  "when": "2017-12-01T00:53:41-05:00", 
+  "message": "Update commons collection version", 
+  "who": "isudana", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-1095,7 +1095,7", 
+          "lines": [
+            "         <commons.pool.version>1.5.7</commons.pool.version>\n", 
+            "         <commons.vfs.version>2.0</commons.vfs.version>\n", 
+            "         <commons.net.version>3.0.1</commons.net.version>\n", 
+            "-        <commons.collections.version>3.2.1</commons.collections.version>\n", 
+            "+        <commons.collections.version>3.2.2</commons.collections.version>\n", 
+            "         <commons.io.version>2.1</commons.io.version>\n", 
+            "         <commons.cli.version>1.2</commons.cli.version>\n", 
+            "         <commons.lang.version>2.6</commons.lang.version>\n"
+          ]
+        }
+      ], 
+      "to": "java/pom.xml", 
+      "from": "java/pom.xml"
+    }
+  ], 
+  "id": "1816799"
+}

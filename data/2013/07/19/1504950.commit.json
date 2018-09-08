@@ -1,0 +1,30 @@
+{
+  "when": "2013-07-19T14:01:47-04:00", 
+  "message": "Fixing SYNAPSE-866; Logging a more general error message with the full stack trace in case of IllegalStateExceptions", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-554,11 +554,6", 
+          "lines": [
+            "                 lstMetrics.incrementFaultsSending();\n", 
+            "             }\n", 
+            "             log.warn(\"Connection closed by client : \" + worker.getRemoteAddress());\n", 
+            "-        } catch (IllegalStateException e) {\n", 
+            "-            if (lstMetrics != null) {\n", 
+            "-                lstMetrics.incrementFaultsSending();\n", 
+            "-            }\n", 
+            "-            log.warn(\"Connection closed by client : \" + worker.getRemoteAddress());\n", 
+            "         } catch (IOException e) {\n", 
+            "             if (lstMetrics != null) {\n", 
+            "                 lstMetrics.incrementFaultsSending();\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java"
+    }
+  ], 
+  "id": "1504950"
+}

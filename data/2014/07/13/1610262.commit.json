@@ -1,0 +1,43 @@
+{
+  "when": "2014-07-13T14:14:59-04:00", 
+  "message": "avoid sync overhead each time null is checked - use double checked locking", 
+  "who": "uswick", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-205,16 +205,16", 
+          "lines": [
+            " \n", 
+            "     private HostConnections getConnectionPool(String host, int port) {\n", 
+            "         String key = host + \":\" + port;\n", 
+            "-        HostConnections pool;\n", 
+            "-        synchronized (poolMap) {\n", 
+            "-            // see weather a pool already exists for this host:port\n", 
+            "-            pool = poolMap.get(key);\n", 
+            "-            if (pool == null) {\n", 
+            "-                pool = new HostConnections(host, port, maxConnections);\n", 
+            "-                poolMap.put(key, pool);\n", 
+            "+        if (!poolMap.containsKey(key)) {\n", 
+            "+            synchronized (poolMap) {\n", 
+            "+                // see weather a pool already exists for this host:port\n", 
+            "+                if (!poolMap.containsKey(key)) {\n", 
+            "+                    HostConnections pool = new HostConnections(host, port, maxConnections);\n", 
+            "+                    poolMap.put(key, pool);\n", 
+            "+                }\n", 
+            "             }\n", 
+            "         }\n", 
+            "-        return pool;\n", 
+            "+        return poolMap.get(key);\n", 
+            "     }\n", 
+            " \n", 
+            " }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/connections/TargetConnections.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/connections/TargetConnections.java"
+    }
+  ], 
+  "id": "1610262"
+}

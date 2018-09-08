@@ -1,0 +1,32 @@
+Index: java/modules/documentation/src/site/site.xml
+===================================================================
+--- java/modules/documentation/src/site/site.xml	(revision 1808053)
++++ java/modules/documentation/src/site/site.xml	(revision 1808054)
+@@ -22,7 +22,7 @@
+     <skin>
+         <groupId>org.apache.maven.skins</groupId>
+         <artifactId>maven-fluido-skin</artifactId>
+-        <version>1.4</version>
++        <version>1.6</version>
+     </skin>
+     <body>
+         <menu name="Main Menu">
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1808053)
++++ java/pom.xml	(revision 1808054)
+@@ -188,7 +188,7 @@
+                 <plugin>
+                     <groupId>org.apache.maven.plugins</groupId>
+                     <artifactId>maven-site-plugin</artifactId>
+-                    <version>3.3</version>
++                    <version>3.6</version>
+                 </plugin>
+                 <plugin>
+                     <groupId>org.apache.maven.plugins</groupId>
+-*-*-*-
+Message: SYNAPSE-1095, Mobile friendly site support
+-*-*-*-
+When: 2017-09-11 15:20:42 -0400 
+-*-*-*-
+Who: vanji

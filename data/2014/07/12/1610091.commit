@@ -1,0 +1,27 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/CloneMediatorFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/CloneMediatorFactory.java	(revision 1610090)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/CloneMediatorFactory.java	(revision 1610091)
+@@ -73,7 +73,7 @@
+      */
+     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+     	
+-    	boolean asynchronousExe = false;
++    	boolean asynchronousExe = true;
+         
+     	CloneMediator mediator = new CloneMediator();
+         processAuditStatus(mediator, elem);
+@@ -101,6 +101,7 @@
+         	target.setAsynchronous(asynchronousExe);
+             mediator.addTarget(target);
+         }
++        mediator.setSequential(!asynchronousExe);
+     
+         return mediator;
+     }
+-*-*-*-
+Message: fixing the issue with the patch submitted on SYNAPSE-901
+-*-*-*-
+When: 2014-07-12 20:09:27 -0400 
+-*-*-*-
+Who: uswick

@@ -1,0 +1,2017 @@
+Index: java/modules/documentation/src/site/xdoc/userguide/samples.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples.xml	(revision 1515262)
++++ java/modules/documentation/src/site/xdoc/userguide/samples.xml	(revision 1515263)
+@@ -200,6 +200,7 @@
+                         <li><a href="samples/sample430.html">Sample 430: Callout mediator for synchronous web service invocations</a></li>
+                         <li><a href="samples/sample431.html">Sample 431: Callout Mediator with WS-Security for Outgoing Messages</a></li>
+                         <li><a href="samples/sample432.html">Sample 432: Callout Mediator - Invoke a secured service which has different policies for inbound and outbound flows</a></li>
++                        <li><a href="samples/sample433.html">Sample 433: Callout Mediator - Invoke a service using a defined Endpoint</a></li>
+                     </ul>
+                 </p>
+                 <h4>URL Rewrite Mediator</h4>
+Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample433.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples/sample433.xml	(nonexistent)
++++ java/modules/documentation/src/site/xdoc/userguide/samples/sample433.xml	(revision 1515263)
+@@ -0,0 +1,85 @@
++<?xml version="1.0" encoding="ISO-8859-1" ?>
++<!--
++  ~  Licensed to the Apache Software Foundation (ASF) under one
++  ~  or more contributor license agreements.  See the NOTICE file
++  ~  distributed with this work for additional information
++  ~  regarding copyright ownership.  The ASF licenses this file
++  ~  to you under the Apache License, Version 2.0 (the
++  ~  "License"); you may not use this file except in compliance
++  ~  with the License.  You may obtain a copy of the License at
++  ~
++  ~   http://www.apache.org/licenses/LICENSE-2.0
++  ~
++  ~  Unless required by applicable law or agreed to in writing,
++  ~  software distributed under the License is distributed on an
++  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++  ~  KIND, either express or implied.  See the License for the
++  ~  specific language governing permissions and limitations
++  ~  under the License.
++  -->
++
++<document>
++    <properties>
++        <title>Apache Synapse - Sample 433</title>
++    </properties>
++    <body>
++        <section name="Sample 433: Callout Mediator - Invoke a service using a defined Endpoint">
++            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
++
++    &lt;sequence name="main"&gt;
++        &lt;callout endpointKey="StockQuoteServiceEndpoint"&gt;
++            &lt;source xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
++                    xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
++                    xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/&gt;
++            &lt;target xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
++                    xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
++                    xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/&gt;
++        &lt;/callout&gt;
++        &lt;property name="RESPONSE" value="true"/&gt;
++        &lt;header name="To" action="remove"/&gt;
++        &lt;send/&gt;
++        &lt;drop/&gt;
++    &lt;/sequence&gt;
++
++    &lt;endpoint name="StockQuoteServiceEndpoint"&gt;
++       &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
++    &lt;/endpoint&gt;
++
++&lt;/definitions&gt;</div>
++            <subsection name="Objective">
++                <p>
++                    Demonstrate how to invoke a service from Callout Mediator using a defined endpoint.
++                </p>
++            </subsection>
++            <subsection name="Pre-requisites">
++                <p>
++                    <ul>
++                        <li>
++                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
++                        </li>
++                        <li>
++                            Start Synapse using the configuration numbered 433 (repository/conf/sample/synapse_sample_433.xml)
++                            <div class="command">
++                                Unix/Linux: sh synapse.sh -sample 433<br/>
++                                Windows: synapse.bat -sample 433
++                            </div>
++                        </li>
++                    </ul>
++                </p>
++            </subsection>
++            <subsection name="Executing the Client">
++                <p>
++                    In this sample, the Callout mediator does the direct service invocation to the
++                    StockQuoteService using the client request, gets the response and sets it as the
++                    first child of the SOAP message body. Callout Mediator uses the defined endpoint
++                    named 'StockQuoteServiceEndpoint' to send the message to the StockQuoteService.
++                </p>
++                <p>
++                    Invoke the client as follows.
++                </p>
++                <div class="command">ant stockquote -Daddurl=http://localhost:8280/</div>
++            </subsection>
++        </section>
++        <p><a href="../samples.html">Back to Catalog</a></p>        
++    </body>
++</document>
+\ No newline at end of file
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample433.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample433.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample433.java	(revision 1515263)
+@@ -0,0 +1,42 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.samples.framework.tests.advanced;
++
++import org.apache.synapse.samples.framework.SampleClientResult;
++import org.apache.synapse.samples.framework.SynapseTestCase;
++import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
++
++public class Sample433 extends SynapseTestCase {
++
++    SampleClientResult result;
++
++    public Sample433() {
++        super(433);
++    }
++
++    public void testCallOutDefinedEndpoint() {
++        log.info("Running test: Callout mediator - Invoke a service using a defined Endpoint");
++        String trpUrl = "http://localhost:8280/";
++        StockQuoteSampleClient client = getStockQuoteClient();
++        result = client.requestStandardQuote(null, trpUrl, null, "IBM" ,null);
++        assertTrue("Client did not run successfully", result.responseReceived());
++    }
++
++}
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1515262)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1515263)
+@@ -234,6 +234,7 @@
+         sampleClassRepo.put("430", Sample430.class);
+         sampleClassRepo.put("431", Sample431.class);
+         sampleClassRepo.put("432", Sample432.class);
++        sampleClassRepo.put("433", Sample433.class);
+         sampleClassRepo.put("450", Sample450.class);
+         sampleClassRepo.put("451", Sample451.class);
+         sampleClassRepo.put("452", Sample452.class);
+Index: java/modules/integration/src/test/resources/sample433.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample433.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample433.xml	(revision 1515263)
+@@ -0,0 +1,18 @@
++<synapseSample>
++    <sampleID>433</sampleID>
++    <sampleName>Callout mediator - Invoke a service using a defined Endpoint</sampleName>
++    <synapseConfig>
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>modules/integration/src/test/resources/extras/synapse_sample_433_altered.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+Index: java/modules/integration/src/test/resources/extras/synapse_sample_433_altered.xml
+===================================================================
+--- java/modules/integration/src/test/resources/extras/synapse_sample_433_altered.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/extras/synapse_sample_433_altered.xml	(revision 1515263)
+@@ -0,0 +1,44 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!--
++  ~  Licensed to the Apache Software Foundation (ASF) under one
++  ~  or more contributor license agreements.  See the NOTICE file
++  ~  distributed with this work for additional information
++  ~  regarding copyright ownership.  The ASF licenses this file
++  ~  to you under the Apache License, Version 2.0 (the
++  ~  "License"); you may not use this file except in compliance
++  ~  with the License.  You may obtain a copy of the License at
++  ~
++  ~   http://www.apache.org/licenses/LICENSE-2.0
++  ~
++  ~  Unless required by applicable law or agreed to in writing,
++  ~  software distributed under the License is distributed on an
++  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++  ~  KIND, either express or implied.  See the License for the
++  ~  specific language governing permissions and limitations
++  ~  under the License.
++  -->
++
++<!-- Callout  mediator Endpoint Sample-->
++<definitions xmlns="http://ws.apache.org/ns/synapse">
++
++    <sequence name="main">
++        <callout endpointKey="StockQuoteServiceEndpoint">
++            <configuration axis2xml="modules/integration/target/test_repos/axis2Client/conf/axis2_def.xml" repository="modules/integration/target/test_repos/axis2Client"/>
++            <source xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
++                    xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
++                    xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
++            <target xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
++                    xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
++                    xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
++        </callout>
++        <property name="RESPONSE" value="true"/>
++        <header name="To" action="remove"/>
++        <send/>
++        <drop/>
++    </sequence>
++
++    <endpoint name="StockQuoteServiceEndpoint">
++       <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
++    </endpoint>
++
++</definitions>
+Index: java/modules/core/src/test/java/org/apache/synapse/config/xml/CalloutMediatorSerializationTest.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/config/xml/CalloutMediatorSerializationTest.java	(revision 1515262)
++++ java/modules/core/src/test/java/org/apache/synapse/config/xml/CalloutMediatorSerializationTest.java	(revision 1515263)
+@@ -19,6 +19,8 @@
+ 
+ package org.apache.synapse.config.xml;
+ 
++import org.apache.commons.io.FileUtils;
++
+ import java.io.File;
+ 
+ /**
+@@ -50,7 +52,9 @@
+ 
+     public void testCalloutMediatorSerializationScenarioTwo() throws Exception {
+         File axis2xml = new File("axis2.xml");
+-        axis2xml.createNewFile();
++        if (!axis2xml.exists() && !axis2xml.createNewFile()) {
++            fail("Failed to create test axis2.xml file");
++        }
+         String inputXml = "<callout xmlns=\"http://ws.apache.org/ns/synapse\" " +
+                           "serviceURL=\"http://localhost:9000/soap/SimpleStockQuoteService\" " +
+                           "action=\"urn:getQuote\"><configuration axis2xml=\"axis2.xml\" " +
+@@ -60,6 +64,7 @@
+                           "xmlns:s12=\"http://www.w3.org/2003/05/soap-envelope\" key=\"key2\"/></callout>";
+         assertTrue(serialization(inputXml, calloutMediatorFactory, calloutMediatorSerializer));
+         assertTrue(serialization(inputXml, calloutMediatorSerializer));
++        FileUtils.deleteQuietly(axis2xml);
+     }
+ 
+     public void testCalloutMediatorSerializationScenarioThree() {
+@@ -103,5 +108,12 @@
+         assertTrue(serialization(inputXml, calloutMediatorSerializer));
+     }
+ 
++    public void testCalloutMediatorSerializationScenarioSix() {
++        String inputXml = "<callout xmlns=\"http://ws.apache.org/ns/synapse\" " +
++                "endpointKey=\"endpoint\"/>";
++        assertTrue(serialization(inputXml, calloutMediatorFactory, calloutMediatorSerializer));
++        assertTrue(serialization(inputXml, calloutMediatorSerializer));
++    }
++
+ }
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/SynapseConstants.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/SynapseConstants.java	(revision 1515262)
++++ java/modules/core/src/main/java/org/apache/synapse/SynapseConstants.java	(revision 1515263)
+@@ -408,8 +408,14 @@
+     // callout operation failed
+     public static final int CALLOUT_OPERATION_FAILED    = 401000;
+ 
++    // - Axis2 Blocking Client Constants
++    /**The Synapse MC property that marks to Exception to be thrown on SOAPFault(Retry on SOAPFault) */
++    public static final String THROW_EXCEPTION_ON_SOAPFAULT = "THROW_EXCEPTION_ON_SOAPFAULT";
+ 
++    public static final String BLOCKING_CLIENT_ERROR = "blocking.client.error";
+ 
++    public static final String HTTP_SENDER_STATUSCODE = "transport.http.statusCode";
++
+     // Fail-safe mode properties
+     public static final String FAIL_SAFE_MODE_STATUS = "failsafe.mode.enable";
+     public static final String FAIL_SAFE_MODE_ALL = "all";
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorSerializer.java	(revision 1515262)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorSerializer.java	(revision 1515263)
+@@ -48,7 +48,10 @@
+ 
+         if (mediator.getServiceURL() != null) {
+             callout.addAttribute(fac.createOMAttribute("serviceURL", nullNS, mediator.getServiceURL()));
++        } else if (mediator.getEndpointKey() != null) {
++            callout.addAttribute(fac.createOMAttribute("endpointKey", nullNS, mediator.getEndpointKey()));
+         }
++
+         if (mediator.getAction() != null) {
+             callout.addAttribute(fac.createOMAttribute("action", nullNS, mediator.getAction()));
+         }
+@@ -70,20 +73,24 @@
+             callout.addAttribute(fac.createOMAttribute("passHeaders", nullNS, "true"));
+         }
+ 
+-        OMElement source = fac.createOMElement("source", synNS, callout);
+-        if (mediator.getRequestXPath() != null) {
+-            SynapseXPathSerializer.serializeXPath(mediator.getRequestXPath(), source, "xpath");
+-        } else if (mediator.getRequestKey() != null) {
+-            source.addAttribute(fac.createOMAttribute(
+-                "key", nullNS, mediator.getRequestKey()));
++        if (mediator.getRequestXPath() != null || mediator.getRequestKey() != null) {
++            OMElement source = fac.createOMElement("source", synNS, callout);
++            if (mediator.getRequestXPath() != null) {
++                SynapseXPathSerializer.serializeXPath(mediator.getRequestXPath(), source, "xpath");
++            } else if (mediator.getRequestKey() != null) {
++                source.addAttribute(fac.createOMAttribute(
++                        "key", nullNS, mediator.getRequestKey()));
++            }
+         }
+ 
+-        OMElement target = fac.createOMElement("target", synNS, callout);
+-        if (mediator.getTargetXPath() != null) {
+-            SynapseXPathSerializer.serializeXPath(mediator.getTargetXPath(), target, "xpath");
+-        } else if (mediator.getTargetKey() != null) {
+-            target.addAttribute(fac.createOMAttribute(
+-                "key", nullNS, mediator.getTargetKey()));
++        if (mediator.getTargetXPath() != null || mediator.getTargetKey() != null) {
++            OMElement target = fac.createOMElement("target", synNS, callout);
++            if (mediator.getTargetXPath() != null) {
++                SynapseXPathSerializer.serializeXPath(mediator.getTargetXPath(), target, "xpath");
++            } else if (mediator.getTargetKey() != null) {
++                target.addAttribute(fac.createOMAttribute(
++                        "key", nullNS, mediator.getTargetKey()));
++            }
+         }
+ 
+         if (mediator.isSecurityOn()) {
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorFactory.java	(revision 1515262)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorFactory.java	(revision 1515263)
+@@ -65,6 +65,7 @@
+                 = new QName(XMLConfigConstants.NULL_NAMESPACE, "outboundPolicy");
+     private static final QName ATT_INBOUND_SEC_POLICY
+                 = new QName(XMLConfigConstants.NULL_NAMESPACE, "inboundPolicy");
++    private static final QName ATT_ENDPOINT = new QName("endpointKey");
+ 
+     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+ 
+@@ -71,6 +72,7 @@
+         CalloutMediator callout = new CalloutMediator();
+ 
+         OMAttribute attServiceURL = elem.getAttribute(ATT_URL);
++        OMAttribute attEndpoint = elem.getAttribute(ATT_ENDPOINT);
+         OMAttribute attAction     = elem.getAttribute(ATT_ACTION);
+         OMAttribute attPassHeaders = elem.getAttribute(ATT_PASS_HEADERS);
+         OMElement   configElt     = elem.getFirstChildWithName(Q_CONFIG);
+@@ -80,6 +82,8 @@
+ 
+         if (attServiceURL != null) {
+             callout.setServiceURL(attServiceURL.getAttributeValue());
++        } else if (attEndpoint != null) {
++            callout.setEndpointKey(attEndpoint.getAttributeValue());
+         }
+ 
+         if (attAction != null) {
+@@ -130,8 +134,6 @@
+                 handleException("A 'xpath' or 'key' attribute " +
+                     "is required for the Callout 'source'");
+             }
+-        } else {
+-            handleException("The message 'source' must be specified for a Callout mediator");
+         }
+ 
+         if (targetElt != null) {
+@@ -149,8 +151,6 @@
+                 handleException("A 'xpath' or 'key' attribute " +
+                     "is required for the Callout 'target'");
+             }
+-        } else {
+-            handleException("The message 'target' must be specified for a Callout mediator");
+         }
+ 
+         if (wsSec != null) {
+Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2BlockingClient.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2BlockingClient.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2BlockingClient.java	(revision 1515263)
+@@ -0,0 +1,267 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.core.axis2;
++
++import org.apache.axis2.AxisFault;
++import org.apache.axis2.Constants;
++import org.apache.axis2.addressing.EndpointReference;
++import org.apache.axis2.client.OperationClient;
++import org.apache.axis2.client.Options;
++import org.apache.axis2.context.ConfigurationContext;
++import org.apache.axis2.context.ConfigurationContextFactory;
++import org.apache.axis2.context.ServiceContext;
++import org.apache.axis2.context.ServiceGroupContext;
++import org.apache.axis2.description.AxisOperation;
++import org.apache.axis2.description.AxisService;
++import org.apache.axis2.description.AxisServiceGroup;
++import org.apache.axis2.description.WSDL2Constants;
++import org.apache.axis2.wsdl.WSDLConstants;
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.MessageContext;
++import org.apache.synapse.SynapseConstants;
++import org.apache.synapse.SynapseException;
++import org.apache.synapse.endpoints.AbstractEndpoint;
++import org.apache.synapse.endpoints.Endpoint;
++import org.apache.synapse.endpoints.EndpointDefinition;
++import org.apache.synapse.transport.nhttp.NhttpConstants;
++import org.apache.synapse.util.MessageHelper;
++
++import javax.xml.namespace.QName;
++
++public class Axis2BlockingClient {
++
++    private static final Log log = LogFactory.getLog(Axis2BlockingClient.class);
++
++    private final static String DEFAULT_CLIENT_REPO = "./repository";
++    private final static String DEFAULT_AXIS2_XML = "./repository/conf/axis2_blocking_client.xml";
++
++    private ConfigurationContext configurationContext = null;
++    private boolean initClientOptions = true;
++    private boolean configurationContextCreated = false;
++
++    public Axis2BlockingClient(String clientRepository, String axis2xml) {
++        try {
++            configurationContext
++                    = ConfigurationContextFactory.createConfigurationContextFromFileSystem(
++                    clientRepository != null ? clientRepository : DEFAULT_CLIENT_REPO,
++                    axis2xml != null ? axis2xml : DEFAULT_AXIS2_XML);
++            configurationContextCreated = true;
++        } catch (AxisFault e) {
++            handleException("Error initializing Axis2 Blocking Client", e);
++        }
++    }
++
++    public Axis2BlockingClient(ConfigurationContext configurationContext) {
++        this.configurationContext = configurationContext;
++    }
++
++    public void cleanup() throws AxisFault {
++        if (configurationContextCreated) {
++            configurationContext.terminate();
++        }
++    }
++
++    /**
++     * Send the message to a given Leaf endpoint (Address/WSDL/Default) in a blocking manner
++     *
++     * @param endpoint  leaf Endpoint
++     * @param synapseInMsgCtx Synapse Message Context to be sent
++     * @return OutPut message Context
++     * @throws Exception
++     */
++    public MessageContext send(Endpoint endpoint, MessageContext synapseInMsgCtx)
++            throws Exception {
++
++        if (log.isDebugEnabled()) {
++            log.debug("Start Sending the Message ");
++        }
++
++        AbstractEndpoint abstractEndpoint = (AbstractEndpoint) endpoint;
++        if (!abstractEndpoint.isLeafEndpoint()) {
++            handleException("Endpoint type not supported. Only leaf endpoints are supported");
++        }
++        EndpointDefinition endpointDefinition = abstractEndpoint.getDefinition();
++
++        org.apache.axis2.context.MessageContext axisInMsgCtx =
++                ((Axis2MessageContext) synapseInMsgCtx).getAxis2MessageContext();
++        org.apache.axis2.context.MessageContext axisOutMsgCtx =
++                new org.apache.axis2.context.MessageContext();
++
++        String endpointReferenceValue = null;
++        if (endpointDefinition.getAddress() != null) {
++            endpointReferenceValue = endpointDefinition.getAddress();
++        } else if (axisInMsgCtx.getTo() != null) {
++            endpointReferenceValue = axisInMsgCtx.getTo().getAddress();
++        } else {
++            handleException("Service url, Endpoint or 'To' header is required");
++        }
++        if (log.isDebugEnabled()) {
++            log.debug("EPR is set to : " + endpointReferenceValue);
++        }
++        axisOutMsgCtx.setTo(new EndpointReference(endpointReferenceValue));
++
++        // Use the configuration context of the original ctx if local transport is selected
++        if (endpointReferenceValue != null && endpointReferenceValue.startsWith(Constants.TRANSPORT_LOCAL)) {
++            configurationContext = axisInMsgCtx.getConfigurationContext();
++        }
++
++        axisOutMsgCtx.setConfigurationContext(configurationContext);
++        axisOutMsgCtx.setEnvelope(axisInMsgCtx.getEnvelope());
++
++        // Fill MessageContext
++        BlockingClientUtils.fillMessageContext(endpointDefinition, axisOutMsgCtx, synapseInMsgCtx);
++
++        Options clientOptions;
++        if (initClientOptions) {
++            clientOptions = new Options();
++        } else {
++            clientOptions = axisInMsgCtx.getOptions();
++        }
++        // Fill Client options
++        BlockingClientUtils.fillClientOptions(endpointDefinition, clientOptions, synapseInMsgCtx);
++
++        AxisService anonymousService = AnonymousServiceFactory.getAnonymousService(null,
++                configurationContext.getAxisConfiguration(), endpointDefinition.isAddressingOn(),
++                false, endpointDefinition.isSecurityOn(), false);
++        anonymousService.getParent().addParameter(SynapseConstants.HIDDEN_SERVICE_PARAM, "true");
++        ServiceGroupContext serviceGroupContext = new ServiceGroupContext(configurationContext, (AxisServiceGroup) anonymousService.getParent());
++        ServiceContext serviceCtx = serviceGroupContext.getServiceContext(anonymousService);
++        axisOutMsgCtx.setServiceContext(serviceCtx);
++
++        // Invoke
++        boolean isOutOnly = isOutOnly(synapseInMsgCtx, axisOutMsgCtx);
++        try {
++            if (isOutOnly) {
++                if (log.isDebugEnabled()) {
++                    log.debug("invoking service in OUT_ONLY manner");
++                }
++                sendRobust(axisOutMsgCtx, clientOptions, anonymousService, serviceCtx);
++            } else {
++                if (log.isDebugEnabled()) {
++                    log.debug("invoking service in OUT_IN manner");
++                }
++                org.apache.axis2.context.MessageContext result = sendReceive(axisOutMsgCtx,
++                        clientOptions, anonymousService, serviceCtx);
++                synapseInMsgCtx.setEnvelope(result.getEnvelope());
++                synapseInMsgCtx.setProperty(NhttpConstants.HTTP_SC, result.getProperty(
++                        SynapseConstants.HTTP_SENDER_STATUSCODE));
++                return synapseInMsgCtx;
++            }
++        } catch (Exception ex) {
++            synapseInMsgCtx.setProperty(SynapseConstants.BLOCKING_CLIENT_ERROR, "true");
++            axisOutMsgCtx.getTransportOut().getSender().cleanup(axisOutMsgCtx);
++            if (!isOutOnly) {
++                if (ex instanceof AxisFault) {
++                    AxisFault fault = (AxisFault) ex;
++                    if (fault.getFaultCode() != null) {
++                        synapseInMsgCtx.setProperty(SynapseConstants.ERROR_CODE,
++                                fault.getFaultCode().getLocalPart());
++                    }
++                    synapseInMsgCtx.setProperty(SynapseConstants.ERROR_MESSAGE, fault.getMessage());
++
++                    if (fault.getDetail() != null) {
++                        synapseInMsgCtx.setProperty(SynapseConstants.ERROR_DETAIL, fault.getDetail());
++                    }
++                    synapseInMsgCtx.setProperty(SynapseConstants.ERROR_EXCEPTION, ex);
++                    org.apache.axis2.context.MessageContext faultMC = fault.getFaultMessageContext();
++                    if (faultMC != null) {
++                        synapseInMsgCtx.setProperty(NhttpConstants.HTTP_SC,
++                                faultMC.getProperty(SynapseConstants.HTTP_SENDER_STATUSCODE));
++                        synapseInMsgCtx.setEnvelope(faultMC.getEnvelope());
++                    }
++                }
++                return synapseInMsgCtx;
++            }
++            handleException("Error sending Message to url : " +
++                    ((AbstractEndpoint) endpoint).getDefinition().getAddress());
++        }
++        return null;
++    }
++
++    private void sendRobust(org.apache.axis2.context.MessageContext axisOutMsgCtx,
++                            Options clientOptions, AxisService anonymousService,
++                            ServiceContext serviceCtx) throws AxisFault {
++
++        AxisOperation axisAnonymousOperation = anonymousService.getOperation(
++                new QName(AnonymousServiceFactory.OUT_ONLY_OPERATION));
++        OperationClient operationClient = axisAnonymousOperation.createClient(
++                serviceCtx, clientOptions);
++        operationClient.addMessageContext(axisOutMsgCtx);
++        axisOutMsgCtx.setAxisMessage(axisAnonymousOperation.getMessage(
++                WSDLConstants.MESSAGE_LABEL_OUT_VALUE));
++        operationClient.execute(true);
++        axisOutMsgCtx.getTransportOut().getSender().cleanup(axisOutMsgCtx);
++
++    }
++
++    private org.apache.axis2.context.MessageContext sendReceive(org.apache.axis2.context.MessageContext axisOutMsgCtx,
++                                                                Options clientOptions,
++                                                                AxisService anonymousService,
++                                                                ServiceContext serviceCtx) throws AxisFault {
++
++        AxisOperation axisAnonymousOperation = anonymousService.getOperation(
++                new QName(AnonymousServiceFactory.OUT_IN_OPERATION));
++        OperationClient operationClient = axisAnonymousOperation.createClient(
++                serviceCtx, clientOptions);
++        operationClient.addMessageContext(axisOutMsgCtx);
++        axisOutMsgCtx.setAxisMessage(axisAnonymousOperation.getMessage(
++                WSDLConstants.MESSAGE_LABEL_OUT_VALUE));
++        operationClient.execute(true);
++        org.apache.axis2.context.MessageContext resultMsgCtx = operationClient.getMessageContext(
++                WSDLConstants.MESSAGE_LABEL_IN_VALUE);
++
++        org.apache.axis2.context.MessageContext returnMsgCtx =
++                new org.apache.axis2.context.MessageContext();
++        returnMsgCtx.setEnvelope(MessageHelper.cloneSOAPEnvelope(resultMsgCtx.getEnvelope()));
++        returnMsgCtx.setProperty(SynapseConstants.HTTP_SENDER_STATUSCODE,
++                resultMsgCtx.getProperty(SynapseConstants.HTTP_SENDER_STATUSCODE));
++        axisOutMsgCtx.getTransportOut().getSender().cleanup(axisOutMsgCtx);
++
++        return returnMsgCtx;
++    }
++
++    private boolean isOutOnly(MessageContext messageIn,
++                              org.apache.axis2.context.MessageContext axis2Ctx) {
++        return "true".equals(messageIn.getProperty(SynapseConstants.OUT_ONLY)) ||
++                axis2Ctx.getOperationContext() != null && WSDL2Constants.MEP_URI_IN_ONLY.equals(
++                        axis2Ctx.getOperationContext().getAxisOperation().getMessageExchangePattern());
++    }
++
++    /**
++     * Set whether to create new client options.
++     * If set to false, client options from incoming message context is used.
++     * @param initClientOptions whether to initialize client options
++     */
++    public void setInitClientOptions(boolean initClientOptions) {
++        this.initClientOptions = initClientOptions;
++    }
++
++    private void handleException(String msg, Exception e) {
++        log.error(msg, e);
++        throw new SynapseException(msg, e);
++    }
++
++    private void handleException(String msg) {
++        log.error(msg);
++        throw new SynapseException(msg);
++    }
++
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/AnonymousServiceFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/core/axis2/AnonymousServiceFactory.java	(revision 1515262)
++++ java/modules/core/src/main/java/org/apache/synapse/core/axis2/AnonymousServiceFactory.java	(revision 1515263)
+@@ -49,19 +49,39 @@
+     public static final String OUT_IN_OPERATION   = "anonOutInOp";
+     public static final String OUT_ONLY_OPERATION = "anonOutonlyOp";
+ 
++
+     /**
+      * Creates an AxisService for the requested QoS for sending out messages
+      * Callers must guarantee that if wsRMon or wsSecOn is required, that wsAddrOn is also set
++     *
++     * @param synCfg   Synapse configuration
++     * @param axisCfg  Axis2 configuration
++     * @param wsAddrOn whether addressing is on or not
++     * @param wsRMOn   whether RM is on ot not
++     * @param wsSecOn  whether security is on or not
++     * @return An Axis service for the requested QoS
++     */
++    public static AxisService getAnonymousService(SynapseConfiguration synCfg,
++                                                  AxisConfiguration axisCfg, boolean wsAddrOn,
++                                                  boolean wsRMOn, boolean wsSecOn) {
++        return getAnonymousService(synCfg, axisCfg, wsAddrOn, wsRMOn, wsSecOn, true);
++    }
++
++
++    /**
++     * Creates an AxisService for the requested QoS for sending out messages
++     * Callers must guarantee that if wsRMon or wsSecOn is required, that wsAddrOn is also set
+      * @param synCfg Synapse configuration
+      * @param axisCfg Axis2 configuration
+      * @param wsAddrOn whether addressing is on or not
+      * @param wsRMOn whether RM is on ot not
+      * @param wsSecOn whether security is on or not
++     * @param setCallback whether to register a synapse callback receiver or not
+      * @return An Axis service for the requested QoS
+      */
+     public static AxisService getAnonymousService(SynapseConfiguration synCfg,
+                                                   AxisConfiguration axisCfg, boolean wsAddrOn,
+-                                                  boolean wsRMOn, boolean wsSecOn) {
++                                                  boolean wsRMOn, boolean wsSecOn, boolean setCallback) {
+ 
+         // if non of addressing, security and rm is engaged then checkbit is 0
+         int checkbit = 0;
+@@ -114,7 +134,7 @@
+                         return service;
+                     }
+ 
+-                    service = createAnonymousService(synCfg, axisCfg, servicekey);
++                    service = createAnonymousService(synCfg, axisCfg, servicekey, setCallback);
+ 
+                     if (wsAddrOn) {
+                         service.engageModule(axisCfg.getModule(
+@@ -147,6 +167,7 @@
+ 
+     /**
+      * Create a new Anonymous Axis service for OUT-IN as default MEP
++     *
+      * @param synCfg the Synapse Configuration
+      * @param axisCfg the Axis2 configuration
+      * @param serviceKey key for the service
+@@ -153,46 +174,96 @@
+      * @return an anonymous service named with the given QoS key
+      */
+     private static AxisService createAnonymousService(SynapseConfiguration synCfg,
+-        AxisConfiguration axisCfg, String serviceKey) {
++        AxisConfiguration axisCfg, String serviceKey, boolean setCallback) {
+ 
+         try {
+-            DynamicAxisOperation dynamicOperation =
++            if (setCallback) {
++                return createAxisServiceWithCallback(synCfg, axisCfg, serviceKey);
++            } else {
++                return createAxisServiceWithoutCallback(synCfg, axisCfg, serviceKey);
++            }
++        } catch (AxisFault e) {
++            handleException("Error occurred while creating an anonymous service for QoS : " +
++                    serviceKey, e);
++        }
++        return null;
++    }
++
++   /**
++    * Create anonymous Axis2 service with setting a Synapse Callback receiver as the message
++    * receiver for operations
++    */
++    private static AxisService createAxisServiceWithCallback(SynapseConfiguration synCfg,
++                                                             AxisConfiguration axisCfg,
++                                                             String serviceKey) throws AxisFault {
++        DynamicAxisOperation dynamicOperation =
+                 new DynamicAxisOperation(new QName(OUT_IN_OPERATION));
+-            dynamicOperation.setMessageReceiver(SynapseCallbackReceiver.getInstance());
+-            AxisMessage inMsg = new AxisMessage();
+-            inMsg.setName("in-message");
+-            inMsg.setParent(dynamicOperation);
+-            AxisMessage outMsg = new AxisMessage();
+-            outMsg.setName("out-message");
+-            outMsg.setParent(dynamicOperation);
+-            dynamicOperation.addMessage(inMsg, WSDLConstants.MESSAGE_LABEL_OUT_VALUE);
+-            dynamicOperation.addMessage(outMsg, WSDLConstants.MESSAGE_LABEL_IN_VALUE);
++        dynamicOperation.setMessageReceiver(SynapseCallbackReceiver.getInstance());
++        AxisMessage inMsg = new AxisMessage();
++        inMsg.setName("in-message");
++        inMsg.setParent(dynamicOperation);
++        AxisMessage outMsg = new AxisMessage();
++        outMsg.setName("out-message");
++        outMsg.setParent(dynamicOperation);
++        dynamicOperation.addMessage(inMsg, WSDLConstants.MESSAGE_LABEL_OUT_VALUE);
++        dynamicOperation.addMessage(outMsg, WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+ 
+-            OutOnlyAxisOperation asyncOperation =
++        OutOnlyAxisOperation asyncOperation =
+                 new OutOnlyAxisOperation(new QName(OUT_ONLY_OPERATION));
+-            asyncOperation.setMessageReceiver(SynapseCallbackReceiver.getInstance());
+-            AxisMessage outOnlyMsg = new AxisMessage();
+-            outOnlyMsg.setName("out-message");
+-            outOnlyMsg.setParent(asyncOperation);
+-            asyncOperation.addMessage(outMsg, WSDLConstants.MESSAGE_LABEL_OUT_VALUE);
++        asyncOperation.setMessageReceiver(SynapseCallbackReceiver.getInstance());
++        AxisMessage outOnlyMsg = new AxisMessage();
++        outOnlyMsg.setName("out-message");
++        outOnlyMsg.setParent(asyncOperation);
++        asyncOperation.addMessage(outMsg, WSDLConstants.MESSAGE_LABEL_OUT_VALUE);
+ 
+-            AxisService axisAnonymousService  = new AxisService(serviceKey);
+-            axisAnonymousService.addOperation(dynamicOperation);
+-            axisAnonymousService.addOperation(asyncOperation);
+-            AxisServiceGroup axisAnonSvcGroup = new AxisServiceGroup(axisCfg);
+-            axisAnonSvcGroup.setServiceGroupName(serviceKey);
+-            axisAnonSvcGroup.addParameter(SynapseConstants.HIDDEN_SERVICE_PARAM, "true");
+-            axisAnonymousService.setClientSide(true);
+-            axisAnonSvcGroup.addService(axisAnonymousService);
+-            axisCfg.addServiceGroup(axisAnonSvcGroup);
+-            axisCfg.getPhasesInfo().setOperationPhases(dynamicOperation);
+-            return axisAnonymousService;
++        AxisService axisAnonymousService = new AxisService(serviceKey);
++        axisAnonymousService.addOperation(dynamicOperation);
++        axisAnonymousService.addOperation(asyncOperation);
++        AxisServiceGroup axisAnonSvcGroup = new AxisServiceGroup(axisCfg);
++        axisAnonSvcGroup.setServiceGroupName(serviceKey);
++        axisAnonSvcGroup.addParameter(SynapseConstants.HIDDEN_SERVICE_PARAM, "true");
++        axisAnonymousService.setClientSide(true);
++        axisAnonSvcGroup.addService(axisAnonymousService);
++        axisCfg.addServiceGroup(axisAnonSvcGroup);
++        axisCfg.getPhasesInfo().setOperationPhases(dynamicOperation);
++        return axisAnonymousService;
++    }
+ 
+-        } catch (AxisFault e) {
+-            handleException(
+-                "Error occurred while creating an anonymous service for QoS : " +
+-                 serviceKey, e);
+-        }
+-        return null;
++    /**
++     * Create anonymous Axis2 service without registering a callback for operations
++     */
++    private static AxisService createAxisServiceWithoutCallback(SynapseConfiguration synCfg,
++                                                                AxisConfiguration axisCfg,
++                                                                String serviceKey) throws AxisFault {
++        OutInAxisOperation outInAxisOperation =
++                new OutInAxisOperation(new QName(OUT_IN_OPERATION));
++        AxisMessage inMsg = new AxisMessage();
++        inMsg.setName("in-message");
++        inMsg.setParent(outInAxisOperation);
++        AxisMessage outMsg = new AxisMessage();
++        outMsg.setName("out-message");
++        outMsg.setParent(outInAxisOperation);
++        outInAxisOperation.addMessage(inMsg, WSDLConstants.MESSAGE_LABEL_OUT_VALUE);
++        outInAxisOperation.addMessage(outMsg, WSDLConstants.MESSAGE_LABEL_IN_VALUE);
++
++        OutOnlyAxisOperation outOnlyAxisOperation =
++                new OutOnlyAxisOperation(new QName(OUT_ONLY_OPERATION));
++        AxisMessage outOnlyMsg = new AxisMessage();
++        outOnlyMsg.setName("out-message");
++        outOnlyMsg.setParent(outOnlyAxisOperation);
++        outOnlyAxisOperation.addMessage(outMsg, WSDLConstants.MESSAGE_LABEL_OUT_VALUE);
++
++        AxisService axisAnonymousService = new AxisService(serviceKey);
++        axisAnonymousService.addOperation(outInAxisOperation);
++        axisAnonymousService.addOperation(outOnlyAxisOperation);
++        AxisServiceGroup axisAnonSvcGroup = new AxisServiceGroup(axisCfg);
++        axisAnonSvcGroup.setServiceGroupName(serviceKey);
++        axisAnonSvcGroup.addParameter(SynapseConstants.HIDDEN_SERVICE_PARAM, "true");
++        axisAnonymousService.setClientSide(true);
++        axisAnonSvcGroup.addService(axisAnonymousService);
++        axisCfg.addServiceGroup(axisAnonSvcGroup);
++        axisCfg.getPhasesInfo().setOperationPhases(outInAxisOperation);
++        return axisAnonymousService;
+     }
++
+ }
+Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/BlockingClientUtils.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/core/axis2/BlockingClientUtils.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/core/axis2/BlockingClientUtils.java	(revision 1515263)
+@@ -0,0 +1,322 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.core.axis2;
++
++import org.apache.axis2.AxisFault;
++import org.apache.axis2.Constants;
++import org.apache.axis2.addressing.AddressingConstants;
++import org.apache.axis2.addressing.EndpointReference;
++import org.apache.axis2.client.Options;
++import org.apache.axis2.transport.http.HTTPConstants;
++import org.apache.axis2.transport.http.HTTPTransportUtils;
++import org.apache.synapse.MessageContext;
++import org.apache.synapse.SynapseConstants;
++import org.apache.synapse.endpoints.EndpointDefinition;
++import org.apache.synapse.rest.RESTConstants;
++import org.apache.synapse.transport.nhttp.NhttpConstants;
++import org.apache.synapse.util.MessageHelper;
++
++public class BlockingClientUtils {
++
++    /**
++     * Fill client options extracting properties from the original message context and
++     * endpoint definition
++     *
++     * @param endpoint endpoint definition
++     * @param clientOptions target client options
++     * @param synapseInMsgCtx original message context
++     */
++    public static void fillClientOptions(EndpointDefinition endpoint, Options clientOptions,
++                                         MessageContext synapseInMsgCtx) {
++
++        org.apache.axis2.context.MessageContext axisInMsgCtx
++                = ((Axis2MessageContext) synapseInMsgCtx).getAxis2MessageContext();
++
++        if (endpoint != null) {
++
++            // if security is enabled
++            boolean wsSecurityEnabled = endpoint.isSecurityOn();
++            if (wsSecurityEnabled) {
++                String wsSecPolicyKey = endpoint.getWsSecPolicyKey();
++                if (wsSecPolicyKey != null) {
++                    clientOptions.setProperty(
++                            SynapseConstants.RAMPART_POLICY,
++                            MessageHelper.getPolicy(synapseInMsgCtx, wsSecPolicyKey));
++                } else {
++                    String inboundWsSecPolicyKey = endpoint.getInboundWsSecPolicyKey();
++                    String outboundWsSecPolicyKey = endpoint.getOutboundWsSecPolicyKey();
++                    if (inboundWsSecPolicyKey != null) {
++                        clientOptions.setProperty(SynapseConstants.RAMPART_IN_POLICY,
++                                                  MessageHelper.getPolicy(
++                                                          synapseInMsgCtx, inboundWsSecPolicyKey));
++                    }
++                    if (outboundWsSecPolicyKey != null) {
++                        clientOptions.setProperty(SynapseConstants.RAMPART_OUT_POLICY,
++                                                  MessageHelper.getPolicy(
++                                                          synapseInMsgCtx, outboundWsSecPolicyKey));
++                    }
++                }
++            }
++        }
++
++        if (axisInMsgCtx.getSoapAction() != null) {
++            clientOptions.setAction(axisInMsgCtx.getSoapAction());
++        }
++
++        clientOptions.setExceptionToBeThrownOnSOAPFault(Constants.VALUE_TRUE.equals(
++                synapseInMsgCtx.getProperty(SynapseConstants.THROW_EXCEPTION_ON_SOAPFAULT)));
++    }
++
++    /**
++     * Fill the target message context extracting the required properties of the original
++     * message context and the endpoint
++     *
++     * @param endpoint endpoint definition
++     * @param axisOutMsgCtx target message axis2 context
++     * @param synapseInMsgCtx original synapse message context
++     * @throws org.apache.axis2.AxisFault
++     */
++    public static void fillMessageContext(EndpointDefinition endpoint,
++                                          org.apache.axis2.context.MessageContext axisOutMsgCtx,
++                                          MessageContext synapseInMsgCtx)
++            throws AxisFault {
++
++        org.apache.axis2.context.MessageContext axisInMsgCtx
++                = ((Axis2MessageContext) synapseInMsgCtx).getAxis2MessageContext();
++
++        // Copy properties
++        setProperties(axisInMsgCtx, axisOutMsgCtx);
++
++        // Endpoint format
++        if (endpoint.getFormat() != null) {
++            String format = endpoint.getFormat();
++            if (SynapseConstants.FORMAT_POX.equals(format)) {
++                axisOutMsgCtx.setDoingREST(true);
++                axisOutMsgCtx.setProperty(Constants.Configuration.MESSAGE_TYPE,
++                        org.apache.axis2.transport.http.HTTPConstants.MEDIA_TYPE_APPLICATION_XML);
++                axisOutMsgCtx.setProperty(Constants.Configuration.CONTENT_TYPE,
++                        org.apache.axis2.transport.http.HTTPConstants.MEDIA_TYPE_APPLICATION_XML);
++
++            } else if (SynapseConstants.FORMAT_GET.equals(format)) {
++                axisOutMsgCtx.setDoingREST(true);
++                axisOutMsgCtx.setProperty(Constants.Configuration.HTTP_METHOD,
++                        Constants.Configuration.HTTP_METHOD_GET);
++                axisOutMsgCtx.setProperty(Constants.Configuration.MESSAGE_TYPE,
++                        org.apache.axis2.transport.http.HTTPConstants.MEDIA_TYPE_X_WWW_FORM);
++
++            } else if (SynapseConstants.FORMAT_SOAP11.equals(format)) {
++                axisOutMsgCtx.setDoingREST(false);
++                axisOutMsgCtx.removeProperty(Constants.Configuration.MESSAGE_TYPE);
++                // We need to set this explicitly here in case the request was not a POST
++                axisOutMsgCtx.setProperty(Constants.Configuration.HTTP_METHOD,
++                                          Constants.Configuration.HTTP_METHOD_POST);
++                if (axisOutMsgCtx.getSoapAction() == null && axisOutMsgCtx.getWSAAction() != null) {
++                    axisOutMsgCtx.setSoapAction(axisOutMsgCtx.getWSAAction());
++                }
++                if (!axisOutMsgCtx.isSOAP11()) {
++                    SOAPUtils.convertSOAP12toSOAP11(axisOutMsgCtx);
++                }
++            } else if (SynapseConstants.FORMAT_SOAP12.equals(format)) {
++                axisOutMsgCtx.setDoingREST(false);
++                axisOutMsgCtx.removeProperty(Constants.Configuration.MESSAGE_TYPE);
++                // We need to set this explicitly here in case the request was not a POST
++                axisOutMsgCtx.setProperty(Constants.Configuration.HTTP_METHOD,
++                                          Constants.Configuration.HTTP_METHOD_POST);
++                if (axisOutMsgCtx.getSoapAction() == null && axisOutMsgCtx.getWSAAction() != null) {
++                    axisOutMsgCtx.setSoapAction(axisOutMsgCtx.getWSAAction());
++                }
++                if (axisOutMsgCtx.isSOAP11()) {
++                    SOAPUtils.convertSOAP11toSOAP12(axisOutMsgCtx);
++                }
++            } else if (SynapseConstants.FORMAT_REST.equals(format)) {
++                if (axisInMsgCtx.getProperty(Constants.Configuration.HTTP_METHOD) != null) {
++                    if (axisInMsgCtx.getProperty(Constants.Configuration.HTTP_METHOD).
++                            toString().equals(Constants.Configuration.HTTP_METHOD_GET)
++                        || axisInMsgCtx.getProperty(Constants.Configuration.HTTP_METHOD).
++                            toString().equals(Constants.Configuration.HTTP_METHOD_DELETE)) {
++                        axisOutMsgCtx.removeProperty(Constants.Configuration.MESSAGE_TYPE);
++                    }
++                }
++                axisOutMsgCtx.setDoingREST(true);
++            }
++        }
++
++        // MTOM/SWA
++        if (endpoint.isUseMTOM()) {
++            axisOutMsgCtx.setDoingMTOM(true);
++            axisOutMsgCtx.setProperty(
++                    Constants.Configuration.ENABLE_MTOM,
++                    Constants.VALUE_TRUE);
++            axisOutMsgCtx.setDoingMTOM(true);
++
++        } else if (endpoint.isUseSwa()) {
++            axisOutMsgCtx.setDoingSwA(true);
++            axisOutMsgCtx.setProperty(
++                    Constants.Configuration.ENABLE_SWA,
++                    Constants.VALUE_TRUE);
++            axisOutMsgCtx.setDoingSwA(true);
++        }
++
++        if (endpoint.getCharSetEncoding() != null) {
++            axisOutMsgCtx.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING,
++                                      endpoint.getCharSetEncoding());
++        }
++
++
++        boolean isRest = SynapseConstants.FORMAT_REST.equals(endpoint.getFormat()) | axisInMsgCtx.isDoingREST();
++        if (!isRest && !endpoint.isForceSOAP11() && !endpoint.isForceSOAP12()) {
++            isRest = isRequestRest(axisInMsgCtx);
++        }
++        String restURLPostfix = (String) axisOutMsgCtx.getProperty(NhttpConstants.REST_URL_POSTFIX);
++
++        if (endpoint.getAddress() != null) {
++            String address = endpoint.getAddress(synapseInMsgCtx);
++            if (isRest && restURLPostfix != null && !"".equals(restURLPostfix)) {
++                address = getEPRWithRestURLPostfix(restURLPostfix, address);
++            }
++            axisOutMsgCtx.setTo(new EndpointReference(address));
++        } else {
++            EndpointReference endpointReference = axisOutMsgCtx.getTo();
++            if (endpointReference != null) {
++                if (isRest && restURLPostfix != null && !"".equals(restURLPostfix)) {
++                    String address = endpointReference.getAddress();
++                    address = getEPRWithRestURLPostfix(restURLPostfix, address);
++                    axisOutMsgCtx.setTo(new EndpointReference(address));
++                } else {
++                    axisInMsgCtx.setTo(endpointReference);
++                }
++            }
++        }
++
++        // set the connection timeout
++        if (endpoint.getTimeoutDuration() > 0) {
++            int endpointTimeout = (int) endpoint.getTimeoutDuration();
++            axisOutMsgCtx.setProperty(HTTPConstants.CONNECTION_TIMEOUT, endpointTimeout);
++            if (endpointTimeout > 30000) {
++                //Default Socket timeout is 30000ms.
++                // If endpoint timeout > SO_TIMEOUT have to increase it.
++                axisOutMsgCtx.setProperty(HTTPConstants.SO_TIMEOUT, endpointTimeout);
++            }
++        }
++
++        // Check for preserve WS-Addressing
++        String preserveAddressingProperty = (String) synapseInMsgCtx.getProperty(
++                SynapseConstants.PRESERVE_WS_ADDRESSING);
++        if (preserveAddressingProperty != null && Boolean.parseBoolean(preserveAddressingProperty)) {
++            axisOutMsgCtx.setMessageID(axisInMsgCtx.getMessageID());
++        } else {
++            MessageHelper.removeAddressingHeaders(axisOutMsgCtx);
++        }
++
++        // WS-Addressing
++        if (endpoint.isAddressingOn()) {
++            String wsAddressingVersion = endpoint.getAddressingVersion();
++            if (wsAddressingVersion != null &&
++                SynapseConstants.ADDRESSING_VERSION_SUBMISSION.equals(wsAddressingVersion)) {
++                axisOutMsgCtx.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,
++                                          AddressingConstants.Submission.WSA_NAMESPACE);
++            } else if (wsAddressingVersion != null &&
++                       SynapseConstants.ADDRESSING_VERSION_FINAL.equals(wsAddressingVersion)) {
++                axisOutMsgCtx.setProperty(AddressingConstants.WS_ADDRESSING_VERSION,
++                                          AddressingConstants.Final.WSA_NAMESPACE);
++            }
++            axisOutMsgCtx.setProperty
++                    (AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.FALSE);
++        } else {
++            axisOutMsgCtx.setProperty
++                    (AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.TRUE);
++        }
++    }
++
++    /**
++     * Get the modified EPR with rest url postfix
++     * @param restURLPostfix Rest URL postfix
++     * @param address original EPR
++    */
++    private static String getEPRWithRestURLPostfix(String restURLPostfix, String address) {
++        String url;
++        if (!address.endsWith("/") && !restURLPostfix.startsWith("/") &&
++            !restURLPostfix.startsWith("?")) {
++            url = address + "/" + restURLPostfix;
++        } else if (address.endsWith("/") && restURLPostfix.startsWith("/")) {
++            url = address + restURLPostfix.substring(1);
++        } else if (address.endsWith("/") && restURLPostfix.startsWith("?")) {
++            url = address.substring(0, address.length() - 1) + restURLPostfix;
++        } else {
++            url = address + restURLPostfix;
++        }
++        return url;
++    }
++
++    /**
++     * Whether the original request received by the synapse is REST
++     *
++     * @param originalInMsgCtx request message
++     * @return <code>true</code> if the request was a REST request
++     */
++    private static boolean isRequestRest(org.apache.axis2.context.MessageContext originalInMsgCtx) {
++
++        boolean isRestRequest =
++                originalInMsgCtx.getProperty(NhttpConstants.REST_REQUEST_CONTENT_TYPE) != null;
++
++        if (!isRestRequest) {
++            String httpMethod = (String) originalInMsgCtx.getProperty(
++                    Constants.Configuration.HTTP_METHOD);
++            isRestRequest = Constants.Configuration.HTTP_METHOD_GET.equals(httpMethod)
++                            || Constants.Configuration.HTTP_METHOD_DELETE.equals(httpMethod)
++                            || Constants.Configuration.HTTP_METHOD_PUT.equals(httpMethod)
++                            || RESTConstants.METHOD_OPTIONS.equals(httpMethod);
++            if (!isRestRequest) {
++                isRestRequest = Constants.Configuration.HTTP_METHOD_POST.equals(httpMethod)
++                                && HTTPTransportUtils.isRESTRequest(
++                        String.valueOf(originalInMsgCtx.getProperty(
++                                Constants.Configuration.MESSAGE_TYPE)));
++            }
++        }
++        return isRestRequest;
++    }
++
++    /**
++     * Set message context properties extracting from the original message context
++     * @param axisInMsgCtx original message context
++     * @param axisOutMsgCtx target message context
++     */
++    private static void setProperties(org.apache.axis2.context.MessageContext axisInMsgCtx,
++                                      org.apache.axis2.context.MessageContext axisOutMsgCtx) {
++        for (String propertyName : allowedProperties) {
++            Object property = axisInMsgCtx.getProperty(propertyName);
++            if (property != null) {
++                axisOutMsgCtx.setProperty(propertyName, property);
++            }
++        }
++    }
++
++    /** Properties allowed to be copied to output message context*/
++    private static String[] allowedProperties = {
++            Constants.Configuration.HTTP_METHOD,
++            Constants.Configuration.MESSAGE_TYPE,
++            Constants.Configuration.CONTENT_TYPE,
++            NhttpConstants.REST_URL_POSTFIX,
++            "JSON_OBJECT",
++            "JSON_STREAM",
++            "JSON_STRING"
++    };
++
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/CalloutMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/CalloutMediator.java	(revision 1515262)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/CalloutMediator.java	(revision 1515263)
+@@ -21,55 +21,72 @@
+ 
+ import org.apache.axiom.om.OMElement;
+ import org.apache.axiom.om.OMNode;
++import org.apache.axiom.soap.SOAPBody;
+ import org.apache.axiom.soap.SOAPHeader;
+ import org.apache.axis2.AxisFault;
+ import org.apache.axis2.Constants;
+-import org.apache.axis2.transport.http.HTTPConstants;
+-import org.apache.axis2.description.Parameter;
+-import org.apache.axis2.addressing.AddressingConstants;
+-import org.apache.axis2.addressing.EndpointReference;
+-import org.apache.axis2.client.Options;
+-import org.apache.axis2.client.ServiceClient;
+-import org.apache.axis2.context.ConfigurationContext;
+-import org.apache.axis2.context.ConfigurationContextFactory;
+-import org.apache.synapse.*;
++import org.apache.synapse.ManagedLifecycle;
++import org.apache.synapse.MessageContext;
++import org.apache.synapse.SynapseConstants;
++import org.apache.synapse.SynapseException;
++import org.apache.synapse.SynapseLog;
+ import org.apache.synapse.core.SynapseEnvironment;
++import org.apache.synapse.core.axis2.Axis2BlockingClient;
+ import org.apache.synapse.core.axis2.Axis2MessageContext;
++import org.apache.synapse.endpoints.AbstractEndpoint;
++import org.apache.synapse.endpoints.AddressEndpoint;
++import org.apache.synapse.endpoints.DefaultEndpoint;
++import org.apache.synapse.endpoints.Endpoint;
++import org.apache.synapse.endpoints.EndpointDefinition;
+ import org.apache.synapse.mediators.AbstractMediator;
+ import org.apache.synapse.util.MessageHelper;
+ import org.apache.synapse.util.xpath.SynapseXPath;
+ import org.jaxen.JaxenException;
+ 
+-import java.util.Iterator;
+ import java.util.List;
+ 
+ /**
+  * <callout [serviceURL="string"] [action="string"][passHeaders="true|false"]>
+- *      <configuration [axis2xml="string"] [repository="string"]/>?
+- *      <source xpath="expression" | key="string"> <!-- key can be a MC property or entry key -->
+- *      <target xpath="expression" | key="string"/>
+- *      <enableSec policy="string" | outboundPolicy="String" | inboundPolicy="String"/>?
++ * <configuration [axis2xml="string"] [repository="string"]/>?
++ * <source xpath="expression" | key="string">? <!-- key can be a MC property or entry key -->
++ * <target xpath="expression" | key="string"/>?
++ * <enableSec policy="string" | outboundPolicy="String" | inboundPolicy="String"/>?
+  * </callout>
+  */
+ public class CalloutMediator extends AbstractMediator implements ManagedLifecycle {
+ 
+-    private ConfigurationContext configCtx = null;
+     private String serviceURL = null;
++
+     private String action = null;
++
+     private String requestKey = null;
++
+     private SynapseXPath requestXPath = null;
++
+     private SynapseXPath targetXPath = null;
++
+     private String targetKey = null;
++
+     private String clientRepository = null;
++
+     private String axis2xml = null;
++
+     private boolean passHeaders = false;
+-    public final static String DEFAULT_CLIENT_REPO = "./samples/axis2Client/client_repo";
+-    public final static String DEFAULT_AXIS2_XML = "./samples/axis2Client/client_repo/conf/axis2.xml";
++
+     private boolean securityOn = false;  //Should messages be sent using WS-Security?
++
+     private String wsSecPolicyKey = null;
++
+     private String inboundWsSecPolicyKey = null;
++
+     private String outboundWsSecPolicyKey = null;
+ 
++    private String endpointKey = null;
++
++    private Endpoint endpoint;
++
++    Axis2BlockingClient blockingMsgSender = null;
++
+     public boolean mediate(MessageContext synCtx) {
+ 
+         SynapseLog synLog = getLog(synCtx);
+@@ -83,93 +100,83 @@
+         }
+ 
+         try {
+-            ServiceClient sc = new ServiceClient(configCtx, null);
+-            Options options = new Options();
+-
+-            if (isSecurityOn()) {
++            if (endpoint == null && endpointKey != null) {
++                endpoint = synCtx.getEndpoint(endpointKey);
+                 if (synLog.isTraceOrDebugEnabled()) {
+-                    synLog.traceOrDebug("Callout mediator: using security");
++                    synLog.traceOrDebug("Using the defined endpoint : " + endpoint.getName());
+                 }
+-                if (wsSecPolicyKey != null) {
+-                    options.setProperty(
+-                            SynapseConstants.RAMPART_POLICY,
+-                            MessageHelper.getPolicy(synCtx, wsSecPolicyKey));
++            } else if (synLog.isTraceOrDebugEnabled()) {
++                if (serviceURL != null) {
++                    synLog.traceOrDebug("Using the serviceURL : " + serviceURL);
+                 } else {
+-                    if (inboundWsSecPolicyKey != null) {
+-                        options.setProperty(SynapseConstants.RAMPART_IN_POLICY,
+-                                            MessageHelper.getPolicy(
+-                                                    synCtx, inboundWsSecPolicyKey));
++                    synLog.traceOrDebug("Using the To header as the EPR ");
++                }
++                if (securityOn) {
++                    synLog.traceOrDebug("Security enabled within the Callout Mediator config");
++                    if (wsSecPolicyKey != null) {
++                        synLog.traceOrDebug("Using security policy key : " + wsSecPolicyKey);
++                    } else {
++                        if (inboundWsSecPolicyKey != null) {
++                            synLog.traceOrDebug("Using inbound security policy key : " + inboundWsSecPolicyKey);
++                        }
++                        if (outboundWsSecPolicyKey != null) {
++                            synLog.traceOrDebug("Using outbound security policy key : " + outboundWsSecPolicyKey);
++                        }
+                     }
+-                    if (outboundWsSecPolicyKey != null) {
+-                        options.setProperty(SynapseConstants.RAMPART_OUT_POLICY,
+-                                            MessageHelper.getPolicy(
+-                                                    synCtx, outboundWsSecPolicyKey));
+-                    }
+                 }
+-                sc.engageModule(SynapseConstants.SECURITY_MODULE_NAME);
+             }
+ 
+-            if (serviceURL != null) {
+-                options.setTo(new EndpointReference(serviceURL));
+-            } else if (synCtx.getTo() != null && synCtx.getTo().getAddress() != null) {
+-                options.setTo(new EndpointReference(synCtx.getTo().getAddress()));
+-            } else {
+-                handleException("Service URL or 'To' header is required", synCtx);
++            org.apache.axis2.context.MessageContext axis2MsgCtx =
++                    ((Axis2MessageContext) synCtx).getAxis2MessageContext();
++            if (Constants.VALUE_TRUE.equals(axis2MsgCtx.getProperty(Constants.Configuration.ENABLE_MTOM))) {
++                ((AbstractEndpoint) endpoint).getDefinition().setUseMTOM(true);
+             }
+ 
++            MessageContext synapseOutMsgCtx = MessageHelper.cloneMessageContext(synCtx);
++
+             if (action != null) {
+-                options.setAction(action);
+-            } else {
+-                if (synCtx.isSOAP11()) {
+-                    options.setProperty(Constants.Configuration.DISABLE_SOAP_ACTION, true);
+-                } else {
+-                    Axis2MessageContext axis2smc = (Axis2MessageContext) synCtx;
+-                    org.apache.axis2.context.MessageContext axis2MessageCtx =
+-                            axis2smc.getAxis2MessageContext();
+-                    axis2MessageCtx.getTransportOut().addParameter(
+-                            new Parameter(HTTPConstants.OMIT_SOAP_12_ACTION, true));
+-                }
++                synapseOutMsgCtx.setSoapAction(action);
+             }
+ 
+-            if (passHeaders) {
+-                SOAPHeader header = synCtx.getEnvelope().getHeader();
+-                if (header != null) {
+-                    Iterator headerElements = header.cloneOMElement().getChildElements();
+-                    while (headerElements.hasNext()) {
+-                        sc.addHeader((OMElement) headerElements.next());
+-                    }
++            if (requestKey != null || requestXPath != null) {
++                SOAPBody soapBody = synapseOutMsgCtx.getEnvelope().getBody();
++                soapBody.removeChildren();
++                soapBody.addChild(getRequestPayload(synCtx));
++                if (!passHeaders) {
++                    SOAPHeader soapHeader = synapseOutMsgCtx.getEnvelope().getHeader();
++                    soapHeader.removeChildren();
+                 }
+             }
+ 
+-            options.setProperty(
+-                    AddressingConstants.DISABLE_ADDRESSING_FOR_OUT_MESSAGES, Boolean.TRUE);
+-            sc.setOptions(options);
+-
+-            OMElement request = getRequestPayload(synCtx);
+             if (synLog.isTraceOrDebugEnabled()) {
+-                synLog.traceOrDebug("About to invoke service : " + serviceURL + (action != null ?
+-                    " with action : " + action : ""));
++                synLog.traceOrDebug("About to invoke the service");
+                 if (synLog.isTraceTraceEnabled()) {
+-                    synLog.traceTrace("Request message payload : " + request);
++                    synLog.traceTrace("Request message payload : " + synapseOutMsgCtx.getEnvelope());
+                 }
+             }
+ 
+-            OMElement result = null;
++            MessageContext resultMsgCtx = null;
+             try {
+-                options.setCallTransportCleanup(true);
+-                result = sc.sendReceive(request);
+-            } catch (AxisFault axisFault) {
+-                handleFault(synCtx, axisFault);
++                if ("true".equals(synCtx.getProperty(SynapseConstants.OUT_ONLY))) {
++                    blockingMsgSender.send(endpoint, synapseOutMsgCtx);
++                } else {
++                    resultMsgCtx = blockingMsgSender.send(endpoint, synapseOutMsgCtx);
++                    if ("true".equals(resultMsgCtx.getProperty(SynapseConstants.BLOCKING_CLIENT_ERROR))) {
++                        handleFault(synCtx, (Exception) synCtx.getProperty(SynapseConstants.ERROR_EXCEPTION));
++                    }
++                }
++            } catch (Exception ex) {
++                handleFault(synCtx, ex);
+             }
+ 
+             if (synLog.isTraceTraceEnabled()) {
+-                synLog.traceTrace("Response payload received : " + result);
++                synLog.traceTrace("Response payload received : " + resultMsgCtx.getEnvelope());
+             }
+ 
+-            if (result != null) {
++            if (resultMsgCtx != null) {
+                 if (targetXPath != null) {
+                     Object o = targetXPath.evaluate(synCtx);
+-
++                    OMElement result = resultMsgCtx.getEnvelope().getBody().getFirstElement();
+                     if (o != null && o instanceof OMElement) {
+                         OMNode tgtNode = (OMElement) o;
+                         tgtNode.insertSiblingAfter(result);
+@@ -181,10 +188,13 @@
+                         tgtNode.detach();
+                     } else {
+                         handleException("Evaluation of target XPath expression : " +
+-                            targetXPath.toString() + " did not yield an OMNode", synCtx);
++                                        targetXPath.toString() + " did not yeild an OMNode", synCtx);
+                     }
+-                } if (targetKey != null) {
++                } else if (targetKey != null) {
++                    OMElement result = resultMsgCtx.getEnvelope().getBody().getFirstElement();
+                     synCtx.setProperty(targetKey, result);
++                } else {
++                    synCtx.setEnvelope(resultMsgCtx.getEnvelope());
+                 }
+             } else {
+                 synLog.traceOrDebug("Service returned a null response");
+@@ -192,10 +202,10 @@
+ 
+         } catch (AxisFault e) {
+             handleException("Error invoking service : " + serviceURL +
+-                (action != null ? " with action : " + action : ""), e, synCtx);
++                            (action != null ? " with action : " + action : ""), e, synCtx);
+         } catch (JaxenException e) {
+             handleException("Error while evaluating the XPath expression: " + targetXPath,
+-                    e, synCtx);
++                            e, synCtx);
+         }
+ 
+         synLog.traceOrDebug("End : Callout mediator");
+@@ -202,36 +212,41 @@
+         return true;
+     }
+ 
+-    private void handleFault(MessageContext synCtx, AxisFault axisFault) {
++    private void handleFault(MessageContext synCtx, Exception ex) {
+         synCtx.setProperty(SynapseConstants.SENDING_FAULT, Boolean.TRUE);
+-        if (axisFault.getFaultCodeElement() != null) {
+-            synCtx.setProperty(SynapseConstants.ERROR_CODE,
+-                    axisFault.getFaultCodeElement().getText());
+-        } else {
+-            synCtx.setProperty(SynapseConstants.ERROR_CODE,
+-                    SynapseConstants.CALLOUT_OPERATION_FAILED);
+-        }
+ 
+-        if (axisFault.getFaultReasonElement() != null) {
+-            synCtx.setProperty(SynapseConstants.ERROR_MESSAGE,
+-                    axisFault.getFaultReasonElement().getText());
+-        } else {
+-            synCtx.setProperty(SynapseConstants.ERROR_MESSAGE, "Error while performing " +
+-                    "the callout operation");
+-        }
++        if (ex instanceof AxisFault) {
++            AxisFault axisFault = (AxisFault) ex;
+ 
+-        if (axisFault.getFaultDetailElement() != null) {
+-            if (axisFault.getFaultDetailElement().getFirstElement() != null) {
+-                synCtx.setProperty(SynapseConstants.ERROR_DETAIL,
+-                        axisFault.getFaultDetailElement().getFirstElement());
++            if (axisFault.getFaultCodeElement() != null) {
++                synCtx.setProperty(SynapseConstants.ERROR_CODE,
++                                   axisFault.getFaultCodeElement().getText());
+             } else {
+-                synCtx.setProperty(SynapseConstants.ERROR_DETAIL,
+-                        axisFault.getFaultDetailElement().getText());
++                synCtx.setProperty(SynapseConstants.ERROR_CODE,
++                                   SynapseConstants.CALLOUT_OPERATION_FAILED);
+             }
++
++            if (axisFault.getMessage() != null) {
++                synCtx.setProperty(SynapseConstants.ERROR_MESSAGE,
++                                   axisFault.getMessage());
++            } else {
++                synCtx.setProperty(SynapseConstants.ERROR_MESSAGE, "Error while performing " +
++                                                                   "the callout operation");
++            }
++
++            if (axisFault.getFaultDetailElement() != null) {
++                if (axisFault.getFaultDetailElement().getFirstElement() != null) {
++                    synCtx.setProperty(SynapseConstants.ERROR_DETAIL,
++                                       axisFault.getFaultDetailElement().getFirstElement());
++                } else {
++                    synCtx.setProperty(SynapseConstants.ERROR_DETAIL,
++                                       axisFault.getFaultDetailElement().getText());
++                }
++            }
+         }
+ 
+-        synCtx.setProperty(SynapseConstants.ERROR_EXCEPTION, axisFault);
+-        throw new SynapseException("Error while performing the callout operation", axisFault);
++        synCtx.setProperty(SynapseConstants.ERROR_EXCEPTION, ex);
++        throw new SynapseException("Error while performing the callout operation", ex);
+     }
+ 
+     private OMElement getRequestPayload(MessageContext synCtx) throws AxisFault {
+@@ -267,20 +282,40 @@
+     }
+ 
+     public void init(SynapseEnvironment synEnv) {
+-        try {
+-            configCtx = ConfigurationContextFactory.createConfigurationContextFromFileSystem(
+-                    clientRepository != null ? clientRepository : DEFAULT_CLIENT_REPO,
+-            axis2xml != null ? axis2xml : DEFAULT_AXIS2_XML);
+-        } catch (AxisFault e) {
+-            String msg = "Error initializing callout mediator : " + e.getMessage();
+-            log.error(msg, e);
+-            throw new SynapseException(msg, e);
++        blockingMsgSender = new Axis2BlockingClient(clientRepository, axis2xml);
++
++        EndpointDefinition endpointDefinition = null;
++        if (serviceURL != null) {
++            endpoint = new AddressEndpoint();
++            endpointDefinition = new EndpointDefinition();
++            endpointDefinition.setAddress(serviceURL);
++            ((AddressEndpoint) endpoint).setDefinition(endpointDefinition);
++        } else if (endpointKey == null) {
++            // Use a default endpoint in this case - i.e. the To header
++            endpoint = new DefaultEndpoint();
++            endpointDefinition = new EndpointDefinition();
++            ((DefaultEndpoint) endpoint).setDefinition(endpointDefinition);
+         }
++        // If the endpointKey is specified, we'll look it up at mediation time
++
++        if (endpointDefinition != null && isSecurityOn()) {
++            endpointDefinition.setSecurityOn(true);
++            if (wsSecPolicyKey != null) {
++                endpointDefinition.setWsSecPolicyKey(wsSecPolicyKey);
++            } else {
++                if (inboundWsSecPolicyKey != null) {
++                    endpointDefinition.setInboundWsSecPolicyKey(inboundWsSecPolicyKey);
++                }
++                if (outboundWsSecPolicyKey != null) {
++                    endpointDefinition.setOutboundWsSecPolicyKey(outboundWsSecPolicyKey);
++                }
++            }
++        }
+     }
+ 
+     public void destroy() {
+         try {
+-            configCtx.terminate();
++            blockingMsgSender.cleanup();
+         } catch (AxisFault ignore) {}
+     }
+ 
+@@ -432,4 +467,12 @@
+         this.inboundWsSecPolicyKey = inboundWsSecPolicyKey;
+     }
+ 
++    public void setEndpointKey(String key) {
++        this.endpointKey = key;
++    }
++
++    public String getEndpointKey() {
++        return endpointKey;
++    }
++
+ }
+Index: java/repository/conf/axis2_blocking_client.xml
+===================================================================
+--- java/repository/conf/axis2_blocking_client.xml	(nonexistent)
++++ java/repository/conf/axis2_blocking_client.xml	(revision 1515263)
+@@ -0,0 +1,375 @@
++<!--
++  ~  Licensed to the Apache Software Foundation (ASF) under one
++  ~  or more contributor license agreements.  See the NOTICE file
++  ~  distributed with this work for additional information
++  ~  regarding copyright ownership.  The ASF licenses this file
++  ~  to you under the Apache License, Version 2.0 (the
++  ~  "License"); you may not use this file except in compliance
++  ~  with the License.  You may obtain a copy of the License at
++  ~
++  ~   http://www.apache.org/licenses/LICENSE-2.0
++  ~
++  ~  Unless required by applicable law or agreed to in writing,
++  ~  software distributed under the License is distributed on an
++  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++  ~  KIND, either express or implied.  See the License for the
++  ~  specific language governing permissions and limitations
++  ~  under the License.
++  -->
++
++<axisconfig name="AxisJava2.0">
++    <!-- ================================================= -->
++    <!-- Parameters -->
++    <!-- ================================================= -->
++    <parameter name="hotdeployment">true</parameter>
++    <parameter name="hotupdate">false</parameter>
++    <parameter name="enableMTOM">false</parameter>
++    <parameter name="enableSwA">false</parameter>
++
++    <!--Uncomment if you want to enable file caching for attachments -->
++    <!--parameter name="cacheAttachments">true</parameter>
++    <parameter name="attachmentDIR"></parameter>
++    <parameter name="sizeThreshold">4000</parameter-->
++
++    <!--This will give out the timout of the configuration contexts, in milliseconds-->
++    <parameter name="ConfigContextTimeoutInterval">30000</parameter>
++
++    <!--During a fault, stacktrace can be sent with the fault message. The following flag will control -->
++    <!--that behavior.-->
++    <parameter name="sendStacktraceDetailsWithFaults">false</parameter>
++
++    <!--If there aren't any information available to find out the fault reason, we set the message of the exception-->
++    <!--as the faultreason/Reason. But when a fault is thrown from a service or some where, it will be -->
++    <!--wrapped by different levels. Due to this the initial exception message can be lost. If this flag-->
++    <!--is set, then Axis2 tries to get the first exception and set its message as the faultreason/Reason.-->
++    <parameter name="DrillDownToRootCauseForFaultReason">false</parameter>
++
++    <parameter name="userName">admin</parameter>
++    <parameter name="password">axis2</parameter>
++
++    <!--To override repository/services you need to uncomment following parameter and value SHOULD be absolute file path.-->
++    <!--ServicesDirectory only works on the following cases-->
++    <!---File based configurator and in that case the value should be a file URL (http:// not allowed)-->
++    <!---When creating URL Based configurator with URL "file://"  -->
++    <!--- War based configurator with expanded case , -->
++
++    <!--All the other scenarios it will be ignored.-->
++    <!--<parameter name="ServicesDirectory">service</parameter>-->
++    <!--To override repository/modules you need to uncomment following parameter and value SHOULD be absolute file path-->
++    <!--<parameter name="ModulesDirectory">modules</parameter>-->
++
++
++
++    <!--Following params will set the proper context paths for invocations. All the endpoints will have a commons context-->
++    <!--root which can configured using the following contextRoot parameter-->
++    <!--<parameter name="contextRoot">axis2</parameter>-->
++
++    <!--Our HTTP endpoints can handle both REST and SOAP. Following parameters can be used to distinguiush those endpoints-->
++    <!--In case of a servlet, if you change this you have to manually change the settings of your servlet container to map this -->
++    <!--context path to proper Axis2 servlets-->
++    <parameter name="servicePath" locked="false">services</parameter>
++    <parameter name="restPath" locked="false">rest</parameter>
++
++    <!-- Following parameter will completely disable REST handling in Axis2-->
++    <parameter name="disableREST" locked="true">false</parameter>
++
++    <!--POJO deployer , this will alow users to drop .class file and make that into a service-->
++    <deployer extension=".class" directory="pojo" class="org.apache.axis2.deployment.POJODeployer"/>
++
++    <!-- Following parameter will set the host name for the epr-->
++    <!--<parameter name="hostname" locked="true">myhost.com</parameter>-->
++
++    <!-- If you have a frontend host which exposes this webservice using a different public URL  -->
++    <!-- use this parameter to override autodetected url -->
++    <!--<parameter name="httpFrontendHostUrl">https://someotherhost/context</parameter>-->
++
++
++    <!--    The way of adding listener to the system-->
++    <!--    <listener class="org.apache.axis2.ObserverIMPL">-->
++    <!--        <parameter name="RSS_URL">http://127.0.0.1/rss</parameter>-->
++    <!--    </listener>-->
++
++    <!-- ================================================= -->
++    <!-- Message Receivers -->
++    <!-- ================================================= -->
++    <!--This is the deafult MessageReceiver for the system , if you want to have MessageReceivers for -->
++    <!--all the other MEP implement it and add the correct entry to here , so that you can refer from-->
++    <!--any operation -->
++    <!--Note : You can ovrride this for a particular service by adding the same element with your requirement-->
++    <messageReceivers>
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
++                         class="org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver"/>
++        <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
++                         class="org.apache.axis2.receivers.RawXMLINOutMessageReceiver"/>
++    </messageReceivers>
++
++    <!-- ================================================= -->
++    <!-- Message Formatter -->
++    <!-- ================================================= -->
++    <!--Following content type to message formatter mapping can be used to implement support for different message -->
++    <!--format  serialization in Axis2. These message formats are expected to be resolved based on the content type. -->
++    <messageFormatters>
++
++        <messageFormatter contentType="application/x-www-form-urlencoded"
++                          class="org.apache.axis2.transport.http.XFormURLEncodedFormatter"/>
++        <messageFormatter contentType="multipart/form-data"
++                          class="org.apache.axis2.transport.http.MultipartFormDataFormatter"/>
++        <messageFormatter contentType="application/xml"
++                          class="org.apache.axis2.transport.http.ApplicationXMLFormatter"/>
++        <!--<messageFormatter contentType="x-application/hessian"
++                         class="org.apache.synapse.format.hessian.HessianMessageFormatter"/>-->
++        <!--<messageFormatter contentType=""
++                         class="org.apache.synapse.format.hessian.HessianMessageFormatter"/>-->
++        <!--<messageFormatter contentType="application/json"
++                         class="org.apache.axis2.json.JSONMessageFormatter"/>-->
++
++    </messageFormatters>
++
++    <!-- ================================================= -->
++    <!-- Message Builders -->
++    <!-- ================================================= -->
++    <!--Following content type to builder mapping can be used to implement support for different message -->
++    <!--formats in Axis2. These message formats are expected to be resolved based on the content type. -->
++    <messageBuilders>
++        <messageBuilder contentType="application/xml"
++                        class="org.apache.axis2.builder.ApplicationXMLBuilder"/>
++        <messageBuilder contentType="application/x-www-form-urlencoded"
++                        class="org.apache.axis2.builder.XFormURLEncodedBuilder"/>
++        <messageBuilder contentType="multipart/form-data"
++                        class="org.apache.axis2.builder.MultipartFormDataBuilder"/>
++        <!--<messageBuilder contentType="x-application/hessian"
++                         class="org.apache.synapse.format.hessian.HessianMessageBuilder"/>-->
++        <!--<messageBuilder contentType=""
++                         class="org.apache.synapse.format.hessian.HessianMessageBuilder"/>-->
++        <!--<messageBuilder contentType="application/json"
++                         class="org.apache.axis2.json.JSONOMBuilder"/>-->
++    </messageBuilders>
++
++    <!-- ================================================= -->
++    <!-- Transport Ins -->
++    <!-- ================================================= -->
++	<transportReceiver name="http"
++                       class="org.apache.axis2.transport.http.SimpleHTTPServer">
++        <parameter name="port">8200</parameter>
++        <!-- Here is the complete list of supported parameters (see example settings further below):
++            port: the port to listen on (default 6060)
++            hostname:  if non-null, url prefix used in reply-to endpoint references                                 (default null)
++            originServer:  value of http Server header in outgoing messages                                         (default "Simple-Server/1.1")
++            requestTimeout:  value in millis of time that requests can wait for data                                (default 20000)
++            requestTcpNoDelay:  true to maximize performance and minimize latency                                   (default true)
++                                false to minimize bandwidth consumption by combining segments
++            requestCoreThreadPoolSize:  number of threads available for request processing (unless queue fills up)  (default 25)
++            requestMaxThreadPoolSize:  number of threads available for request processing if queue fills up         (default 150)
++                                       note that default queue never fills up:  see HttpFactory
++            threadKeepAliveTime:  time to keep threads in excess of core size alive while inactive                  (default 180)
++                                  note that no such threads can exist with default unbounded request queue
++            threadKeepAliveTimeUnit:  TimeUnit of value in threadKeepAliveTime (default SECONDS)                    (default SECONDS)
++        -->
++        <!-- <parameter name="hostname">http://www.myApp.com/ws</parameter> -->
++        <!-- <parameter name="originServer">My-Server/1.1</parameter>           -->
++        <!-- <parameter name="requestTimeout">10000</parameter>                   -->
++        <!-- <parameter name="requestTcpNoDelay">false</parameter>                   -->
++        <!-- <parameter name="requestCoreThreadPoolSize">50</parameter>                      -->
++        <!-- <parameter name="RequestMaxThreadPoolSize">100</parameter>                     -->
++        <!-- <parameter name="threadKeepAliveTime">240000</parameter>                  -->
++        <!-- <parameter name="threadKeepAliveTimeUnit">MILLISECONDS</parameter>            -->
++    </transportReceiver>
++
++    <!--Uncomment this and configure as appropriate for JMS transport support, after setting up your JMS environment (e.g. ActiveMQ)
++    <transportReceiver name="jms" class="org.apache.axis2.transport.jms.JMSListener">
++        <parameter name="myTopicConnectionFactory">
++        	<parameter name="java.naming.factory.initial">org.apache.activemq.jndi.ActiveMQInitialContextFactory</parameter>
++        	<parameter name="java.naming.provider.url">tcp://localhost:61616</parameter>
++        	<parameter name="transport.jms.ConnectionFactoryJNDIName">TopicConnectionFactory</parameter>
++		<parameter name="transport.jms.ConnectionFactoryType" locked="false">topic</parameter>
++        </parameter>
++
++        <parameter name="myQueueConnectionFactory">
++        	<parameter name="java.naming.factory.initial">org.apache.activemq.jndi.ActiveMQInitialContextFactory</parameter>
++        	<parameter name="java.naming.provider.url">tcp://localhost:61616</parameter>
++        	<parameter name="transport.jms.ConnectionFactoryJNDIName">QueueConnectionFactory</parameter>
++		<parameter name="transport.jms.ConnectionFactoryType" locked="false">queue</parameter>
++        </parameter>
++
++        <parameter name="default">
++        	<parameter name="java.naming.factory.initial">org.apache.activemq.jndi.ActiveMQInitialContextFactory</parameter>
++        	<parameter name="java.naming.provider.url">tcp://localhost:61616</parameter>
++        	<parameter name="transport.jms.ConnectionFactoryJNDIName">QueueConnectionFactory</parameter>
++		<parameter name="transport.jms.ConnectionFactoryType" locked="false">queue</parameter>
++        </parameter>
++    </transportReceiver>-->
++
++    <transportReceiver name="mailto" class="org.apache.axis2.transport.mail.MailTransportListener">
++        <!-- configure any optional POP3/IMAP properties
++        check com.sun.mail.pop3 and com.sun.mail.imap package documentation for more details-->
++    </transportReceiver>
++
++	<!--Uncomment if you want to have TCP transport support-->
++    <!--transportReceiver name="tcp"
++                       class="org.apache.axis2.transport.tcp.TCPServer">
++        <parameter name="port">6060</parameter-->>
++        <!--If you want to give your own host address for EPR generation-->
++        <!--uncomment the following paramter , and set it as you required.-->
++        <!--<parameter name="hostname">tcp://myApp.com/ws</parameter>-->
++    <!-- /transportReceiver -->
++
++    <!-- ================================================= -->
++    <!-- Transport Outs -->
++    <!-- ================================================= -->
++
++    <!-- transportSender name="tcp"
++                     class="org.apache.axis2.transport.tcp.TCPTransportSender"/>
++    <transportSender name="udp"
++                     class="org.apache.axis2.transport.udp.UDPSender"/>
++    <transportSender name="local"
++                     class="org.apache.axis2.transport.local.LocalTransportSender"/ -->
++	<transportSender name="http"
++                     class="org.apache.axis2.transport.http.CommonsHTTPTransportSender">
++        <parameter name="PROTOCOL">HTTP/1.1</parameter>
++        <parameter name="Transfer-Encoding">chunked</parameter>
++        <parameter name="cacheHttpClient">true</parameter>
++        <parameter name="defaultMaxConnectionsPerHost">200</parameter>
++        <!-- If following is set to 'true', optional action part of the Content-Type will not be added to the SOAP 1.2 messages -->
++        <!--  <parameter name="OmitSOAP12Action">true</parameter>  -->
++    </transportSender>
++
++    <transportSender name="https"
++                     class="org.apache.axis2.transport.http.CommonsHTTPTransportSender">
++        <parameter name="PROTOCOL">HTTP/1.1</parameter>
++        <parameter name="Transfer-Encoding">chunked</parameter>
++        <parameter name="cacheHttpClient">true</parameter>
++        <parameter name="defaultMaxConnectionsPerHost">200</parameter>
++    </transportSender>
++    <transportSender name="jms"
++                     class="org.apache.axis2.transport.jms.JMSSender"/>
++
++    <!-- configure the SMTP server information
++    check com.sun.mail.smtp package documentation for descriptions of properties-->
++    <transportSender name="mailto" class="org.apache.axis2.transport.mail.MailTransportSender">
++        <parameter name="mail.smtp.host">smtp.gmail.com</parameter>
++        <parameter name="mail.smtp.port">587</parameter>
++        <parameter name="mail.smtp.starttls.enable">true</parameter>
++        <parameter name="mail.smtp.auth">true</parameter>
++        <parameter name="mail.smtp.user">synapse.demo.0</parameter>
++        <parameter name="mail.smtp.password">mailpassword</parameter>
++        <parameter name="mail.smtp.from">synapse.demo.0@gmail.com</parameter>
++    </transportSender>
++
++    <!-- ================================================= -->
++    <!-- Global Modules  -->
++    <!-- ================================================= -->
++    <!-- Comment this to disable Addressing -->
++    <module ref="addressing"/>
++
++    <!--Configuring module , providing parameters for modules whether they refer or not-->
++    <!--<moduleConfig name="addressing">-->
++    <!--<parameter name="addressingPara">N/A</parameter>-->
++    <!--</moduleConfig>-->
++
++    <!-- ================================================= -->
++    <!-- Clustering  -->
++    <!-- ================================================= -->
++    <!-- Configure and uncomment following for preparing Axis2 to a clustered environment -->
++    <!--
++    <clustering class="org.apache.axis2.cluster.tribes.TribesClusteringAgent">
++        <parameter name="param1">value1</parameter>
++        <parameter name="domain">apache.axis2.domain</parameter>
++    	<configurationManager class="org.apache.axis2.cluster.configuration.TribesConfigurationManager">
++    	    <listener class="org.apache.axis2.cluster.configuration.DefaultConfigurationManagerListener"/>
++    	</configurationManager>
++    	<contextManager class="org.apache.axis2.cluster.context.TribesContextManager">
++    	    <listener class="org.apache.axis2.cluster.context.DefaultContextManagerListener"/>
++    	</contextManager>
++    </clustering>
++     -->
++
++    <!-- ================================================= -->
++    <!-- Phases  -->
++    <!-- ================================================= -->
++    <phaseOrder type="InFlow">
++        <!--  System pre defined phases       -->
++        <phase name="Transport">
++            <handler name="RequestURIBasedDispatcher"
++                     class="org.apache.axis2.dispatchers.RequestURIBasedDispatcher">
++                <order phase="Transport"/>
++            </handler>
++            <handler name="SOAPActionBasedDispatcher"
++                     class="org.apache.axis2.dispatchers.SOAPActionBasedDispatcher">
++                <order phase="Transport"/>
++            </handler>
++        </phase>
++        <phase name="Addressing">
++             <handler name="AddressingBasedDispatcher"
++                     class="org.apache.axis2.dispatchers.AddressingBasedDispatcher">
++                 <order phase="Addressing"/>
++            </handler>
++        </phase>
++        <phase name="Security"/>
++        <phase name="PreDispatch"/>
++        <phase name="Dispatch" class="org.apache.axis2.engine.DispatchPhase">
++            <handler name="RequestURIBasedDispatcher"
++                     class="org.apache.axis2.dispatchers.RequestURIBasedDispatcher"/>
++            <handler name="SOAPActionBasedDispatcher"
++                     class="org.apache.axis2.dispatchers.SOAPActionBasedDispatcher"/>
++            <handler name="RequestURIOperationDispatcher"
++                     class="org.apache.axis2.dispatchers.RequestURIOperationDispatcher"/>
++            <handler name="SOAPMessageBodyBasedDispatcher"
++                     class="org.apache.axis2.dispatchers.SOAPMessageBodyBasedDispatcher"/>
++
++            <handler name="HTTPLocationBasedDispatcher"
++                     class="org.apache.axis2.dispatchers.HTTPLocationBasedDispatcher"/>
++        </phase>
++        <phase name="RMPhase"/>
++        <!--  System predefined phases       -->
++        <!--   After Postdispatch phase module author or service author can add any phase he want      -->
++        <phase name="OperationInPhase"/>
++        <phase name="soapmonitorPhase"/>
++    </phaseOrder>
++    <phaseOrder type="OutFlow">
++        <!--      user can add his own phases to this area  -->
++        <phase name="soapmonitorPhase"/>
++        <phase name="OperationOutPhase"/>
++        <!--system predefined phase-->
++        <!--these phase will run irrespective of the service-->
++        <phase name="RMPhase"/>
++        <phase name="PolicyDetermination"/>
++        <phase name="MessageOut"/>
++        <phase name="Security"/>
++    </phaseOrder>
++    <phaseOrder type="InFaultFlow">
++        <phase name="Addressing">
++             <handler name="AddressingBasedDispatcher"
++                     class="org.apache.axis2.dispatchers.AddressingBasedDispatcher">
++                 <order phase="Addressing"/>
++            </handler>
++        </phase>
++        <phase name="Security"/>
++        <phase name="PreDispatch"/>
++        <phase name="Dispatch" class="org.apache.axis2.engine.DispatchPhase">
++            <handler name="RequestURIBasedDispatcher"
++                     class="org.apache.axis2.dispatchers.RequestURIBasedDispatcher"/>
++            <handler name="SOAPActionBasedDispatcher"
++                     class="org.apache.axis2.dispatchers.SOAPActionBasedDispatcher"/>
++            <handler name="RequestURIOperationDispatcher"
++                     class="org.apache.axis2.dispatchers.RequestURIOperationDispatcher"/>
++            <handler name="SOAPMessageBodyBasedDispatcher"
++                     class="org.apache.axis2.dispatchers.SOAPMessageBodyBasedDispatcher"/>
++
++            <handler name="HTTPLocationBasedDispatcher"
++                     class="org.apache.axis2.dispatchers.HTTPLocationBasedDispatcher"/>
++        </phase>
++        <phase name="RMPhase"/>
++        <!--      user can add his own phases to this area  -->
++        <phase name="OperationInFaultPhase"/>
++        <phase name="soapmonitorPhase"/>
++    </phaseOrder>
++    <phaseOrder type="OutFaultFlow">
++        <!--      user can add his own phases to this area  -->
++        <phase name="soapmonitorPhase"/>
++        <phase name="OperationOutFaultPhase"/>
++        <phase name="RMPhase"/>
++        <phase name="PolicyDetermination"/>
++        <phase name="MessageOut"/>
++        <phase name="Security"/>
++    </phaseOrder>
++</axisconfig>
+Index: java/repository/conf/sample/synapse_sample_433.xml
+===================================================================
+--- java/repository/conf/sample/synapse_sample_433.xml	(nonexistent)
++++ java/repository/conf/sample/synapse_sample_433.xml	(revision 1515263)
+@@ -0,0 +1,43 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!--
++  ~  Licensed to the Apache Software Foundation (ASF) under one
++  ~  or more contributor license agreements.  See the NOTICE file
++  ~  distributed with this work for additional information
++  ~  regarding copyright ownership.  The ASF licenses this file
++  ~  to you under the Apache License, Version 2.0 (the
++  ~  "License"); you may not use this file except in compliance
++  ~  with the License.  You may obtain a copy of the License at
++  ~
++  ~   http://www.apache.org/licenses/LICENSE-2.0
++  ~
++  ~  Unless required by applicable law or agreed to in writing,
++  ~  software distributed under the License is distributed on an
++  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++  ~  KIND, either express or implied.  See the License for the
++  ~  specific language governing permissions and limitations
++  ~  under the License.
++  -->
++
++<!-- Callout  mediator Endpoint Sample-->
++<definitions xmlns="http://ws.apache.org/ns/synapse">
++
++    <sequence name="main">
++        <callout endpointKey="StockQuoteServiceEndpoint">
++            <source xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
++                    xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
++                    xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
++            <target xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
++                    xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
++                    xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
++        </callout>
++        <property name="RESPONSE" value="true"/>
++        <header name="To" action="remove"/>
++        <send/>
++        <drop/>
++    </sequence>
++
++    <endpoint name="StockQuoteServiceEndpoint">
++       <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
++    </endpoint>
++
++</definitions>
+-*-*-*-
+Message: Callout mediator improvements - Supporting Synapse Endpoints in callout mediator. Applying patches from SYNAPSE-966 SYNAPSE-967 and SYNAPSE-968
+-*-*-*-
+When: 2013-08-18 22:29:05 -0400 
+-*-*-*-
+Who: hiranya

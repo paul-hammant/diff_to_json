@@ -1,0 +1,31 @@
+{
+  "when": "2016-05-31T07:12:33-04:00", 
+  "message": "Initial commit", 
+  "who": "ravi", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-1286,6 +1286,12", 
+          "lines": [
+            "             <id>dushan</id>\n", 
+            "             <email>dushan AT apache.org</email>\n", 
+            "             <organization>WSO2</organization>\n", 
+            "+    \t</developer>\n", 
+            "+\t<developer>\n", 
+            "+            <name>Ravi Undupitiya</name>\n", 
+            "+            <id>ravi</id>\n", 
+            "+            <email>ravi AT apache.org</email>\n", 
+            "+            <organization>WSO2</organization>\n", 
+            "         </developer>\n", 
+            "     </developers>\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/pom.xml", 
+      "from": "java/pom.xml"
+    }
+  ], 
+  "id": "1746265"
+}

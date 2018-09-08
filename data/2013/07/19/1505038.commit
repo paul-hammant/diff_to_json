@@ -1,3 +1,33 @@
+Index: java/modules/extensions/src/test/java/org/apache/synapse/mediators/xquery/XQueryMediatorTest.java
+===================================================================
+--- java/modules/extensions/src/test/java/org/apache/synapse/mediators/xquery/XQueryMediatorTest.java	(revision 1505037)
++++ java/modules/extensions/src/test/java/org/apache/synapse/mediators/xquery/XQueryMediatorTest.java	(revision 1505038)
+@@ -19,6 +19,7 @@
+ package org.apache.synapse.mediators.xquery;
+ 
+ import junit.framework.TestCase;
++import org.apache.axiom.om.OMAbstractFactory;
+ import org.apache.synapse.MessageContext;
+ import org.apache.synapse.config.SynapseConfigUtils;
+ import org.apache.synapse.mediators.TestUtils;
+@@ -255,4 +256,17 @@
+         assertTrue(mediator.mediate(mc));
+         assertEquals("true", mc.getEnvelope().getBody().getFirstElement().getText());
+     }
++
++    public void testEmptyBodyQuery() throws Exception {
++        MessageContext mc = TestUtils.getTestContext(sampleXml3, null);
++        mc.setEnvelope(OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope());
++
++        XQueryMediator mediator = new XQueryMediator();
++        mediator.setQuerySource(" declare namespace m0=\"http://services.samples/xsd\";\n" +
++                " declare variable $payload as document-node() external;\n" +
++                " declare variable $commission as document-node() external;\n" +
++                " <testing/>");
++        assertTrue(mediator.mediate(mc));
++        assertEquals("testing", mc.getEnvelope().getBody().getFirstElement().getLocalName());
++    }
+ }
 Index: java/modules/extensions/src/main/java/org/apache/synapse/mediators/xquery/XQueryMediator.java
 ===================================================================
 --- java/modules/extensions/src/main/java/org/apache/synapse/mediators/xquery/XQueryMediator.java	(revision 1505037)
@@ -30,36 +60,6 @@ Index: java/modules/extensions/src/main/java/org/apache/synapse/mediators/xquery
                  }
                  break;   // Only take the *first* value of the result sequence
              }
-Index: java/modules/extensions/src/test/java/org/apache/synapse/mediators/xquery/XQueryMediatorTest.java
-===================================================================
---- java/modules/extensions/src/test/java/org/apache/synapse/mediators/xquery/XQueryMediatorTest.java	(revision 1505037)
-+++ java/modules/extensions/src/test/java/org/apache/synapse/mediators/xquery/XQueryMediatorTest.java	(revision 1505038)
-@@ -19,6 +19,7 @@
- package org.apache.synapse.mediators.xquery;
- 
- import junit.framework.TestCase;
-+import org.apache.axiom.om.OMAbstractFactory;
- import org.apache.synapse.MessageContext;
- import org.apache.synapse.config.SynapseConfigUtils;
- import org.apache.synapse.mediators.TestUtils;
-@@ -255,4 +256,17 @@
-         assertTrue(mediator.mediate(mc));
-         assertEquals("true", mc.getEnvelope().getBody().getFirstElement().getText());
-     }
-+
-+    public void testEmptyBodyQuery() throws Exception {
-+        MessageContext mc = TestUtils.getTestContext(sampleXml3, null);
-+        mc.setEnvelope(OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope());
-+
-+        XQueryMediator mediator = new XQueryMediator();
-+        mediator.setQuerySource(" declare namespace m0=\"http://services.samples/xsd\";\n" +
-+                " declare variable $payload as document-node() external;\n" +
-+                " declare variable $commission as document-node() external;\n" +
-+                " <testing/>");
-+        assertTrue(mediator.mediate(mc));
-+        assertEquals("testing", mc.getEnvelope().getBody().getFirstElement().getLocalName());
-+    }
- }
 -*-*-*-
 Message: Applying the patch for SYNAPSE-877, Appling XQuery transformations on empty SOAP body. Added a test case to verify the fix.
 -*-*-*-

@@ -1,0 +1,100 @@
+Index: java/modules/xar-maven-plugin/src/main/java/org/apache/synapse/maven/xar/AbstractXarMojo.java
+===================================================================
+--- java/modules/xar-maven-plugin/src/main/java/org/apache/synapse/maven/xar/AbstractXarMojo.java	(revision 1776259)
++++ java/modules/xar-maven-plugin/src/main/java/org/apache/synapse/maven/xar/AbstractXarMojo.java	(revision 1776260)
+@@ -43,6 +43,7 @@
+ import org.apache.maven.artifact.resolver.ArtifactCollector;
+ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+ import org.apache.maven.artifact.resolver.DebugResolutionListener;
++import org.apache.maven.artifact.resolver.ResolutionListener;
+ import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
+ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+ import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
+@@ -358,15 +359,10 @@
+         logArtifacts(synapseRuntimeDeps);
+         
+         log.debug("Resolving transitive dependencies for " + synapseCore + " ...");
+-        try {
+-            synapseRuntimeDeps = artifactCollector.collect(synapseRuntimeDeps,
+-                    synapseCoreProject.getArtifact(), synapseCoreProject.getManagedVersionMap(),
+-                    localRepository, remoteArtifactRepositories, artifactMetadataSource, null,
+-                    Collections.singletonList(new DebugResolutionListener(logger))).getArtifacts();
+-        } catch (ArtifactResolutionException e) {
+-            throw new MojoExecutionException("Unable to resolve transitive dependencies for "
+-                    + synapseCore);
+-        }
++        synapseRuntimeDeps = artifactCollector.collect(synapseRuntimeDeps,
++                synapseCoreProject.getArtifact(), synapseCoreProject.getManagedVersionMap(),
++                localRepository, remoteArtifactRepositories, artifactMetadataSource, null,
++                Collections.<ResolutionListener>singletonList(new DebugResolutionListener(logger))).getArtifacts();
+         log.debug("All runtime dependencies for " + synapseCore + " :");
+         logArtifacts(synapseRuntimeDeps);
+         
+Index: java/modules/xar-maven-plugin/pom.xml
+===================================================================
+--- java/modules/xar-maven-plugin/pom.xml	(revision 1776259)
++++ java/modules/xar-maven-plugin/pom.xml	(revision 1776260)
+@@ -46,7 +46,7 @@
+         </dependency>
+         <dependency>
+             <groupId>org.apache.maven</groupId>
+-            <artifactId>maven-project</artifactId>
++            <artifactId>maven-core</artifactId>
+         </dependency>
+         <dependency>
+             <groupId>org.apache.maven</groupId>
+@@ -54,6 +54,10 @@
+         </dependency>
+         <dependency>
+             <groupId>org.apache.maven</groupId>
++            <artifactId>maven-compat</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>org.apache.maven</groupId>
+             <artifactId>maven-archiver</artifactId>
+         </dependency>
+         <dependency>
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1776259)
++++ java/pom.xml	(revision 1776260)
+@@ -840,16 +840,21 @@
+             </dependency>
+             <dependency>
+                 <groupId>org.apache.maven</groupId>
+-                <artifactId>maven-project</artifactId>
++                <artifactId>maven-core</artifactId>
+                 <version>${maven.version}</version>
+             </dependency>
+             <dependency>
+                 <groupId>org.apache.maven</groupId>
+                 <artifactId>maven-artifact</artifactId>
+-                <version>${maven.artifact.version}</version>
++                <version>${maven.version}</version>
+             </dependency>
+             <dependency>
+                 <groupId>org.apache.maven</groupId>
++                <artifactId>maven-compat</artifactId>
++                <version>${maven.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>org.apache.maven</groupId>
+                 <artifactId>maven-archiver</artifactId>
+                 <version>${maven.archiver.version}</version>
+             </dependency>
+@@ -1105,8 +1110,7 @@
+         <activation.version>1.1</activation.version>
+ 
+         <!-- Maven Tools -->
+-        <maven.version>2.0.7</maven.version>
+-        <maven.artifact.version>2.0.8</maven.artifact.version>
++        <maven.version>3.0</maven.version>
+         <maven.archiver.version>2.2</maven.archiver.version>
+         <plexus.utils.version>1.5.4</plexus.utils.version>
+     </properties>
+-*-*-*-
+Message: Update Maven dependencies to 3.0 to fix a weird compilation failure (related to raw types) that seems to occur only on Java 8.
+-*-*-*-
+When: 2016-12-28 05:42:28 -0500 
+-*-*-*-
+Who: veithen

@@ -1,0 +1,21 @@
+Index: java/modules/integration/pom.xml
+===================================================================
+--- java/modules/integration/pom.xml	(revision 1547183)
++++ java/modules/integration/pom.xml	(revision 1547184)
+@@ -295,6 +295,10 @@
+                         <timeStamp>${maven.build.timestamp}</timeStamp>
+                     </systemPropertyVariables>
+                     <argLine>-Xms128m -Xmx384m -XX:MaxPermSize=128m</argLine>
++                    <!-- The working directory must be set to the root directory of the Synapse project because the
++                         test cases use the configuration files in the repository directory (repository/conf/sample/*.xml)
++                         and some of these configuration files contain URLs that are relative to the current working
++                         directory (file:repository/...). -->
+                     <workingDirectory>../..</workingDirectory>
+                     <!--redirectTestOutputToFile>true</redirectTestOutputToFile-->
+                     <forkMode>pertest</forkMode>
+-*-*-*-
+Message: Added an explanation why the working directory for the integration tests must be set to the root directory of the Synapse project.
+-*-*-*-
+When: 2013-12-02 15:47:38 -0500 
+-*-*-*-
+Who: veithen

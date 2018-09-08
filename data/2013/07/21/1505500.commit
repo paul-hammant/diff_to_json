@@ -1,123 +1,3 @@
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/Axis2BackEndServerController.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/Axis2BackEndServerController.java	(revision 1505499)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/Axis2BackEndServerController.java	(revision 1505500)
-@@ -6,10 +6,13 @@
- import org.apache.axis2.context.ConfigurationContextFactory;
- import org.apache.axis2.description.TransportInDescription;
- import org.apache.axis2.engine.ListenerManager;
-+import org.apache.axis2.engine.Phase;
-+import org.apache.axis2.phaseresolver.PhaseMetadata;
- import org.apache.commons.logging.Log;
- import org.apache.commons.logging.LogFactory;
- import org.apache.synapse.samples.framework.config.Axis2ServerConfiguration;
- 
-+import java.util.List;
- import java.util.concurrent.CountDownLatch;
- 
- /**
-@@ -27,6 +30,7 @@
-     private Axis2ServerConfiguration configuration;
-     private CountDownLatch cdLatch;
-     private Exception processException;
-+    private MessageCounter counter;
- 
-     public Axis2BackEndServerController(String serverName,
-                                         Axis2ServerConfiguration configuration) {
-@@ -61,6 +65,7 @@
- 
-     public boolean stop() {
-         if (serverThread.isRunning) {
-+            counter = null;
-             serverThread.isRunning = false;
-             try {
-                 cdLatch = new CountDownLatch(1);
-@@ -72,6 +77,13 @@
-         return true;
-     }
- 
-+    public int getMessageCount(String service, String operation) {
-+        if (counter != null) {
-+            return counter.getCount(service, operation);
-+        }
-+        return -1;
-+    }
-+
-     class BackEndServerThread extends Thread {
- 
-         public boolean isRunning = false;
-@@ -126,6 +138,17 @@
-                     clusteringAgent.init();
-                 }
- 
-+                if (configuration.isCounterEnabled()) {
-+                    log.info("Engaging server side message counter");
-+                    List<Phase> phases = configContext.getAxisConfiguration().getInFlowPhases();
-+                    for (Phase phase : phases) {
-+                        if (PhaseMetadata.PHASE_DISPATCH.equals(phase.getName())) {
-+                            counter = new MessageCounter();
-+                            phase.addHandler(counter);
-+                            break;
-+                        }
-+                    }
-+                }
- 
-                 listenerManager.startSystem(configContext);
-                 isRunning = true;
-@@ -135,7 +158,7 @@
-             }
-             cdLatch.countDown();
- 
--            log.info("ServerThread: Wait until test are finished");
-+            log.info("ServerThread: Wait until tests are finished");
-             while (isRunning) {
-                 //wait
-                 try {
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1505499)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1505500)
-@@ -22,6 +22,7 @@
- import junit.framework.TestSuite;
- import org.apache.commons.logging.Log;
- import org.apache.commons.logging.LogFactory;
-+import org.apache.synapse.samples.framework.tests.Sample250;
- import org.apache.synapse.samples.framework.tests.advanced.*;
- import org.apache.synapse.samples.framework.tests.endpoint.*;
- import org.apache.synapse.samples.framework.tests.message.*;
-@@ -203,6 +204,9 @@
-         sampleClassRepo.put("156", Sample156.class);
-         sampleClassRepo.put("157", Sample157.class);
- 
-+        //Transport switching
-+        sampleClassRepo.put("250", Sample250.class);
-+
-         //Advanced
-         sampleClassRepo.put("350", Sample350.class);
-         sampleClassRepo.put("351", Sample351.class);
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java	(revision 1505499)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java	(revision 1505500)
-@@ -356,6 +356,8 @@
-                     SampleConfigConstants.TAG_BE_SERVER_CONF_AXIS2_HTTP_PORT);
-             String axis2HttpsPort = axis2Properties.getProperty(
-                     SampleConfigConstants.TAG_BE_SERVER_CONF_AXIS2_HTTPS_PORT);
-+            String counterEnabled = axis2Properties.getProperty(
-+                    SampleConfigConstants.TAG_BE_SERVER_CONF_AXIS2_COUNTER_ENABLED);
- 
-             configuration.getAxis2Config(serverName).setServerName(serverName);
- 
-@@ -377,6 +379,9 @@
- 
-             configuration.getAxis2Config(serverName).setHttpPort(axis2HttpPort);
-             configuration.getAxis2Config(serverName).setHttpsPort(axis2HttpsPort);
-+            if (Boolean.parseBoolean(counterEnabled)) {
-+                configuration.getAxis2Config(serverName).setCounterEnabled(true);
-+            }
- 
-             backendServerControllers.add(new Axis2BackEndServerController(serverName,
-                     configuration.getAxis2Config(serverName)));
 Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/JMSSampleClient.java
 ===================================================================
 --- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/JMSSampleClient.java	(revision 1505499)
@@ -320,6 +200,126 @@ Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framewo
 +        this.counterEnabled = counterEnabled;
 +    }
  }
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/Axis2BackEndServerController.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/Axis2BackEndServerController.java	(revision 1505499)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/Axis2BackEndServerController.java	(revision 1505500)
+@@ -6,10 +6,13 @@
+ import org.apache.axis2.context.ConfigurationContextFactory;
+ import org.apache.axis2.description.TransportInDescription;
+ import org.apache.axis2.engine.ListenerManager;
++import org.apache.axis2.engine.Phase;
++import org.apache.axis2.phaseresolver.PhaseMetadata;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.config.Axis2ServerConfiguration;
+ 
++import java.util.List;
+ import java.util.concurrent.CountDownLatch;
+ 
+ /**
+@@ -27,6 +30,7 @@
+     private Axis2ServerConfiguration configuration;
+     private CountDownLatch cdLatch;
+     private Exception processException;
++    private MessageCounter counter;
+ 
+     public Axis2BackEndServerController(String serverName,
+                                         Axis2ServerConfiguration configuration) {
+@@ -61,6 +65,7 @@
+ 
+     public boolean stop() {
+         if (serverThread.isRunning) {
++            counter = null;
+             serverThread.isRunning = false;
+             try {
+                 cdLatch = new CountDownLatch(1);
+@@ -72,6 +77,13 @@
+         return true;
+     }
+ 
++    public int getMessageCount(String service, String operation) {
++        if (counter != null) {
++            return counter.getCount(service, operation);
++        }
++        return -1;
++    }
++
+     class BackEndServerThread extends Thread {
+ 
+         public boolean isRunning = false;
+@@ -126,6 +138,17 @@
+                     clusteringAgent.init();
+                 }
+ 
++                if (configuration.isCounterEnabled()) {
++                    log.info("Engaging server side message counter");
++                    List<Phase> phases = configContext.getAxisConfiguration().getInFlowPhases();
++                    for (Phase phase : phases) {
++                        if (PhaseMetadata.PHASE_DISPATCH.equals(phase.getName())) {
++                            counter = new MessageCounter();
++                            phase.addHandler(counter);
++                            break;
++                        }
++                    }
++                }
+ 
+                 listenerManager.startSystem(configContext);
+                 isRunning = true;
+@@ -135,7 +158,7 @@
+             }
+             cdLatch.countDown();
+ 
+-            log.info("ServerThread: Wait until test are finished");
++            log.info("ServerThread: Wait until tests are finished");
+             while (isRunning) {
+                 //wait
+                 try {
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1505499)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1505500)
+@@ -22,6 +22,7 @@
+ import junit.framework.TestSuite;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.samples.framework.tests.Sample250;
+ import org.apache.synapse.samples.framework.tests.advanced.*;
+ import org.apache.synapse.samples.framework.tests.endpoint.*;
+ import org.apache.synapse.samples.framework.tests.message.*;
+@@ -203,6 +204,9 @@
+         sampleClassRepo.put("156", Sample156.class);
+         sampleClassRepo.put("157", Sample157.class);
+ 
++        //Transport switching
++        sampleClassRepo.put("250", Sample250.class);
++
+         //Advanced
+         sampleClassRepo.put("350", Sample350.class);
+         sampleClassRepo.put("351", Sample351.class);
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java	(revision 1505499)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java	(revision 1505500)
+@@ -356,6 +356,8 @@
+                     SampleConfigConstants.TAG_BE_SERVER_CONF_AXIS2_HTTP_PORT);
+             String axis2HttpsPort = axis2Properties.getProperty(
+                     SampleConfigConstants.TAG_BE_SERVER_CONF_AXIS2_HTTPS_PORT);
++            String counterEnabled = axis2Properties.getProperty(
++                    SampleConfigConstants.TAG_BE_SERVER_CONF_AXIS2_COUNTER_ENABLED);
+ 
+             configuration.getAxis2Config(serverName).setServerName(serverName);
+ 
+@@ -377,6 +379,9 @@
+ 
+             configuration.getAxis2Config(serverName).setHttpPort(axis2HttpPort);
+             configuration.getAxis2Config(serverName).setHttpsPort(axis2HttpsPort);
++            if (Boolean.parseBoolean(counterEnabled)) {
++                configuration.getAxis2Config(serverName).setCounterEnabled(true);
++            }
+ 
+             backendServerControllers.add(new Axis2BackEndServerController(serverName,
+                     configuration.getAxis2Config(serverName)));
 Index: java/modules/integration/src/test/resources/sample250.xml
 ===================================================================
 --- java/modules/integration/src/test/resources/sample250.xml	(nonexistent)

@@ -1,0 +1,50 @@
+{
+  "when": "2016-06-07T21:32:59-04:00", 
+  "message": "applying patch by prabath to fix SYNAPSE-1042", 
+  "who": "isudana", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-39,6 +39,7", 
+          "lines": [
+            " import org.apache.synapse.mediators.base.SequenceMediator;\r\n", 
+            " import org.apache.synapse.task.Task;\r\n", 
+            " import org.apache.synapse.util.PayloadHelper;\r\n", 
+            "+import org.apache.axiom.util.UIDGenerator;\r\n", 
+            " \r\n", 
+            " /**\r\n", 
+            "  * Injects a Message into a named sequence or a proxy service configured in the Synapse\r\n"
+          ]
+        }, 
+        {
+          "locn": "-209,6 +210,7", 
+          "lines": [
+            "             axis2MsgCtx.setConfigurationContext(configurationContext);\r\n", 
+            "             axis2MsgCtx.setIncomingTransportName(Constants.TRANSPORT_LOCAL);\r\n", 
+            "             axis2MsgCtx.setServerSide(true);\r\n", 
+            "+            axis2MsgCtx.setMessageID(UIDGenerator.generateURNString());\r\n", 
+            " \r\n", 
+            "             try {\r\n", 
+            "                 AxisService axisService = configurationContext.getAxisConfiguration().\r\n"
+          ]
+        }, 
+        {
+          "locn": "-266,6 +268,7", 
+          "lines": [
+            " \r\n", 
+            "         } else {\r\n", 
+            "             MessageContext mc = synapseEnvironment.createMessageContext();\r\n", 
+            "+            mc.setMessageID(UIDGenerator.generateURNString());\r\n", 
+            "             mc.pushFaultHandler(new MediatorFaultHandler(mc.getFaultSequence()));\r\n", 
+            "             if (to != null) {\r\n", 
+            "                 mc.setTo(new EndpointReference(to));\r\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/startup/tasks/MessageInjector.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/startup/tasks/MessageInjector.java"
+    }
+  ], 
+  "id": "1747332"
+}

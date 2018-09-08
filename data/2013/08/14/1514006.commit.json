@@ -1,0 +1,90 @@
+{
+  "when": "2013-08-14T14:55:05-04:00", 
+  "message": "Documentation update", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-982,15 +982,16", 
+          "lines": [
+            "             <subsection name=\"Guidelines for Using Advanced Settings\" id=\"AdvancedGuidelines\">\n", 
+            "                 <p>\n", 
+            "                     Note that all the above settings are optional. In fact the entire passthru-http.properties\n", 
+            "-                    file is optional. Synapse is programmed with some reasonable default values (also\n", 
+            "-                    given in the table) for each of the above settings. However, it is highly\n", 
+            "-                    recommended to tweak the above values to obtain best performance from the\n", 
+            "-                    Pass Through HTTP transport. At least, consider tuning the worker_pool_size_core\n", 
+            "-                    and worker_pool_size_max to match the expected load in your deployment.\n", 
+            "+                    file is optional. Synapse is programmed with some reasonable default values for\n", 
+            "+                    each of the above settings, and these defaults will deliver good performance in\n", 
+            "+                    most scenarios. However, to obtain 'best' performance from the Pass Through HTTP\n", 
+            "+                    transport, it is recommended to tweak the above values. At least, consider tuning\n", 
+            "+                    the worker_pool_size_core and worker_pool_size_max to match the expected load in\n", 
+            "+                    your deployment.\n", 
+            "                 </p>\n", 
+            "                 <p>\n", 
+            "                     You might be tempted to configure the transport with a very large thread pool\n", 
+            "-                    (e.g. 1000's of threads). But bare in mind that more threads equals more memory\n", 
+            "+                    (e.g. 1000's of threads). But bare in mind that more threads equal more memory\n", 
+            "                     usage. Also, on some operating systems there are restrictions on the number of\n", 
+            "                     threads that can be spawned by an application. Therefore, do not attempt to set\n", 
+            "                     the thread pool size to an unnecessarily large value. Do a rough estimate of your\n"
+          ]
+        }, 
+        {
+          "locn": "-1002,9 +1003,9", 
+          "lines": [
+            "                 </p>\n", 
+            "                 <p>\n", 
+            "                     It is highly recommended to run some load tests on Synapse using your own mediation\n", 
+            "-                    (sequence/proxy/API) configurations on the actual production hardware. This will\n", 
+            "-                    give you a much clear idea of what transport level properties need to be tuned up\n", 
+            "-                    in your deployment.\n", 
+            "+                    configurations (sequences, proxy services etc.) on the actual production hardware.\n", 
+            "+                    This will give you a much clear idea about what transport level properties need to\n", 
+            "+                    be tuned up in your deployment.\n", 
+            "                 </p>\n", 
+            "             </subsection>\n", 
+            "             <subsection name=\"Unix/Linux Specific Settings\" id=\"LinuxSettings\">\n"
+          ]
+        }, 
+        {
+          "locn": "-1012,7 +1013,7", 
+          "lines": [
+            "                     Users deploying Synapse on Unix/Linux systems are further advised to set the\n", 
+            "                     following OS level configuration parameters. This is completely optional, but\n", 
+            "                     for high-throughput and high-volume deployments, configuring these parameters\n", 
+            "-                    may be crucial.\n", 
+            "+                    may prove to be useful.\n", 
+            "                 </p>\n", 
+            "                 <ul>\n", 
+            "                     <li>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/documentation/src/site/xdoc/userguide/transports/pass_through.xml", 
+      "from": "java/modules/documentation/src/site/xdoc/userguide/transports/pass_through.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-78,7 +78,7", 
+          "lines": [
+            "         Thread.sleep(5000);\n", 
+            "         XMLAssert.assertXMLEqual(TEXT_1, reg.getResource(prop, new Properties()).toString());\n", 
+            " \n", 
+            "-        // the renewed cache should be valid for another 5 secs\n", 
+            "+        // the renewed cache should be valid for another 3 secs\n", 
+            "         // change the file now and change next cache duration\n", 
+            "         writeToFile(TEXT_2);\n", 
+            "         props.put(\"cachableDuration\", \"100\");\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/test/java/org/apache/synapse/registry/url/SimpleURLRegistryTest.java", 
+      "from": "java/modules/core/src/test/java/org/apache/synapse/registry/url/SimpleURLRegistryTest.java"
+    }
+  ], 
+  "id": "1514006"
+}

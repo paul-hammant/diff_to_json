@@ -1,0 +1,311 @@
+{
+  "when": "2013-07-14T19:06:26-04:00", 
+  "message": "Adding sample 800 (REST APIs) to the integration test suite. Updated sample 150 (proxy services) to check for the WSDL of the proxy service.", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-0,0 +1,19", 
+          "lines": [
+            "+<synapseSample>\n", 
+            "+    <sampleID>800</sampleID>\n", 
+            "+    <sampleName>Introduction to REST APIs</sampleName>\n", 
+            "+    <synapseConfig>\n", 
+            "+        <!--if we don't specify the optional values, framework will use defaults-->\n", 
+            "+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>\n", 
+            "+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>\n", 
+            "+        <synapseXml>repository/conf/sample/synapse_sample_800.xml</synapseXml>\n", 
+            "+    </synapseConfig>\n", 
+            "+    <backEndServerConfig>\n", 
+            "+        <axis2Server id='0'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+        </axis2Server>\n", 
+            "+    </backEndServerConfig>\n", 
+            "+    <clientConfig>\n", 
+            "+        <clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>\n", 
+            "+    </clientConfig>\n", 
+            "+</synapseSample>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/resources/sample800.xml", 
+      "from": "java/modules/integration/src/test/resources/sample800.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-28,6 +28,7", 
+          "lines": [
+            " import org.apache.synapse.samples.framework.tests.proxy.*;\n", 
+            " import org.apache.synapse.samples.framework.tests.qos.Sample100;\n", 
+            " import org.apache.synapse.samples.framework.tests.qos.Sample101;\n", 
+            "+import org.apache.synapse.samples.framework.tests.rest.Sample800;\n", 
+            " \n", 
+            " import java.util.ArrayList;\n", 
+            " import java.util.HashMap;\n"
+          ]
+        }, 
+        {
+          "locn": "-138,7 +139,7", 
+          "lines": [
+            "             }\n", 
+            "         } else {\n", 
+            "             suiteName = \"AllSamplesSuite\";\n", 
+            "-            for (int i = 0; i <= 600; i++) {\n", 
+            "+            for (int i = 0; i <= 1000; i++) {\n", 
+            "                 Class testClass = (Class) sampleClassRepo.get(Integer.toString(i));\n", 
+            "                 if (testClass != null) {\n", 
+            "                     suiteClassesList.add(testClass);\n"
+          ]
+        }, 
+        {
+          "locn": "-222,5 +223,7", 
+          "lines": [
+            "         sampleClassRepo.put(\"451\", Sample451.class);\n", 
+            "         sampleClassRepo.put(\"452\", Sample452.class);\n", 
+            "         sampleClassRepo.put(\"460\", Sample460.class);\n", 
+            "+\n", 
+            "+        sampleClassRepo.put(\"800\", Sample800.class);\n", 
+            "     }\n", 
+            " }\n", 
+            "\\ No newline at end of file\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java", 
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-0,0 +1,64", 
+          "lines": [
+            "+package org.apache.synapse.samples.framework.clients;\n", 
+            "+\n", 
+            "+import org.apache.axiom.om.OMElement;\n", 
+            "+import org.apache.axiom.om.OMXMLBuilderFactory;\n", 
+            "+import org.apache.axiom.om.OMXMLParserWrapper;\n", 
+            "+import org.apache.http.Header;\n", 
+            "+import org.apache.http.HttpEntity;\n", 
+            "+\n", 
+            "+import java.io.ByteArrayInputStream;\n", 
+            "+import java.io.ByteArrayOutputStream;\n", 
+            "+import java.io.IOException;\n", 
+            "+import java.io.InputStream;\n", 
+            "+import java.util.HashMap;\n", 
+            "+import java.util.Map;\n", 
+            "+\n", 
+            "+public class HttpResponse {\n", 
+            "+\n", 
+            "+    private int status;\n", 
+            "+    private Map<String,String> headers = new HashMap<String, String>();\n", 
+            "+    private byte[] body;\n", 
+            "+\n", 
+            "+    public HttpResponse(org.apache.http.HttpResponse response) throws IOException {\n", 
+            "+        this.status = response.getStatusLine().getStatusCode();\n", 
+            "+        Header[] headers = response.getAllHeaders();\n", 
+            "+        for (Header header : headers) {\n", 
+            "+            this.headers.put(header.getName(), header.getValue());\n", 
+            "+        }\n", 
+            "+        HttpEntity entity = response.getEntity();\n", 
+            "+        if (entity != null) {\n", 
+            "+            InputStream in = entity.getContent();\n", 
+            "+            byte[] data = new byte[1024];\n", 
+            "+            ByteArrayOutputStream out = new ByteArrayOutputStream();\n", 
+            "+            int len;\n", 
+            "+            while ((len = in.read(data)) != -1) {\n", 
+            "+                out.write(data, 0, len);\n", 
+            "+            }\n", 
+            "+            this.body = out.toByteArray();\n", 
+            "+            out.close();\n", 
+            "+            in.close();\n", 
+            "+        }\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public int getStatus() {\n", 
+            "+        return status;\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public Map<String, String> getHeaders() {\n", 
+            "+        return headers;\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public byte[] getBody() {\n", 
+            "+        return body;\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public OMElement getBodyAsXML() {\n", 
+            "+        OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(\n", 
+            "+                new ByteArrayInputStream(this.body));\n", 
+            "+        return builder.getDocumentElement();\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public String getBodyAsString() {\n", 
+            "+        return new String(this.body);\n", 
+            "+    }\n", 
+            "+}\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/HttpResponse.java", 
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/HttpResponse.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-0,0 +1,38", 
+          "lines": [
+            "+package org.apache.synapse.samples.framework.clients;\n", 
+            "+\n", 
+            "+import org.apache.http.HttpEntity;\n", 
+            "+import org.apache.http.client.HttpClient;\n", 
+            "+import org.apache.http.client.methods.HttpGet;\n", 
+            "+import org.apache.http.client.methods.HttpPost;\n", 
+            "+import org.apache.http.entity.BasicHttpEntity;\n", 
+            "+import org.apache.http.impl.client.DefaultHttpClient;\n", 
+            "+\n", 
+            "+import java.io.ByteArrayInputStream;\n", 
+            "+\n", 
+            "+public class BasicHttpClient {\n", 
+            "+\n", 
+            "+    public HttpResponse doGet(String url) throws Exception {\n", 
+            "+        HttpClient client = new DefaultHttpClient();\n", 
+            "+        try {\n", 
+            "+            HttpGet get = new HttpGet(url);\n", 
+            "+            return new HttpResponse(client.execute(get));\n", 
+            "+        } finally {\n", 
+            "+            client.getConnectionManager().shutdown();\n", 
+            "+        }\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public HttpResponse doPost(String url, byte[] payload, String contentType) throws Exception {\n", 
+            "+        HttpClient client = new DefaultHttpClient();\n", 
+            "+        try {\n", 
+            "+            HttpPost post = new HttpPost(url);\n", 
+            "+            BasicHttpEntity entity = new BasicHttpEntity();\n", 
+            "+            entity.setContentType(contentType);\n", 
+            "+            entity.setContent(new ByteArrayInputStream(payload));\n", 
+            "+            post.setEntity(entity);\n", 
+            "+            return new HttpResponse(client.execute(post));\n", 
+            "+        } finally {\n", 
+            "+            client.getConnectionManager().shutdown();\n", 
+            "+        }\n", 
+            "+    }\n", 
+            "+\n", 
+            "+}\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/BasicHttpClient.java", 
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/BasicHttpClient.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-0,0 +1,40", 
+          "lines": [
+            "+package org.apache.synapse.samples.framework.tests.rest;\n", 
+            "+\n", 
+            "+import org.apache.axiom.om.OMElement;\n", 
+            "+import org.apache.commons.logging.Log;\n", 
+            "+import org.apache.commons.logging.LogFactory;\n", 
+            "+import org.apache.http.HttpStatus;\n", 
+            "+import org.apache.synapse.samples.framework.SynapseTestCase;\n", 
+            "+import org.apache.synapse.samples.framework.clients.BasicHttpClient;\n", 
+            "+import org.apache.synapse.samples.framework.clients.HttpResponse;\n", 
+            "+\n", 
+            "+public class Sample800 extends SynapseTestCase {\n", 
+            "+\n", 
+            "+    private static final Log log = LogFactory.getLog(Sample800.class);\n", 
+            "+\n", 
+            "+    public Sample800() {\n", 
+            "+        super(800);\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public void testGetQuote() throws Exception {\n", 
+            "+        BasicHttpClient client = new BasicHttpClient();\n", 
+            "+        HttpResponse response = client.doGet(\"http://127.0.0.1:8280/stockquote/view/IBM\");\n", 
+            "+        assertEquals(response.getStatus(), HttpStatus.SC_OK);\n", 
+            "+        OMElement body = response.getBodyAsXML();\n", 
+            "+        assertEquals(body.getLocalName(), \"getQuoteResponse\");\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public void testPlaceOrder() throws Exception {\n", 
+            "+        BasicHttpClient client = new BasicHttpClient();\n", 
+            "+        String payload = \"<placeOrder xmlns=\\\"http://services.samples\\\">\\n\" +\n", 
+            "+                \"  <order>\\n\" +\n", 
+            "+                \"     <price>50</price>\\n\" +\n", 
+            "+                \"     <quantity>10</quantity>\\n\" +\n", 
+            "+                \"     <symbol>IBM</symbol>\\n\" +\n", 
+            "+                \"  </order>\\n\" +\n", 
+            "+                \"</placeOrder>\";\n", 
+            "+        HttpResponse response = client.doPost(\"http://127.0.0.1:8280/stockquote/order\",\n", 
+            "+                payload.getBytes(), \"application/xml\");\n", 
+            "+        assertEquals(response.getStatus(), HttpStatus.SC_ACCEPTED);\n", 
+            "+    }\n", 
+            "+}\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/rest/Sample800.java", 
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/rest/Sample800.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-18,10 +18,14", 
+          "lines": [
+            "  */\n", 
+            " package org.apache.synapse.samples.framework.tests.proxy;\n", 
+            " \n", 
+            "+import org.apache.axiom.om.OMElement;\n", 
+            " import org.apache.commons.logging.Log;\n", 
+            " import org.apache.commons.logging.LogFactory;\n", 
+            "+import org.apache.http.HttpStatus;\n", 
+            " import org.apache.synapse.samples.framework.SampleClientResult;\n", 
+            " import org.apache.synapse.samples.framework.SynapseTestCase;\n", 
+            "+import org.apache.synapse.samples.framework.clients.BasicHttpClient;\n", 
+            "+import org.apache.synapse.samples.framework.clients.HttpResponse;\n", 
+            " import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;\n", 
+            " \n", 
+            " public class Sample150 extends SynapseTestCase {\n"
+          ]
+        }, 
+        {
+          "locn": "-35,7 +39,6", 
+          "lines": [
+            "         client = getStockQuoteClient();\n", 
+            "     }\n", 
+            " \n", 
+            "-\n", 
+            "     public void testBasicProxy() {\n", 
+            "         String addUrl = \"http://localhost:8280/services/StockQuoteProxy\";\n", 
+            "         log.info(\"Running test: Introduction to proxy services\");\n"
+          ]
+        }, 
+        {
+          "locn": "-43,4 +46,12", 
+          "lines": [
+            "         assertTrue(\"Client did not get run successfully \", result.responseReceived());\n", 
+            "     }\n", 
+            " \n", 
+            "+    public void testProxyWSDL() throws Exception {\n", 
+            "+        BasicHttpClient client = new BasicHttpClient();\n", 
+            "+        HttpResponse response = client.doGet(\"http://localhost:8280/services/StockQuoteProxy?wsdl\");\n", 
+            "+        assertEquals(response.getStatus(), HttpStatus.SC_OK);\n", 
+            "+        OMElement element = response.getBodyAsXML();\n", 
+            "+        assertEquals(element.getLocalName(), \"definitions\");\n", 
+            "+    }\n", 
+            "+\n", 
+            " }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample150.java", 
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample150.java"
+    }
+  ], 
+  "id": "1503079"
+}

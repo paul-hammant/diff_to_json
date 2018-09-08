@@ -1,0 +1,367 @@
+{
+  "when": "2016-05-29T20:35:51-04:00", 
+  "message": "Implemented support for echoing HTTP headers in the Echo Http server; Implemented Sample10101 to test the impact of the DISABLE_CHUNKING property in the HTTP transport", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-0,0 +1,29", 
+          "lines": [
+            "+<syn:definitions xmlns:syn=\"http://ws.apache.org/ns/synapse\">\n", 
+            "+    <syn:api name=\"TestAPI\" context=\"/test\">\n", 
+            "+        <syn:resource methods=\"POST\" url-mapping=\"/content_length\">\n", 
+            "+            <syn:inSequence>\n", 
+            "+                <syn:property name=\"DISABLE_CHUNKING\" value=\"true\" scope=\"axis2\"/>\n", 
+            "+                <syn:send>\n", 
+            "+                    <syn:endpoint>\n", 
+            "+                        <syn:address uri=\"http://localhost:9000/services/EchoService\"/>\n", 
+            "+                    </syn:endpoint>\n", 
+            "+                </syn:send>\n", 
+            "+            </syn:inSequence>\n", 
+            "+            <syn:outSequence>\n", 
+            "+                <syn:send/>\n", 
+            "+            </syn:outSequence>\n", 
+            "+        </syn:resource>\n", 
+            "+        <syn:resource methods=\"POST\" url-mapping=\"/chunked\">\n", 
+            "+            <syn:inSequence>\n", 
+            "+                <syn:send>\n", 
+            "+                    <syn:endpoint>\n", 
+            "+                        <syn:address uri=\"http://localhost:9000/services/EchoService\"/>\n", 
+            "+                    </syn:endpoint>\n", 
+            "+                </syn:send>\n", 
+            "+            </syn:inSequence>\n", 
+            "+            <syn:outSequence>\n", 
+            "+                <syn:send/>\n", 
+            "+            </syn:outSequence>\n", 
+            "+        </syn:resource>\n", 
+            "+    </syn:api>\n", 
+            "+</syn:definitions>\n", 
+            "\\ No newline at end of file\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/resources/extras/synapse_sample_10101.xml", 
+      "from": "java/modules/integration/src/test/resources/extras/synapse_sample_10101.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-0,0 +1,18", 
+          "lines": [
+            "+<synapseSample>\n", 
+            "+    <sampleID>10101</sampleID>\n", 
+            "+    <sampleName>Pass Through Transport Chunked Encoding Support</sampleName>\n", 
+            "+    <synapseConfig>\n", 
+            "+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>\n", 
+            "+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>\n", 
+            "+        <synapseXml>modules/integration/src/test/resources/extras/synapse_sample_10101.xml</synapseXml>\n", 
+            "+    </synapseConfig>\n", 
+            "+    <backEndServerConfig>\n", 
+            "+        <echoServer id=\"0\">\n", 
+            "+            <httpPort>9000</httpPort>\n", 
+            "+            <echoHeaders>true</echoHeaders>\n", 
+            "+        </echoServer>\n", 
+            "+    </backEndServerConfig>\n", 
+            "+    <clientConfig>\n", 
+            "+        <clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>\n", 
+            "+    </clientConfig>\n", 
+            "+</synapseSample>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/resources/sample10101.xml", 
+      "from": "java/modules/integration/src/test/resources/sample10101.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-25,6 +25,7", 
+          "lines": [
+            " import org.apache.synapse.samples.framework.tests.rest.Sample10002;\n", 
+            " import org.apache.synapse.samples.framework.tests.rest.Sample10003;\n", 
+            " import org.apache.synapse.samples.framework.tests.tasks.*;\n", 
+            "+import org.apache.synapse.samples.framework.tests.transport.Sample10101;\n", 
+            " import org.apache.synapse.samples.framework.tests.transport.Sample250;\n", 
+            " import org.apache.synapse.samples.framework.tests.advanced.*;\n", 
+            " import org.apache.synapse.samples.framework.tests.endpoint.*;\n"
+          ]
+        }, 
+        {
+          "locn": "-246,5 +247,7", 
+          "lines": [
+            "         sampleClassRepo.put(\"10001\", Sample10001.class);\n", 
+            "         sampleClassRepo.put(\"10002\", Sample10002.class);\n", 
+            "         sampleClassRepo.put(\"10003\", Sample10003.class);\n", 
+            "+\n", 
+            "+        sampleClassRepo.put(\"10101\", Sample10101.class);\n", 
+            "     }\n", 
+            " }\n", 
+            "\\ No newline at end of file\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java", 
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-29,8 +29,7", 
+          "lines": [
+            " import java.io.ByteArrayOutputStream;\n", 
+            " import java.io.IOException;\n", 
+            " import java.io.InputStream;\n", 
+            "-import java.util.HashMap;\n", 
+            "-import java.util.Map;\n", 
+            "+import java.util.*;\n", 
+            " \n", 
+            " public class HttpResponse {\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-80,4 +79,21", 
+          "lines": [
+            "     public String getBodyAsString() {\n", 
+            "         return new String(this.body);\n", 
+            "     }\n", 
+            "+\n", 
+            "+    public Map<String,List<String>> getBodyAsMap() {\n", 
+            "+        String body = getBodyAsString();\n", 
+            "+        Map<String,List<String>> map = new HashMap<String,List<String>>();\n", 
+            "+        for (String line : body.split(\"\\n\")) {\n", 
+            "+            int index = line.indexOf(':');\n", 
+            "+            String key = line.substring(0, index).trim();\n", 
+            "+            String value = line.substring(index + 1).trim();\n", 
+            "+            List<String> values = map.get(key);\n", 
+            "+            if (values == null) {\n", 
+            "+                values = new ArrayList<String>();\n", 
+            "+                map.put(key, values);\n", 
+            "+            }\n", 
+            "+            values.add(value);\n", 
+            "+        }\n", 
+            "+        return map;\n", 
+            "+    }\n", 
+            " }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/HttpResponse.java", 
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/HttpResponse.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-0,0 +1,43", 
+          "lines": [
+            "+package org.apache.synapse.samples.framework.tests.transport;\n", 
+            "+\n", 
+            "+import org.apache.http.HttpHeaders;\n", 
+            "+import org.apache.http.HttpStatus;\n", 
+            "+import org.apache.synapse.samples.framework.SynapseTestCase;\n", 
+            "+import org.apache.synapse.samples.framework.clients.BasicHttpClient;\n", 
+            "+import org.apache.synapse.samples.framework.clients.HttpResponse;\n", 
+            "+\n", 
+            "+import java.util.List;\n", 
+            "+import java.util.Map;\n", 
+            "+\n", 
+            "+public class Sample10101 extends SynapseTestCase {\n", 
+            "+\n", 
+            "+    public static final byte[] TEST_PAYLOAD = \"<test>foo</test>\".getBytes();\n", 
+            "+\n", 
+            "+    public Sample10101() {\n", 
+            "+        super(10101);\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public void testChunking() throws Exception {\n", 
+            "+        BasicHttpClient client = new BasicHttpClient();\n", 
+            "+        HttpResponse response = client.doPost(\"http://127.0.0.1:8280/test/chunked\",\n", 
+            "+                TEST_PAYLOAD, \"application/xml\");\n", 
+            "+        assertEquals(HttpStatus.SC_OK, response.getStatus());\n", 
+            "+        Map<String,List<String>> headers = response.getBodyAsMap();\n", 
+            "+        assertTrue(headers.containsKey(HttpHeaders.TRANSFER_ENCODING));\n", 
+            "+        assertFalse(headers.containsKey(HttpHeaders.CONTENT_LENGTH));\n", 
+            "+        assertEquals(\"chunked\", headers.get(HttpHeaders.TRANSFER_ENCODING).get(0));\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public void testDisableChunking() throws Exception {\n", 
+            "+        BasicHttpClient client = new BasicHttpClient();\n", 
+            "+        HttpResponse response = client.doPost(\"http://127.0.0.1:8280/test/content_length\",\n", 
+            "+                TEST_PAYLOAD, \"application/xml\");\n", 
+            "+        assertEquals(HttpStatus.SC_OK, response.getStatus());\n", 
+            "+        Map<String,List<String>> headers = response.getBodyAsMap();\n", 
+            "+        assertFalse(headers.containsKey(HttpHeaders.TRANSFER_ENCODING));\n", 
+            "+        assertTrue(headers.containsKey(HttpHeaders.CONTENT_LENGTH));\n", 
+            "+        assertEquals(TEST_PAYLOAD.length, Integer.parseInt(headers.get(\n", 
+            "+                HttpHeaders.CONTENT_LENGTH).get(0)));\n", 
+            "+    }\n", 
+            "+\n", 
+            "+}\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/transport/Sample10101.java", 
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/transport/Sample10101.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-48,7 +48,8", 
+          "lines": [
+            "     public static final String TAG_BE_SERVER_CONF_AXIS2_HTTPS_PORT = \"httpsPort\";\n", 
+            "     public static final String TAG_BE_SERVER_CONF_AXIS2_COUNTER_ENABLED = \"counterEnabled\";\n", 
+            " \n", 
+            "-    public static final String TAG_BE_SERVER_CONF_ECHO_HTTP_PORT = \"port\";\n", 
+            "+    public static final String TAG_BE_SERVER_CONF_ECHO_HTTP_PORT = \"httpPort\";\n", 
+            "+    public static final String TAG_BE_SERVER_CONF_ECHO_HEADERS = \"echoHeaders\";\n", 
+            " \n", 
+            "     public static final String TAG_BE_SERVER_CONF_DERBY_PORT = \"dbPort\";\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/SampleConfigConstants.java", 
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/SampleConfigConstants.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-25,6 +25,7", 
+          "lines": [
+            " import org.apache.http.*;\n", 
+            " import org.apache.http.entity.ByteArrayEntity;\n", 
+            " import org.apache.http.entity.ContentType;\n", 
+            "+import org.apache.http.entity.StringEntity;\n", 
+            " import org.apache.http.impl.DefaultBHttpServerConnection;\n", 
+            " import org.apache.http.impl.DefaultBHttpServerConnectionFactory;\n", 
+            " import org.apache.http.protocol.*;\n"
+          ]
+        }, 
+        {
+          "locn": "-38,22 +39,29", 
+          "lines": [
+            " import java.net.Socket;\n", 
+            " import java.util.concurrent.atomic.AtomicInteger;\n", 
+            " \n", 
+            "+/**\n", 
+            "+ * A simple HTTP server implementation which is capable of echoing back the body\n", 
+            "+ * or the headers of an HTTP request.\n", 
+            "+ */\n", 
+            " public class EchoHttpServerController extends AbstractBackEndServerController {\n", 
+            " \n", 
+            "     private static final Log log = LogFactory.getLog(EchoHttpServerController.class);\n", 
+            " \n", 
+            "-    private int port;\n", 
+            "+    private final int port;\n", 
+            "+    private final boolean echoHeaders;\n", 
+            "     private RequestListenerThread requestListener;\n", 
+            " \n", 
+            "     public EchoHttpServerController(OMElement element) {\n", 
+            "         super(element);\n", 
+            "         port = Integer.parseInt(SynapseTestUtils.getParameter(element,\n", 
+            "-                SampleConfigConstants.TAG_BE_SERVER_CONF_AXIS2_HTTP_PORT, \"9000\"));\n", 
+            "+                SampleConfigConstants.TAG_BE_SERVER_CONF_ECHO_HTTP_PORT, \"9000\"));\n", 
+            "+        echoHeaders = Boolean.parseBoolean(SynapseTestUtils.getParameter(element,\n", 
+            "+                SampleConfigConstants.TAG_BE_SERVER_CONF_ECHO_HEADERS, \"false\"));\n", 
+            "     }\n", 
+            " \n", 
+            "     public boolean startProcess() {\n", 
+            "         try {\n", 
+            "-            requestListener = new RequestListenerThread(port);\n", 
+            "+            requestListener = new RequestListenerThread(port, echoHeaders);\n", 
+            "             requestListener.start();\n", 
+            "             return true;\n", 
+            "         } catch (IOException e) {\n"
+          ]
+        }, 
+        {
+          "locn": "-70,6 +78,12", 
+          "lines": [
+            " \n", 
+            "     static class EchoHttpHandler implements HttpRequestHandler {\n", 
+            " \n", 
+            "+        private final boolean echoHeaders;\n", 
+            "+\n", 
+            "+        EchoHttpHandler(boolean echoHeaders) {\n", 
+            "+            this.echoHeaders = echoHeaders;\n", 
+            "+        }\n", 
+            "+\n", 
+            "         public void handle(HttpRequest request, HttpResponse response,\n", 
+            "                            HttpContext context) throws HttpException, IOException {\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-76,17 +90,27", 
+          "lines": [
+            "             if (log.isDebugEnabled()) {\n", 
+            "                 log.debug(request.getRequestLine().toString());\n", 
+            "             }\n", 
+            "-            if (request instanceof HttpEntityEnclosingRequest) {\n", 
+            "-                HttpEntity entity = ((HttpEntityEnclosingRequest) request).getEntity();\n", 
+            "-                byte[] entityContent = EntityUtils.toByteArray(entity);\n", 
+            "-                if (log.isDebugEnabled()) {\n", 
+            "-                \tlog.debug(\"Request entity read; size=\" + entityContent.length);\n", 
+            "+\n", 
+            "+            if (echoHeaders) {\n", 
+            "+                StringBuilder body = new StringBuilder();\n", 
+            "+                for (Header header : request.getAllHeaders()) {\n", 
+            "+                    body.append(header.getName()).append(\": \").append(header.getValue()).append(\"\\n\");\n", 
+            "                 }\n", 
+            "                 response.setStatusCode(HttpStatus.SC_OK);\n", 
+            "-                response.setEntity(new ByteArrayEntity(entityContent,\n", 
+            "-                        ContentType.create(entity.getContentType().getValue())));\n", 
+            "+                response.setEntity(new StringEntity(body.toString(), ContentType.TEXT_PLAIN));\n", 
+            "             } else {\n", 
+            "-                response.setStatusCode(HttpStatus.SC_NO_CONTENT);\n", 
+            "+                if (request instanceof HttpEntityEnclosingRequest) {\n", 
+            "+                    HttpEntity entity = ((HttpEntityEnclosingRequest) request).getEntity();\n", 
+            "+                    byte[] entityContent = EntityUtils.toByteArray(entity);\n", 
+            "+                    if (log.isDebugEnabled()) {\n", 
+            "+                        log.debug(\"Request entity read; size=\" + entityContent.length);\n", 
+            "+                    }\n", 
+            "+                    response.setStatusCode(HttpStatus.SC_OK);\n", 
+            "+                    response.setEntity(new ByteArrayEntity(entityContent,\n", 
+            "+                            ContentType.create(entity.getContentType().getValue())));\n", 
+            "+                } else {\n", 
+            "+                    response.setStatusCode(HttpStatus.SC_NO_CONTENT);\n", 
+            "+                }\n", 
+            "             }\n", 
+            "         }\n", 
+            "     }\n"
+          ]
+        }, 
+        {
+          "locn": "-97,7 +121,7", 
+          "lines": [
+            "         private final ServerSocket serversocket;\n", 
+            "         private final HttpService httpService;\n", 
+            " \n", 
+            "-        public RequestListenerThread(final int port) throws IOException {\n", 
+            "+        public RequestListenerThread(final int port, final boolean echoHeaders) throws IOException {\n", 
+            "             this.connFactory = DefaultBHttpServerConnectionFactory.INSTANCE;\n", 
+            "             this.serversocket = new ServerSocket();\n", 
+            "             this.serversocket.setReuseAddress(true);\n"
+          ]
+        }, 
+        {
+          "locn": "-112,7 +136,7", 
+          "lines": [
+            " \n", 
+            "             // Set up request handlers\n", 
+            "             UriHttpRequestHandlerMapper registry = new UriHttpRequestHandlerMapper();\n", 
+            "-            registry.register(\"*\", new EchoHttpHandler());\n", 
+            "+            registry.register(\"*\", new EchoHttpHandler(echoHeaders));\n", 
+            " \n", 
+            "             // Set up the HTTP service\n", 
+            "             this.httpService = new HttpService(httpProcessor, registry);\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/EchoHttpServerController.java", 
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/EchoHttpServerController.java"
+    }
+  ], 
+  "id": "1746069"
+}

@@ -111,35 +111,6 @@ Index: java/modules/core/src/test/java/org/apache/synapse/config/xml/InvokeMedia
 +        assertTrue(serialization(inputXml, serializer));
 +    }
 +}
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/ValueFactory.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/ValueFactory.java	(revision 1510086)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/ValueFactory.java	(revision 1510087)
-@@ -69,7 +69,8 @@
-                 key = new Value(attributeValue);
-             }
-         } else {
--            handleException("The 'key' attribute is required for the XSLT mediator");
-+            handleException("The '" + name + "' attribute is required on the " +
-+                    elem.getLocalName() + " element");
-         }
-         return key;
-     }
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/InvokeMediatorFactory.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/InvokeMediatorFactory.java	(revision 1510086)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/InvokeMediatorFactory.java	(revision 1510087)
-@@ -71,9 +71,9 @@
-             OMElement child = (OMElement) subElements.next();
-             if (child.getQName().equals(WITH_PARAM_Q)) {
-                 OMAttribute paramNameAttr = child.getAttribute(ATT_NAME);
--                Value paramValue = new ValueFactory().createValue("value", child);
-                 if (paramNameAttr != null) {
-                     //set parameter value
-+                    Value paramValue = new ValueFactory().createValue("value", child);
-                     invoker.addExpressionForParamName(paramNameAttr.getAttributeValue(), paramValue);
-                 }
-             }
 Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MessageStoreMediatorFactory.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/config/xml/MessageStoreMediatorFactory.java	(revision 1510086)
@@ -170,6 +141,35 @@ Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MessageStor
              messageStoreMediator.setOnStoreSequence(sequenceAtt.getAttributeValue());
          }
  
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/ValueFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/ValueFactory.java	(revision 1510086)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/ValueFactory.java	(revision 1510087)
+@@ -69,7 +69,8 @@
+                 key = new Value(attributeValue);
+             }
+         } else {
+-            handleException("The 'key' attribute is required for the XSLT mediator");
++            handleException("The '" + name + "' attribute is required on the " +
++                    elem.getLocalName() + " element");
+         }
+         return key;
+     }
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/InvokeMediatorFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/InvokeMediatorFactory.java	(revision 1510086)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/InvokeMediatorFactory.java	(revision 1510087)
+@@ -71,9 +71,9 @@
+             OMElement child = (OMElement) subElements.next();
+             if (child.getQName().equals(WITH_PARAM_Q)) {
+                 OMAttribute paramNameAttr = child.getAttribute(ATT_NAME);
+-                Value paramValue = new ValueFactory().createValue("value", child);
+                 if (paramNameAttr != null) {
+                     //set parameter value
++                    Value paramValue = new ValueFactory().createValue("value", child);
+                     invoker.addExpressionForParamName(paramNameAttr.getAttributeValue(), paramValue);
+                 }
+             }
 Index: java/modules/core/src/main/java/org/apache/synapse/mediators/template/InvokeMediator.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/mediators/template/InvokeMediator.java	(revision 1510086)

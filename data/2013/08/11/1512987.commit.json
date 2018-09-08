@@ -1,0 +1,191 @@
+{
+  "when": "2013-08-11T14:47:16-04:00", 
+  "message": "Making it possible to send requests using the To header in the callout mediator. Patch applied from SYNAPSE-965", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-90,5 +90,18", 
+          "lines": [
+            "             assertTrue(serialization(inputXml, calloutMediatorSerializer));\n", 
+            "     }\n", 
+            " \n", 
+            "+    public void testCalloutMediatorSerializationScenarioFive() {\n", 
+            "+        String inputXml = \"<callout xmlns=\\\"http://ws.apache.org/ns/synapse\\\" \" +\n", 
+            "+                \"action=\\\"urn:getQuote\\\"><source xmlns:s11=\\\"http://schemas.xmlsoap.org/\" +\n", 
+            "+                \"soap/envelope/\\\" xmlns:s12=\\\"http://www.w3.org/2003/05/soap-envelope\\\" \" +\n", 
+            "+                \"xpath=\\\"s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]\\\"/>\" +\n", 
+            "+                \"<target xmlns:s11=\\\"http://schemas.xmlsoap.org/soap/envelope/\\\" \" +\n", 
+            "+                \"xmlns:s12=\\\"http://www.w3.org/2003/05/soap-envelope\\\" xpath=\\\"s11:Body/\" +\n", 
+            "+                \"child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]\\\"/>\" +\n", 
+            "+                \"<enableSec outboundPolicy=\\\"out_sec_policy\\\" inboundPolicy=\\\"in_sec_policy\\\"/></callout>\";\n", 
+            "+        assertTrue(serialization(inputXml, calloutMediatorFactory, calloutMediatorSerializer));\n", 
+            "+        assertTrue(serialization(inputXml, calloutMediatorSerializer));\n", 
+            "+    }\n", 
+            "+\n", 
+            " }\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/test/java/org/apache/synapse/config/xml/CalloutMediatorSerializationTest.java", 
+      "from": "java/modules/core/src/test/java/org/apache/synapse/config/xml/CalloutMediatorSerializationTest.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-44,7 +44,7", 
+          "lines": [
+            " import java.util.List;\n", 
+            " \n", 
+            " /**\n", 
+            "- * <callout serviceURL=\"string\" [action=\"string\"][passHeaders=\"true|false\"]>\n", 
+            "+ * <callout [serviceURL=\"string\"] [action=\"string\"][passHeaders=\"true|false\"]>\n", 
+            "  *      <configuration [axis2xml=\"string\"] [repository=\"string\"]/>?\n", 
+            "  *      <source xpath=\"expression\" | key=\"string\"> <!-- key can be a MC property or entry key -->\n", 
+            "  *      <target xpath=\"expression\" | key=\"string\"/>\n"
+          ]
+        }, 
+        {
+          "locn": "-109,7 +109,13", 
+          "lines": [
+            "                 sc.engageModule(SynapseConstants.SECURITY_MODULE_NAME);\n", 
+            "             }\n", 
+            " \n", 
+            "-            options.setTo(new EndpointReference(serviceURL));\n", 
+            "+            if (serviceURL != null) {\n", 
+            "+                options.setTo(new EndpointReference(serviceURL));\n", 
+            "+            } else if (synCtx.getTo() != null && synCtx.getTo().getAddress() != null) {\n", 
+            "+                options.setTo(new EndpointReference(synCtx.getTo().getAddress()));\n", 
+            "+            } else {\n", 
+            "+                handleException(\"Service URL or 'To' header is required\", synCtx);\n", 
+            "+            }\n", 
+            " \n", 
+            "             if (action != null) {\n", 
+            "                 options.setAction(action);\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/CalloutMediator.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/CalloutMediator.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-25,7 +25,7", 
+          "lines": [
+            " \n", 
+            " /**\n", 
+            "  * <pre>\n", 
+            "- * &lt;callout serviceURL=\"string\" [action=\"string\"][passHeaders=\"true|false\"]&gt;\n", 
+            "+ * &lt;callout [serviceURL=\"string\"] [action=\"string\"][passHeaders=\"true|false\"]&gt;\n", 
+            "  *      &lt;configuration [axis2xml=\"string\"] [repository=\"string\"]/&gt;?\n", 
+            "  *      &lt;source xpath=\"expression\" | key=\"string\"&gt;\n", 
+            "  *      &lt;target xpath=\"expression\" | key=\"string\"/&gt;\n"
+          ]
+        }, 
+        {
+          "locn": "-46,7 +46,9", 
+          "lines": [
+            "         OMElement callout = fac.createOMElement(\"callout\", synNS);\n", 
+            "         saveTracingState(callout, mediator);\n", 
+            " \n", 
+            "-        callout.addAttribute(fac.createOMAttribute(\"serviceURL\", nullNS, mediator.getServiceURL()));\n", 
+            "+        if (mediator.getServiceURL() != null) {\n", 
+            "+            callout.addAttribute(fac.createOMAttribute(\"serviceURL\", nullNS, mediator.getServiceURL()));\n", 
+            "+        }\n", 
+            "         if (mediator.getAction() != null) {\n", 
+            "             callout.addAttribute(fac.createOMAttribute(\"action\", nullNS, mediator.getAction()));\n", 
+            "         }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorSerializer.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorSerializer.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-34,12 +34,11", 
+          "lines": [
+            "  * Factory for {@link CalloutMediator} instances.\n", 
+            "  * \n", 
+            "  * <pre>\n", 
+            "- * &lt;callout serviceURL=\"string\" [action=\"string\"][passHeaders=\"true|false\"]&gt;\n", 
+            "+ * &lt;callout [serviceURL=\"string\"] [action=\"string\"][passHeaders=\"true|false\"]&gt;\n", 
+            "  *      &lt;configuration [axis2xml=\"string\"] [repository=\"string\"]/&gt;?\n", 
+            "  *      &lt;source xpath=\"expression\" | key=\"string\"&gt;\n", 
+            "  *      &lt;target xpath=\"expression\" | key=\"string\"/&gt;\n", 
+            "  *      &lt;enableSec policy=\"string\" | outboundPolicy=\"String\" | inboundPolicy=\"String\" /&gt;?\n", 
+            "- *      &lt;enableSec policy=\"string\" /&gt;?\n", 
+            "  * &lt;/callout&gt;\n", 
+            "  * </pre>\n", 
+            "  */\n"
+          ]
+        }, 
+        {
+          "locn": "-81,8 +80,6", 
+          "lines": [
+            " \n", 
+            "         if (attServiceURL != null) {\n", 
+            "             callout.setServiceURL(attServiceURL.getAttributeValue());\n", 
+            "-        } else {\n", 
+            "-            handleException(\"The 'serviceURL' attribute is required for the Callout mediator\");\n", 
+            "         }\n", 
+            " \n", 
+            "         if (attAction != null) {\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorFactory.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorFactory.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-812,10 +812,11", 
+          "lines": [
+            "                     current message, or the name of a key/property using which the response would be\n", 
+            "                     attached to the current message context as a property.\n", 
+            "                 </p>\n", 
+            "-                <div class=\"xmlConf\">&lt;callout serviceURL=\"string\" [action=\"string\"]&gt;\n", 
+            "+                <div class=\"xmlConf\">&lt;callout [serviceURL=\"string\"] [action=\"string\"]&gt;\n", 
+            "     &lt;configuration [axis2xml=\"string\"] [repository=\"string\"]/&gt;?\n", 
+            "     &lt;source xpath=\"expression\" | key=\"string\"&gt;\n", 
+            "     &lt;target xpath=\"expression\" | key=\"string\"/&gt;\n", 
+            "+    &lt;enableSec policy=\"string\" | outboundPolicy=\"String\" | inboundPolicy=\"String\" /&gt;?\n", 
+            " &lt;/callout&gt;</div>\n", 
+            "                 <p>\n", 
+            "                     Since the callout mediator performs a blocking call, it cannot use the default\n"
+          ]
+        }, 
+        {
+          "locn": "-826,9 +827,15", 
+          "lines": [
+            "                 </p>\n", 
+            "                 <p>\n", 
+            "                     To invoke secured services, Callout mediator can be configured to enable WS-Security\n", 
+            "-                    using the enableSec element. Security policy should be specified using the policy\n", 
+            "-                    attribute which may point to a registry key or a local entry.\n", 
+            "+                    using the enableSec element. Security policy should be specified using the 'policy'\n", 
+            "+                    attribute which may point to a registry key or a local entry. You can also specify\n", 
+            "+                    two different policies for inbound and outbound messages (flows). This is done by\n", 
+            "+                    using the 'inboundPolicy' and 'outboundPolicy' attributes.\n", 
+            "                 </p>\n", 
+            "+                <p>\n", 
+            "+                    When the 'serviceURL' attribute is not present, the 'To' header on the request\n", 
+            "+                    is used as the target endpoint.\n", 
+            "+                </p>\n", 
+            "             </subsection>\n", 
+            "             <subsection name=\"Clone Mediator\" id=\"Clone\">\n", 
+            "                 <p>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/documentation/src/site/xdoc/userguide/mediators.xml", 
+      "from": "java/modules/documentation/src/site/xdoc/userguide/mediators.xml"
+    }
+  ], 
+  "id": "1512987"
+}

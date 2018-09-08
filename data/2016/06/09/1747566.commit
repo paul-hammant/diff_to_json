@@ -1,0 +1,70 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/aspects/statistics/StatisticsLog.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/aspects/statistics/StatisticsLog.java	(revision 1747565)
++++ java/modules/core/src/main/java/org/apache/synapse/aspects/statistics/StatisticsLog.java	(revision 1747566)
+@@ -64,6 +64,7 @@
+     public void setTime(long time) {
+         this.time = time;
+     }
++
+     public boolean isResponse() {
+         return isResponse;
+     }
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/template/TemplateContext.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/template/TemplateContext.java	(revision 1747565)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/template/TemplateContext.java	(revision 1747566)
+@@ -24,7 +24,6 @@
+ import org.apache.synapse.mediators.TemplateParameter;
+ import org.apache.synapse.mediators.Value;
+ import org.apache.synapse.mediators.eip.EIPUtils;
+-import org.jaxen.JaxenException;
+ 
+ import java.util.*;
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/util/MessageHelper.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/util/MessageHelper.java	(revision 1747565)
++++ java/modules/core/src/main/java/org/apache/synapse/util/MessageHelper.java	(revision 1747566)
+@@ -1,7 +1,8 @@
+ package org.apache.synapse.util;
+ 
+-import org.apache.axiom.attachments.Attachments;
+-import org.apache.axiom.om.*;
++import org.apache.axiom.om.OMCloneOptions;
++import org.apache.axiom.om.OMElement;
++import org.apache.axiom.om.OMNamespace;
+ import org.apache.axiom.om.util.ElementHelper;
+ import org.apache.axiom.soap.*;
+ import org.apache.axiom.util.UIDGenerator;
+@@ -21,16 +22,21 @@
+ import org.apache.synapse.aspects.statistics.ErrorLog;
+ import org.apache.synapse.aspects.statistics.StatisticsLog;
+ import org.apache.synapse.aspects.statistics.StatisticsRecord;
+-import org.apache.synapse.aspects.statistics.StatisticsRecordFactory;
+ import org.apache.synapse.core.axis2.Axis2MessageContext;
+ import org.apache.synapse.mediators.eip.EIPConstants;
+ import org.apache.synapse.mediators.template.TemplateContext;
+ import org.apache.synapse.transport.passthru.PassThroughConstants;
+ import org.apache.synapse.transport.passthru.Pipe;
+-import org.apache.synapse.transport.passthru.ServerWorker;
+ import org.apache.synapse.transport.passthru.config.SourceConfiguration;
++import java.util.ArrayList;
++import java.util.Comparator;
++import java.util.HashMap;
++import java.util.Iterator;
++import java.util.List;
++import java.util.Map;
++import java.util.Stack;
++import java.util.TreeMap;
+ 
+-import java.util.*;
+ 
+ /**
+  *
+-*-*-*-
+Message: cleaning imports in message helper and template context
+-*-*-*-
+When: 2016-06-09 13:13:16 -0400 
+-*-*-*-
+Who: isudana

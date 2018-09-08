@@ -1,0 +1,45 @@
+{
+  "when": "2013-07-15T17:03:24-04:00", 
+  "message": "SYNAPSE-846 Made the suggested changes to the synapse servlet. Added the MBean unregistration code to the pass through transport. NHTTP transport seems to be already fixed.", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-256,6 +256,8", 
+          "lines": [
+            "         sourceConfiguration.getConfigurationContext().\n", 
+            "                 getAxisConfiguration().getObserversList().remove(axisObserver);\n", 
+            " \n", 
+            "+        MBeanRegistrar.getInstance().unRegisterMBean(\"Transport\",\n", 
+            "+                \"passthru-\" + namePrefix.toLowerCase() + \"-receiver\");\n", 
+            "         sourceConfiguration.getMetrics().destroy();\n", 
+            "     }\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpListener.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpListener.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-76,6 +76,7", 
+          "lines": [
+            "             if (o != null && o instanceof ServerManager) {\n", 
+            "                 ServerManager serverManager = (ServerManager) o;\n", 
+            "                 serverManager.stop();\n", 
+            "+                serverManager.shutdown();\n", 
+            "                 getServletContext().removeAttribute(ALREADY_INITED);\n", 
+            "             }\n", 
+            "         } catch (Exception e) {\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/SynapseStartUpServlet.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/SynapseStartUpServlet.java"
+    }
+  ], 
+  "id": "1503474"
+}

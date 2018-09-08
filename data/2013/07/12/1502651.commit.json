@@ -1,0 +1,27 @@
+{
+  "when": "2013-07-12T14:47:41-04:00", 
+  "message": "Fixed my id.", 
+  "who": "rajikak", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-1284,7 +1284,7", 
+          "lines": [
+            "         </developer>\n", 
+            "         <developer>\n", 
+            "             <name>Rajika Kumarasiri</name>\n", 
+            "-            <id>rajika</id>\n", 
+            "+            <id>rajikak</id>\n", 
+            "             <email>rajikak AT apache.org</email>\n", 
+            "         </developer>\n", 
+            "         <developer>\n"
+          ]
+        }
+      ], 
+      "to": "java/pom.xml", 
+      "from": "java/pom.xml"
+    }
+  ], 
+  "id": "1502651"
+}

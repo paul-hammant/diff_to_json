@@ -92,6 +92,95 @@ Index: java/modules/documentation/src/site/xdoc/userguide/transports/pass_throug
                              listener and sender. Typically, the HTTP listener would write the incoming
                              message data to one of these buffers, and the sender would read from it to
                              send the message out.
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/PassThroughTransportUtils.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/PassThroughTransportUtils.java	(revision 1514486)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/PassThroughTransportUtils.java	(revision 1514487)
+@@ -24,11 +24,21 @@
+ import org.apache.axis2.context.MessageContext;
+ import org.apache.axis2.Constants;
+ import org.apache.axis2.transport.TransportUtils;
++import org.apache.http.ConnectionReuseStrategy;
++import org.apache.http.HttpResponse;
++import org.apache.http.impl.DefaultConnectionReuseStrategy;
++import org.apache.http.nio.NHttpClientConnection;
++import org.apache.http.nio.NHttpServerConnection;
+ import org.apache.http.protocol.HTTP;
+ import org.apache.http.HttpStatus;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.transport.passthru.PassThroughConstants;
++import org.apache.synapse.transport.passthru.ProtocolState;
++import org.apache.synapse.transport.passthru.SourceContext;
++import org.apache.synapse.transport.passthru.TargetContext;
++import org.apache.synapse.transport.passthru.connections.SourceConnections;
++import org.apache.synapse.transport.passthru.connections.TargetConnections;
+ 
+ import java.net.InetAddress;
+ import java.util.Map;
+@@ -41,6 +51,8 @@
+ 
+     private static final Log log = LogFactory.getLog(PassThroughTransportUtils.class);
+ 
++    private static final ConnectionReuseStrategy connStrategy = new DefaultConnectionReuseStrategy();
++
+     /**
+      * This method tries to determine the hostname of the given InetAddress without
+      * triggering a reverse DNS lookup.  {@link java.net.InetAddress#getHostName()}
+@@ -212,4 +224,31 @@
+                 PassThroughConstants.MESSAGE_BUILDER_INVOKED));
+     }
+ 
++    public static void finishUsingSourceConnection(HttpResponse response,
++                                                   NHttpServerConnection conn,
++                                                   SourceConnections connections) {
++        if (!connStrategy.keepAlive(response, conn.getContext()) ||
++                SourceContext.get(conn).isShutDown()) {
++            SourceContext.updateState(conn, ProtocolState.CLOSING);
++            connections.closeConnection(conn);
++        } else {
++            // Reset connection state
++            connections.releaseConnection(conn);
++            // Ready to deal with a new request
++            conn.requestInput();
++        }
++    }
++
++    public static void finishUsingTargetConnection(HttpResponse response,
++                                                   NHttpClientConnection conn,
++                                                   TargetConnections connections) {
++        if (!connStrategy.keepAlive(response, conn.getContext())) {
++            // this is a connection we should not re-use
++            TargetContext.updateState(conn, ProtocolState.CLOSING);
++            connections.closeConnection(conn);
++        } else {
++            connections.releaseConnection(conn);
++        }
++    }
++
+ }
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java	(revision 1514486)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java	(revision 1514487)
+@@ -32,6 +32,7 @@
+ import org.apache.synapse.transport.passthru.config.SourceConfiguration;
+ import org.apache.synapse.transport.passthru.jmx.LatencyView;
+ import org.apache.synapse.transport.passthru.jmx.PassThroughTransportMetricsCollector;
++import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
+ 
+ import java.io.IOException;
+ 
+@@ -202,7 +203,8 @@
+                     if (!outBuf.hasData() && encoder.isCompleted()) {
+                         // We are done - At this point the entire response payload has been
+                         // written out to the SimpleOutputBuffer
+-                        sourceConfiguration.getSourceConnections().releaseConnection(conn);
++                        PassThroughTransportUtils.finishUsingSourceConnection(conn.getHttpResponse(),
++                                conn, sourceConfiguration.getSourceConnections());
+                     }
+                 }
+                 return;
 Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/connections/TargetConnections.java
 ===================================================================
 --- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/connections/TargetConnections.java	(revision 1514486)
@@ -256,95 +345,6 @@ Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/trans
          }
          return bytes;
      }
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/PassThroughTransportUtils.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/PassThroughTransportUtils.java	(revision 1514486)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/PassThroughTransportUtils.java	(revision 1514487)
-@@ -24,11 +24,21 @@
- import org.apache.axis2.context.MessageContext;
- import org.apache.axis2.Constants;
- import org.apache.axis2.transport.TransportUtils;
-+import org.apache.http.ConnectionReuseStrategy;
-+import org.apache.http.HttpResponse;
-+import org.apache.http.impl.DefaultConnectionReuseStrategy;
-+import org.apache.http.nio.NHttpClientConnection;
-+import org.apache.http.nio.NHttpServerConnection;
- import org.apache.http.protocol.HTTP;
- import org.apache.http.HttpStatus;
- import org.apache.commons.logging.Log;
- import org.apache.commons.logging.LogFactory;
- import org.apache.synapse.transport.passthru.PassThroughConstants;
-+import org.apache.synapse.transport.passthru.ProtocolState;
-+import org.apache.synapse.transport.passthru.SourceContext;
-+import org.apache.synapse.transport.passthru.TargetContext;
-+import org.apache.synapse.transport.passthru.connections.SourceConnections;
-+import org.apache.synapse.transport.passthru.connections.TargetConnections;
- 
- import java.net.InetAddress;
- import java.util.Map;
-@@ -41,6 +51,8 @@
- 
-     private static final Log log = LogFactory.getLog(PassThroughTransportUtils.class);
- 
-+    private static final ConnectionReuseStrategy connStrategy = new DefaultConnectionReuseStrategy();
-+
-     /**
-      * This method tries to determine the hostname of the given InetAddress without
-      * triggering a reverse DNS lookup.  {@link java.net.InetAddress#getHostName()}
-@@ -212,4 +224,31 @@
-                 PassThroughConstants.MESSAGE_BUILDER_INVOKED));
-     }
- 
-+    public static void finishUsingSourceConnection(HttpResponse response,
-+                                                   NHttpServerConnection conn,
-+                                                   SourceConnections connections) {
-+        if (!connStrategy.keepAlive(response, conn.getContext()) ||
-+                SourceContext.get(conn).isShutDown()) {
-+            SourceContext.updateState(conn, ProtocolState.CLOSING);
-+            connections.closeConnection(conn);
-+        } else {
-+            // Reset connection state
-+            connections.releaseConnection(conn);
-+            // Ready to deal with a new request
-+            conn.requestInput();
-+        }
-+    }
-+
-+    public static void finishUsingTargetConnection(HttpResponse response,
-+                                                   NHttpClientConnection conn,
-+                                                   TargetConnections connections) {
-+        if (!connStrategy.keepAlive(response, conn.getContext())) {
-+            // this is a connection we should not re-use
-+            TargetContext.updateState(conn, ProtocolState.CLOSING);
-+            connections.closeConnection(conn);
-+        } else {
-+            connections.releaseConnection(conn);
-+        }
-+    }
-+
- }
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java	(revision 1514486)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java	(revision 1514487)
-@@ -32,6 +32,7 @@
- import org.apache.synapse.transport.passthru.config.SourceConfiguration;
- import org.apache.synapse.transport.passthru.jmx.LatencyView;
- import org.apache.synapse.transport.passthru.jmx.PassThroughTransportMetricsCollector;
-+import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
- 
- import java.io.IOException;
- 
-@@ -202,7 +203,8 @@
-                     if (!outBuf.hasData() && encoder.isCompleted()) {
-                         // We are done - At this point the entire response payload has been
-                         // written out to the SimpleOutputBuffer
--                        sourceConfiguration.getSourceConnections().releaseConnection(conn);
-+                        PassThroughTransportUtils.finishUsingSourceConnection(conn.getHttpResponse(),
-+                                conn, sourceConfiguration.getSourceConnections());
-                     }
-                 }
-                 return;
 -*-*-*-
 Message: Refactored the code related to closing/releasing http connections in the PT transport
 -*-*-*-

@@ -1,0 +1,48 @@
+{
+  "when": "2013-07-21T07:27:59-04:00", 
+  "message": "fixing SYNAPSE-946", 
+  "who": "miyuru", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-28,6 +28,8", 
+          "lines": [
+            " import org.apache.synapse.commons.executors.PriorityExecutor;\n", 
+            " import org.apache.synapse.core.axis2.Axis2MessageContext;\n", 
+            " \n", 
+            "+import java.util.concurrent.RejectedExecutionException;\n", 
+            "+\n", 
+            " /**\n", 
+            "  * This mediator execute a given sequence with a given priority.\n", 
+            "  *\n"
+          ]
+        }, 
+        {
+          "locn": "-61,8 +63,14", 
+          "lines": [
+            "         Mediator m = synCtx.getSequence(sequenceName);\n", 
+            "         if (m != null && m instanceof SequenceMediator) {\n", 
+            "             MediatorWorker worker = new MediatorWorker(m, synCtx);\n", 
+            "-            // execute with the given priority\n", 
+            "-            executor.execute(worker, priority);\n", 
+            "+            try {\n", 
+            "+                // execute with the given priority\n", 
+            "+                executor.execute(worker, priority);\n", 
+            "+            } catch (RejectedExecutionException ex) {\n", 
+            "+                //if RejectedExecutionException, jump to fault handler\n", 
+            "+                handleException(\"Unable to process message in priority executor \" + executorName + \" with priority \" +\n", 
+            "+                        priority + \". Thread pool exhausted.\", ex, synCtx);\n", 
+            "+            }\n", 
+            " \n", 
+            "             // with the nio transport, this causes the listener not to write a 202\n", 
+            "             // Accepted response, as this implies that Synapse does not yet know if\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/EnqueueMediator.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/EnqueueMediator.java"
+    }
+  ], 
+  "id": "1505344"
+}

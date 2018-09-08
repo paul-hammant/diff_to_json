@@ -1,0 +1,33 @@
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestUtils.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestUtils.java	(revision 1544881)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestUtils.java	(revision 1544882)
+@@ -52,16 +52,16 @@
+         List<InetAddress> ipAddresses = new ArrayList<InetAddress>();
+         String ipAddress = null;
+ 
+-        Enumeration e = NetworkInterface.getNetworkInterfaces();
++        Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
+         while (e.hasMoreElements()) {
+-            NetworkInterface ni = (NetworkInterface) e.nextElement();
++            NetworkInterface ni = e.nextElement();
+             // Clustering doesn't work for loop-back addresses, so we are not interested
+             // we are not interested in inactive interfaces either
+-            // if (ni.isLoopback() || !ni.isUp()) continue; TODO: Find Java 5 alternative
++            if (ni.isLoopback() || !ni.isUp()) continue;
+ 
+-            Enumeration e2 = ni.getInetAddresses();
++            Enumeration<InetAddress> e2 = ni.getInetAddresses();
+             while (e2.hasMoreElements()) {
+-                InetAddress ip = (InetAddress) e2.nextElement();
++                InetAddress ip = e2.nextElement();
+                 ipAddresses.add(ip);
+             }
+         }
+-*-*-*-
+Message: * Fixed an old todo: we now require Java 1.6.
+* Use generics where appropriate (for Java 1.6).
+-*-*-*-
+When: 2013-11-23 16:36:05 -0500 
+-*-*-*-
+Who: veithen

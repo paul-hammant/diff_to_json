@@ -74,91 +74,6 @@ Index: java/modules/core/src/test/java/org/apache/synapse/rest/APIDispatcherTest
      public void testResponseDispatch() throws Exception {
          API api = new API(TEST_API, "/test");
          SynapseConfiguration synapseConfig = new SynapseConfiguration();
-Index: java/modules/core/src/main/java/org/apache/synapse/rest/API.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/rest/API.java	(revision 1511546)
-+++ java/modules/core/src/main/java/org/apache/synapse/rest/API.java	(revision 1511547)
-@@ -44,6 +44,8 @@
-     private Map<String,Resource> resources = new LinkedHashMap<String,Resource>();
-     private List<Handler> handlers = new ArrayList<Handler>();
- 
-+    private int protocol = RESTConstants.PROTOCOL_HTTP_AND_HTTPS;
-+
-     private VersionStrategy versionStrategy = new DefaultStrategy(this);
- 
-     private String fileName;
-@@ -68,6 +70,14 @@
-         return name;
-     }
- 
-+    public int getProtocol() {
-+        return protocol;
-+    }
-+
-+    public void setProtocol(int protocol) {
-+        this.protocol = protocol;
-+    }
-+
-     public String getAPIName() {
-         return name;
-     }
-@@ -176,9 +186,10 @@
-                 return false;
-             }
- 
-+            org.apache.axis2.context.MessageContext msgCtx =
-+                    ((Axis2MessageContext) synCtx).getAxis2MessageContext();
-+
-             if (host != null || port != -1) {
--                org.apache.axis2.context.MessageContext msgCtx =
--                        ((Axis2MessageContext) synCtx).getAxis2MessageContext();
-                 String hostHeader = getHostHeader(msgCtx);
-                 if (hostHeader != null) {
-                     if (host != null && !host.equals(extractHostName(hostHeader))) {
-@@ -204,6 +215,29 @@
-                     return false;
-                 }
-             }
-+            if (protocol == RESTConstants.PROTOCOL_HTTP_ONLY &&
-+                    !Constants.TRANSPORT_HTTP.equals(msgCtx.getIncomingTransportName())) {
-+                if (log.isDebugEnabled()) {
-+                    log.debug("Protocol information does not match - Expected HTTP");
-+                }
-+                synCtx.setProperty(RESTConstants.REST_API_TRANSPORT_DENIED, true);
-+                synCtx.setProperty(RESTConstants.REST_API_IN_TRANSPORT,
-+                        msgCtx.getIncomingTransportName());
-+                log.warn("Trying to access API : " + name + " on restricted transport chanel [" +
-+                        msgCtx.getIncomingTransportName() + "]");
-+                return false;
-+            } else if (protocol == RESTConstants.PROTOCOL_HTTPS_ONLY &&
-+                    !Constants.TRANSPORT_HTTPS.equals(msgCtx.getIncomingTransportName())) {
-+                if (log.isDebugEnabled()) {
-+                    log.debug("Protocol information does not match - Expected HTTPS");
-+                }
-+                synCtx.setProperty(RESTConstants.REST_API_TRANSPORT_DENIED, true);
-+                synCtx.setProperty(RESTConstants.REST_API_IN_TRANSPORT,
-+                        msgCtx.getIncomingTransportName());
-+                log.warn("Trying to access API : " + name + " on restricted transport chanel [" +
-+                        msgCtx.getIncomingTransportName() + "]");
-+                return false;
-+            }
-         }
- 
-         return true;
-Index: java/modules/core/src/main/java/org/apache/synapse/rest/RESTConstants.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/rest/RESTConstants.java	(revision 1511546)
-+++ java/modules/core/src/main/java/org/apache/synapse/rest/RESTConstants.java	(revision 1511547)
-@@ -48,4 +48,9 @@
- 
-     public static final String NO_MATCHING_RESOURCE_HANDLER = "_resource_mismatch_handler_";
- 
-+    /** The Synapse MC property that indicates the in-transport */
-+    public static final String REST_API_IN_TRANSPORT = "REST_API_IN_TRANSPORT";
-+    /** The Synapse MC property that marks if the message was denied on the accessed transport */
-+    public static final String REST_API_TRANSPORT_DENIED = "REST_API_TRANSPORT_DENIED";
-+
- }
 Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/rest/APIFactory.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/config/xml/rest/APIFactory.java	(revision 1511546)
@@ -247,6 +162,91 @@ Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/rest/APISer
 +
          return apiElt;
      }
+ }
+Index: java/modules/core/src/main/java/org/apache/synapse/rest/API.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/rest/API.java	(revision 1511546)
++++ java/modules/core/src/main/java/org/apache/synapse/rest/API.java	(revision 1511547)
+@@ -44,6 +44,8 @@
+     private Map<String,Resource> resources = new LinkedHashMap<String,Resource>();
+     private List<Handler> handlers = new ArrayList<Handler>();
+ 
++    private int protocol = RESTConstants.PROTOCOL_HTTP_AND_HTTPS;
++
+     private VersionStrategy versionStrategy = new DefaultStrategy(this);
+ 
+     private String fileName;
+@@ -68,6 +70,14 @@
+         return name;
+     }
+ 
++    public int getProtocol() {
++        return protocol;
++    }
++
++    public void setProtocol(int protocol) {
++        this.protocol = protocol;
++    }
++
+     public String getAPIName() {
+         return name;
+     }
+@@ -176,9 +186,10 @@
+                 return false;
+             }
+ 
++            org.apache.axis2.context.MessageContext msgCtx =
++                    ((Axis2MessageContext) synCtx).getAxis2MessageContext();
++
+             if (host != null || port != -1) {
+-                org.apache.axis2.context.MessageContext msgCtx =
+-                        ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+                 String hostHeader = getHostHeader(msgCtx);
+                 if (hostHeader != null) {
+                     if (host != null && !host.equals(extractHostName(hostHeader))) {
+@@ -204,6 +215,29 @@
+                     return false;
+                 }
+             }
++            if (protocol == RESTConstants.PROTOCOL_HTTP_ONLY &&
++                    !Constants.TRANSPORT_HTTP.equals(msgCtx.getIncomingTransportName())) {
++                if (log.isDebugEnabled()) {
++                    log.debug("Protocol information does not match - Expected HTTP");
++                }
++                synCtx.setProperty(RESTConstants.REST_API_TRANSPORT_DENIED, true);
++                synCtx.setProperty(RESTConstants.REST_API_IN_TRANSPORT,
++                        msgCtx.getIncomingTransportName());
++                log.warn("Trying to access API : " + name + " on restricted transport chanel [" +
++                        msgCtx.getIncomingTransportName() + "]");
++                return false;
++            } else if (protocol == RESTConstants.PROTOCOL_HTTPS_ONLY &&
++                    !Constants.TRANSPORT_HTTPS.equals(msgCtx.getIncomingTransportName())) {
++                if (log.isDebugEnabled()) {
++                    log.debug("Protocol information does not match - Expected HTTPS");
++                }
++                synCtx.setProperty(RESTConstants.REST_API_TRANSPORT_DENIED, true);
++                synCtx.setProperty(RESTConstants.REST_API_IN_TRANSPORT,
++                        msgCtx.getIncomingTransportName());
++                log.warn("Trying to access API : " + name + " on restricted transport chanel [" +
++                        msgCtx.getIncomingTransportName() + "]");
++                return false;
++            }
+         }
+ 
+         return true;
+Index: java/modules/core/src/main/java/org/apache/synapse/rest/RESTConstants.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/rest/RESTConstants.java	(revision 1511546)
++++ java/modules/core/src/main/java/org/apache/synapse/rest/RESTConstants.java	(revision 1511547)
+@@ -48,4 +48,9 @@
+ 
+     public static final String NO_MATCHING_RESOURCE_HANDLER = "_resource_mismatch_handler_";
+ 
++    /** The Synapse MC property that indicates the in-transport */
++    public static final String REST_API_IN_TRANSPORT = "REST_API_IN_TRANSPORT";
++    /** The Synapse MC property that marks if the message was denied on the accessed transport */
++    public static final String REST_API_TRANSPORT_DENIED = "REST_API_TRANSPORT_DENIED";
++
  }
 -*-*-*-
 Message: Supporting a transport attribute on API configuration. Patch applied from SYNAPSE-953 with some changes

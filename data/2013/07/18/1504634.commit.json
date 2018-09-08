@@ -1,0 +1,108 @@
+{
+  "when": "2013-07-18T16:19:35-04:00", 
+  "message": "Some changes related to SYNAPSE-851; Adding plain text formatter to the AxisConfig by default (we already add the plain text builder by default). In the VFS sender, setting the default output file name to response.dat for potential non-XML outputs.", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-51,7 +51,8", 
+          "lines": [
+            "     public static final String TRANSPORT_FILE_MOVE_TIMESTAMP_FORMAT\n", 
+            "             = \"transport.vfs.MoveTimestampFormat\";\n", 
+            " \n", 
+            "-    public static final String DEFAULT_RESPONSE_FILE = \"response.xml\";\n", 
+            "+    public static final String DEFAULT_XML_RESPONSE_FILE = \"response.xml\";\n", 
+            "+    public static final String DEFAULT_NON_XML_RESPONSE_FILE = \"response.dat\";\n", 
+            "     \n", 
+            "     public static final String STREAMING = \"transport.vfs.Streaming\";\n", 
+            "     \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSConstants.java", 
+      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSConstants.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-18,6 +18,7", 
+          "lines": [
+            " */\n", 
+            " package org.apache.synapse.transport.vfs;\n", 
+            " \n", 
+            "+import org.apache.axis2.Constants;\n", 
+            " import org.apache.axis2.context.MessageContext;\n", 
+            " import org.apache.axis2.description.Parameter;\n", 
+            " import org.apache.axis2.transport.base.BaseUtils;\n"
+          ]
+        }, 
+        {
+          "locn": "-94,17 +95,22", 
+          "lines": [
+            " \n", 
+            "         // if none works.. use default\n", 
+            "         if (fileName == null) {\n", 
+            "-            fileName = VFSConstants.DEFAULT_RESPONSE_FILE;\n", 
+            "+            String messageType = (String) msgCtx.getProperty(Constants.Configuration.MESSAGE_TYPE);\n", 
+            "+            if (messageType != null && !messageType.contains(\"xml\")) {\n", 
+            "+                fileName = VFSConstants.DEFAULT_NON_XML_RESPONSE_FILE;\n", 
+            "+            } else {\n", 
+            "+                fileName = VFSConstants.DEFAULT_XML_RESPONSE_FILE;\n", 
+            "+            }\n", 
+            "         }\n", 
+            "         return fileName;\n", 
+            "     }\n", 
+            " \n", 
+            "     /**\n", 
+            "-     * Acquires a file item lock before processing the item, guaranteing that the file is not\n", 
+            "+     * Acquires a file item lock before processing the item, guaranteeing that the file is not\n", 
+            "      * processed while it is being uploaded and/or the item is not processed by two listeners\n", 
+            "      *\n", 
+            "      * @param fsManager used to resolve the processing file\n", 
+            "-     * @param fo representing the processign file item\n", 
+            "+     * @param fo representing the processing file item\n", 
+            "      * @return boolean true if the lock has been acquired or false if not\n", 
+            "      */\n", 
+            "     public synchronized static boolean acquireLock(FileSystemManager fsManager, FileObject fo) {\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSUtils.java", 
+      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSUtils.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-29,6 +29,7", 
+          "lines": [
+            " import org.apache.axis2.engine.*;\r\n", 
+            " import org.apache.axis2.format.BinaryBuilder;\r\n", 
+            " import org.apache.axis2.format.PlainTextBuilder;\r\n", 
+            "+import org.apache.axis2.format.PlainTextFormatter;\r\n", 
+            " import org.apache.axis2.phaseresolver.PhaseException;\r\n", 
+            " import org.apache.axis2.phaseresolver.PhaseMetadata;\r\n", 
+            " import org.apache.axis2.util.JavaUtils;\r\n"
+          ]
+        }, 
+        {
+          "locn": "-905,6 +906,9", 
+          "lines": [
+            "         if (axisConf.getMessageBuilder(\"application/octet-stream\") == null) {\r\n", 
+            "             axisConf.addMessageBuilder(\"application/octet-stream\", new BinaryBuilder());\r\n", 
+            "         }\r\n", 
+            "+        if (axisConf.getMessageFormatter(\"text/plain\") == null) {\r\n", 
+            "+            axisConf.addMessageFormatter(\"text/plain\", new PlainTextFormatter());\r\n", 
+            "+        }\r\n", 
+            "     }\r\n", 
+            " \r\n", 
+            "     private void addServerIPAndHostEntries() {\r\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java"
+    }
+  ], 
+  "id": "1504634"
+}

@@ -1,0 +1,41 @@
+{
+  "when": "2013-07-19T17:01:29-04:00", 
+  "message": "Applying the patch for SYNAPSE-919. Treating OPTIONS and PUT requests are possible REST requests.", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-46,6 +46,7", 
+          "lines": [
+            " import org.apache.sandesha2.policy.builders.RMAssertionBuilder;\n", 
+            " import org.apache.synapse.SynapseConstants;\n", 
+            " import org.apache.synapse.endpoints.EndpointDefinition;\n", 
+            "+import org.apache.synapse.rest.RESTConstants;\n", 
+            " import org.apache.synapse.transport.nhttp.NhttpConstants;\n", 
+            " import org.apache.synapse.util.MessageHelper;\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-526,7 +527,9", 
+          "lines": [
+            "                     Constants.Configuration.HTTP_METHOD);\n", 
+            " \n", 
+            "             isRestRequest = Constants.Configuration.HTTP_METHOD_GET.equals(httpMethod)\n", 
+            "-                    || Constants.Configuration.HTTP_METHOD_DELETE.equals(httpMethod);\n", 
+            "+                    || Constants.Configuration.HTTP_METHOD_DELETE.equals(httpMethod)\n", 
+            "+                    || Constants.Configuration.HTTP_METHOD_PUT.equals(httpMethod)\n", 
+            "+                    || RESTConstants.METHOD_OPTIONS.equals(httpMethod);\n", 
+            " \n", 
+            "             if (!isRestRequest) {\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java"
+    }
+  ], 
+  "id": "1505016"
+}

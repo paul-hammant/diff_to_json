@@ -1,0 +1,40 @@
+{
+  "when": "2013-08-02T15:09:41-04:00", 
+  "message": "Fixing a broken link as per SYNAPSE-922", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-51,7 +51,7", 
+          "lines": [
+            "         <section name=\"Installing Synapse\">\n", 
+            "             <p>\n", 
+            "                 Let's start by downloading Apache Synapse. Launch a web browser and navigate to\n", 
+            "-                the <a href=\"\">Synapse Downloads</a> page. Download the binary distribution\n", 
+            "+                the <a href=\"../download.html\">Synapse Downloads</a> page. Download the binary distribution\n", 
+            "                 of the latest release. Binary distributions are available in standard zip\n", 
+            "                 format and Unix tar ball format.\n", 
+            "             </p>\n"
+          ]
+        }, 
+        {
+          "locn": "-70,7 +70,7", 
+          "lines": [
+            "             <p>\n", 
+            "                 Samples described in this tutorial involve routing messages to a Web Service\n", 
+            "                 through the Synapse ESB. In real world applications, these Web Services could be\n", 
+            "-                hosted in a web server in your organization, or practiacally anywhere in the\n", 
+            "+                hosted in a web server in your organization, or practically anywhere in the\n", 
+            "                 Internet. In this tutorial we will be using a sample Web Service that ships with\n", 
+            "                 Synapse and we will deploy it in the sample Axis2 server that comes bundled with\n", 
+            "                 Synapse.\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/documentation/src/site/xdoc/userguide/quick_start.xml", 
+      "from": "java/modules/documentation/src/site/xdoc/userguide/quick_start.xml"
+    }
+  ], 
+  "id": "1509821"
+}

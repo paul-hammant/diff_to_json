@@ -1,0 +1,70 @@
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/BasicHttpClient.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/BasicHttpClient.java	(revision 1544950)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/BasicHttpClient.java	(revision 1544951)
+@@ -19,11 +19,11 @@
+ 
+ package org.apache.synapse.samples.framework.clients;
+ 
+-import org.apache.http.client.HttpClient;
+ import org.apache.http.client.methods.HttpGet;
+ import org.apache.http.client.methods.HttpPost;
+ import org.apache.http.entity.BasicHttpEntity;
+-import org.apache.http.impl.client.DefaultHttpClient;
++import org.apache.http.impl.client.CloseableHttpClient;
++import org.apache.http.impl.client.HttpClientBuilder;
+ 
+ import java.io.ByteArrayInputStream;
+ import java.util.Map;
+@@ -42,12 +42,12 @@
+      * @throws Exception If an error occurs while making the HTTP call
+      */
+     public HttpResponse doGet(String url) throws Exception {
+-        HttpClient client = new DefaultHttpClient();
++        CloseableHttpClient client = HttpClientBuilder.create().build();
+         try {
+             HttpGet get = new HttpGet(url);
+             return new HttpResponse(client.execute(get));
+         } finally {
+-            client.getConnectionManager().shutdown();
++            client.close();
+         }
+     }
+ 
+@@ -76,7 +76,7 @@
+      */
+     public HttpResponse doPost(String url, byte[] payload,
+                                String contentType, Map<String,String> headers) throws Exception {
+-        HttpClient client = new DefaultHttpClient();
++        CloseableHttpClient client = HttpClientBuilder.create().build();
+         try {
+             HttpPost post = new HttpPost(url);
+             if (headers != null) {
+@@ -90,7 +90,7 @@
+             post.setEntity(entity);
+             return new HttpResponse(client.execute(post));
+         } finally {
+-            client.getConnectionManager().shutdown();
++            client.close();
+         }
+     }
+ 
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1544950)
++++ java/pom.xml	(revision 1544951)
+@@ -1102,7 +1102,7 @@
+         <jsch.version>0.1.31</jsch.version>
+         <jms-1.1-spec.version>1.1</jms-1.1-spec.version>
+         <httpcore.nio.version>4.3</httpcore.nio.version>
+-        <http.client.version>4.1</http.client.version>
++        <http.client.version>4.3.1</http.client.version>
+         <aspectj.version>1.6.1</aspectj.version>
+         <qfj.version>1.4.0</qfj.version>
+         <wso2uri-template.version>1.0.0</wso2uri-template.version>
+-*-*-*-
+Message: Upgraded to the latest httpclient version.
+-*-*-*-
+When: 2013-11-24 04:58:13 -0500 
+-*-*-*-
+Who: veithen

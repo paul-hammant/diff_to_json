@@ -1,161 +1,3 @@
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1510358)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1510359)
-@@ -22,7 +22,7 @@
- import junit.framework.TestSuite;
- import org.apache.commons.logging.Log;
- import org.apache.commons.logging.LogFactory;
--import org.apache.synapse.samples.framework.tests.tasks.Sample300;
-+import org.apache.synapse.samples.framework.tests.tasks.*;
- import org.apache.synapse.samples.framework.tests.transport.Sample250;
- import org.apache.synapse.samples.framework.tests.advanced.*;
- import org.apache.synapse.samples.framework.tests.endpoint.*;
-@@ -212,6 +212,8 @@
- 
-         //Tasks
-         sampleClassRepo.put("300", Sample300.class);
-+        sampleClassRepo.put("301", Sample301.class);
-+        sampleClassRepo.put("302", Sample302.class);
- 
-         //Advanced
-         sampleClassRepo.put("350", Sample350.class);
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/tasks/Sample301.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/tasks/Sample301.java	(nonexistent)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/tasks/Sample301.java	(revision 1510359)
-@@ -0,0 +1,37 @@
-+/*
-+ * Licensed to the Apache Software Foundation (ASF) under one
-+ * or more contributor license agreements.  See the NOTICE file
-+ * distributed with this work for additional information
-+ * regarding copyright ownership.  The ASF licenses this file
-+ * to you under the Apache License, Version 2.0 (the
-+ * "License"); you may not use this file except in compliance
-+ * with the License.  You may obtain a copy of the License at
-+ *
-+ * http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing,
-+ * software distributed under the License is distributed on an
-+ *  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ * KIND, either express or implied.  See the License for the
-+ * specific language governing permissions and limitations
-+ * under the License.
-+ */
-+
-+package org.apache.synapse.samples.framework.tests.tasks;
-+
-+import org.apache.synapse.samples.framework.SynapseTestCase;
-+
-+public class Sample301 extends SynapseTestCase {
-+
-+    public Sample301() {
-+        super(301);
-+    }
-+
-+    public void testScheduledTaskInjectToSequence() throws Exception {
-+        log.info("Waiting 10 seconds for the task to run...");
-+        Thread.sleep(10000);
-+        int messageCount = getAxis2Server().getMessageCount("SimpleStockQuoteService", "getQuote");
-+        log.info("Task sent " + messageCount + " messages.");
-+        assertTrue(messageCount >= 2);
-+    }
-+}
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/tasks/Sample302.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/tasks/Sample302.java	(nonexistent)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/tasks/Sample302.java	(revision 1510359)
-@@ -0,0 +1,37 @@
-+/*
-+ * Licensed to the Apache Software Foundation (ASF) under one
-+ * or more contributor license agreements.  See the NOTICE file
-+ * distributed with this work for additional information
-+ * regarding copyright ownership.  The ASF licenses this file
-+ * to you under the Apache License, Version 2.0 (the
-+ * "License"); you may not use this file except in compliance
-+ * with the License.  You may obtain a copy of the License at
-+ *
-+ * http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing,
-+ * software distributed under the License is distributed on an
-+ *  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ * KIND, either express or implied.  See the License for the
-+ * specific language governing permissions and limitations
-+ * under the License.
-+ */
-+
-+package org.apache.synapse.samples.framework.tests.tasks;
-+
-+import org.apache.synapse.samples.framework.SynapseTestCase;
-+
-+public class Sample302 extends SynapseTestCase {
-+
-+    public Sample302() {
-+        super(302);
-+    }
-+
-+    public void testScheduledTaskInjectToProxy() throws Exception {
-+        log.info("Waiting 10 seconds for the task to run...");
-+        Thread.sleep(10000);
-+        int messageCount = getAxis2Server().getMessageCount("SimpleStockQuoteService", "getQuote");
-+        log.info("Task sent " + messageCount + " messages.");
-+        assertTrue(messageCount >= 2);
-+    }
-+}
-Index: java/modules/integration/src/test/resources/sample301.xml
-===================================================================
---- java/modules/integration/src/test/resources/sample301.xml	(nonexistent)
-+++ java/modules/integration/src/test/resources/sample301.xml	(revision 1510359)
-@@ -0,0 +1,20 @@
-+<synapseSample>
-+    <sampleID>301</sampleID>
-+    <sampleName>Task injecting to a named sequence</sampleName>
-+    <synapseConfig>
-+        <!--if we don't specify the optional values, framework will use defaults-->
-+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
-+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
-+        <synapseXml>repository/conf/sample/synapse_sample_301.xml</synapseXml>
-+    </synapseConfig>
-+    <backEndServerConfig>
-+        <axis2Server id='0'>
-+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
-+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
-+            <counterEnabled>true</counterEnabled>
-+        </axis2Server>
-+    </backEndServerConfig>
-+    <clientConfig>
-+        <clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
-+    </clientConfig>
-+</synapseSample>
-\ No newline at end of file
-Index: java/modules/integration/src/test/resources/sample302.xml
-===================================================================
---- java/modules/integration/src/test/resources/sample302.xml	(nonexistent)
-+++ java/modules/integration/src/test/resources/sample302.xml	(revision 1510359)
-@@ -0,0 +1,20 @@
-+<synapseSample>
-+    <sampleID>302</sampleID>
-+    <sampleName>Task injecting to a Proxy service</sampleName>
-+    <synapseConfig>
-+        <!--if we don't specify the optional values, framework will use defaults-->
-+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
-+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
-+        <synapseXml>repository/conf/sample/synapse_sample_302.xml</synapseXml>
-+    </synapseConfig>
-+    <backEndServerConfig>
-+        <axis2Server id='0'>
-+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
-+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
-+            <counterEnabled>true</counterEnabled>
-+        </axis2Server>
-+    </backEndServerConfig>
-+    <clientConfig>
-+        <clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
-+    </clientConfig>
-+</synapseSample>
-\ No newline at end of file
 Index: java/modules/core/src/main/java/org/apache/synapse/startup/tasks/MessageInjector.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/startup/tasks/MessageInjector.java	(revision 1510358)
@@ -686,6 +528,164 @@ Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample302.xml
 +        <p><a href="../samples.html">Back to Catalog</a></p>        
 +    </body>
 +</document>
+\ No newline at end of file
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1510358)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1510359)
+@@ -22,7 +22,7 @@
+ import junit.framework.TestSuite;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+-import org.apache.synapse.samples.framework.tests.tasks.Sample300;
++import org.apache.synapse.samples.framework.tests.tasks.*;
+ import org.apache.synapse.samples.framework.tests.transport.Sample250;
+ import org.apache.synapse.samples.framework.tests.advanced.*;
+ import org.apache.synapse.samples.framework.tests.endpoint.*;
+@@ -212,6 +212,8 @@
+ 
+         //Tasks
+         sampleClassRepo.put("300", Sample300.class);
++        sampleClassRepo.put("301", Sample301.class);
++        sampleClassRepo.put("302", Sample302.class);
+ 
+         //Advanced
+         sampleClassRepo.put("350", Sample350.class);
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/tasks/Sample301.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/tasks/Sample301.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/tasks/Sample301.java	(revision 1510359)
+@@ -0,0 +1,37 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one
++ * or more contributor license agreements.  See the NOTICE file
++ * distributed with this work for additional information
++ * regarding copyright ownership.  The ASF licenses this file
++ * to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance
++ * with the License.  You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing,
++ * software distributed under the License is distributed on an
++ *  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ * KIND, either express or implied.  See the License for the
++ * specific language governing permissions and limitations
++ * under the License.
++ */
++
++package org.apache.synapse.samples.framework.tests.tasks;
++
++import org.apache.synapse.samples.framework.SynapseTestCase;
++
++public class Sample301 extends SynapseTestCase {
++
++    public Sample301() {
++        super(301);
++    }
++
++    public void testScheduledTaskInjectToSequence() throws Exception {
++        log.info("Waiting 10 seconds for the task to run...");
++        Thread.sleep(10000);
++        int messageCount = getAxis2Server().getMessageCount("SimpleStockQuoteService", "getQuote");
++        log.info("Task sent " + messageCount + " messages.");
++        assertTrue(messageCount >= 2);
++    }
++}
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/tasks/Sample302.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/tasks/Sample302.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/tasks/Sample302.java	(revision 1510359)
+@@ -0,0 +1,37 @@
++/*
++ * Licensed to the Apache Software Foundation (ASF) under one
++ * or more contributor license agreements.  See the NOTICE file
++ * distributed with this work for additional information
++ * regarding copyright ownership.  The ASF licenses this file
++ * to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance
++ * with the License.  You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing,
++ * software distributed under the License is distributed on an
++ *  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ * KIND, either express or implied.  See the License for the
++ * specific language governing permissions and limitations
++ * under the License.
++ */
++
++package org.apache.synapse.samples.framework.tests.tasks;
++
++import org.apache.synapse.samples.framework.SynapseTestCase;
++
++public class Sample302 extends SynapseTestCase {
++
++    public Sample302() {
++        super(302);
++    }
++
++    public void testScheduledTaskInjectToProxy() throws Exception {
++        log.info("Waiting 10 seconds for the task to run...");
++        Thread.sleep(10000);
++        int messageCount = getAxis2Server().getMessageCount("SimpleStockQuoteService", "getQuote");
++        log.info("Task sent " + messageCount + " messages.");
++        assertTrue(messageCount >= 2);
++    }
++}
+Index: java/modules/integration/src/test/resources/sample301.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample301.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample301.xml	(revision 1510359)
+@@ -0,0 +1,20 @@
++<synapseSample>
++    <sampleID>301</sampleID>
++    <sampleName>Task injecting to a named sequence</sampleName>
++    <synapseConfig>
++        <!--if we don't specify the optional values, framework will use defaults-->
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>repository/conf/sample/synapse_sample_301.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++            <counterEnabled>true</counterEnabled>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++        <clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+\ No newline at end of file
+Index: java/modules/integration/src/test/resources/sample302.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample302.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample302.xml	(revision 1510359)
+@@ -0,0 +1,20 @@
++<synapseSample>
++    <sampleID>302</sampleID>
++    <sampleName>Task injecting to a Proxy service</sampleName>
++    <synapseConfig>
++        <!--if we don't specify the optional values, framework will use defaults-->
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>repository/conf/sample/synapse_sample_302.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++            <counterEnabled>true</counterEnabled>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++        <clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
 \ No newline at end of file
 Index: java/repository/conf/sample/synapse_sample_301.xml
 ===================================================================

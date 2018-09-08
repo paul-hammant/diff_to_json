@@ -1,0 +1,443 @@
+{
+  "when": "2016-12-25T11:57:39-05:00", 
+  "message": "Fix possible buffer corruption issue in Passthrough Transport", 
+  "who": "isudana", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-106,7 +106,24", 
+          "lines": [
+            "         this.writer = writer;\n", 
+            "     }\n", 
+            " \n", 
+            "+    /**\n", 
+            "+     * Reset the resources associated with this context\n", 
+            "+     */\n", 
+            "     public void reset() {\n", 
+            "+        reset(false);\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    /**\n", 
+            "+     * Reset the resources associated with this context\n", 
+            "+     *\n", 
+            "+     * @param isError whether an error is causing this shutdown of the connection.\n", 
+            "+     *                It is very important to set this flag correctly.\n", 
+            "+     *                When an error causing the shutdown of the connections we should not\n", 
+            "+     *                release associated writer buffer to the pool as it might lead into\n", 
+            "+     *                situations like same buffer is getting released to both source and target\n", 
+            "+     *                buffer factories\n", 
+            "+     */\n", 
+            "+    public void reset(boolean isError) {\n", 
+            "         request = null;\n", 
+            "         response = null;\n", 
+            "         if (state != ProtocolState.CLOSED) {\n"
+          ]
+        }, 
+        {
+          "locn": "-114,7 +131,7", 
+          "lines": [
+            "             state = ProtocolState.REQUEST_READY;\n", 
+            "         }\n", 
+            " \n", 
+            "-        if (writer != null) {\n", 
+            "+        if (writer != null && !isError) { // If there is an error we do not release the buffer to the factory\n", 
+            "             ControlledByteBuffer buffer = writer.getBuffer();\n", 
+            "             buffer.clear();\n", 
+            "             targetConfiguration.getBufferFactory().release(buffer);\n"
+          ]
+        }, 
+        {
+          "locn": "-121,7 +138,7", 
+          "lines": [
+            "         }\n", 
+            " \n", 
+            "         reader = null;\n", 
+            "-        writer = null;       \n", 
+            "+        writer = null;\n", 
+            "     }\n", 
+            " \n", 
+            "     public static void create(NHttpConnection conn, ProtocolState state, \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetContext.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetContext.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-113,12 +113,12", 
+          "lines": [
+            "             log.error(\"HTTP exception while processing request\", e);\n", 
+            "             informReaderError(conn);\n", 
+            "             SourceContext.updateState(conn, ProtocolState.CLOSED);\n", 
+            "-            sourceConfiguration.getSourceConnections().shutDownConnection(conn);\n", 
+            "+            sourceConfiguration.getSourceConnections().shutDownConnection(conn, true);\n", 
+            "         } catch (IOException e) {\n", 
+            "             logIOException(e);\n", 
+            "             informReaderError(conn);\n", 
+            "             SourceContext.updateState(conn, ProtocolState.CLOSED);\n", 
+            "-            sourceConfiguration.getSourceConnections().shutDownConnection(conn);\n", 
+            "+            sourceConfiguration.getSourceConnections().shutDownConnection(conn, true);\n", 
+            "         }\n", 
+            "     }\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-143,7 +143,7", 
+          "lines": [
+            "             logIOException(e);\n", 
+            "             informReaderError(conn);\n", 
+            "             SourceContext.updateState(conn, ProtocolState.CLOSED);\n", 
+            "-            sourceConfiguration.getSourceConnections().shutDownConnection(conn);\n", 
+            "+            sourceConfiguration.getSourceConnections().shutDownConnection(conn, true);\n", 
+            "         }\n", 
+            "     }\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-174,12 +174,12", 
+          "lines": [
+            "             logIOException(e);\n", 
+            "             informWriterError(conn);\n", 
+            "             SourceContext.updateState(conn, ProtocolState.CLOSING);\n", 
+            "-            sourceConfiguration.getSourceConnections().shutDownConnection(conn);\n", 
+            "+            sourceConfiguration.getSourceConnections().shutDownConnection(conn, true);\n", 
+            "         } catch (HttpException e) {\n", 
+            "             log.error(e.getMessage(), e);\n", 
+            "             informWriterError(conn);\n", 
+            "             SourceContext.updateState(conn, ProtocolState.CLOSING);\n", 
+            "-            sourceConfiguration.getSourceConnections().shutDownConnection(conn);\n", 
+            "+            sourceConfiguration.getSourceConnections().shutDownConnection(conn, true);\n", 
+            "         }\n", 
+            "     }\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-254,12 +254,13", 
+          "lines": [
+            "             logIOException(e);\n", 
+            "             informWriterError(conn);\n", 
+            "             SourceContext.updateState(conn, ProtocolState.CLOSING);\n", 
+            "-            sourceConfiguration.getSourceConnections().shutDownConnection(conn);\n", 
+            "+            sourceConfiguration.getSourceConnections().shutDownConnection(conn, true);\n", 
+            "         } \n", 
+            "     }\n", 
+            " \n", 
+            "     public void endOfInput(NHttpServerConnection conn) throws IOException {\n", 
+            "         ProtocolState state = SourceContext.getState(conn);\n", 
+            "+        boolean isError = false;\n", 
+            " \n", 
+            "         if (state == ProtocolState.REQUEST_READY || state == ProtocolState.RESPONSE_DONE) {\n", 
+            "             if (log.isDebugEnabled()) {\n"
+          ]
+        }, 
+        {
+          "locn": "-266,17 +267,20", 
+          "lines": [
+            "                 log.debug(\"Keep-Alive connection was closed by the client: \" + conn);\n", 
+            "             }\n", 
+            "         } else if (state == ProtocolState.REQUEST_BODY || state == ProtocolState.REQUEST_HEAD) {\n", 
+            "+            isError = true;\n", 
+            "             informReaderError(conn);\n", 
+            "             log.warn(\"Connection closed by the client while reading the request: \" + conn);\n", 
+            "         } else if (state == ProtocolState.RESPONSE_BODY || state == ProtocolState.RESPONSE_HEAD) {\n", 
+            "+            isError = true;\n", 
+            "             informWriterError(conn);\n", 
+            "             log.warn(\"Connection closed by the client end while writing the response: \" + conn);\n", 
+            "         } else if (state == ProtocolState.REQUEST_DONE) {\n", 
+            "+            isError = true;\n", 
+            "             log.warn(\"Connection closed by the client after request is read: \" + conn);\n", 
+            "         }\n", 
+            " \n", 
+            "         SourceContext.updateState(conn, ProtocolState.CLOSED);\n", 
+            "-        sourceConfiguration.getSourceConnections().shutDownConnection(conn);\n", 
+            "+        sourceConfiguration.getSourceConnections().shutDownConnection(conn, isError);\n", 
+            "     }\n", 
+            " \n", 
+            "     public void exception(NHttpServerConnection conn, Exception e) {\n"
+          ]
+        }, 
+        {
+          "locn": "-302,7 +306,7", 
+          "lines": [
+            "             }\n", 
+            " \n", 
+            "             SourceContext.updateState(conn, ProtocolState.CLOSED);\n", 
+            "-            sourceConfiguration.getSourceConnections().shutDownConnection(conn);\n", 
+            "+            sourceConfiguration.getSourceConnections().shutDownConnection(conn, true);\n", 
+            "         }\n", 
+            "     }\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-325,7 +329,7", 
+          "lines": [
+            "         }\n", 
+            "         \n", 
+            "         SourceContext.updateState(conn, ProtocolState.CLOSED);\n", 
+            "-        sourceConfiguration.getSourceConnections().shutDownConnection(conn);\n", 
+            "+        sourceConfiguration.getSourceConnections().shutDownConnection(conn, true);\n", 
+            "     }\n", 
+            " \n", 
+            "     private void logIOException(IOException e) {\n"
+          ]
+        }, 
+        {
+          "locn": "-361,7 +365,7", 
+          "lines": [
+            "         }\n", 
+            " \n", 
+            "         if (conn.isResponseSubmitted()) {\n", 
+            "-            sourceConfiguration.getSourceConnections().shutDownConnection(conn);\n", 
+            "+            sourceConfiguration.getSourceConnections().shutDownConnection(conn, true);\n", 
+            "             return;\n", 
+            "         }\n", 
+            "         HttpContext httpContext = conn.getContext();\n"
+          ]
+        }, 
+        {
+          "locn": "-382,7 +386,7", 
+          "lines": [
+            "             log.error(\"Error while handling HttpException\", ex);\n", 
+            "         } finally {\n", 
+            "             SourceContext.updateState(conn, ProtocolState.CLOSED);\n", 
+            "-            sourceConfiguration.getSourceConnections().shutDownConnection(conn);\n", 
+            "+            sourceConfiguration.getSourceConnections().shutDownConnection(conn, true);\n", 
+            "         }\n", 
+            "     }\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-409,11 +413,12", 
+          "lines": [
+            "         }\n", 
+            " \n", 
+            "         SourceContext.updateState(conn, ProtocolState.CLOSED);\n", 
+            "-        sourceConfiguration.getSourceConnections().shutDownConnection(conn);\n", 
+            "+        sourceConfiguration.getSourceConnections().shutDownConnection(conn, true);\n", 
+            "     }\n", 
+            " \n", 
+            "     public void closed(NHttpServerConnection conn) {\n", 
+            "         ProtocolState state = SourceContext.getState(conn);\n", 
+            "+        boolean isFault = false;\n", 
+            " \n", 
+            "         if (state == ProtocolState.REQUEST_READY || state == ProtocolState.RESPONSE_DONE) {\n", 
+            "             if (log.isDebugEnabled()) {\n"
+          ]
+        }, 
+        {
+          "locn": "-420,12 +425,15", 
+          "lines": [
+            "                 log.debug(\"Keep-Alive connection was closed: \" + conn);\n", 
+            "             }\n", 
+            "         } else if (state == ProtocolState.REQUEST_BODY || state == ProtocolState.REQUEST_HEAD) {\n", 
+            "+            isFault = true;\n", 
+            "             informReaderError(conn);\n", 
+            "             log.warn(\"Connection closed while reading the request: \" + conn);\n", 
+            "         } else if (state == ProtocolState.RESPONSE_BODY || state == ProtocolState.RESPONSE_HEAD) {\n", 
+            "+            isFault = true;\n", 
+            "             informWriterError(conn);\n", 
+            "             log.warn(\"Connection closed while writing the response: \" + conn);\n", 
+            "         } else if (state == ProtocolState.REQUEST_DONE) {\n", 
+            "+            isFault = true;\n", 
+            "             log.warn(\"Connection closed after request is read: \" + conn);\n", 
+            "         }\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-432,7 +440,7", 
+          "lines": [
+            "         metrics.disconnected();\n", 
+            "         if (state != ProtocolState.CLOSED) {\n", 
+            "             SourceContext.updateState(conn, ProtocolState.CLOSED);\n", 
+            "-            sourceConfiguration.getSourceConnections().shutDownConnection(conn);\n", 
+            "+            sourceConfiguration.getSourceConnections().shutDownConnection(conn, isFault);\n", 
+            "         }\n", 
+            "     }\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-440,7 +448,7", 
+          "lines": [
+            "         log.warn(action + \" while the handler is in an inconsistent state \" +\n", 
+            "                 SourceContext.getState(conn));\n", 
+            "         SourceContext.updateState(conn, ProtocolState.CLOSED);\n", 
+            "-        sourceConfiguration.getSourceConnections().shutDownConnection(conn);\n", 
+            "+        sourceConfiguration.getSourceConnections().shutDownConnection(conn, true);\n", 
+            "     }\n", 
+            " \n", 
+            "     private void informReaderError(NHttpServerConnection conn) {\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-150,10 +150,25", 
+          "lines": [
+            "      * @param conn connection to shutdownConnection\n", 
+            "      */\n", 
+            "     public void shutdownConnection(NHttpClientConnection conn) {\n", 
+            "+        shutdownConnection(conn, false);\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    /**\n", 
+            "+     * This connection is no longer valid. So we need to shutdown connection.\n", 
+            "+     *\n", 
+            "+     * @param conn connection to shutdownConnection\n", 
+            "+     * @param isError whether an error is causing this shutdown of the connection.\n", 
+            "+     *                It is very important to set this flag correctly.\n", 
+            "+     *                When an error causing the shutdown of the connections we should not\n", 
+            "+     *                release associated writer buffer to the pool as it might lead into\n", 
+            "+     *                situations like same buffer is getting released to both source and target\n", 
+            "+     *                buffer factories\n", 
+            "+     */\n", 
+            "+    public void shutdownConnection(NHttpClientConnection conn, boolean isError) {\n", 
+            "         HostConnections pool = (HostConnections) conn.getContext().getAttribute(\n", 
+            "                 PassThroughConstants.CONNECTION_POOL);\n", 
+            " \n", 
+            "-        TargetContext.get(conn).reset();\n", 
+            "+        TargetContext.get(conn).reset(isError);\n", 
+            " \n", 
+            "         if (pool != null) {\n", 
+            "             pool.forget(conn);\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/connections/TargetConnections.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/connections/TargetConnections.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-117,12 +117,27", 
+          "lines": [
+            "      * @param conn the connection that needs to be shut down\n", 
+            "      */\n", 
+            "     public void shutDownConnection(NHttpServerConnection conn) {\n", 
+            "+        shutDownConnection(conn, false);\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    /**\n", 
+            "+     * Shutdown a connection\n", 
+            "+     *\n", 
+            "+     * @param conn the connection that needs to be shut down\n", 
+            "+     * @param isError whether an error is causing this shutdown of the connection\n", 
+            "+     *                It is very important to set this flag correctly.\n", 
+            "+     *                When an error causing the shutdown of the connections we should not\n", 
+            "+     *                release associated writer buffer to the pool as it might lead into\n", 
+            "+     *                situations like same buffer is getting released to both source and target\n", 
+            "+     *                buffer factories\n", 
+            "+     */\n", 
+            "+    public void shutDownConnection(NHttpServerConnection conn, boolean isError) {\n", 
+            "         if (log.isDebugEnabled()) {\n", 
+            "             log.debug(\"Shutting down connection forcefully \" + conn);\n", 
+            "         }\n", 
+            "         lock.lock();\n", 
+            "         try {\n", 
+            "-            SourceContext.get(conn).reset();\n", 
+            "+            SourceContext.get(conn).reset(isError);\n", 
+            " \n", 
+            "             if (!busyConnections.remove(conn)) {\n", 
+            "                 freeConnections.remove(conn);\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/connections/SourceConnections.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/connections/SourceConnections.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-23,8 +23,6", 
+          "lines": [
+            " import org.apache.synapse.transport.passthru.config.SourceConfiguration;\n", 
+            " import org.apache.synapse.transport.passthru.util.ControlledByteBuffer;\n", 
+            " \n", 
+            "-import java.nio.ByteBuffer;\n", 
+            "-\n", 
+            " /**\n", 
+            "  * This class represents the information about a TCP Connection at a given point in time.\n", 
+            "  * In a Single TCP Connection there can be multiple HTTP Requests.\n"
+          ]
+        }, 
+        {
+          "locn": "-76,7 +74,24", 
+          "lines": [
+            "         this.response = response;\n", 
+            "     }\n", 
+            " \n", 
+            "+    /**\n", 
+            "+     * Reset the resources associated with this context\n", 
+            "+     */\n", 
+            "     public void reset() {\n", 
+            "+        reset(false);\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    /**\n", 
+            "+     * Reset the resources associated with this context\n", 
+            "+     *\n", 
+            "+     * @param isError whether an error is causing this shutdown of the connection.\n", 
+            "+     *                It is very important to set this flag correctly.\n", 
+            "+     *                When an error causing the shutdown of the connections we should not\n", 
+            "+     *                release associated writer buffer to the pool as it might lead into\n", 
+            "+     *                situations like same buffer is getting released to both source and target\n", 
+            "+     *                buffer factories\n", 
+            "+     */\n", 
+            "+    public void reset(boolean isError) {\n", 
+            "         this.request = null;\n", 
+            "         this.response = null;\n", 
+            "         if (this.state != ProtocolState.CLOSED) {\n"
+          ]
+        }, 
+        {
+          "locn": "-85,7 +100,7", 
+          "lines": [
+            "             this.state = ProtocolState.REQUEST_READY;\n", 
+            "         }\n", 
+            " \n", 
+            "-        if (writer != null) {\n", 
+            "+        if (writer != null && !isError) {    // If there is an error we do not release the buffer to the factory\n", 
+            "             ControlledByteBuffer buffer = writer.getBuffer();\n", 
+            "             buffer.clear();\n", 
+            "             sourceConfiguration.getBufferFactory().release(buffer);\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceContext.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceContext.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-579,7 +579,7", 
+          "lines": [
+            "             }\n", 
+            " \n", 
+            "             SourceContext.updateState(conn, ProtocolState.CLOSED);\n", 
+            "-            sourceConfiguration.getSourceConnections().shutDownConnection(conn);\n", 
+            "+            sourceConfiguration.getSourceConnections().shutDownConnection(conn, true);\n", 
+            "         }\n", 
+            "     }\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java"
+    }
+  ], 
+  "id": "1776016"
+}

@@ -1,0 +1,87 @@
+{
+  "when": "2013-08-12T01:46:56-04:00", 
+  "message": "Fixing a bug in the pass thru http sender (transport was setting the RESPONSE_WRITTEN property to true on outgoing requests). Cleaned up some unused configurations.", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-188,7 +188,6", 
+          "lines": [
+            "     <!-- the non blocking http transport based on HttpCore + NIO extensions -->\n", 
+            "     <transportReceiver name=\"http\" class=\"org.apache.synapse.transport.passthru.PassThroughHttpListener\">\n", 
+            "         <parameter name=\"port\">8280</parameter>\n", 
+            "-        <parameter name=\"non-blocking\">true</parameter>\n", 
+            " \t    <parameter name=\"httpGetProcessor\" locked=\"false\">org.apache.synapse.transport.passthru.api.PassThroughNHttpGetProcessor</parameter>\n", 
+            "         <!--parameter name=\"bind-address\" locked=\"false\">hostname or IP address</parameter-->\n", 
+            "         <!--parameter name=\"WSDLEPRPrefix\" locked=\"false\">https://apachehost:port/somepath</parameter-->\n"
+          ]
+        }, 
+        {
+          "locn": "-198,7 +197,6", 
+          "lines": [
+            "     <!-- the non blocking https transport based on HttpCore + SSL-NIO extensions -->\n", 
+            "     <transportReceiver name=\"https\" class=\"org.apache.synapse.transport.passthru.PassThroughHttpSSLListener\">\n", 
+            "         <parameter name=\"port\" locked=\"false\">8243</parameter>\n", 
+            "-        <parameter name=\"non-blocking\" locked=\"false\">true</parameter>\n", 
+            "         <parameter name=\"httpGetProcessor\" locked=\"false\">org.apache.synapse.transport.passthru.api.PassThroughNHttpGetProcessor</parameter>\n", 
+            "         <!--parameter name=\"bind-address\" locked=\"false\">hostname or IP address</parameter-->\n", 
+            "         <!--parameter name=\"WSDLEPRPrefix\" locked=\"false\">http://apachehost:port/somepath</parameter-->\n"
+          ]
+        }, 
+        {
+          "locn": "-287,15 +285,11", 
+          "lines": [
+            "     <!-- ================================================= -->\n", 
+            " \n", 
+            "     <transportSender name=\"http\"  class=\"org.apache.synapse.transport.passthru.PassThroughHttpSender\">\n", 
+            "-        <parameter name=\"non-blocking\" locked=\"false\">true</parameter>\n", 
+            "-        <parameter name=\"warnOnHTTP500\" locked=\"false\">*</parameter>\n", 
+            "         <!--parameter name=\"http.proxyHost\" locked=\"false\">localhost</parameter>\n", 
+            "         <parameter name=\"http.proxyPort\" locked=\"false\">3128</parameter>\n", 
+            "         <parameter name=\"http.nonProxyHosts\" locked=\"false\">localhost|moon|sun</parameter-->\n", 
+            "     </transportSender>\n", 
+            "     <transportSender name=\"https\" class=\"org.apache.synapse.transport.passthru.PassThroughHttpSSLSender\">\n", 
+            "-        <parameter name=\"non-blocking\" locked=\"false\">true</parameter>\n", 
+            "-        <parameter name=\"warnOnHTTP500\" locked=\"false\">*</parameter>\n", 
+            "         <parameter name=\"keystore\" locked=\"false\">\n", 
+            "             <KeyStore>\n", 
+            "                 <Location>lib/identity.jks</Location>\n"
+          ]
+        }
+      ], 
+      "to": "java/repository/conf/axis2.xml", 
+      "from": "java/repository/conf/axis2.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-320,13 +320,14", 
+          "lines": [
+            "             } else {\n", 
+            "                 handleException(\"No valid destination EPR to send message\");\n", 
+            "             }\n", 
+            "-        }\n", 
+            " \n", 
+            "-        if (msgContext.getOperationContext() != null) {\n", 
+            "-            msgContext.getOperationContext().setProperty(\n", 
+            "-                Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);\n", 
+            "+            if (msgContext.getOperationContext() != null) {\n", 
+            "+                msgContext.getOperationContext().setProperty(\n", 
+            "+                        Constants.RESPONSE_WRITTEN, Constants.VALUE_TRUE);\n", 
+            "+            }\n", 
+            "         }\n", 
+            " \n", 
+            "+\n", 
+            "         return InvocationResponse.CONTINUE;\n", 
+            "     }\n", 
+            "     \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java"
+    }
+  ], 
+  "id": "1513043"
+}

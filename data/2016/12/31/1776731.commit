@@ -1,0 +1,48 @@
+Index: java/modules/patches/src/main/assembly/jars.xml
+===================================================================
+--- java/modules/patches/src/main/assembly/jars.xml	(revision 1776730)
++++ java/modules/patches/src/main/assembly/jars.xml	(revision 1776731)
+@@ -25,7 +25,7 @@
+     </formats>
+     <fileSets>
+         <fileSet>
+-            <directory>jars</directory>
++            <directory>target/jars</directory>
+             <outputDirectory>/</outputDirectory>
+             <includes>
+                 <include>*.jar</include>
+@@ -32,4 +32,4 @@
+             </includes>
+         </fileSet>
+     </fileSets>
+-</assembly>
+\ No newline at end of file
++</assembly>
+Index: java/modules/patches/pom.xml
+===================================================================
+--- java/modules/patches/pom.xml	(revision 1776730)
++++ java/modules/patches/pom.xml	(revision 1776731)
+@@ -52,7 +52,7 @@
+                             <goal>jar</goal>
+                         </goals>
+                         <configuration>
+-                            <outputDirectory>./jars</outputDirectory>
++                            <outputDirectory>./target/jars</outputDirectory>
+                         </configuration>
+                     </execution>
+                 </executions>
+@@ -68,7 +68,7 @@
+                         <configuration>
+                             <target>
+                                 <unjar dest="${project.build.outputDirectory}">
+-                                    <fileset dir="${basedir}/jars">
++                                    <fileset dir="${basedir}/target/jars">
+                                         <include name="**/*.jar" />
+                                     </fileset>
+                                 </unjar>
+-*-*-*-
+Message: Moving patch jar creation into target. This causes mvn release:prepare to fail the second time after a dryRun
+-*-*-*-
+When: 2016-12-31 07:32:53 -0500 
+-*-*-*-
+Who: ravi

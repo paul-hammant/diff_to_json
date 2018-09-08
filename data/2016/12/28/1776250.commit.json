@@ -1,0 +1,24 @@
+{
+  "when": "2016-12-28T04:30:28-05:00", 
+  "message": "Adding http.headers.preserve configuration to nhttp.properties", 
+  "who": "ravi", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-43,3 +43,5", 
+          "lines": [
+            " #lst_t_max=100\n", 
+            " #lst_alive_sec=5\n", 
+            " #lst_qlen=-1\n", 
+            "+\n", 
+            "+#http.headers.preserve=Serer,User-Agent,Date\n"
+          ]
+        }
+      ], 
+      "to": "java/repository/conf/nhttp.properties", 
+      "from": "java/repository/conf/nhttp.properties"
+    }
+  ], 
+  "id": "1776250"
+}

@@ -1,22 +1,3 @@
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java	(revision 1511993)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java	(revision 1511994)
-@@ -267,7 +267,13 @@
-                 cfg.getProperty(HttpConnectionParams.STALE_CONNECTION_CHECK, 0) == 1)
-             .setBooleanParameter(HttpConnectionParams.TCP_NODELAY,
-                 cfg.getProperty(HttpConnectionParams.TCP_NODELAY, 1) == 1)
--            .setParameter(HttpProtocolParams.USER_AGENT, "Synapse-HttpComponents-NIO");
-+            .setParameter(HttpProtocolParams.USER_AGENT, "Synapse-HttpComponents-NIO")
-+            .setParameter(
-+                    HttpProtocolParams.HTTP_MALFORMED_INPUT_ACTION,
-+                    cfg.getMalformedInputActionValue())
-+            .setParameter(
-+                    HttpProtocolParams.HTTP_UNMAPPABLE_INPUT_ACTION,
-+                    cfg.getUnMappableInputActionValue());
- 
-         if (cfg.getBooleanValue(NIOReactorPNames.INTEREST_OPS_QUEUEING, false)) {
-             params.setBooleanParameter(NIOReactorPNames.INTEREST_OPS_QUEUEING, true);
 Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/NHttpConfiguration.java
 ===================================================================
 --- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/NHttpConfiguration.java	(revision 1511993)
@@ -68,6 +49,25 @@ Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/trans
                  cfg.getProperty(HttpConnectionParams.TCP_NODELAY, 1) == 1)
 -            .setParameter(HttpProtocolParams.ORIGIN_SERVER, "Synapse-HttpComponents-NIO");
 +            .setParameter(HttpProtocolParams.ORIGIN_SERVER, "Synapse-HttpComponents-NIO")
++            .setParameter(
++                    HttpProtocolParams.HTTP_MALFORMED_INPUT_ACTION,
++                    cfg.getMalformedInputActionValue())
++            .setParameter(
++                    HttpProtocolParams.HTTP_UNMAPPABLE_INPUT_ACTION,
++                    cfg.getUnMappableInputActionValue());
+ 
+         if (cfg.getBooleanValue(NIOReactorPNames.INTEREST_OPS_QUEUEING, false)) {
+             params.setBooleanParameter(NIOReactorPNames.INTEREST_OPS_QUEUEING, true);
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java	(revision 1511993)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java	(revision 1511994)
+@@ -267,7 +267,13 @@
+                 cfg.getProperty(HttpConnectionParams.STALE_CONNECTION_CHECK, 0) == 1)
+             .setBooleanParameter(HttpConnectionParams.TCP_NODELAY,
+                 cfg.getProperty(HttpConnectionParams.TCP_NODELAY, 1) == 1)
+-            .setParameter(HttpProtocolParams.USER_AGENT, "Synapse-HttpComponents-NIO");
++            .setParameter(HttpProtocolParams.USER_AGENT, "Synapse-HttpComponents-NIO")
 +            .setParameter(
 +                    HttpProtocolParams.HTTP_MALFORMED_INPUT_ACTION,
 +                    cfg.getMalformedInputActionValue())

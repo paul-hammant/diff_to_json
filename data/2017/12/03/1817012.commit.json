@@ -1,0 +1,186 @@
+{
+  "when": "2017-12-03T00:31:59-05:00", 
+  "message": "Update documentation to use 3.0.1 version", 
+  "who": "isudana", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-25,7 +25,7", 
+          "lines": [
+            "     <body>\n", 
+            "         <section name=\"Download Latest Stable Release\">\n", 
+            "             <p>\n", 
+            "-                The latest stable release of Apache Synapse is 3.0.0. It is highly recommended\n", 
+            "+                The latest stable release of Apache Synapse is 3.0.1. It is highly recommended\n", 
+            "                 to use the latest stable release so that you can use our newest features\n", 
+            "                 while benefiting from all the recent bug fixes and improvements.\n", 
+            "             </p>\n"
+          ]
+        }, 
+        {
+          "locn": "-35,8 +35,8", 
+          "lines": [
+            "                     <th>Release Date</th>\n", 
+            "                 </tr>\n", 
+            "                 <tr>\n", 
+            "-                    <td><a href=\"download/3.0.0/download.cgi\">3.0.0</a></td>\n", 
+            "-                    <td>04-Jan-2017</td>\n", 
+            "+                    <td><a href=\"download/3.0.1/download.cgi\">3.0.1</a></td>\n", 
+            "+                    <td>07-Dec-2017</td>\n", 
+            "                 </tr>\n", 
+            "             </table>\n", 
+            "         </section>\n"
+          ]
+        }, 
+        {
+          "locn": "-47,6 +47,10", 
+          "lines": [
+            "                     <th>Release Date</th>\n", 
+            "                 </tr>\n", 
+            "                 <tr>\n", 
+            "+                    <td><a href=\"download/3.0.0/download.cgi\">2.1</a></td>\n", 
+            "+                    <td>04-Jan-2017</td>\n", 
+            "+                </tr>\n", 
+            "+                <tr>\n", 
+            "                     <td><a href=\"download/2.1/download.cgi\">2.1</a></td>\n", 
+            "                     <td>22-Dec-2011</td>\n", 
+            "                 </tr>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/documentation/src/site/xdoc/download.xml", 
+      "from": "java/modules/documentation/src/site/xdoc/download.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-37,9 +37,9", 
+          "lines": [
+            "             <p>\n", 
+            "                 Apache Synapse is free and open source software distributed under the\n", 
+            "                 <a href=\"http://www.apache.org/licenses/LICENSE-2.0\">Apache Software License 2.0</a>.\n", 
+            "-                The latest version of Synaspe is <a href=\"download/3.0.0/download.cgi\">v3.0.0</a>.\n", 
+            "-                This release comes with a horde of new features, bug fixes, performance and\n", 
+            "-                stability improvements.\n", 
+            "+                The latest version of Synapse is <a href=\"download/3.0.1/download.cgi\">v3.0.1</a>.\n", 
+            "+                It is a patch release which contains bug fixes and library upgrades to\n", 
+            "+                3.0.0 major feature release.\n", 
+            "             </p>\n", 
+            "             <p>\n", 
+            "                 Apache Synapse, Synapse, Apache, the Apache feather logo, and the Apache Synapse\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/documentation/src/site/xdoc/index.xml", 
+      "from": "java/modules/documentation/src/site/xdoc/index.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-81,25 +81,25", 
+          "lines": [
+            "                 'ant'. You will see an output similar to the following as the service is built\n", 
+            "                 and deployed to the sample Axis2 server.\n", 
+            "             </p>\n", 
+            "-            <div class=\"consoleOutput\">user@domain:/opt/synapse-3.0.0/samples/axis2Server/src/SimpleStockQuoteService$ ant\n", 
+            "+            <div class=\"consoleOutput\">user@domain:/opt/synapse-3.0.1/samples/axis2Server/src/SimpleStockQuoteService$ ant\n", 
+            " Buildfile: build.xml\n", 
+            " \n", 
+            " clean:\n", 
+            " \n", 
+            " init:\n", 
+            "-[mkdir] Created dir: /opt/synapse-3.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp\n", 
+            "-[mkdir] Created dir: /opt/synapse-3.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp/classes\n", 
+            "-[mkdir] Created dir: /opt/synapse-3.0.0/samples/axis2Server/repository/services\n", 
+            "+[mkdir] Created dir: /opt/synapse-3.0.1/samples/axis2Server/src/SimpleStockQuoteService/temp\n", 
+            "+[mkdir] Created dir: /opt/synapse-3.0.1/samples/axis2Server/src/SimpleStockQuoteService/temp/classes\n", 
+            "+[mkdir] Created dir: /opt/synapse-3.0.1/samples/axis2Server/repository/services\n", 
+            " \n", 
+            " compile-all:\n", 
+            "-[javac] Compiling 9 source files to /opt/synapse-3.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp/classes\n", 
+            "+[javac] Compiling 9 source files to /opt/synapse-3.0.1/samples/axis2Server/src/SimpleStockQuoteService/temp/classes\n", 
+            " \n", 
+            " build-service:\n", 
+            "-[mkdir] Created dir: /opt/synapse-3.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote\n", 
+            "-[mkdir] Created dir: /opt/synapse-3.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote/META-INF\n", 
+            "-[copy] Copying 1 file to /opt/synapse-3.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote/META-INF\n", 
+            "-[copy] Copying 9 files to /opt/synapse-3.0.0/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote\n", 
+            "-[jar] Building jar: /opt/synapse-3.0.0/samples/axis2Server/repository/services/SimpleStockQuoteService.aar\n", 
+            "+[mkdir] Created dir: /opt/synapse-3.0.1/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote\n", 
+            "+[mkdir] Created dir: /opt/synapse-3.0.1/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote/META-INF\n", 
+            "+[copy] Copying 1 file to /opt/synapse-3.0.1/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote/META-INF\n", 
+            "+[copy] Copying 9 files to /opt/synapse-3.0.1/samples/axis2Server/src/SimpleStockQuoteService/temp/SimpleStockQuote\n", 
+            "+[jar] Building jar: /opt/synapse-3.0.1/samples/axis2Server/repository/services/SimpleStockQuoteService.aar\n", 
+            " \n", 
+            " BUILD SUCCESSFUL\n", 
+            " Total time: 1 second</div>\n"
+          ]
+        }, 
+        {
+          "locn": "-144,14 +144,14", 
+          "lines": [
+            "                 above configuration.\n", 
+            "             </p>\n", 
+            "             <div class=\"consoleOutput\">Starting Synapse/Java ...\n", 
+            "-Using SYNAPSE_HOME:    /opt/synapse-3.0.0\n", 
+            "+Using SYNAPSE_HOME:    /opt/synapse-3.0.1\n", 
+            " Using JAVA_HOME:       /opt/jdk1.7.0_79\n", 
+            "-Using SYNAPSE_XML:     /opt/synapse-3.0.0/repository/conf/sample/synapse_sample_0.xml\n", 
+            "+Using SYNAPSE_XML:     /opt/synapse-3.0.1/repository/conf/sample/synapse_sample_0.xml\n", 
+            " 2016-12-28 10:38:00,456 [-] [main]  INFO SynapseServer Starting Apache Synapse...\n", 
+            "-2016-12-28 10:38:00,476 [-] [main]  INFO SynapseControllerFactory Using Synapse home : /opt/synapse-3.0.0\n", 
+            "-2016-12-28 10:38:00,476 [-] [main]  INFO SynapseControllerFactory Using Axis2 repository : /opt/synapse-3.0.0/repository\n", 
+            "-2016-12-28 10:38:00,476 [-] [main]  INFO SynapseControllerFactory Using axis2.xml location : /opt/synapse-3.0.0/repository/conf/axis2.xml\n", 
+            "-2016-12-28 10:38:00,476 [-] [main]  INFO SynapseControllerFactory Using synapse.xml location : /opt/synapse-3.0.0/repository/conf/sample/synapse_sample_0.xml\n", 
+            "+2016-12-28 10:38:00,476 [-] [main]  INFO SynapseControllerFactory Using Synapse home : /opt/synapse-3.0.1\n", 
+            "+2016-12-28 10:38:00,476 [-] [main]  INFO SynapseControllerFactory Using Axis2 repository : /opt/synapse-3.0.1/repository\n", 
+            "+2016-12-28 10:38:00,476 [-] [main]  INFO SynapseControllerFactory Using axis2.xml location : /opt/synapse-3.0.1/repository/conf/axis2.xml\n", 
+            "+2016-12-28 10:38:00,476 [-] [main]  INFO SynapseControllerFactory Using synapse.xml location : /opt/synapse-3.0.1/repository/conf/sample/synapse_sample_0.xml\n", 
+            " 2016-12-28 10:38:00,476 [-] [main]  INFO SynapseControllerFactory Using server name : localhost\n", 
+            " 2016-12-28 10:38:00,493 [-] [main]  INFO SynapseControllerFactory The timeout handler will run every : 15s\n", 
+            " 2016-12-28 10:38:00,566 [-] [main]  INFO Axis2SynapseController Initializing Synapse at : Wed Dec 28 10:38:00 IST 2016\n"
+          ]
+        }, 
+        {
+          "locn": "-166,7 +166,7", 
+          "lines": [
+            " 2016-12-28 10:38:01,429 [-] [main]  INFO PassThroughHttpSSLListener Loading Trust Keystore from : lib/trust.jks\n", 
+            " 2016-12-28 10:38:01,443 [-] [main]  INFO Axis2SynapseController Loading mediator extensions...\n", 
+            " 2016-12-28 10:38:01,451 [-] [main]  INFO XMLConfigurationBuilder Generating the Synapse configuration model by parsing the XML configuration\n", 
+            "-2016-12-28 10:38:01,506 [-] [main]  INFO SynapseConfigurationBuilder Loaded Synapse configuration from : /opt/synapse-3.0.0/repository/conf/sample/synapse_sample_0.xml\n", 
+            "+2016-12-28 10:38:01,506 [-] [main]  INFO SynapseConfigurationBuilder Loaded Synapse configuration from : /opt/synapse-3.0.1/repository/conf/sample/synapse_sample_0.xml\n", 
+            " 2016-12-28 10:38:01,542 [-] [main]  INFO Axis2SynapseController Deploying the Synapse service...\n", 
+            " 2016-12-28 10:38:01,563 [-] [main]  INFO Axis2SynapseController Deploying Proxy services...\n", 
+            " 2016-12-28 10:38:01,563 [-] [main]  INFO Axis2SynapseController Deploying EventSources...\n"
+          ]
+        }, 
+        {
+          "locn": "-197,13 +197,13", 
+          "lines": [
+            "                 <div class=\"consoleOutput\">Buildfile: build.xml\n", 
+            " \n", 
+            " init:\n", 
+            "-    [mkdir] Created dir: /opt/synapse-3.0.0/samples/axis2Client/target/classes\n", 
+            "+    [mkdir] Created dir: /opt/synapse-3.0.1/samples/axis2Client/target/classes\n", 
+            " \n", 
+            " compile:\n", 
+            "-    [javac] Compiling 22 source files to /opt/synapse-3.0.0/samples/axis2Client/target/classes\n", 
+            "-    [javac] Note: /opt/synapse-3.0.0/samples/axis2Client/src/samples/userguide/PWCallback.java uses or overrides a deprecated API.\n", 
+            "+    [javac] Compiling 22 source files to /opt/synapse-3.0.1/samples/axis2Client/target/classes\n", 
+            "+    [javac] Note: /opt/synapse-3.0.1/samples/axis2Client/src/samples/userguide/PWCallback.java uses or overrides a deprecated API.\n", 
+            "     [javac] Note: Recompile with -Xlint:deprecation for details.\n", 
+            "-    [javac] Note: /opt/synapse-3.0.0/samples/axis2Client/src/samples/userguide/LoadbalanceFailoverClient.java uses unchecked or unsafe operations.\n", 
+            "+    [javac] Note: /opt/synapse-3.0.1/samples/axis2Client/src/samples/userguide/LoadbalanceFailoverClient.java uses unchecked or unsafe operations.\n", 
+            "     [javac] Note: Recompile with -Xlint:unchecked for details.\n", 
+            " \n", 
+            " stockquote:\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/documentation/src/site/xdoc/userguide/quick_start.xml", 
+      "from": "java/modules/documentation/src/site/xdoc/userguide/quick_start.xml"
+    }
+  ], 
+  "id": "1817012"
+}

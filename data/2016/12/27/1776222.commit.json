@@ -1,0 +1,38 @@
+{
+  "when": "2016-12-27T21:57:00-05:00", 
+  "message": "Fix by Auke Schrijnen for SYNAPSE-1062", 
+  "who": "ravi", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-235,12 +235,14", 
+          "lines": [
+            " \n", 
+            "                     if (resenvelope != null) {\n", 
+            "                         responseMessageContext.setEnvelope(resenvelope);\n", 
+            "-                        AxisEngine.receive(responseMessageContext);\n", 
+            "-                        if (responseMessageContext.getReplyTo() != null) {\n", 
+            "-                            sc.setTargetEPR(responseMessageContext.getReplyTo());\n", 
+            "+                        try {\n", 
+            "+                            AxisEngine.receive(responseMessageContext);\n", 
+            "+                            if (responseMessageContext.getReplyTo() != null) {\n", 
+            "+                                sc.setTargetEPR(responseMessageContext.getReplyTo());\n", 
+            "+                            }\n", 
+            "+                        } finally {\n", 
+            "+                            complete(msgctx);\n", 
+            "                         }\n", 
+            "-\n", 
+            "-                        complete(msgctx);\n", 
+            "                     } else {\n", 
+            "                         throw new AxisFault(\n", 
+            "                                 Messages.getMessage(\"blockingInvocationExpectsResponse\"));\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/DynamicAxisOperation.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/DynamicAxisOperation.java"
+    }
+  ], 
+  "id": "1776222"
+}

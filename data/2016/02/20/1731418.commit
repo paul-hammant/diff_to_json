@@ -1,0 +1,202 @@
+Index: java/modules/core/src/test/java/org/apache/synapse/eventing/builders/MessageBuilderTest.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/eventing/builders/MessageBuilderTest.java	(revision 1731417)
++++ java/modules/core/src/test/java/org/apache/synapse/eventing/builders/MessageBuilderTest.java	(revision 1731418)
+@@ -81,9 +81,9 @@
+             assertEquals(filterDialect, sub.getFilterDialect());
+             assertEquals(filter, sub.getFilterValue());
+             assertEquals(date, sub.getExpires().getTime());
+-            assertNull(SubscriptionMessageBuilder.getErrorCode());
+-            assertNull(SubscriptionMessageBuilder.getErrorReason());
+-            assertNull(SubscriptionMessageBuilder.getErrorSubCode());
++            assertNull(sub.getErrorCode());
++            assertNull(sub.getErrorReason());
++            assertNull(sub.getErrorSubCode());
+         } catch (Exception e) {
+             fail("Error while constructing the sample subscription request: " + e.getMessage());
+         }
+@@ -102,9 +102,9 @@
+             SynapseSubscription sub = SubscriptionMessageBuilder.createUnSubscribeMessage(msgCtx);
+             assertEquals(id, sub.getId());
+             assertEquals(addressUrl, sub.getAddressUrl());
+-            assertNull(SubscriptionMessageBuilder.getErrorCode());
+-            assertNull(SubscriptionMessageBuilder.getErrorReason());
+-            assertNull(SubscriptionMessageBuilder.getErrorSubCode());
++            assertNull(sub.getErrorCode());
++            assertNull(sub.getErrorReason());
++            assertNull(sub.getErrorSubCode());
+ 
+         } catch (Exception e) {
+             e.printStackTrace();
+@@ -133,9 +133,9 @@
+             assertEquals(id, sub.getId());
+             assertEquals(addressUrl, sub.getAddressUrl());
+             assertEquals(date, sub.getExpires().getTime());
+-            assertNull(SubscriptionMessageBuilder.getErrorCode());
+-            assertNull(SubscriptionMessageBuilder.getErrorReason());
+-            assertNull(SubscriptionMessageBuilder.getErrorSubCode());
++            assertNull(sub.getErrorCode());
++            assertNull(sub.getErrorReason());
++            assertNull(sub.getErrorSubCode());
+ 
+         } catch (Exception e) {
+             e.printStackTrace();
+@@ -157,9 +157,9 @@
+             SynapseSubscription sub = SubscriptionMessageBuilder.createGetStatusMessage(msgCtx);
+             assertEquals(id, sub.getId());
+             assertEquals(addressUrl, sub.getAddressUrl());
+-            assertNull(SubscriptionMessageBuilder.getErrorCode());
+-            assertNull(SubscriptionMessageBuilder.getErrorReason());
+-            assertNull(SubscriptionMessageBuilder.getErrorSubCode());
++            assertNull(sub.getErrorCode());
++            assertNull(sub.getErrorReason());
++            assertNull(sub.getErrorSubCode());
+ 
+         } catch (Exception e) {
+             e.printStackTrace();
+@@ -184,9 +184,9 @@
+                     createRenewSubscribeMessage(msgCtx);
+             assertNull(id, sub.getId());
+             assertEquals(addressUrl, sub.getAddressUrl());
+-            assertNotNull(SubscriptionMessageBuilder.getErrorCode());
+-            assertNotNull(SubscriptionMessageBuilder.getErrorReason());
+-            assertNotNull(SubscriptionMessageBuilder.getErrorSubCode());
++            assertNotNull(sub.getErrorCode());
++            assertNotNull(sub.getErrorReason());
++            assertNotNull(sub.getErrorSubCode());
+ 
+         } catch (Exception e) {
+             e.printStackTrace();
+Index: java/modules/core/src/main/java/org/apache/synapse/eventing/SynapseEventSource.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/eventing/SynapseEventSource.java	(revision 1731417)
++++ java/modules/core/src/main/java/org/apache/synapse/eventing/SynapseEventSource.java	(revision 1731418)
+@@ -273,9 +273,9 @@
+                 log.debug("SynapseSubscription Failed, sending fault response");
+             }
+             SOAPEnvelope soapEnvelope = messageBuilder.genFaultResponse(mc,
+-                    SubscriptionMessageBuilder.getErrorCode(),
+-                    SubscriptionMessageBuilder.getErrorSubCode(),
+-                    SubscriptionMessageBuilder.getErrorReason(), "");
++                                                                        subscription.getErrorCode(),
++                                                                        subscription.getErrorSubCode(),
++                                                                        subscription.getErrorReason(), "");
+             dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, mc,
+                     true);
+         }
+@@ -402,9 +402,9 @@
+             }
+         } else {
+             SOAPEnvelope soapEnvelope = messageBuilder.genFaultResponse(mc,
+-                    SubscriptionMessageBuilder.getErrorCode(),
+-                    SubscriptionMessageBuilder.getErrorSubCode(),
+-                    SubscriptionMessageBuilder.getErrorReason(), "");
++                                                                        subscription.getErrorCode(),
++                                                                        subscription.getErrorSubCode(),
++                                                                        subscription.getErrorReason(), "");
+             dispatchResponse(soapEnvelope, EventingConstants.WSA_FAULT, mc, true);
+         }
+     }
+Index: java/modules/core/src/main/java/org/apache/synapse/eventing/SynapseSubscription.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/eventing/SynapseSubscription.java	(revision 1731417)
++++ java/modules/core/src/main/java/org/apache/synapse/eventing/SynapseSubscription.java	(revision 1731418)
+@@ -32,6 +32,10 @@
+ public class SynapseSubscription extends Subscription {
+ 
+ 
++    private String errorSubCode = null;
++    private String errorReason = null;
++    private String errorCode = null;
++
+     public SynapseSubscription() {
+         this.setId(UIDGenerator.generateURNString());
+         this.setDeliveryMode(EventingConstants.WSE_DEFAULT_DELIVERY_MODE);
+@@ -44,4 +48,28 @@
+         this.setId(UIDGenerator.generateURNString());
+         this.setDeliveryMode(deliveryMode);
+     }
++
++    public String getErrorSubCode() {
++        return errorSubCode;
++    }
++
++    public void setErrorSubCode(String errorCode) {
++        errorSubCode = errorCode;
++    }
++
++    public String getErrorReason() {
++        return errorReason;
++    }
++
++    public void setErrorReason(String errorReasons) {
++        errorReason = errorReasons;
++    }
++
++    public String getErrorCode() {
++        return errorCode;
++    }
++
++    public void setErrorCode(String errorCodes) {
++        errorCode = errorCodes;
++    }
+ }
+Index: java/modules/core/src/main/java/org/apache/synapse/eventing/builders/SubscriptionMessageBuilder.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/eventing/builders/SubscriptionMessageBuilder.java	(revision 1731417)
++++ java/modules/core/src/main/java/org/apache/synapse/eventing/builders/SubscriptionMessageBuilder.java	(revision 1731418)
+@@ -57,10 +57,6 @@
+     private static final QName RENEW =
+             new QName(EventingConstants.WSE_EVENTING_NS, EventingConstants.WSE_EN_RENEW);
+ 
+-    private static String errorSubCode = null;
+-    private static String errorReason = null;
+-    private static String errorCode = null;
+-
+     /**
+      * (01) <s12:Envelope
+      * (02)     xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
+@@ -336,34 +332,10 @@
+         throw new SynapseException(message);
+     }
+ 
+-    public static String getErrorSubCode() {
+-        return errorSubCode;
+-    }
+-
+-    public static void setErrorSubCode(String errorCode) {
+-        errorSubCode = errorCode;
+-    }
+-
+-    public static String getErrorReason() {
+-        return errorReason;
+-    }
+-
+-    public static void setErrorReason(String errorReasons) {
+-        errorReason = errorReasons;
+-    }
+-
+-    public static String getErrorCode() {
+-        return errorCode;
+-    }
+-
+-    public static void setErrorCode(String errorCodes) {
+-        errorCode = errorCodes;
+-    }
+-
+     private static void setExpirationFault(SynapseSubscription subscription) {
+-        setErrorCode(EventingConstants.WSE_FAULT_CODE_SENDER);
+-        setErrorSubCode("InvalidExpirationTime");
+-        setErrorReason("The expiration time requested is invalid");
++        subscription.setErrorCode(EventingConstants.WSE_FAULT_CODE_SENDER);
++        subscription.setErrorSubCode("InvalidExpirationTime");
++        subscription.setErrorReason("The expiration time requested is invalid");
+         subscription.setId(null);
+     }
+ 
+-*-*-*-
+Message: Moving error infromation of Subscription from SubscriptionMessageBuilder to SynapseSubscription - static variables are not suitable for storing error information as error information must be per subscription based and not something applicable globally for all the subscriptions
+-*-*-*-
+When: 2016-02-20 11:17:57 -0500 
+-*-*-*-
+Who: isudana

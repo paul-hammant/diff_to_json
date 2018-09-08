@@ -1,16 +1,3 @@
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ServerWorker.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ServerWorker.java	(revision 1507724)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ServerWorker.java	(revision 1507725)
-@@ -179,7 +179,7 @@
-             }
-             response.setEntity(entity);
-             
--			httpGetRequestProcessor.process(request.getRequest(), response,msgContext,
-+			httpGetRequestProcessor.process(request.getRequest(), response, msgContext,
- 					request.getConnection(), os, true);
- 		} 
- 		
 Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/api/PassThroughNHttpGetProcessor.java
 ===================================================================
 --- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/api/PassThroughNHttpGetProcessor.java	(revision 1507724)
@@ -138,6 +125,19 @@ Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/trans
  
              while (addresses.hasMoreElements()) {
                  InetAddress ip = (InetAddress) addresses.nextElement();
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ServerWorker.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ServerWorker.java	(revision 1507724)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ServerWorker.java	(revision 1507725)
+@@ -179,7 +179,7 @@
+             }
+             response.setEntity(entity);
+             
+-			httpGetRequestProcessor.process(request.getRequest(), response,msgContext,
++			httpGetRequestProcessor.process(request.getRequest(), response, msgContext,
+ 					request.getConnection(), os, true);
+ 		} 
+ 		
 -*-*-*-
 Message: Refactoring and clean up
 -*-*-*-

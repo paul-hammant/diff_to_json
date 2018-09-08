@@ -1,3 +1,16 @@
+Index: java/modules/core/src/test/java/org/apache/synapse/config/xml/IterateMediatorSerializationTest.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/config/xml/IterateMediatorSerializationTest.java	(revision 1504968)
++++ java/modules/core/src/test/java/org/apache/synapse/config/xml/IterateMediatorSerializationTest.java	(revision 1504969)
+@@ -35,7 +35,7 @@
+         iterateMediatorSerializer = new IterateMediatorSerializer();
+     }
+ 
+-    public void testIterateMediatorSerializationSenarioOne() throws Exception {
++    public void testIterateMediatorSerializationScenarioOne() throws Exception {
+         String inputXml = "<iterate xmlns=\"http://ws.apache.org/ns/synapse\" " +
+             "continueParent=\"true\" preservePayload=\"true\" expression=\".\" " +
+             "attachPath=\"get-property('to')\"><target sequence=\"sequenceRef1\" " +
 Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/IterateMediatorFactory.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/config/xml/IterateMediatorFactory.java	(revision 1504968)
@@ -48,19 +61,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/IterateMedi
          }
  
          itrElem.addChild(TargetSerializer.serializeTarget(itrMed.getTarget()));
-Index: java/modules/core/src/test/java/org/apache/synapse/config/xml/IterateMediatorSerializationTest.java
-===================================================================
---- java/modules/core/src/test/java/org/apache/synapse/config/xml/IterateMediatorSerializationTest.java	(revision 1504968)
-+++ java/modules/core/src/test/java/org/apache/synapse/config/xml/IterateMediatorSerializationTest.java	(revision 1504969)
-@@ -35,7 +35,7 @@
-         iterateMediatorSerializer = new IterateMediatorSerializer();
-     }
- 
--    public void testIterateMediatorSerializationSenarioOne() throws Exception {
-+    public void testIterateMediatorSerializationScenarioOne() throws Exception {
-         String inputXml = "<iterate xmlns=\"http://ws.apache.org/ns/synapse\" " +
-             "continueParent=\"true\" preservePayload=\"true\" expression=\".\" " +
-             "attachPath=\"get-property('to')\"><target sequence=\"sequenceRef1\" " +
 -*-*-*-
 Message: Fixing SYNAPSE-870. Iterate mediator is misinterpretting being sequential as being asynchronous, where actually it should be the opposite. That is being sequential is not being asynchronous. I've fixed this issue and now the iterate mediator is async (not sequential) by default, and setting sequential attribute to true will make it not async.
 -*-*-*-

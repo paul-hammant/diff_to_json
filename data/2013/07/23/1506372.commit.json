@@ -1,0 +1,30 @@
+{
+  "when": "2013-07-23T19:39:44-04:00", 
+  "message": "Applying the patch for SYNAPSE-952", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-824,6 +824,11", 
+          "lines": [
+            "                     samples/axis2Client/client_repo as the client repository unless these are\n", 
+            "                     specified otherwise inside the 'configuration' sub-element.\n", 
+            "                 </p>\n", 
+            "+                <p>\n", 
+            "+                    To invoke secured services, Callout mediator can be configured to enable WS-Security\n", 
+            "+                    using the enableSec element. Security policy should be specified using the policy\n", 
+            "+                    attribute which may point to a registry key or a local entry.\n", 
+            "+                </p>\n", 
+            "             </subsection>\n", 
+            "             <subsection name=\"Clone Mediator\" id=\"Clone\">\n", 
+            "                 <p>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/documentation/src/site/xdoc/userguide/mediators.xml", 
+      "from": "java/modules/documentation/src/site/xdoc/userguide/mediators.xml"
+    }
+  ], 
+  "id": "1506372"
+}

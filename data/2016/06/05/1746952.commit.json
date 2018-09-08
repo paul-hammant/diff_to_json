@@ -1,0 +1,18 @@
+{
+  "when": "2016-06-05T16:59:12-04:00", 
+  "message": "Set svn:ignore.", 
+  "who": "veithen", 
+  "changes": [
+    {
+      "chunks": [], 
+      "to": "java/modules/documentation", 
+      "from": "java/modules/documentation"
+    }, 
+    {
+      "chunks": [], 
+      "to": "java/modules/transports/optional/amqp", 
+      "from": "java/modules/transports/optional/amqp"
+    }
+  ], 
+  "id": "1746952"
+}

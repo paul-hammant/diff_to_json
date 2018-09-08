@@ -1,3 +1,26 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/transform/url/RewriteAction.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/transform/url/RewriteAction.java	(revision 1503834)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/transform/url/RewriteAction.java	(revision 1503835)
+@@ -53,6 +53,9 @@
+         String result;
+         if (xpath != null) {
+             result = xpath.stringValueOf(messageContext);
++            if (result == null) {
++                result = "";
++            }
+         } else {
+             result = value;
+         }
+@@ -68,7 +71,7 @@
+                 uri = new URI("");
+             }
+ 
+-            // Since the entire URL has been rewritten we need to reinit all the fragments
++            // Since the entire URL has been rewritten we need to re-init all the fragments
+             fragments.setFragments(uri);
+ 
+         } else if (fragmentIndex == URIFragments.PORT) {
 Index: java/modules/core/src/test/java/org/apache/synapse/mediators/transform/url/URLRewriteMediatorTest.java
 ===================================================================
 --- java/modules/core/src/test/java/org/apache/synapse/mediators/transform/url/URLRewriteMediatorTest.java	(revision 1503834)
@@ -25,29 +48,6 @@ Index: java/modules/core/src/test/java/org/apache/synapse/mediators/transform/ur
 +        mediator.mediate(msgCtx);
 +    }
  }
-Index: java/modules/core/src/main/java/org/apache/synapse/mediators/transform/url/RewriteAction.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/mediators/transform/url/RewriteAction.java	(revision 1503834)
-+++ java/modules/core/src/main/java/org/apache/synapse/mediators/transform/url/RewriteAction.java	(revision 1503835)
-@@ -53,6 +53,9 @@
-         String result;
-         if (xpath != null) {
-             result = xpath.stringValueOf(messageContext);
-+            if (result == null) {
-+                result = "";
-+            }
-         } else {
-             result = value;
-         }
-@@ -68,7 +71,7 @@
-                 uri = new URI("");
-             }
- 
--            // Since the entire URL has been rewritten we need to reinit all the fragments
-+            // Since the entire URL has been rewritten we need to re-init all the fragments
-             fragments.setFragments(uri);
- 
-         } else if (fragmentIndex == URIFragments.PORT) {
 -*-*-*-
 Message: Fixing SYNAPSE-889 If the XPath expression evaluates to null in a RewriteAction, treat the result as if it was an empty string. Added a test case to verify the fix.
 -*-*-*-

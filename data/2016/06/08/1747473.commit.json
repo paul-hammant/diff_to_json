@@ -1,0 +1,216 @@
+{
+  "when": "2016-06-08T20:39:35-04:00", 
+  "message": "Preventing Strings from being set as fault detail in the FaultMediator; Applied patch from SYNAPSE-1041 with a couple of unit tests", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-29,6 +29,7", 
+          "lines": [
+            " import org.apache.synapse.core.axis2.Axis2MessageContext;\n", 
+            " import org.apache.synapse.mediators.AbstractMediator;\n", 
+            " import org.apache.synapse.util.xpath.SynapseXPath;\n", 
+            "+import org.apache.synapse.util.POXUtils;\n", 
+            " import org.jaxen.JaxenException;\n", 
+            " \n", 
+            " import javax.xml.namespace.QName;\n"
+          ]
+        }, 
+        {
+          "locn": "-392,7 +393,10", 
+          "lines": [
+            "                     }\n", 
+            "                 }\n", 
+            "             } else {\n", 
+            "-                soapFaultDetail.setText(faultDetailExpr.stringValueOf(synCtx));\n", 
+            "+                OMElement om = POXUtils.getOMFromXML(faultDetailExpr.stringValueOf(synCtx));\n", 
+            "+                if (om != null) {\n", 
+            "+                    soapFaultDetail.addChild(om);\n", 
+            "+                }\n", 
+            "             }\n", 
+            "             fault.setDetail(soapFaultDetail);\n", 
+            "         } else if (!faultDetailElements.isEmpty()) {\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/transform/FaultMediator.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/transform/FaultMediator.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-20,7 +20,9", 
+          "lines": [
+            " package org.apache.synapse.util;\n", 
+            " \n", 
+            " import org.apache.axiom.om.OMElement;\n", 
+            "+import org.apache.axiom.om.OMException;\n", 
+            " import org.apache.axiom.om.OMFactory;\n", 
+            "+import org.apache.axiom.om.util.AXIOMUtil;\n", 
+            " import org.apache.axiom.soap.SOAPBody;\n", 
+            " import org.apache.axiom.soap.SOAPFault;\n", 
+            " import org.apache.axis2.context.MessageContext;\n"
+          ]
+        }, 
+        {
+          "locn": "-28,6 +30,7", 
+          "lines": [
+            " import org.apache.commons.logging.LogFactory;\n", 
+            " \n", 
+            " import javax.xml.namespace.QName;\n", 
+            "+import javax.xml.stream.XMLStreamException;\n", 
+            " \n", 
+            " /**\n", 
+            "  *\n"
+          ]
+        }, 
+        {
+          "locn": "-52,8 +55,10", 
+          "lines": [
+            "                 if (log.isDebugEnabled()) {\n", 
+            "                     log.debug(\"Setting the fault detail : \" + faultDetail + \" as athe POX Fault\");\n", 
+            "                 }\n", 
+            "-                faultPayload.setText(faultDetail);\n", 
+            "-\n", 
+            "+                OMElement om = POXUtils.getOMFromXML(faultDetail);\n", 
+            "+                if(om != null) {\n", 
+            "+                    faultPayload.addChild(om);\n", 
+            "+                }\n", 
+            "             } else if (fault.getReason() != null && !fault.getReason().getText().equals(\"\")) {\n", 
+            " \n", 
+            "                 String faultReasonValue = fault.getReason().getText();\n"
+          ]
+        }, 
+        {
+          "locn": "-89,4 +94,16", 
+          "lines": [
+            "             body.addChild(faultPayload);\n", 
+            "         }\n", 
+            "     }\n", 
+            "+\n", 
+            "+    /**\n", 
+            "+     * If the input string is valid xml, this method will convert it into an OMElement and\n", 
+            "+     * return back. Otherwise returns null.\n", 
+            "+     */\n", 
+            "+    public static OMElement getOMFromXML(String text) {\n", 
+            "+        try {\n", 
+            "+            return AXIOMUtil.stringToOM(text);\n", 
+            "+        } catch (Exception ignore) {\n", 
+            "+            return null;\n", 
+            "+        }\n", 
+            "+    }\n", 
+            " }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/util/POXUtils.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/util/POXUtils.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-24,9 +24,11", 
+          "lines": [
+            " import org.apache.axiom.soap.SOAP11Constants;\n", 
+            " import org.apache.axiom.soap.SOAPEnvelope;\n", 
+            " import org.apache.axiom.soap.SOAPFault;\n", 
+            "+import org.apache.axiom.soap.SOAPFaultDetail;\n", 
+            " import org.apache.synapse.MessageContext;\n", 
+            " import org.apache.synapse.config.Entry;\n", 
+            " import org.apache.synapse.mediators.TestUtils;\n", 
+            "+import org.apache.synapse.util.xpath.SynapseXPath;\n", 
+            " \n", 
+            " import javax.xml.namespace.QName;\n", 
+            " import java.net.URI;\n"
+          ]
+        }, 
+        {
+          "locn": "-40,7 +42,6", 
+          "lines": [
+            "     private static final String F_DETAIL = \"Some detail text\";\n", 
+            " \n", 
+            "     public void testSOAP11Fault() throws Exception {\n", 
+            "-\n", 
+            "         FaultMediator faultMediator = new FaultMediator();\n", 
+            "         faultMediator.setSoapVersion(FaultMediator.SOAP11);\n", 
+            "         faultMediator.setFaultCodeValue(F_CODE);\n"
+          ]
+        }, 
+        {
+          "locn": "-48,7 +49,7", 
+          "lines": [
+            "         faultMediator.setFaultRole(new URI(F_ACTOR_URI));\n", 
+            "         faultMediator.setFaultDetail(F_DETAIL);\n", 
+            " \n", 
+            "-        // invoke transformation, with static enveope\n", 
+            "+        // invoke transformation, with static envelope\n", 
+            "         MessageContext synCtx = TestUtils.getAxis2MessageContext(\n", 
+            "                 \"<empty/>\", new HashMap<String, Entry>());\n", 
+            "         faultMediator.mediate(synCtx);\n"
+          ]
+        }, 
+        {
+          "locn": "-61,4 +62,52", 
+          "lines": [
+            "         assertTrue(F_DETAIL.equals(fault.getDetail().getText()));\n", 
+            "         assertEquals(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI, envelope.getNamespace().getNamespaceURI());\n", 
+            "     }\n", 
+            "+\n", 
+            "+    public void testSOAP11FaultWithExpression() throws Exception {\n", 
+            "+        FaultMediator faultMediator = new FaultMediator();\n", 
+            "+        faultMediator.setSoapVersion(FaultMediator.SOAP11);\n", 
+            "+        faultMediator.setFaultCodeValue(F_CODE);\n", 
+            "+        faultMediator.setFaultReasonValue(F_STRING);\n", 
+            "+        faultMediator.setFaultRole(new URI(F_ACTOR_URI));\n", 
+            "+        faultMediator.setFaultDetailExpr(new SynapseXPath(\"get-property('foo')\"));\n", 
+            "+\n", 
+            "+        // invoke transformation, with static envelope\n", 
+            "+        MessageContext synCtx = TestUtils.getAxis2MessageContext(\n", 
+            "+                \"<empty/>\", new HashMap<String, Entry>());\n", 
+            "+        synCtx.setProperty(\"foo\", \"<test>some text</test>\");\n", 
+            "+        faultMediator.mediate(synCtx);\n", 
+            "+\n", 
+            "+        SOAPEnvelope envelope = synCtx.getEnvelope();\n", 
+            "+        SOAPFault fault = envelope.getBody().getFault();\n", 
+            "+        assertTrue(F_CODE.equals(fault.getCode().getTextAsQName()));\n", 
+            "+        assertTrue(F_STRING.equals(fault.getReason().getText()));\n", 
+            "+        assertTrue(F_ACTOR_URI.equals(fault.getRole().getRoleValue()));\n", 
+            "+        SOAPFaultDetail detail = fault.getDetail();\n", 
+            "+        assertNotNull(detail.getFirstElement());\n", 
+            "+        assertEquals(\"test\", detail.getFirstElement().getLocalName());\n", 
+            "+        assertEquals(\"some text\", detail.getFirstElement().getText());\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public void testSOAP11FaultWithInvalidOutputExpression() throws Exception {\n", 
+            "+        FaultMediator faultMediator = new FaultMediator();\n", 
+            "+        faultMediator.setSoapVersion(FaultMediator.SOAP11);\n", 
+            "+        faultMediator.setFaultCodeValue(F_CODE);\n", 
+            "+        faultMediator.setFaultReasonValue(F_STRING);\n", 
+            "+        faultMediator.setFaultRole(new URI(F_ACTOR_URI));\n", 
+            "+        faultMediator.setFaultDetailExpr(new SynapseXPath(\"get-property('foo')\"));\n", 
+            "+\n", 
+            "+        // invoke transformation, with static envelope\n", 
+            "+        MessageContext synCtx = TestUtils.getAxis2MessageContext(\n", 
+            "+                \"<empty/>\", new HashMap<String, Entry>());\n", 
+            "+        synCtx.setProperty(\"foo\", F_DETAIL);\n", 
+            "+        faultMediator.mediate(synCtx);\n", 
+            "+\n", 
+            "+        SOAPEnvelope envelope = synCtx.getEnvelope();\n", 
+            "+        SOAPFault fault = envelope.getBody().getFault();\n", 
+            "+        assertTrue(F_CODE.equals(fault.getCode().getTextAsQName()));\n", 
+            "+        assertTrue(F_STRING.equals(fault.getReason().getText()));\n", 
+            "+        assertTrue(F_ACTOR_URI.equals(fault.getRole().getRoleValue()));\n", 
+            "+        SOAPFaultDetail detail = fault.getDetail();\n", 
+            "+        assertNull(detail.getFirstElement());\n", 
+            "+    }\n", 
+            " }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/test/java/org/apache/synapse/mediators/transform/FaultMediatorTest.java", 
+      "from": "java/modules/core/src/test/java/org/apache/synapse/mediators/transform/FaultMediatorTest.java"
+    }
+  ], 
+  "id": "1747473"
+}

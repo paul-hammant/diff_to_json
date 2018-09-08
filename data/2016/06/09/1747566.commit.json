@@ -1,0 +1,94 @@
+{
+  "when": "2016-06-09T13:13:16-04:00", 
+  "message": "cleaning imports in message helper and template context", 
+  "who": "isudana", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-64,6 +64,7", 
+          "lines": [
+            "     public void setTime(long time) {\r\n", 
+            "         this.time = time;\r\n", 
+            "     }\r\n", 
+            "+\r\n", 
+            "     public boolean isResponse() {\r\n", 
+            "         return isResponse;\r\n", 
+            "     }\r\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/aspects/statistics/StatisticsLog.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/aspects/statistics/StatisticsLog.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-1,7 +1,8", 
+          "lines": [
+            " package org.apache.synapse.util;\n", 
+            " \n", 
+            "-import org.apache.axiom.attachments.Attachments;\n", 
+            "-import org.apache.axiom.om.*;\n", 
+            "+import org.apache.axiom.om.OMCloneOptions;\n", 
+            "+import org.apache.axiom.om.OMElement;\n", 
+            "+import org.apache.axiom.om.OMNamespace;\n", 
+            " import org.apache.axiom.om.util.ElementHelper;\n", 
+            " import org.apache.axiom.soap.*;\n", 
+            " import org.apache.axiom.util.UIDGenerator;\n"
+          ]
+        }, 
+        {
+          "locn": "-21,16 +22,21", 
+          "lines": [
+            " import org.apache.synapse.aspects.statistics.ErrorLog;\n", 
+            " import org.apache.synapse.aspects.statistics.StatisticsLog;\n", 
+            " import org.apache.synapse.aspects.statistics.StatisticsRecord;\n", 
+            "-import org.apache.synapse.aspects.statistics.StatisticsRecordFactory;\n", 
+            " import org.apache.synapse.core.axis2.Axis2MessageContext;\n", 
+            " import org.apache.synapse.mediators.eip.EIPConstants;\n", 
+            " import org.apache.synapse.mediators.template.TemplateContext;\n", 
+            " import org.apache.synapse.transport.passthru.PassThroughConstants;\n", 
+            " import org.apache.synapse.transport.passthru.Pipe;\n", 
+            "-import org.apache.synapse.transport.passthru.ServerWorker;\n", 
+            " import org.apache.synapse.transport.passthru.config.SourceConfiguration;\n", 
+            "+import java.util.ArrayList;\n", 
+            "+import java.util.Comparator;\n", 
+            "+import java.util.HashMap;\n", 
+            "+import java.util.Iterator;\n", 
+            "+import java.util.List;\n", 
+            "+import java.util.Map;\n", 
+            "+import java.util.Stack;\n", 
+            "+import java.util.TreeMap;\n", 
+            " \n", 
+            "-import java.util.*;\n", 
+            " \n", 
+            " /**\n", 
+            "  *\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/util/MessageHelper.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/util/MessageHelper.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-24,7 +24,6", 
+          "lines": [
+            " import org.apache.synapse.mediators.TemplateParameter;\n", 
+            " import org.apache.synapse.mediators.Value;\n", 
+            " import org.apache.synapse.mediators.eip.EIPUtils;\n", 
+            "-import org.jaxen.JaxenException;\n", 
+            " \n", 
+            " import java.util.*;\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/template/TemplateContext.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/template/TemplateContext.java"
+    }
+  ], 
+  "id": "1747566"
+}

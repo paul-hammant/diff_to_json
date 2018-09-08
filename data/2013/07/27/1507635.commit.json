@@ -1,0 +1,40 @@
+{
+  "when": "2013-07-27T09:19:40-04:00", 
+  "message": "SYNAPSE-838 - Updating the sample.\n", 
+  "who": "sadeep", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-29,7 +29,7", 
+          "lines": [
+            "                 <bean action=\"CREATE\" class=\"samples.bean.Location\" var=\"loc\"/>\n", 
+            "                 <bean action=\"SET_PROPERTY\" var=\"loc\" property=\"latitude\" value=\"{//m:latitude}\" xmlns:m=\"http://services.samples\"/>\n", 
+            "                 <bean action=\"SET_PROPERTY\" var=\"loc\" property=\"longitude\" value=\"{//m:longitude}\" xmlns:m=\"http://services.samples\"/>\n", 
+            "-                <ejb class=\"samples.ejb.StoreLocator\" beanstalk=\"demo\" method=\"getClosestStore\" target=\"loc_id\" jndiName=\"StoreLocatorBean/remote\">\n", 
+            "+                <ejb class=\"samples.ejb.StoreLocator\" beanstalk=\"demo\" method=\"getClosestStore\" target=\"store_id\" jndiName=\"StoreLocatorBean/remote\">\n", 
+            "                     <args>\n", 
+            "                         <arg value=\"{get-property('loc')}\"/>\n", 
+            "                     </args>\n"
+          ]
+        }, 
+        {
+          "locn": "-36,7 +36,7", 
+          "lines": [
+            "                 </ejb>\n", 
+            "                 <ejb class=\"samples.ejb.StoreRegistry\" beanstalk=\"demo\" method=\"getStoreById\" target=\"store\" jndiName=\"StoreRegistryBean/remote\">\n", 
+            "                     <args>\n", 
+            "-                        <arg value=\"{get-property('loc_id')}\"/>\n", 
+            "+                        <arg value=\"{get-property('store_id')}\"/>\n", 
+            "                     </args>\n", 
+            "                 </ejb>\n", 
+            "                 <!-- Prepare the response. -->\n"
+          ]
+        }
+      ], 
+      "to": "java/repository/conf/sample/synapse_sample_470.xml", 
+      "from": "java/repository/conf/sample/synapse_sample_470.xml"
+    }
+  ], 
+  "id": "1507635"
+}

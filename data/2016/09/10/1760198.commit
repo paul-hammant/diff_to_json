@@ -1,0 +1,220 @@
+Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample256.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples/sample256.xml	(revision 1760197)
++++ java/modules/documentation/src/site/xdoc/userguide/samples/sample256.xml	(revision 1760198)
+@@ -52,12 +52,12 @@
+         &lt;/target&gt;
+         &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+ 
+-        &lt;parameter name="transport.mail.Address"&gt;synapse.demo.1@gmail.com&lt;/parameter&gt;
++        &lt;parameter name="transport.mail.Address"&gt;synapse.demo.mail1@gmail.com&lt;/parameter&gt;
+         &lt;parameter name="transport.mail.Protocol"&gt;pop3&lt;/parameter&gt;
+         &lt;parameter name="transport.PollInterval"&gt;5&lt;/parameter&gt;
+         &lt;parameter name="mail.pop3.host"&gt;pop.gmail.com&lt;/parameter&gt;
+         &lt;parameter name="mail.pop3.port"&gt;995&lt;/parameter&gt;
+-        &lt;parameter name="mail.pop3.user"&gt;synapse.demo.1&lt;/parameter&gt;
++        &lt;parameter name="mail.pop3.user"&gt;synapse.demo.mail1&lt;/parameter&gt;
+         &lt;parameter name="mail.pop3.password"&gt;mailpassword&lt;/parameter&gt;
+         &lt;parameter name="mail.pop3.socketFactory.class"&gt;javax.net.ssl.SSLSocketFactory&lt;/parameter&gt;
+         &lt;parameter name="mail.pop3.socketFactory.fallback"&gt;false&lt;/parameter&gt;
+@@ -100,7 +100,7 @@
+             </subsection>
+             <subsection name="Executing the Client">
+                 <p>
+-                    Send an e-mail to <a href="mailto:synapse.demo.1@gmail.com">synapse.demo.1@gmail.com</a>
++                    Send an e-mail to <a href="mailto:synapse.demo.mail1@gmail.com">synapse.demo.mail1@gmail.com</a>
+                     with the following payload.
+                 </p>
+                 <div class="xmlConf">&lt;getQuote xmlns=&quot;http://services.samples&quot;&gt;
+@@ -130,4 +130,4 @@
+         </section>
+         <p><a href="../samples.html">Back to Catalog</a></p>        
+     </body>
+-</document>
+\ No newline at end of file
++</document>
+Index: java/modules/documentation/src/site/xdoc/userguide/samples/setup/mail.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples/setup/mail.xml	(revision 1760197)
++++ java/modules/documentation/src/site/xdoc/userguide/samples/setup/mail.xml	(revision 1760198)
+@@ -45,9 +45,9 @@
+         &lt;parameter name=&quot;mail.smtp.port&quot;&gt;587&lt;/parameter&gt;
+         &lt;parameter name=&quot;mail.smtp.starttls.enable&quot;&gt;true&lt;/parameter&gt;
+         &lt;parameter name=&quot;mail.smtp.auth&quot;&gt;true&lt;/parameter&gt;
+-        &lt;parameter name=&quot;mail.smtp.user&quot;&gt;synapse.demo.0&lt;/parameter&gt;
++        &lt;parameter name=&quot;mail.smtp.user&quot;&gt;synapse.demo.mail1&lt;/parameter&gt;
+         &lt;parameter name=&quot;mail.smtp.password&quot;&gt;mailpassword&lt;/parameter&gt;
+-        &lt;parameter name=&quot;mail.smtp.from&quot;&gt;synapse.demo.0@gmail.com&lt;/parameter&gt;
++        &lt;parameter name=&quot;mail.smtp.from&quot;&gt;synapse.demo.mail1@gmail.com&lt;/parameter&gt;
+ &lt;/transportSender&gt;</div>
+ 			</p>
+ 		</section>
+@@ -62,4 +62,4 @@
+ 			<div class="xmlConf">&lt;transportReceiver name=&quot;mailto&quot; class=&quot;org.apache.axis2.transport.mail.MailTransportListener&quot;&gt;&lt;/transportReceiver&gt;</div>
+ 		</section>
+ 	</body>
+-</document>
+\ No newline at end of file
++</document>
+Index: java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_jms.xml
+===================================================================
+--- java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_jms.xml	(revision 1760197)
++++ java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_jms.xml	(revision 1760198)
+@@ -307,9 +307,9 @@
+         <parameter name="mail.smtp.port">587</parameter>
+         <parameter name="mail.smtp.starttls.enable">true</parameter>
+         <parameter name="mail.smtp.auth">true</parameter>
+-        <parameter name="mail.smtp.user">synapse.demo.0</parameter>
++        <parameter name="mail.smtp.user">synapse.demo.mail1</parameter>
+         <parameter name="mail.smtp.password">mailpassword</parameter>
+-        <parameter name="mail.smtp.from">synapse.demo.0@gmail.com</parameter>
++        <parameter name="mail.smtp.from">synapse.demo.mail1@gmail.com</parameter>
+     </transportSender>-->
+ 
+     <!--Uncomment this for FIX transport support
+Index: java/modules/integration/src/test/resources/axis2Xml/axis2Client/axis2_jms.xml
+===================================================================
+--- java/modules/integration/src/test/resources/axis2Xml/axis2Client/axis2_jms.xml	(revision 1760197)
++++ java/modules/integration/src/test/resources/axis2Xml/axis2Client/axis2_jms.xml	(revision 1760198)
+@@ -226,9 +226,9 @@
+         <parameter name="mail.smtp.port">587</parameter>
+         <parameter name="mail.smtp.starttls.enable">true</parameter>
+         <parameter name="mail.smtp.auth">true</parameter>
+-        <parameter name="mail.smtp.user">synapse.demo.0</parameter>
++        <parameter name="mail.smtp.user">synapse.demo.mail1</parameter>
+         <parameter name="mail.smtp.password">mailpassword</parameter>
+-        <parameter name="mail.smtp.from">synapse.demo.0@gmail.com</parameter>
++        <parameter name="mail.smtp.from">synapse.demo.mail1@gmail.com</parameter>
+     </transportSender-->
+ 
+     <!-- ================================================= -->
+Index: java/modules/integration/src/test/resources/axis2Xml/axis2Client/axis2_def.xml
+===================================================================
+--- java/modules/integration/src/test/resources/axis2Xml/axis2Client/axis2_def.xml	(revision 1760197)
++++ java/modules/integration/src/test/resources/axis2Xml/axis2Client/axis2_def.xml	(revision 1760198)
+@@ -227,9 +227,9 @@
+         <parameter name="mail.smtp.port">587</parameter>
+         <parameter name="mail.smtp.starttls.enable">true</parameter>
+         <parameter name="mail.smtp.auth">true</parameter>
+-        <parameter name="mail.smtp.user">synapse.demo.0</parameter>
++        <parameter name="mail.smtp.user">synapse.demo.mail1</parameter>
+         <parameter name="mail.smtp.password">mailpassword</parameter>
+-        <parameter name="mail.smtp.from">synapse.demo.0@gmail.com</parameter>
++        <parameter name="mail.smtp.from">synapse.demo.mail1@gmail.com</parameter>
+     </transportSender-->
+ 
+     <!-- ================================================= -->
+Index: java/modules/packaging/package-archetype/src/main/resources/archetype-resources/repository/conf/axis2.xml
+===================================================================
+--- java/modules/packaging/package-archetype/src/main/resources/archetype-resources/repository/conf/axis2.xml	(revision 1760197)
++++ java/modules/packaging/package-archetype/src/main/resources/archetype-resources/repository/conf/axis2.xml	(revision 1760198)
+@@ -273,9 +273,9 @@
+         <parameter name="mail.smtp.port">587</parameter>
+         <parameter name="mail.smtp.starttls.enable">true</parameter>
+         <parameter name="mail.smtp.auth">true</parameter>
+-        <parameter name="mail.smtp.user">synapse.demo.0</parameter>
++        <parameter name="mail.smtp.user">synapse.demo.mail1</parameter>
+         <parameter name="mail.smtp.password">mailpassword</parameter>
+-        <parameter name="mail.smtp.from">synapse.demo.0@gmail.com</parameter>
++        <parameter name="mail.smtp.from">synapse.demo.mail1@gmail.com</parameter>
+     </transportSender>-->
+ 
+     <!--Uncomment this for FIX transport support
+Index: java/repository/conf/axis2.xml
+===================================================================
+--- java/repository/conf/axis2.xml	(revision 1760197)
++++ java/repository/conf/axis2.xml	(revision 1760198)
+@@ -349,9 +349,9 @@
+         <parameter name="mail.smtp.port">587</parameter>
+         <parameter name="mail.smtp.starttls.enable">true</parameter>
+         <parameter name="mail.smtp.auth">true</parameter>
+-        <parameter name="mail.smtp.user">synapse.demo.0</parameter>
++        <parameter name="mail.smtp.user">synapse.demo.mail1</parameter>
+         <parameter name="mail.smtp.password">mailpassword</parameter>
+-        <parameter name="mail.smtp.from">synapse.demo.0@gmail.com</parameter>
++        <parameter name="mail.smtp.from">synapse.demo.mail1@gmail.com</parameter>
+     </transportSender>-->
+ 
+     <!--Uncomment this for FIX transport support
+Index: java/repository/conf/axis2_blocking_client.xml
+===================================================================
+--- java/repository/conf/axis2_blocking_client.xml	(revision 1760197)
++++ java/repository/conf/axis2_blocking_client.xml	(revision 1760198)
+@@ -250,9 +250,9 @@
+         <parameter name="mail.smtp.port">587</parameter>
+         <parameter name="mail.smtp.starttls.enable">true</parameter>
+         <parameter name="mail.smtp.auth">true</parameter>
+-        <parameter name="mail.smtp.user">synapse.demo.0</parameter>
++        <parameter name="mail.smtp.user">synapse.demo.mail1</parameter>
+         <parameter name="mail.smtp.password">mailpassword</parameter>
+-        <parameter name="mail.smtp.from">synapse.demo.0@gmail.com</parameter>
++        <parameter name="mail.smtp.from">synapse.demo.mail1@gmail.com</parameter>
+     </transportSender>
+ 
+     <!-- ================================================= -->
+Index: java/repository/conf/axis2_server.xml
+===================================================================
+--- java/repository/conf/axis2_server.xml	(revision 1760197)
++++ java/repository/conf/axis2_server.xml	(revision 1760198)
+@@ -315,9 +315,9 @@
+         <parameter name="mail.smtp.port">587</parameter>
+         <parameter name="mail.smtp.starttls.enable">true</parameter>
+         <parameter name="mail.smtp.auth">true</parameter>
+-        <parameter name="mail.smtp.user">synapse.demo.0</parameter>
++        <parameter name="mail.smtp.user">synapse.demo.mail1</parameter>
+         <parameter name="mail.smtp.password">mailpassword</parameter>
+-        <parameter name="mail.smtp.from">synapse.demo.0@gmail.com</parameter>
++        <parameter name="mail.smtp.from">synapse.demo.mail1@gmail.com</parameter>
+     </transportSender>-->
+ 
+     <!--Uncomment this for FIX transport support
+Index: java/repository/conf/sample/resources/misc/client/axis2.xml
+===================================================================
+--- java/repository/conf/sample/resources/misc/client/axis2.xml	(revision 1760197)
++++ java/repository/conf/sample/resources/misc/client/axis2.xml	(revision 1760198)
+@@ -233,9 +233,9 @@
+         <parameter name="mail.smtp.port">587</parameter>
+         <parameter name="mail.smtp.starttls.enable">true</parameter>
+         <parameter name="mail.smtp.auth">true</parameter>
+-        <parameter name="mail.smtp.user">synapse.demo.0</parameter>
++        <parameter name="mail.smtp.user">synapse.demo.mail1</parameter>
+         <parameter name="mail.smtp.password">mailpassword</parameter>
+-        <parameter name="mail.smtp.from">synapse.demo.0@gmail.com</parameter>
++        <parameter name="mail.smtp.from">synapse.demo.mail1@gmail.com</parameter>
+     </transportSender>
+ 
+     <!-- ================================================= -->
+Index: java/repository/conf/sample/synapse_sample_256.xml
+===================================================================
+--- java/repository/conf/sample/synapse_sample_256.xml	(revision 1760197)
++++ java/repository/conf/sample/synapse_sample_256.xml	(revision 1760198)
+@@ -45,20 +45,19 @@
+                 <send/>
+             </outSequence>
+         </target>
+-        <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
+ 
+-        <parameter name="transport.mail.Address">synapse.demo.1@gmail.com</parameter>
++        <parameter name="transport.mail.Address">synapse.demo.mail1@gmail.com</parameter>
+         <parameter name="transport.mail.Protocol">pop3</parameter>
+         <parameter name="transport.PollInterval">5</parameter>
+         <parameter name="mail.pop3.host">pop.gmail.com</parameter>
+         <parameter name="mail.pop3.port">995</parameter>
+-        <parameter name="mail.pop3.user">synapse.demo.1</parameter>
++        <parameter name="mail.pop3.user">synapse.demo.mail1</parameter>
+         <parameter name="mail.pop3.password">mailpassword</parameter>
+         <parameter name="mail.pop3.socketFactory.class">javax.net.ssl.SSLSocketFactory</parameter>
+         <parameter name="mail.pop3.socketFactory.fallback">false</parameter>
+         <parameter name="mail.pop3.socketFactory.port">995</parameter>
+         <parameter name="transport.mail.ContentType">application/xml</parameter>
+-        
++
+     </proxy>
+ 
+ </definitions>
+-*-*-*-
+Message: Fix for SYNAPSE-974 by chanaka
+-*-*-*-
+When: 2016-09-10 13:51:28 -0400 
+-*-*-*-
+Who: isudana

@@ -1,0 +1,27 @@
+{
+  "when": "2013-08-03T19:08:24-04:00", 
+  "message": "don't ignore execeptions.", 
+  "who": "rajikak", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-555,7 +555,7", 
+          "lines": [
+            " \n", 
+            "             } catch (ConsumerCancelledException e) {\n", 
+            "                 log.error(\"Polling task for service '\" + serviceName + \"' received a \" +\n", 
+            "-                        \"cancellation signal\");\n", 
+            "+                        \"cancellation signal\", e);\n", 
+            "             }\n", 
+            "         }\n", 
+            "     }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTask.java", 
+      "from": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTask.java"
+    }
+  ], 
+  "id": "1510078"
+}

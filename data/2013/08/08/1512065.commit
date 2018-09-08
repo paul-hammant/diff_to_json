@@ -44,45 +44,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/ProxyServic
                                  }
                              }
                          }
-Index: java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfigUtils.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfigUtils.java	(revision 1512064)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfigUtils.java	(revision 1512065)
-@@ -636,6 +636,34 @@
-         return url;
-     }
- 
-+    /**
-+     * Resolve a relative URI. If the URI is a file and it's path is relative, the basePath will be
-+     * used as parent location. If the URI is null the basePath will be returned as URI.
-+     *
-+     * @param uri      the URI to resolve
-+     * @param basePath the base path
-+     * @return the absolute URI
-+     */
-+    public static URI resolveRelativeURI(URI uri, String basePath) {
-+        URI baseURI;
-+        if (uri != null) {
-+            if ("file".equals(uri.getScheme())) {
-+                String wsdlPath = uri.getSchemeSpecificPart();
-+                if (!new File(wsdlPath).isAbsolute()) {
-+                    baseURI = new File(new File(basePath),
-+                            wsdlPath).toURI();
-+                } else {
-+                    baseURI = uri;
-+                }
-+            } else {
-+                baseURI = uri;
-+            }
-+        } else {
-+            baseURI = new File(basePath).toURI();
-+        }
-+        return baseURI;
-+    }
-+
-     public static String resolveRelativeURI(String parentLocation, String relativeLocation) {
- 
-         if (relativeLocation == null) {
 Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/WSDLEndpointFactory.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/WSDLEndpointFactory.java	(revision 1512064)
@@ -123,6 +84,45 @@ Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/W
  
                                  } else if (WSDL2Constants.WSDL_NAMESPACE.equals(nsUri)) {
                                      //endpoint = new WSDL20EndpointBuilder().
+Index: java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfigUtils.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfigUtils.java	(revision 1512064)
++++ java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfigUtils.java	(revision 1512065)
+@@ -636,6 +636,34 @@
+         return url;
+     }
+ 
++    /**
++     * Resolve a relative URI. If the URI is a file and it's path is relative, the basePath will be
++     * used as parent location. If the URI is null the basePath will be returned as URI.
++     *
++     * @param uri      the URI to resolve
++     * @param basePath the base path
++     * @return the absolute URI
++     */
++    public static URI resolveRelativeURI(URI uri, String basePath) {
++        URI baseURI;
++        if (uri != null) {
++            if ("file".equals(uri.getScheme())) {
++                String wsdlPath = uri.getSchemeSpecificPart();
++                if (!new File(wsdlPath).isAbsolute()) {
++                    baseURI = new File(new File(basePath),
++                            wsdlPath).toURI();
++                } else {
++                    baseURI = uri;
++                }
++            } else {
++                baseURI = uri;
++            }
++        } else {
++            baseURI = new File(basePath).toURI();
++        }
++        return baseURI;
++    }
++
+     public static String resolveRelativeURI(String parentLocation, String relativeLocation) {
+ 
+         if (relativeLocation == null) {
 -*-*-*-
 Message: Resolving relative paths of WSDLs relative to SynapseHome. This is important in WAR deployments. Patch applied from SYNAPSE-896
 -*-*-*-

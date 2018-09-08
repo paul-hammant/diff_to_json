@@ -1,0 +1,58 @@
+{
+  "when": "2013-07-21T15:31:38-04:00", 
+  "message": "Applying the patch for SYNAPSE-950. Handling the NO_ENTITY_BODY property in the pass thru http sender.", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-508,12 +508,18", 
+          "lines": [
+            " \n", 
+            "         ProtocolState state = SourceContext.getState(conn);\n", 
+            "         if (state != null && state.compareTo(ProtocolState.REQUEST_DONE) <= 0) {\n", 
+            "-            // start sending the response if we\n", 
+            "-            if (msgContext.isPropertyTrue(PassThroughConstants.MESSAGE_BUILDER_INVOKED) && pipe != null) {\n", 
+            "+            // start sending the response\n", 
+            "+            if (noEntityBody != null && Boolean.TRUE == noEntityBody && pipe != null) {\n", 
+            "                 OutputStream out = pipe.getOutputStream();\n", 
+            "+                out.write(new byte[0]);\n", 
+            "+                pipe.setRawSerializationComplete(true);\n", 
+            "+                out.close();\n", 
+            "+            } else if (msgContext.isPropertyTrue(PassThroughConstants.MESSAGE_BUILDER_INVOKED) &&\n", 
+            "+                    pipe != null) {\n", 
+            "+                OutputStream out = pipe.getOutputStream();\n", 
+            "                 if (msgContext.isPropertyTrue(NhttpConstants.SC_ACCEPTED)) {\n", 
+            "                     out.write(new byte[0]);\n", 
+            "-                }else {\n", 
+            "+                } else {\n", 
+            "                     MessageFormatter formatter = MessageProcessorSelector.getMessageFormatter(msgContext);\n", 
+            "                     OMOutputFormat format = PassThroughTransportUtils.getOMOutputFormat(msgContext);\n", 
+            "                     formatter.writeTo(msgContext, format, out, false);\n"
+          ]
+        }, 
+        {
+          "locn": "-521,13 +527,6", 
+          "lines": [
+            "                 pipe.setSerializationComplete(true);\n", 
+            "                 out.close();\n", 
+            "             }\n", 
+            "-            \n", 
+            "-            if(noEntityBody != null && Boolean.TRUE == noEntityBody && pipe != null){\n", 
+            "-                OutputStream out = pipe.getOutputStream();\n", 
+            "-            \tout.write(new byte[0]);\n", 
+            "-            \tpipe.setRawSerializationComplete(true);\n", 
+            "-                out.close();\n", 
+            "-            }\n", 
+            "             conn.requestOutput();\n", 
+            "         } else {\n", 
+            "             // nothing much to do as we have started the response already\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java"
+    }
+  ], 
+  "id": "1505454"
+}

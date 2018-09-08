@@ -1,0 +1,100 @@
+{
+  "when": "2013-07-20T21:28:59-04:00", 
+  "message": "Applying the patch for SYNAPSE-871. Prevent calling the datasource.getConnection() twice for a single DB interaction.", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-200,12 +200,13", 
+          "lines": [
+            " \n", 
+            "     /**\n", 
+            "      * Return a Prepared statement for the given Statement object, which is ready to be executed\n", 
+            "-     * @param stmnt SQL stataement to be executed\n", 
+            "+     * @param stmnt SQL statement to be executed\n", 
+            "+     * @param con The connection to be used\n", 
+            "      * @param msgCtx Current message context\n", 
+            "      * @return a PreparedStatement\n", 
+            "      * @throws SQLException on error\n", 
+            "      */\n", 
+            "-    protected PreparedStatement getPreparedStatement(Statement stmnt,\n", 
+            "+    protected PreparedStatement getPreparedStatement(Statement stmnt, Connection con,\n", 
+            "                                                      MessageContext msgCtx) throws SQLException {\n", 
+            " \n", 
+            "         SynapseLog synLog = getLog(msgCtx);\n"
+          ]
+        }, 
+        {
+          "locn": "-215,7 +216,6", 
+          "lines": [
+            "                 \" and preparing statement : \" + stmnt.getRawStatement());\n", 
+            "         }\n", 
+            " \n", 
+            "-        Connection con = getDataSource().getConnection();\n", 
+            "         if (con == null) {\n", 
+            "             String msg = \"Connection from DataSource \" + getDSName() + \" is null.\";\n", 
+            "             log.error(msg);\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/db/AbstractDBMediator.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/db/AbstractDBMediator.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-41,8 +41,8", 
+          "lines": [
+            "         Connection con = null;\n", 
+            "         ResultSet rs = null;\n", 
+            "         try {\n", 
+            "-            PreparedStatement ps = getPreparedStatement(stmnt, msgCtx);\n", 
+            "-            con = ps.getConnection();\n", 
+            "+            con = this.getDataSource().getConnection();\n", 
+            "+            PreparedStatement ps = getPreparedStatement(stmnt, con, msgCtx);\n", 
+            "             rs = ps.executeQuery();\n", 
+            " \n", 
+            "             if (rs.next()) {\n"
+          ]
+        }, 
+        {
+          "locn": "-90,7 +90,7", 
+          "lines": [
+            "             if (rs != null) {\n", 
+            "                 try {\n", 
+            "                     rs.close();\n", 
+            "-                } catch (SQLException e) {}\n", 
+            "+                } catch (SQLException ignore) {}\n", 
+            "             }\n", 
+            "             if (con != null) {\n", 
+            "                 try {\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/db/DBLookupMediator.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/db/DBLookupMediator.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-50,7 +50,8", 
+          "lines": [
+            " \n", 
+            "         Connection con = null;\n", 
+            "         try {\n", 
+            "-            PreparedStatement ps = getPreparedStatement(stmnt, msgCtx);\n", 
+            "+            con = this.getDataSource().getConnection();\n", 
+            "+            PreparedStatement ps = getPreparedStatement(stmnt, con, msgCtx);\n", 
+            "             con = ps.getConnection();\n", 
+            "             int count = ps.executeUpdate();\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/db/DBReportMediator.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/db/DBReportMediator.java"
+    }
+  ], 
+  "id": "1505250"
+}

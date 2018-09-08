@@ -186,6 +186,27 @@ Index: java/modules/core/src/test/java/org/apache/synapse/endpoints/dispatch/Sim
 +        return msgContext;
 +    }
 +}
+Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/dispatch/AbstractDispatcher.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/endpoints/dispatch/AbstractDispatcher.java	(revision 1510819)
++++ java/modules/core/src/main/java/org/apache/synapse/endpoints/dispatch/AbstractDispatcher.java	(revision 1510820)
+@@ -36,7 +36,6 @@
+ public abstract class AbstractDispatcher implements Dispatcher {
+ 
+     protected Log log;
+-    private final static String TRANSPORT_HEADERS = "TRANSPORT_HEADERS";
+ 
+     protected AbstractDispatcher() {
+         log = LogFactory.getLog(this.getClass());
+@@ -149,7 +148,7 @@
+         org.apache.axis2.context.MessageContext axis2MessageContext =
+                 ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+ 
+-        Object o = axis2MessageContext.getProperty(TRANSPORT_HEADERS);
++        Object o = axis2MessageContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+         if (o != null && o instanceof Map) {
+             return (Map) o;
+         }
 Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/dispatch/SALSessions.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/endpoints/dispatch/SALSessions.java	(revision 1510819)
@@ -217,27 +238,6 @@ Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/dispatch/SAL
       */
      private SessionInformation createSessionInformation(MessageContext synCtx,
                                                          String id, Member currentMember) {
-Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/dispatch/AbstractDispatcher.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/endpoints/dispatch/AbstractDispatcher.java	(revision 1510819)
-+++ java/modules/core/src/main/java/org/apache/synapse/endpoints/dispatch/AbstractDispatcher.java	(revision 1510820)
-@@ -36,7 +36,6 @@
- public abstract class AbstractDispatcher implements Dispatcher {
- 
-     protected Log log;
--    private final static String TRANSPORT_HEADERS = "TRANSPORT_HEADERS";
- 
-     protected AbstractDispatcher() {
-         log = LogFactory.getLog(this.getClass());
-@@ -149,7 +148,7 @@
-         org.apache.axis2.context.MessageContext axis2MessageContext =
-                 ((Axis2MessageContext) synCtx).getAxis2MessageContext();
- 
--        Object o = axis2MessageContext.getProperty(TRANSPORT_HEADERS);
-+        Object o = axis2MessageContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
-         if (o != null && o instanceof Map) {
-             return (Map) o;
-         }
 -*-*-*-
 Message: Adding test cases for session dispatchers
 -*-*-*-

@@ -120,26 +120,6 @@ Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/trans
  import org.apache.synapse.transport.passthru.jmx.PassThroughTransportMetricsCollector;
  import org.apache.synapse.transport.passthru.jmx.TransportView;
  
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java	(revision 1509911)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java	(revision 1509912)
-@@ -50,6 +50,7 @@
- import org.apache.http.nio.reactor.IOReactorExceptionHandler;
- import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
- import org.apache.http.params.HttpParams;
-+import org.apache.synapse.commons.jmx.MBeanRegistrar;
- import org.apache.synapse.transport.nhttp.NhttpConstants;
- import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
- import org.apache.synapse.transport.nhttp.util.NhttpUtil;
-@@ -56,7 +57,6 @@
- import org.apache.synapse.transport.passthru.config.SourceConfiguration;
- import org.apache.synapse.transport.passthru.config.TargetConfiguration;
- import org.apache.synapse.transport.passthru.connections.TargetConnections;
--import org.apache.synapse.transport.passthru.jmx.MBeanRegistrar;
- import org.apache.synapse.transport.passthru.jmx.PassThroughTransportMetricsCollector;
- import org.apache.synapse.transport.passthru.jmx.TransportView;
- import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
 Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/jmx/LatencyView.java
 ===================================================================
 --- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/jmx/LatencyView.java	(revision 1509911)
@@ -236,6 +216,26 @@ Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/trans
              }
          } else {
              for (int i = 0; i < samples; i++) {
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java	(revision 1509911)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java	(revision 1509912)
+@@ -50,6 +50,7 @@
+ import org.apache.http.nio.reactor.IOReactorExceptionHandler;
+ import org.apache.http.nio.reactor.ssl.SSLSetupHandler;
+ import org.apache.http.params.HttpParams;
++import org.apache.synapse.commons.jmx.MBeanRegistrar;
+ import org.apache.synapse.transport.nhttp.NhttpConstants;
+ import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
+ import org.apache.synapse.transport.nhttp.util.NhttpUtil;
+@@ -56,7 +57,6 @@
+ import org.apache.synapse.transport.passthru.config.SourceConfiguration;
+ import org.apache.synapse.transport.passthru.config.TargetConfiguration;
+ import org.apache.synapse.transport.passthru.connections.TargetConnections;
+-import org.apache.synapse.transport.passthru.jmx.MBeanRegistrar;
+ import org.apache.synapse.transport.passthru.jmx.PassThroughTransportMetricsCollector;
+ import org.apache.synapse.transport.passthru.jmx.TransportView;
+ import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
 -*-*-*-
 Message: Removing the redundant MBeanRegistrar in pass thru transport - Changed the transport to use the registrat in Synapse commons like the nhttp transport.
 -*-*-*-

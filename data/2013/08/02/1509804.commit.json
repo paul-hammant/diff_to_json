@@ -1,0 +1,27 @@
+{
+  "when": "2013-08-02T14:47:02-04:00", 
+  "message": "Applying the patch for SYNAPSE-886", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-75,7 +75,7", 
+          "lines": [
+            "             if (sessionList != null) {\n", 
+            "                 for (String sessionID : sessionList) {\n", 
+            "                     SessionInformation sessionInfoObj = SALSessions.getInstance().getSession(sessionID);\n", 
+            "-                    if (sessionInfoObj != null) {\n", 
+            "+                    if (sessionInfoObj != null && sessionInfoObj.getMember() != null) {\n", 
+            "                         Map<String, String> subDomainNames =\n", 
+            "                                 (Map<String, String>) sessionInfoObj.getMember().getProperties().get(HOSTS);\n", 
+            "                         if (log.isDebugEnabled()) {\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/endpoints/dispatch/HttpSessionDispatcher.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/endpoints/dispatch/HttpSessionDispatcher.java"
+    }
+  ], 
+  "id": "1509804"
+}

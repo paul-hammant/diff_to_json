@@ -79,20 +79,6 @@ Index: java/modules/commons/src/test/java/org/apache/synapse/commons/evaluators/
  
          try {
              Evaluator eval = fac.create(AXIOMUtil.stringToOM(input));
-Index: java/modules/commons/src/main/java/org/apache/synapse/commons/evaluators/EvaluatorConstants.java
-===================================================================
---- java/modules/commons/src/main/java/org/apache/synapse/commons/evaluators/EvaluatorConstants.java	(revision 1504962)
-+++ java/modules/commons/src/main/java/org/apache/synapse/commons/evaluators/EvaluatorConstants.java	(revision 1504963)
-@@ -47,6 +47,9 @@
-     public static final String PRIORITY = "priority";
-     public static final String DEFAULT_PRIORITY = "defaultPriority";
- 
-+    public static final String SYNAPSE_NAMESPACE = "http://ws.apache.org/ns/synapse";
-+    public static final String EMPTY_PREFIX = "";
-+
-     public static enum URI_FRAGMENTS {
-         protocol,
-         user,
 Index: java/modules/commons/src/main/java/org/apache/synapse/commons/evaluators/config/MatchSerializer.java
 ===================================================================
 --- java/modules/commons/src/main/java/org/apache/synapse/commons/evaluators/config/MatchSerializer.java	(revision 1504962)
@@ -191,6 +177,20 @@ Index: java/modules/commons/src/main/java/org/apache/synapse/commons/evaluators/
          serializeChildren(orElement, orEvaluator.getEvaluators());
  
          if (parent != null) {
+Index: java/modules/commons/src/main/java/org/apache/synapse/commons/evaluators/EvaluatorConstants.java
+===================================================================
+--- java/modules/commons/src/main/java/org/apache/synapse/commons/evaluators/EvaluatorConstants.java	(revision 1504962)
++++ java/modules/commons/src/main/java/org/apache/synapse/commons/evaluators/EvaluatorConstants.java	(revision 1504963)
+@@ -47,6 +47,9 @@
+     public static final String PRIORITY = "priority";
+     public static final String DEFAULT_PRIORITY = "defaultPriority";
+ 
++    public static final String SYNAPSE_NAMESPACE = "http://ws.apache.org/ns/synapse";
++    public static final String EMPTY_PREFIX = "";
++
+     public static enum URI_FRAGMENTS {
+         protocol,
+         user,
 Index: java/modules/core/src/test/java/org/apache/synapse/config/xml/ConditionalRouterMediatorSerializationTest.java
 ===================================================================
 --- java/modules/core/src/test/java/org/apache/synapse/config/xml/ConditionalRouterMediatorSerializationTest.java	(revision 1504962)

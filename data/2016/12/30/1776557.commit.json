@@ -1,0 +1,46 @@
+{
+  "when": "2016-12-30T08:15:46-05:00", 
+  "message": "We want to produce zip+tar.gz and src distro in addition to bin distro", 
+  "who": "ravi", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-21,7 +21,7", 
+          "lines": [
+            "     <id>bin</id>\r\n", 
+            "     <includeBaseDirectory>false</includeBaseDirectory>\r\n", 
+            "     <formats>\r\n", 
+            "-        <!--<format>tar.gz</format>-->\r\n", 
+            "+        <format>tar.gz</format>\r\n", 
+            "         <format>zip</format>\r\n", 
+            "     </formats>\r\n", 
+            " \r\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/distribution/src/main/assembly/bin.xml", 
+      "from": "java/modules/distribution/src/main/assembly/bin.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-188,7 +188,7", 
+          "lines": [
+            "                         <configuration>\n", 
+            "                             <descriptors>\n", 
+            "                                 <descriptor>src/main/assembly/bin.xml</descriptor>\n", 
+            "-                                <!--<descriptor>src/main/assembly/src.xml</descriptor>-->\n", 
+            "+                                <descriptor>src/main/assembly/src.xml</descriptor>\n", 
+            "                             </descriptors>\n", 
+            "                             <finalName>synapse-${synapse.version}</finalName>\n", 
+            "                         </configuration>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/distribution/pom.xml", 
+      "from": "java/modules/distribution/pom.xml"
+    }
+  ], 
+  "id": "1776557"
+}

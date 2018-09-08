@@ -1,0 +1,44 @@
+{
+  "when": "2013-12-16T04:25:45-05:00", 
+  "message": "SYNAPSE-986: Removed a dependency management entry that is no longer relevant.", 
+  "who": "veithen", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-585,13 +585,6", 
+          "lines": [
+            "                 <version>${axiom.version}</version>\n", 
+            "             </dependency>\n", 
+            " \n", 
+            "-            <!-- XML Schema -->\n", 
+            "-            <dependency>\n", 
+            "-                <groupId>org.apache.ws.commons.schema</groupId>\n", 
+            "-                <artifactId>XmlSchema</artifactId>\n", 
+            "-                <version>${xml_schema.version}</version>\n", 
+            "-            </dependency>\n", 
+            "-\n", 
+            "             <!-- Apache Commons -->\n", 
+            "             <dependency>\n", 
+            "                 <groupId>commons-dbcp</groupId>\n"
+          ]
+        }, 
+        {
+          "locn": "-1072,7 +1065,6", 
+          "lines": [
+            "         <axis2.version>1.7.0-SNAPSHOT</axis2.version>\n", 
+            "         <axis2.transport.version>1.7.0-SNAPSHOT</axis2.transport.version>\n", 
+            "         <axiom.version>1.2.15-SNAPSHOT</axiom.version>\n", 
+            "-        <xml_schema.version>1.4.3</xml_schema.version>\n", 
+            "         <wsdl4j.version>1.6.2</wsdl4j.version>\n", 
+            " \n", 
+            "         <!-- addressing, rampart, neethi -->\n"
+          ]
+        }
+      ], 
+      "to": "java/pom.xml", 
+      "from": "java/pom.xml"
+    }
+  ], 
+  "id": "1551136"
+}

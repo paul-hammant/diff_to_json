@@ -1,3 +1,49 @@
+Index: java/repository/conf/axis2.xml
+===================================================================
+--- java/repository/conf/axis2.xml	(revision 1507854)
++++ java/repository/conf/axis2.xml	(revision 1507855)
+@@ -266,6 +266,22 @@
+     <!--Uncomment this for UDP transport support
+     <transportReceiver name="udp" class="org.apache.axis2.transport.udp.UDPListener"/>-->
+ 
++    <!--Uncomment this for AMQP transport support-->
++    <!--<transportReceiver name="amqp" class="org.apache.synapse.transport.amqp.AMQPTransportListener">-->
++        <!--<parameter name="consumer" locked="false">-->
++            <!--<parameter name="transport.amqp.Uri" locked="false">amqp://localhost:5672</parameter>-->
++        <!--</parameter>-->
++        <!--<parameter name="worker-queue" locked="false">-->
++            <!--<parameter name="transport.amqp.Uri" locked="false">amqp://localhost:5672</parameter>-->
++            <!--<parameter name="transport.amqp.ChannelPreFetchCountSize" locked="false">1</parameter>-->
++        <!--</parameter>-->
++        <!--<parameter name="subscriber" locked="false">-->
++            <!--<parameter name="transport.amqp.Uri" locked="false">amqp://localhost:5672</parameter>-->
++        <!--</parameter>-->
++    <!--</transportReceiver>-->
++
++    <!--Uncomment this for AMQP transport support -->
++
+     <!-- ================================================= -->
+     <!-- Transport Outs -->
+     <!-- ================================================= -->
+@@ -348,6 +364,18 @@
+     <!--Uncomment this for UDP transport support
+     <transportSender name="udp" class="org.apache.axis2.transport.udp.UDPSender"/>-->
+ 
++
++    <!--Uncomment this for AMQP transport support-->
++    <!--<transportSender name="amqp" class="org.apache.synapse.transport.amqp.AMQPTransportSender">-->
++        <!--<parameter name="producer" locked="false">-->
++            <!--<parameter name="transport.amqp.Uri" locked="false">amqp://localhost:5672</parameter>-->
++        <!--</parameter>-->
++        <!--<parameter name="publisher" locked="false">-->
++            <!--<parameter name="transport.amqp.Uri" locked="false">amqp://localhost:5672</parameter>-->
++        <!--</parameter>-->
++    <!--</transportSender>-->
++
++
+     <!-- ================================================= -->
+     <!-- Global Modules  -->
+     <!-- ================================================= -->
 Index: java/modules/documentation/src/site/xdoc/userguide/transports.xml
 ===================================================================
 --- java/modules/documentation/src/site/xdoc/userguide/transports.xml	(revision 1507854)
@@ -407,23 +453,417 @@ Index: java/modules/distribution/pom.xml
  
          <dependency>
              <groupId>com.oopsconsultancy</groupId>
-Index: java/modules/transports/pom.xml
+Index: java/modules/transports/optional/amqp/src/test/resources/amqp-transport.properties
 ===================================================================
---- java/modules/transports/pom.xml	(revision 1507854)
-+++ java/modules/transports/pom.xml	(revision 1507855)
-@@ -47,6 +47,7 @@
-         <module>core/pipe</module>
-         <module>core/vfs</module>
-         <module>optional/fix</module>
-+		<module>optional/amqp</module>
-     </modules>
- 
-     <dependencies>
-Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/connectionfactory/AMQPTransportConnectionFactoryManager.java
+--- java/modules/transports/optional/amqp/src/test/resources/amqp-transport.properties	(nonexistent)
++++ java/modules/transports/optional/amqp/src/test/resources/amqp-transport.properties	(revision 1507855)
+@@ -0,0 +1,7 @@
++# Do not edit. This is for JUnit tests.
++string=username@domain.com
++int=10
++long=13
++double=14.4
++boolean1=true
++boolean2=false
+\ No newline at end of file
+Index: java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPProducerClient.java
 ===================================================================
---- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/connectionfactory/AMQPTransportConnectionFactoryManager.java	(nonexistent)
-+++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/connectionfactory/AMQPTransportConnectionFactoryManager.java	(revision 1507855)
-@@ -0,0 +1,115 @@
+--- java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPProducerClient.java	(nonexistent)
++++ java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPProducerClient.java	(revision 1507855)
+@@ -0,0 +1,75 @@
++package org.apache.synapse.tranport.amqp;
++
++import com.rabbitmq.client.Channel;
++import com.rabbitmq.client.Connection;
++import com.rabbitmq.client.ConnectionFactory;
++
++import java.io.IOException;
++
++/**
++ * The producer for AMQP transport.
++ */
++public class AMQPProducerClient {
++
++    //    private static final String QUEUE_NAME = "ConsumerTxProxy";
++//    private static final String QUEUE_NAME = "worker-queue";
++    private static final String QUEUE_NAME = "ProducerProxy";
++
++    private static final String MESSAGE =
++            "<?xml version='1.0' encoding='UTF-8'?>\n" +
++                    "   <soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
++                    "      <soapenv:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\n" +
++                    "         <wsa:To>http://localhost:8281/services/StockQuoteProxy</wsa:To>\n" +
++                    "         <wsa:MessageID>urn:uuid:44d578a8-20e9-4ee4-8407-9b0a0768e5a8</wsa:MessageID>\n" +
++                    "         <wsa:Action>urn:getQuote</wsa:Action>\n" +
++                    "      </soapenv:Header>\n" +
++                    "      <soapenv:Body>\n" +
++                    "         <m0:getQuote xmlns:m0=\"http://services.samples\">\n" +
++                    "            <m0:request>\n" +
++                    "               <m0:symbol>IBM</m0:symbol>\n" +
++                    "            </m0:request>\n" +
++                    "         </m0:getQuote>\n" +
++                    "      </soapenv:Body>\n" +
++                    "   </soapenv:Envelope>";
++
++    private static final String MESSAGE2 =
++            "<?xml version='1.0' encoding='UTF-8'?>\n" +
++                    "         <m0:getQuote xmlns:m0=\"http://services.samples\">\n" +
++                    "            <m0:request>\n" +
++                    "               <m0:symbol>IBM</m0:symbol>\n" +
++                    "            </m0:request>\n" +
++                    "         </m0:getQuote>";
++
++    public static void main(String[] args) throws IOException {
++
++        ConnectionFactory factory = new ConnectionFactory();
++        factory.setHost("localhost");
++        Connection connection = factory.newConnection();
++
++        Channel channel = connection.createChannel();
++
++        //channel.queueDeclare(QUEUE_NAME, false, false, false, null);
++        AMQPProducerClient.produce(MESSAGE2, channel, QUEUE_NAME);
++//        AMQPProducerClient.publish(MESSAGE2, channel, "subscriber-exchange");
++//        AMQPProducerClient.route(MESSAGE2, channel, "route-exchange", "fatal");
++//        AMQPProducerClient.route(MESSAGE2, channel, "topic-exchange", "kern.critical");
++
++        channel.close();
++        connection.close();
++
++    }
++
++
++    private static void produce(String message, Channel channel, String queueName) throws IOException {
++        channel.basicPublish("", queueName, null, message.getBytes());
++    }
++
++    private static void publish(String message, Channel channel, String exchangeName) throws IOException {
++        channel.basicPublish(exchangeName, "", null, message.getBytes());
++    }
++
++    private static void route(String message, Channel channel, String exchangeName, String routeKey) throws IOException {
++        channel.basicPublish(exchangeName, routeKey, null, message.getBytes());
++    }
++
++}
+Index: java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPConsumerClient.java
+===================================================================
+--- java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPConsumerClient.java	(nonexistent)
++++ java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPConsumerClient.java	(revision 1507855)
+@@ -0,0 +1,34 @@
++package org.apache.synapse.tranport.amqp;
++
++import com.rabbitmq.client.Channel;
++import com.rabbitmq.client.Connection;
++import com.rabbitmq.client.ConnectionFactory;
++import com.rabbitmq.client.QueueingConsumer;
++
++import java.io.IOException;
++
++/**
++ * The consumer client for AMQP transport
++ */
++public class AMQPConsumerClient {
++
++    public static final String QUEUE_NAME = "ProducerProxy";
++
++    public static void main(String[] args) throws IOException, InterruptedException {
++
++        ConnectionFactory factory = new ConnectionFactory();
++        factory.setHost("localhost");
++        Connection connection = factory.newConnection();
++
++        Channel channel = connection.createChannel();
++        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
++
++        QueueingConsumer consumer = new QueueingConsumer(channel);
++        channel.basicConsume(QUEUE_NAME, true, consumer);
++        System.out.println("Waiting for message on queue '" + QUEUE_NAME + "'");
++
++        QueueingConsumer.Delivery delivery = consumer.nextDelivery();
++        String message = new String(delivery.getBody());
++        System.out.println("[x] received '" + message + "'");
++    }
++}
+Index: java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPTransportUtilsTest.java
+===================================================================
+--- java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPTransportUtilsTest.java	(nonexistent)
++++ java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPTransportUtilsTest.java	(revision 1507855)
+@@ -0,0 +1,155 @@
++/*
++ * Copyright WSO2, Inc. (http://wso2.com)
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.synapse.tranport.amqp;
++
++import com.rabbitmq.client.Address;
++import junit.framework.TestCase;
++import org.apache.axis2.description.AxisService;
++import org.apache.synapse.transport.amqp.AMQPTransportConstant;
++import org.apache.synapse.transport.amqp.AMQPTransportUtils;
++
++import java.util.HashMap;
++import java.util.Map;
++
++public class AMQPTransportUtilsTest extends TestCase {
++
++    private Map<String, String> svcMap = new HashMap<String, String>();
++
++    private Map<String, String> cfMap = new HashMap<String, String>();
++
++    @Override
++    public void setUp() throws Exception {
++        super.setUp();
++        // Do not edit the values, test may fail!
++        svcMap.put(AMQPTransportConstant.PARAMETER_EXCHANGE_NAME, "directExchange");
++        svcMap.put(AMQPTransportConstant.PARAMETER_EXCHANGE_INTERNAL, "true");
++        svcMap.put(AMQPTransportConstant.PARAMETER_NO_OF_CONCURRENT_CONSUMERS, "2");
++
++        cfMap.put(AMQPTransportConstant.PARAMETER_EXCHANGE_TYPE, "direct");
++        cfMap.put(AMQPTransportConstant.PARAMETER_QUEUE_DURABLE, "true");
++        cfMap.put(AMQPTransportConstant.PARAMETER_INITIAL_RE_CONNECTION_DURATION, "10");
++    }
++
++    public void testGetStringProperty() throws Exception {
++        assertEquals("In valid string value received,",
++                "username@domain.com", AMQPTransportUtils.getStringProperty("string", null));
++    }
++
++    public void testGetIntProperty() throws Exception {
++        assertEquals("In valid int value received,", 10, AMQPTransportUtils.getIntProperty("int", -1));
++    }
++
++    public void testGetLongProperty() throws Exception {
++        assertEquals("In valid long value received,", 13, AMQPTransportUtils.getLongProperty("long", -1));
++    }
++
++    public void testGetDoubleProperty() throws Exception {
++        assertEquals("In valid double value received,", 14.4, AMQPTransportUtils.getDoubleProperty("double", -1));
++    }
++
++    public void testGetBooleanProperty() throws Exception {
++        assertEquals(
++                "In valid boolean value received,",
++                false,
++                AMQPTransportUtils.getBooleanProperty("boolean2", true).booleanValue());
++
++        assertEquals(
++                "In valid boolean value received,",
++                true,
++                AMQPTransportUtils.getBooleanProperty("boolean1", false).booleanValue());
++    }
++
++    public void testGetServiceStringParameters() throws Exception {
++        AxisService service = new AxisService();
++        service.addParameter("param1", "value1");
++
++        Map<String, String> paramMap =
++                AMQPTransportUtils.getServiceStringParameters(service.getParameters());
++        assertEquals("In valid parameter for key param1", "value1", paramMap.get("param1"));
++    }
++
++    public void testGetOptionalStringParameter() throws Exception {
++        assertEquals(
++                "In valid value received",
++                svcMap.get(AMQPTransportConstant.PARAMETER_EXCHANGE_NAME),
++                AMQPTransportUtils.getOptionalStringParameter(
++                        AMQPTransportConstant.PARAMETER_EXCHANGE_NAME, svcMap, cfMap));
++
++        assertEquals(
++                "In valid value received",
++                cfMap.get(AMQPTransportConstant.PARAMETER_EXCHANGE_TYPE),
++                AMQPTransportUtils.getOptionalStringParameter(
++                        AMQPTransportConstant.PARAMETER_EXCHANGE_TYPE, svcMap, cfMap));
++    }
++
++    public void testGetOptionalBooleanParameter() throws Exception {
++        assertEquals("Invalid value",
++                Boolean.valueOf(svcMap.get(AMQPTransportConstant.PARAMETER_EXCHANGE_INTERNAL)),
++                AMQPTransportUtils.getOptionalBooleanParameter(
++                        AMQPTransportConstant.PARAMETER_EXCHANGE_INTERNAL, svcMap, cfMap));
++
++        assertEquals("Invalid value",
++                Boolean.valueOf(cfMap.get(AMQPTransportConstant.PARAMETER_QUEUE_DURABLE)),
++                AMQPTransportUtils.getOptionalBooleanParameter(
++                        AMQPTransportConstant.PARAMETER_QUEUE_DURABLE, svcMap, cfMap));
++    }
++
++    public void testGetOptionalIntParameter() throws Exception {
++        assertEquals("Invalid value",
++                Integer.parseInt(cfMap.get(AMQPTransportConstant.PARAMETER_INITIAL_RE_CONNECTION_DURATION)),
++                AMQPTransportUtils.getOptionalIntParameter(
++                        AMQPTransportConstant.PARAMETER_INITIAL_RE_CONNECTION_DURATION, svcMap, cfMap).intValue());
++
++        assertEquals("Invalid value",
++                Integer.parseInt(svcMap.get(AMQPTransportConstant.PARAMETER_NO_OF_CONCURRENT_CONSUMERS)),
++                AMQPTransportUtils.getOptionalIntParameter(
++                        AMQPTransportConstant.PARAMETER_NO_OF_CONCURRENT_CONSUMERS, svcMap, cfMap).intValue());
++    }
++
++    public void testGetBindingKeys() throws Exception {
++        String keys[] = AMQPTransportUtils.split("ERROR,WARN,DEBUG", ",");
++        assertEquals("Invalid value", "ERROR", keys[0]);
++        assertEquals("Invalid value", "WARN", keys[1]);
++        assertEquals("Invalid value", "DEBUG", keys[2]);
++    }
++
++    public void testGetAddressArray() throws Exception {
++        try {
++            Address[] addresses1 = AMQPTransportUtils.getAddressArray(
++                    "wso2.org:443,rajika.org:25", ",", ':');
++            assertEquals("Invalid value", "wso2.org", addresses1[0].getHost());
++            assertEquals("Invalid value", 25, addresses1[1].getPort());
++            assertEquals("Invalid value", "rajika.org", addresses1[1].getHost());
++        } catch (NumberFormatException e) {
++            fail("Should not throw an exception, " + e.getMessage());
++        }
++
++        try {
++            AMQPTransportUtils.getAddressArray(
++                    "hostName1:443,hostName2:25,hostName3:invalidPort", ",", ':');
++            fail("Should not come here because above should throw an exception");
++        } catch (NumberFormatException e) {
++            // expected
++        }
++    }
++
++    public void testParseAMQPUri() throws Exception {
++        String url = "amqp://SimpleStockQuoteService?transport.amqp.ConnectionFactoryName=producer&transport.amqp.QueueName=producer" ;
++        Map<String, String> uriParam = AMQPTransportUtils.parseAMQPUri(url);
++        assertEquals("Invalid value", "producer", uriParam.get(AMQPTransportConstant.PARAMETER_QUEUE_NAME));
++
++    }
++}
+Index: java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPTwoWayProducerClient.java
+===================================================================
+--- java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPTwoWayProducerClient.java	(nonexistent)
++++ java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPTwoWayProducerClient.java	(revision 1507855)
+@@ -0,0 +1,109 @@
++/*
++ * ====================================================================
++ * Licensed to the Apache Software Foundation (ASF) under one
++ * or more contributor license agreements.  See the NOTICE file
++ * distributed with this work for additional information
++ * regarding copyright ownership.  The ASF licenses this file
++ * to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance
++ * with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing,
++ * software distributed under the License is distributed on an
++ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ * KIND, either express or implied.  See the License for the
++ * specific language governing permissions and limitations
++ * under the License.
++ * ====================================================================
++ *
++ * This software consists of voluntary contributions made by many
++ * individuals on behalf of the Apache Software Foundation.  For more
++ * information on the Apache Software Foundation, please see
++ * <http://www.apache.org/>.
++ *
++ */
++package org.apache.synapse.tranport.amqp;
++
++import com.rabbitmq.client.*;
++
++import java.io.IOException;
++
++/**
++ * A request/response producer client
++ * author : rajika.kumarasiri@gmail.com
++ */
++public class AMQPTwoWayProducerClient {
++
++    private static final String MESSAGE =
++            "<?xml version='1.0' encoding='UTF-8'?>\n" +
++                    "   <soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
++                    "      <soapenv:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\n" +
++                    "         <wsa:To>http://localhost:8281/services/StockQuoteProxy</wsa:To>\n" +
++                    "         <wsa:MessageID>urn:uuid:44d578a8-20e9-4ee4-8407-9b0a0768e5a8</wsa:MessageID>\n" +
++                    "         <wsa:Action>urn:getQuote</wsa:Action>\n" +
++                    "      </soapenv:Header>\n" +
++                    "      <soapenv:Body>\n" +
++                    "         <m0:getQuote xmlns:m0=\"http://services.samples\">\n" +
++                    "            <m0:request>\n" +
++                    "               <m0:symbol>IBM</m0:symbol>\n" +
++                    "            </m0:request>\n" +
++                    "         </m0:getQuote>\n" +
++                    "      </soapenv:Body>\n" +
++                    "   </soapenv:Envelope>";
++
++    private static final String MESSAGE2 =
++            "<?xml version='1.0' encoding='UTF-8'?>\n" +
++                    "         <m0:getQuote xmlns:m0=\"http://services.samples\">\n" +
++                    "            <m0:request>\n" +
++                    "               <m0:symbol>IBM</m0:symbol>\n" +
++                    "            </m0:request>\n" +
++                    "         </m0:getQuote>";
++
++    public static void main(String[] args) throws IOException, InterruptedException {
++
++        ConnectionFactory factory = new ConnectionFactory();
++        factory.setHost("localhost");
++        Connection connection = factory.newConnection();
++
++        Channel channel = connection.createChannel();
++
++        AMQPTwoWayProducerClient.produceAndConsume(
++                MESSAGE2, channel, "consumer", "consumerReply");
++
++        channel.close();
++        connection.close();
++
++    }
++
++
++    private static void produceAndConsume(
++            String message,
++            Channel channel,
++            String requestQueueName,
++            String replyQueueName) throws IOException, InterruptedException {
++
++        AMQP.BasicProperties.Builder builder = new
++                AMQP.BasicProperties().builder();
++        String restCoID = Math.random() + "";
++        builder.correlationId(restCoID);
++        System.out.println("Request correlation Id : " + restCoID);
++        builder.replyTo(replyQueueName);
++        channel.basicPublish("", requestQueueName, builder.build(), message.getBytes());
++        System.out.println("[x] sent to '" + requestQueueName + "' the message '\n" + message + "'");
++
++        channel.queueDeclare(replyQueueName, false, false, false, null);
++        QueueingConsumer consumer = new QueueingConsumer(channel);
++        channel.basicConsume(replyQueueName, true, consumer);
++        System.out.println("Waiting for message on queue '" + replyQueueName + "'");
++        while (true) {
++            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
++            String replyMessage = new String(delivery.getBody());
++            System.out.println("[x] received '" + replyMessage + "'");
++            System.out.println("Response correlation Id : " + delivery.getProperties().getCorrelationId());
++            break;
++
++        }
++    }
++}
+Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportMessage.java
+===================================================================
+--- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportMessage.java	(nonexistent)
++++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportMessage.java	(revision 1507855)
+@@ -0,0 +1,173 @@
 +/*
 + * Licensed under the Apache License, Version 2.0 (the "License");
 + * you may not use this file except in compliance with the License.
@@ -437,108 +877,1130 @@ Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/tr
 + * See the License for the specific language governing permissions and
 + * limitations under the License.
 + */
-+package org.apache.synapse.transport.amqp.connectionfactory;
++package org.apache.synapse.transport.amqp;
 +
-+import org.apache.axis2.description.Parameter;
-+import org.apache.axis2.description.ParameterInclude;
-+import org.apache.commons.logging.Log;
-+import org.apache.commons.logging.LogFactory;
-+import org.apache.synapse.transport.amqp.AMQPTransportException;
++import com.rabbitmq.client.BasicProperties;
++import com.rabbitmq.client.Envelope;
++import com.rabbitmq.client.QueueingConsumer;
++import org.apache.axis2.transport.base.BaseConstants;
 +
-+import java.io.IOException;
++import java.util.Date;
 +import java.util.Map;
-+import java.util.concurrent.ConcurrentHashMap;
-+import java.util.concurrent.ExecutorService;
 +
 +/**
-+ * Holds a list of {@link AMQPTransportConnectionFactory}.
++ * Represent a AMQP message transfer between the broker and the consumer/producer.
 + */
-+public class AMQPTransportConnectionFactoryManager {
++public class AMQPTransportMessage {
 +
-+    private static Log log = LogFactory.getLog(AMQPTransportConnectionFactoryManager.class);
++    private String soapAction;
++
++    private String messageId;
++
++    private String contentType;
++
++    private String contentEncoding;
++
++    private Integer deliveryMode;
++
++    private Integer priority;
++
++    private String correlationId;
++
++    private String replyTo;
++
++    private String expiration;
++
++    private Date timestamp;
++
++    private String type;
++
++    private String userId;
++
++    private String appId;
++
++    private String clusterId;
++
++    private Map<String, Object> headers;
 +
 +    /**
-+     * Keeps the list of connection factories defined.
++     * Keeps a reference to the AMQP message.
 +     */
-+    private ConcurrentHashMap<String, AMQPTransportConnectionFactory> factories =
-+            new ConcurrentHashMap<String, AMQPTransportConnectionFactory>();
++    private byte[] body;
 +
-+    /**
-+     * Add the list of defined connection factories definition.
-+     *
-+     * @param transportInDescription The connection factory definition in axis2.xml
-+     * @param es An instance of java.util.concurrent.ExecutorService to use with AMQP connection
-+     *           factory
-+     */
-+    public void addConnectionFactories(ParameterInclude transportInDescription, ExecutorService es) {
-+        for (Parameter p : transportInDescription.getParameters()) {
-+            try {
-+                addConnectionFactory(p, es);
-+            } catch (AMQPTransportException e) {
-+                log.error("Error whiling adding the connection factory with name '" + p.getName() +
-+                        "'. ", e);
-+            }
++    private Envelope envelope;
++
++    private BasicProperties basicProperties;
++
++    private QueueingConsumer.Delivery delivery;
++
++    public AMQPTransportMessage(QueueingConsumer.Delivery delivery) {
++        this.delivery = delivery;
++        this.body = delivery.getBody();
++        this.envelope = delivery.getEnvelope();
++        this.basicProperties = delivery.getProperties();
++        this.messageId = delivery.getProperties().getMessageId();
++        this.contentType = delivery.getProperties().getContentType();
++        this.contentEncoding = delivery.getProperties().getContentEncoding();
++        this.deliveryMode = delivery.getProperties().getDeliveryMode();
++        this.priority = delivery.getProperties().getPriority();
++        this.correlationId = delivery.getProperties().getCorrelationId();
++        this.replyTo = delivery.getProperties().getReplyTo();
++        this.expiration = delivery.getProperties().getExpiration();
++        this.timestamp = delivery.getProperties().getTimestamp();
++        this.type = delivery.getProperties().getType();
++        this.userId = delivery.getProperties().getUserId();
++        this.appId = delivery.getProperties().getAppId();
++        this.clusterId = delivery.getProperties().getClusterId();
++        this.headers = delivery.getProperties().getHeaders();
++
++        if (delivery.getProperties().getHeaders() != null) {
++            this.soapAction = (String) delivery.getProperties().getHeaders().get(BaseConstants.SOAPACTION);
 +        }
 +    }
 +
++    public AMQPTransportMessage(BasicProperties basicProperties, byte[] message) {
++        this.body = message;
++        this.basicProperties = basicProperties;
++    }
++
++    public String getSoapAction() {
++        return soapAction;
++    }
++
++    public String getMessageId() {
++        return messageId;
++    }
++
++
++    public String getContentType() {
++        return contentType;
++    }
++
++    public String getContentEncoding() {
++        return contentEncoding;
++    }
++
++
++    public Integer getDeliveryMode() {
++        return deliveryMode;
++    }
++
++    public Integer getPriority() {
++        return priority;
++    }
++
++    public String getCorrelationId() {
++        return correlationId;
++    }
++
++    public String getReplyTo() {
++        return replyTo;
++    }
++
++    public String getExpiration() {
++        return expiration;
++    }
++
++    public Date getTimestamp() {
++        return timestamp;
++    }
++
++    public String getType() {
++        return type;
++    }
++
++    public String getUserId() {
++        return userId;
++    }
++
++    public String getAppId() {
++        return appId;
++    }
++
++    public String getClusterId() {
++        return clusterId;
++    }
++
++    public Map<String, Object> getHeaders() {
++        return headers;
++    }
++
++    public byte[] getBody() {
++        return body;
++    }
++
++    public QueueingConsumer.Delivery getDelivery() {
++        return delivery;
++    }
++
++    public Envelope getEnvelope() {
++        return envelope;
++    }
++}
+\ No newline at end of file
+Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportListener.java
+===================================================================
+--- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportListener.java	(nonexistent)
++++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportListener.java	(revision 1507855)
+@@ -0,0 +1,118 @@
++/*
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.synapse.transport.amqp;
++
++import org.apache.axis2.AxisFault;
++import org.apache.axis2.transport.base.AbstractTransportListenerEx;
++import org.apache.synapse.transport.amqp.connectionfactory.AMQPTransportConnectionFactory;
++import org.apache.synapse.transport.amqp.connectionfactory.AMQPTransportConnectionFactoryManager;
++import org.apache.synapse.transport.amqp.pollingtask.AMQPTransportPollingTask;
++
++import java.util.concurrent.ExecutorService;
++import java.util.concurrent.Executors;
++import java.util.concurrent.ScheduledExecutorService;
++
++/**
++ * The AMQP transport receiver implementation.
++ */
++public class AMQPTransportListener extends AbstractTransportListenerEx<AMQPTransportEndpoint> {
++
 +    /**
-+     * Add a connection factory definition into store.
++     * The worker pool for polling tasks
 +     */
-+    public void addConnectionFactory(Parameter parameter, ExecutorService es)
-+            throws AMQPTransportException {
-+        factories.put(parameter.getName(), new AMQPTransportConnectionFactory(parameter, es));
++    private ScheduledExecutorService workerPool;
++
++    /**
++     * The connection factories defined in axis2.xml for transport receiver section.
++     */
++    private AMQPTransportConnectionFactoryManager connectionFactoryManager;
++
++    private ExecutorService connectionFactoryES;
++
++    @Override
++    protected void doInit() throws AxisFault {
++
++        // pass a custom executor service instance into the AMQP connection factory for better
++        // control see http://www.rabbitmq.com/api-guide.html
++        connectionFactoryES = Executors.newFixedThreadPool(
++                AMQPTransportUtils.getIntProperty(
++                        AMQPTransportConstant.PARAM_CONNECTION_FACTORY_POOL_SIZE,
++                        AMQPTransportConstant.CONNECTION_FACTORY_POOL_DEFAULT));
++
++        connectionFactoryManager = new AMQPTransportConnectionFactoryManager();
++        connectionFactoryManager.addConnectionFactories(
++                getTransportInDescription(), connectionFactoryES);
++
++        workerPool = Executors.newScheduledThreadPool(
++                AMQPTransportUtils.getIntProperty(AMQPTransportConstant.PARAM_WORKER_POOL_SIZE,
++                        AMQPTransportConstant.WORKER_POOL_DEFAULT));
++
++        log.info("AMQP transport listener initializing..");
++    }
++
++    @Override
++    protected AMQPTransportEndpoint createEndpoint() {
++        return new AMQPTransportEndpoint(workerPool, this);
++    }
++
++    @Override
++    protected void startEndpoint(AMQPTransportEndpoint endpoint) throws AxisFault {
++        AMQPTransportPollingTask ptm = endpoint.getPollingTask();
++        try {
++            ptm.start();
++        } catch (AMQPTransportException e) {
++            throw new AxisFault(e.getMessage(), e);
++        }
++
++        log.info("AMQP transport polling task started listen for service '" +
++                ptm.getServiceName() + "'");
++    }
++
++    @Override
++    protected void stopEndpoint(AMQPTransportEndpoint endpoint) {
++        AMQPTransportPollingTask ptm = endpoint.getPollingTask();
++        ptm.stop();
++
++        log.info("AMQP transport polling task stopped listen for service '" +
++                ptm.getServiceName() + "'");
++    }
++
++    @Override
++    public void stop() throws AxisFault {
++        super.stop();
++        workerPool.shutdown();
++        try {
++            connectionFactoryManager.shutDownConnectionFactories();
++        } catch (AMQPTransportException e) {
++            log.error("Error while shutting down connection factories, continue anyway...", e);
++        }
++        connectionFactoryES.shutdown();
 +    }
 +
 +    /**
-+     * Get the connection factory with this name.
++     * Returns the connection factory with this name.
 +     *
-+     * @param name connection factory name.
-+     * @return the connection factory with this name.
++     * @param name Name of the connection factory.
++     * @return The connection factory with this name.
 +     * @throws AMQPTransportException throws in case of an error.
 +     */
 +    public AMQPTransportConnectionFactory getConnectionFactory(final String name)
 +            throws AMQPTransportException {
-+        if (factories.containsKey(name)) {
-+            return factories.get(name);
++        if (connectionFactoryManager.getConnectionFactory(name) != null) {
++            return connectionFactoryManager.getConnectionFactory(name);
 +        }
-+        throw new AMQPTransportException("No connection factory found with the name '" + name + "'");
-+    }
-+
-+    /**
-+     * Remove and return the connection factory with this name.
-+     *
-+     * @param name connection factory name.
-+     * @throws AMQPTransportException throws in case of an error.
-+     */
-+    public void removeConnectionFactory(final String name) throws AMQPTransportException {
-+        if (factories.containsKey(name)) {
-+            try {
-+                // shutdown and remove
-+                AMQPTransportConnectionFactory factory = factories.remove(name);
-+                factory.shutDownChannel();
-+                factory.shutDownConnection();
-+            } catch (IOException e) {
-+                throw new AMQPTransportException("Could not remove the connection '" + name + "'", e);
-+            }
-+        }
-+        throw new AMQPTransportException("No connection factory found with the name '" + name + "'");
-+    }
-+
-+    /**
-+     * Shutdown the open connections to the broker via the connection factory
-+     */
-+    public void shutDownConnectionFactories() throws AMQPTransportException {
-+        try {
-+            for (Map.Entry<String, AMQPTransportConnectionFactory> entry : factories.entrySet()) {
-+                AMQPTransportConnectionFactory connectionFactory = entry.getValue();
-+                connectionFactory.shutDownChannel();
-+                connectionFactory.shutDownConnection();
-+            }
-+        } catch (IOException e) {
-+            throw new AMQPTransportException("Error occurred whiling shutting down connections", e);
-+        }
++        return connectionFactoryManager.getConnectionFactory(
++                AMQPTransportConstant.DEFAULT_CONNECTION_FACTORY_NAME);
 +    }
 +}
+Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/sendertask/AMQPSenderFactory.java
+===================================================================
+--- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/sendertask/AMQPSenderFactory.java	(nonexistent)
++++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/sendertask/AMQPSenderFactory.java	(revision 1507855)
+@@ -0,0 +1,154 @@
++/*
++ * ====================================================================
++ * Licensed to the Apache Software Foundation (ASF) under one
++ * or more contributor license agreements.  See the NOTICE file
++ * distributed with this work for additional information
++ * regarding copyright ownership.  The ASF licenses this file
++ * to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance
++ * with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing,
++ * software distributed under the License is distributed on an
++ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ * KIND, either express or implied.  See the License for the
++ * specific language governing permissions and limitations
++ * under the License.
++ * ====================================================================
++ *
++ * This software consists of voluntary contributions made by many
++ * individuals on behalf of the Apache Software Foundation.  For more
++ * information on the Apache Software Foundation, please see
++ * <http://www.apache.org/>.
++ *
++ */
++package org.apache.synapse.transport.amqp.sendertask;
++
++import com.rabbitmq.client.Channel;
++import org.apache.axis2.AxisFault;
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.transport.amqp.AMQPTransportConstant;
++import org.apache.synapse.transport.amqp.AMQPTransportException;
++import org.apache.synapse.transport.amqp.AMQPTransportUtils;
++import org.apache.synapse.transport.amqp.connectionfactory.AMQPTransportConnectionFactory;
++import org.apache.synapse.transport.amqp.connectionfactory.AMQPTransportConnectionFactoryManager;
++
++import java.io.IOException;
++import java.util.Map;
++
++public class AMQPSenderFactory {
++
++    private static Log log = LogFactory.getLog(AMQPSenderFactory.class);
++
++    public synchronized static AMQPSender createAMQPSender(
++            AMQPTransportConnectionFactoryManager connectionFactoryManager,
++            Map<String, String> params) throws IOException {
++
++        boolean isQueueDurable = false;
++
++        boolean isQueueRestricted = false;
++
++        boolean isQueueAutoDelete = true;
++
++        String exchangeType;
++
++        boolean isExchangeDurable = false;
++
++        boolean isExchangeAutoDelete = true;
++
++        boolean isInternalExchange = false;
++
++        String exchangeName;
++
++        Channel channel;
++
++        AMQPSender as = new AMQPSender();
++
++        AMQPTransportConnectionFactory connFac;
++
++        try {
++            connFac = connectionFactoryManager.getConnectionFactory(
++                    params.get(AMQPTransportConstant.PARAMETER_CONNECTION_FACTORY_NAME));
++            channel = connFac.getChannel();
++            as.setChannel(channel);
++        } catch (AMQPTransportException e) {
++            throw new AxisFault("Could not retrieve the channel", e);
++        }
++
++        exchangeName = params.get(AMQPTransportConstant.PARAMETER_EXCHANGE_NAME);
++        if (exchangeName != null) {
++            as.setExchangeName(exchangeName);
++        }
++        exchangeType = params.get(AMQPTransportConstant.PARAMETER_EXCHANGE_TYPE);
++        if (exchangeType == null) {
++            exchangeType = "direct";
++        }
++
++        Map<String, String> conFacParam = connFac.getParameters();
++
++        Boolean value;
++        value = AMQPTransportUtils.getOptionalBooleanParameter(
++                AMQPTransportConstant.PARAMETER_EXCHANGE_IS_DURABLE, params, conFacParam);
++        if (value != null) {
++            isExchangeDurable = value.booleanValue();
++        }
++
++        value = AMQPTransportUtils.getOptionalBooleanParameter(
++                AMQPTransportConstant.PARAMETER_EXCHANGE_IS_AUTO_DELETE, params, conFacParam);
++        if (value != null) {
++            isExchangeAutoDelete = value.booleanValue();
++        }
++
++        value = AMQPTransportUtils.getOptionalBooleanParameter(
++                AMQPTransportConstant.PARAMETER_EXCHANGE_INTERNAL, params, conFacParam);
++        if (value != null) {
++            isInternalExchange = value.booleanValue();
++        }
++
++        String queueName = params.get(AMQPTransportConstant.PARAMETER_QUEUE_NAME);
++        as.setQueueName(queueName);
++
++        String routingKey = AMQPTransportUtils.getOptionalStringParameter(
++                AMQPTransportConstant.PARAMETER_ROUTING_KEY, params, conFacParam);
++        if (routingKey != null) {
++            as.setRoutingKey(routingKey);
++        }
++
++        value = AMQPTransportUtils.getOptionalBooleanParameter(
++                AMQPTransportConstant.PARAMETER_QUEUE_DURABLE, params, conFacParam);
++        if (value != null) {
++            isQueueDurable = value.booleanValue();
++        }
++
++        value = AMQPTransportUtils.getOptionalBooleanParameter(
++                AMQPTransportConstant.PARAMETER_QUEUE_RESTRICTED, params, conFacParam);
++        if (value != null) {
++            isQueueRestricted = value.booleanValue();
++        }
++
++        value = AMQPTransportUtils.getOptionalBooleanParameter(
++                AMQPTransportConstant.PARAMETER_QUEUE_AUTO_DELETE, params, conFacParam);
++        if (value != null) {
++            isQueueAutoDelete = value.booleanValue();
++        }
++
++        /* use available, otherwise declare
++        if (exchangeName != null) {
++            channel.exchangeDeclare(
++                    exchangeName,
++                    exchangeType,
++                    isExchangeDurable,
++                    isExchangeAutoDelete,
++                    isInternalExchange,
++                    null);
++        } else {
++            channel.queueDeclare(queueName, isQueueDurable, isQueueRestricted, isQueueAutoDelete, null);
++        }
++        */
++
++        return as;
++    }
++}
+Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/sendertask/AMQPSender.java
+===================================================================
+--- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/sendertask/AMQPSender.java	(nonexistent)
++++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/sendertask/AMQPSender.java	(revision 1507855)
+@@ -0,0 +1,195 @@
++/*
++ * ====================================================================
++ * Licensed to the Apache Software Foundation (ASF) under one
++ * or more contributor license agreements.  See the NOTICE file
++ * distributed with this work for additional information
++ * regarding copyright ownership.  The ASF licenses this file
++ * to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance
++ * with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing,
++ * software distributed under the License is distributed on an
++ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ * KIND, either express or implied.  See the License for the
++ * specific language governing permissions and limitations
++ * under the License.
++ * ====================================================================
++ *
++ * This software consists of voluntary contributions made by many
++ * individuals on behalf of the Apache Software Foundation.  For more
++ * information on the Apache Software Foundation, please see
++ * <http://www.apache.org/>.
++ *
++ */
++package org.apache.synapse.transport.amqp.sendertask;
++
++import com.rabbitmq.client.AMQP;
++import com.rabbitmq.client.Channel;
++import org.apache.axiom.om.OMOutputFormat;
++import org.apache.axis2.AxisFault;
++import org.apache.axis2.Constants;
++import org.apache.axis2.context.MessageContext;
++import org.apache.axis2.transport.MessageFormatter;
++import org.apache.axis2.transport.base.BaseUtils;
++import org.apache.axis2.util.MessageProcessorSelector;
++import org.apache.synapse.transport.amqp.AMQPTransportConstant;
++import org.apache.synapse.transport.amqp.AMQPTransportException;
++
++import java.io.ByteArrayOutputStream;
++import java.io.IOException;
++import java.util.Date;
++import java.util.HashMap;
++import java.util.Map;
++
++/**
++ * Performs the actual sending of the AMQP message, this class is designed to be cached
++ * ,so it accepts the message context from out side rather than from the constructor.
++ *
++ */
++public class AMQPSender {
++
++    private Channel channel = null;
++
++    private String queueName = null;
++
++    private String exchangeName = null;
++
++    private String routingKey = null;
++
++    public void setChannel(Channel channel) {
++        this.channel = channel;
++    }
++
++    public void setExchangeName(String exchangeName) {
++        this.exchangeName = exchangeName;
++    }
++
++    public void setRoutingKey(String routingKey) {
++        this.routingKey = routingKey;
++    }
++
++    public void setQueueName(String queueName) {
++        this.queueName = queueName;
++    }
++
++    public Channel getChannel() {
++        return channel;
++    }
++
++    public void sendAMQPMessage(MessageContext mc, String correlationId, String replyTo)
++            throws AMQPTransportException, IOException {
++
++        OMOutputFormat format = BaseUtils.getOMOutputFormat(mc);
++        MessageFormatter formatter;
++        try {
++            formatter = MessageProcessorSelector.getMessageFormatter(mc);
++        } catch (AxisFault axisFault) {
++            throw new AxisFault("Unable to get the message formatter to use");
++        }
++
++        AMQP.BasicProperties.Builder builder = new
++                AMQP.BasicProperties().builder();
++
++        String msgId = getProperty(mc, AMQPTransportConstant.PROPERTY_AMQP_MESSAGE_ID);
++        if (msgId == null) {
++            msgId = mc.getMessageID();
++        }
++        builder.messageId(msgId);
++
++        String contentType = getProperty(mc, AMQPTransportConstant.PROPERTY_AMQP_CONTENT_TYPE);
++        if (contentType == null) {
++            contentType = getProperty(mc, Constants.Configuration.CONTENT_TYPE);
++        }
++        if (contentType != null) {
++            builder.contentType(contentType);
++        }
++
++        if (correlationId != null) {
++            builder.correlationId(correlationId);
++        }
++
++        if (replyTo != null) {
++            builder.replyTo(replyTo);
++        }
++
++        String encoding = getProperty(mc, AMQPTransportConstant.PROPERTY_AMQP_CONTENT_ENCODING);
++        if (encoding == null) {
++            encoding = getProperty(mc, Constants.Configuration.CHARACTER_SET_ENCODING);
++        }
++        if (encoding != null) {
++            builder.contentEncoding(encoding);
++        }
++
++        String deliverMode = getProperty(mc, AMQPTransportConstant.PROPERTY_AMQP_DELIVER_MODE);
++        if (deliverMode != null) {
++            builder.deliveryMode(Integer.parseInt(deliverMode));
++        }
++
++        String priority = getProperty(mc, AMQPTransportConstant.PROPERTY_AMQP_PRIORITY);
++        if (priority != null) {
++            builder.priority(Integer.parseInt(priority));
++        }
++
++
++        String expiration = getProperty(mc, AMQPTransportConstant.PROPERTY_AMQP_EXPIRATION);
++        if (expiration != null) {
++            builder.expiration(expiration);
++        }
++
++        String timeStamp = getProperty(mc, AMQPTransportConstant.PROPERTY_AMQP_TIME_STAMP);
++        if (timeStamp != null) {
++            builder.timestamp(new Date(Long.parseLong(timeStamp)));
++        }
++
++        String type = getProperty(mc, AMQPTransportConstant.PROPERTY_AMQP_TYPE);
++        if (type != null) {
++            builder.type(type);
++        }
++
++        String userId = getProperty(mc, AMQPTransportConstant.PROPERTY_AMQP_USER_ID);
++        if (userId != null) {
++            builder.type(userId);
++        }
++
++        String appId = getProperty(mc, AMQPTransportConstant.PROPERTY_AMQP_APP_ID);
++        if (appId != null) {
++            builder.appId(appId);
++        }
++
++        String clusterId = getProperty(mc, AMQPTransportConstant.PROPERTY_AMQP_CLUSTER_ID);
++        if (clusterId != null) {
++            builder.clusterId(clusterId);
++        }
++
++        // add any custom properties set with AMQP_HEADER_* as headers
++        Map<String, Object> headers = new HashMap<String, Object>();
++        Map<String, Object> prop = mc.getProperties();
++        for (String key : prop.keySet()) {
++            if (key.contains(AMQPTransportConstant.AMQP_HEADER)) {
++                headers.put(key, prop.get(key));
++            }
++        }
++        builder.headers(headers);
++
++        ByteArrayOutputStream out = new ByteArrayOutputStream();
++        formatter.writeTo(mc, format, out, false);
++        byte[] msg = out.toByteArray();
++
++        if (exchangeName != null) {
++            if (routingKey != null) {
++                channel.basicPublish(exchangeName, routingKey, builder.build(), msg);
++            } else {
++                channel.basicPublish(exchangeName, "", builder.build(), msg);
++            }
++        } else {
++            channel.basicPublish("", queueName, builder.build(), msg);
++        }
++    }
++
++    private String getProperty(MessageContext mc, String key) {
++        return (String) mc.getProperty(key);
++    }
++}
+\ No newline at end of file
+Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/sendertask/AMQPSenderCache.java
+===================================================================
+--- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/sendertask/AMQPSenderCache.java	(nonexistent)
++++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/sendertask/AMQPSenderCache.java	(revision 1507855)
+@@ -0,0 +1,62 @@
++/*
++ * ====================================================================
++ * Licensed to the Apache Software Foundation (ASF) under one
++ * or more contributor license agreements.  See the NOTICE file
++ * distributed with this work for additional information
++ * regarding copyright ownership.  The ASF licenses this file
++ * to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance
++ * with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing,
++ * software distributed under the License is distributed on an
++ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ * KIND, either express or implied.  See the License for the
++ * specific language governing permissions and limitations
++ * under the License.
++ * ====================================================================
++ *
++ * This software consists of voluntary contributions made by many
++ * individuals on behalf of the Apache Software Foundation.  For more
++ * information on the Apache Software Foundation, please see
++ * <http://www.apache.org/>.
++ *
++ */
++package org.apache.synapse.transport.amqp.sendertask;
++
++import java.util.concurrent.ConcurrentMap;
++
++/**
++ * Simple cache for caching AMQP senders
++ *
++ */
++public class AMQPSenderCache {
++
++    private ConcurrentMap<Integer, AMQPSender> cache;
++
++    public AMQPSenderCache(ConcurrentMap<Integer, AMQPSender> cache) {
++        this.cache = cache;
++    }
++
++    public boolean hit(Integer hashKey) {
++        return cache.containsKey(hashKey);
++    }
++
++    public void add(Integer hashKey, AMQPSender entry) {
++        cache.put(hashKey, entry);
++    }
++
++    public void remove(Integer hashKey) {
++        cache.remove(hashKey);
++    }
++
++    public AMQPSender get(Integer hashKey) {
++        return cache.get(hashKey);
++    }
++
++    public void clean() {
++        cache.clear();
++    }
++}
+Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPOutTransportInfo.java
+===================================================================
+--- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPOutTransportInfo.java	(nonexistent)
++++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPOutTransportInfo.java	(revision 1507855)
+@@ -0,0 +1,44 @@
++/*
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.synapse.transport.amqp;
++
++import org.apache.axis2.transport.OutTransportInfo;
++
++import java.util.HashMap;
++import java.util.Map;
++
++public class AMQPOutTransportInfo implements OutTransportInfo {
++
++    private String contentType;
++
++    private Map<String, String> params = new HashMap<String, String>();
++
++    public AMQPOutTransportInfo(String contentType, String connFacName, String queueName) {
++        this.contentType = contentType;
++        params.put(AMQPTransportConstant.PROPERTY_AMQP_REPLY_TO, queueName);
++        params.put(AMQPTransportConstant.RESPONSE_CONNECTION_FACTORY_NAME, connFacName);
++    }
++
++    public String getContentType() {
++        return contentType;
++    }
++
++    public void setContentType(String contentType) {
++        this.contentType = contentType;
++    }
++
++    public Map<String, String> getParams() {
++        return params;
++    }
++}
+Index: java/modules/transports/pom.xml
+===================================================================
+--- java/modules/transports/pom.xml	(revision 1507854)
++++ java/modules/transports/pom.xml	(revision 1507855)
+@@ -47,6 +47,7 @@
+         <module>core/pipe</module>
+         <module>core/vfs</module>
+         <module>optional/fix</module>
++		<module>optional/amqp</module>
+     </modules>
+ 
+     <dependencies>
+Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportConstant.java
+===================================================================
+--- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportConstant.java	(nonexistent)
++++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportConstant.java	(revision 1507855)
+@@ -0,0 +1,346 @@
++/*
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.synapse.transport.amqp;
++
++/**
++ * Constant decelerations for the AMQP transport.
++ */
++public final class AMQPTransportConstant {
++
++    /**
++     * The transport prefix for AMQP transport.
++     */
++    public static final String AMQP_TRANSPORT_PREFIX = "amqp://";
++
++    /**
++     * The default connection factory name.
++     */
++    public static final String DEFAULT_CONNECTION_FACTORY_NAME = "default";
++
++    /**
++     * The parameter to specify the Uri of the form amqp://userName:password@hostName:portNumber/virtualHost.
++     */
++    public static final String PARAMETER_CONNECTION_URI = "transport.amqp.Uri";
++
++
++    /**
++     * The list of broker of the form, host1:port1,host2:port2... which will be used as the address array in AMQP
++     * connection to the broker.
++     */
++    public static final String PARAMETER_BROKER_LIST = "transport.amqp.BrokerList";
++
++
++    /**
++     * The name of the exchange to be used.
++     */
++    public static final String PARAMETER_EXCHANGE_NAME = "transport.amqp.ExchangeName";
++
++
++    /**
++     * The durability of the exchange. One of durable, transient or auto-deleted.
++     */
++    public static final String PARAMETER_EXCHANGE_IS_DURABLE = "transport.amqp.IsExchangeDurable";
++
++
++    /**
++     * Should the exchange be deleted if it is no longer in use
++     */
++    public static final String PARAMETER_EXCHANGE_IS_AUTO_DELETE = "transport.amqp.IsExchangeAutoDelete";
++
++    /**
++     * The channel pre fetch size for fair dispatch
++     */
++    public static final String PARAMETER_CHANNEL_PREFETCH_SIZE = "transport.amqp.ChannelPreFetchSize";
++
++    /**
++     * The channel prefetch count for fair dispatch
++     */
++    public static final String PARAMETER_CHANNEL_PREFETCH_COUNT = "transport.amqp.ChannelPreFetchCountSize";
++
++    /**
++     * Should the configuration be used in globally ?
++     */
++    public static final String PARAMETER_CHANNEL_QOS_GLOBAL = "transport.amqp.IsQoSGlobally";
++
++    /**
++     * The type of the exchange. One of fanout, direct, header or topic.
++     */
++    public static final String PARAMETER_EXCHANGE_TYPE = "transport.amqp.ExchangeType";
++
++
++    /**
++     * Should the exchange be declared as internal? One of true of false.
++     */
++    public static final String PARAMETER_EXCHANGE_INTERNAL = "transport.amqp.ExchangeInternal";
++
++
++    /**
++     * The name of the exchange that the publisher/consumer should publish/consume message to.
++     */
++    public static final String PARAMETER_BIND_EXCHANGE = "transport.amqp.BindExchange";
++
++
++    /**
++     * The comma separated binding keys this queue should be bound into exchange.
++     */
++    public static final String PARAMETER_BINDING_KEYS = "transport.amqp.BindingKeys";
++
++
++    /**
++     * The routing key to be used by the publisher
++     */
++    public static final String PARAMETER_ROUTING_KEY = "transport.amqp.RoutingKey";
++
++    /**
++     * True if requesting a mandatory publishing.
++     */
++    public static final String PARAMETER_PUBLISHER_MANDATORY_PUBLISH = "transport.amqp.MandatoryPublish";
++
++
++    /**
++     * True if requesting an immediate publishing.
++     */
++    public static final String PARAMETER_PUBLISHER_IMMEDIATE_PUBLISH = "transport.amqp.ImmediatePublish";
++
++
++    /**
++     * Use transactions at consumer side if set to true. By default this will be considered false
++     * and explicit acknowledgement will be done
++     */
++    public static final String PARAMETER_CONSUMER_TX = "transport.amqp.ConsumerTx";
++
++    /**
++     * Use transactions at producer side, possible values are lwpc(light weight publisher confirm),
++     * tx(transaction). tx should be able to set per message basis
++     */
++    public static final String PROPERTY_PRODUCER_TX = "AMQP_PRODUCER_TX";
++
++    /**
++     * The name of the queue
++     */
++    public static final String PARAMETER_QUEUE_NAME = "transport.amqp.QueueName";
++
++    /**
++     * True if the queue is durable
++     */
++    public static final String PARAMETER_QUEUE_DURABLE = "transport.amqp.IsQueueDurable";
++
++
++    /**
++     * True of the queue is restricted(only within this connection)
++     */
++    public static final String PARAMETER_QUEUE_RESTRICTED = "transport.amqp.IsQueueRestricted";
++
++
++    /**
++     * True if the queue should be auto deleted
++     */
++    public static final String PARAMETER_QUEUE_AUTO_DELETE = "transport.amqp.IsQueueAutoDelete";
++
++
++    /**
++     * True if the polling task should wait until the she processed the accepted message. This can be used
++     * in conjunction with a single thread polling task(in the whole transport, i.e. only a single AMQP proxy per flow)
++     * to achieve in order delivery.
++     */
++    public static final String PARAMETER_OPERATE_ON_BLOCKING_MODE = "transport.amqp.OperateOnBlockingMode";
++
++
++    /**
++     * If a polling task encounter an exception due to some reason(most probably due to broker outage) the number of
++     * milliseconds it should be suspended before next re-try.
++     */
++    public static final String PARAMETER_INITIAL_RE_CONNECTION_DURATION = "transport.amqp.InitialReconnectDuration";
++
++    /**
++     * If the polling task fails again after the initial re-connection duration
++     * {@link AMQPTransportConstant#PARAMETER_INITIAL_RE_CONNECTION_DURATION}
++     * next suspend duration will be calculated using this
++     * (PARAMETER_RE_CONNECTION_PROGRESSION_FACTOR * PARAMETER_INITIAL_RE_CONNECTION_DURATION).
++     */
++    public static final String PARAMETER_RE_CONNECTION_PROGRESSION_FACTOR = "transport.amqp.ReconnectionProgressionFactor";
++
++
++    /**
++     * The maximum duration to suspend the polling task in case of an error. The current suspend duration will reach this
++     * value by following the series,
++     * PARAMETER_RE_CONNECTION_PROGRESSION_FACTOR * PARAMETER_INITIAL_RE_CONNECTION_DURATION. This upper bound is there
++     * because nobody wants to wait a long time until the next re-try if the broker is alive.
++     */
++    public static final String PARAMETER_MAX_RE_CONNECTION_DURATION = "transport.amqp.MaximumReconnectionDuration";
++
++
++    /**
++     * The connection factory to be used either with consumer or producer.
++     */
++    public static final String PARAMETER_CONNECTION_FACTORY_NAME = "transport.amqp.ConnectionFactoryName";
++
++    /**
++     * In a two-way scenario which connection factory of the senders' should be used to send the response
++     */
++    public static final String PARAMETER_RESPONSE_CONNECTION_FACTORY_NAME =
++            "transport.amqp.ResponseConnectionFactoryName";
++
++
++    /**
++     * The initial delay(in milliseconds) that the polling task should delay before initial attempt.
++     * http://docs.oracle.com/javase/6/docs/api/index.html?java/util/concurrent/ScheduledExecutorService.html
++     */
++    public static final String PARAMETER_SCHEDULED_TASK_INITIAL_DELAY =
++            "transport.amqp.ScheduledTaskInitialDelay";
++
++    /**
++     * The delay(in milliseconds) that the polling task should delay before next attempt.
++     * http://docs.oracle.com/javase/6/docs/api/index.html?java/util/concurrent/ScheduledExecutorService.html
++     */
++    public static final String PARAMETER_SCHEDULED_TASK_DELAY = "transport.amqp.ScheduledTaskDelay";
++
++    /**
++     * The time unit which should use to calculate,
++     * {@link AMQPTransportConstant#PARAMETER_SCHEDULED_TASK_INITIAL_DELAY} and
++     * {@link AMQPTransportConstant#PARAMETER_SCHEDULED_TASK_DELAY}.
++     */
++    public static final String PARAMETER_SCHEDULED_TASK_TIME_UNIT = "transport.amqp.ScheduledTaskTimeUnit";
++
++    /**
++     * Number of concurrent consumers per polling task.
++     */
++    public static final String PARAMETER_NO_OF_CONCURRENT_CONSUMERS = "transport.amqp.NoOfConcurrentConsumers";
++
++    /**
++     * Number of dispatching task to use any request messages to actual processing task.
++     */
++    public static final String PARAMETER_DISPATCHING_TASK_SIZE = "transport.amqp.NoOfDispatchingTask";
++
++    /**
++     * Use the given channel number if possible. See
++     * http://www.rabbitmq.com/releases/rabbitmq-java-client/v3.0.1/rabbitmq-java-client-javadoc-3.0.1/com/rabbitmq/client/Connection.html#createChannel(int)
++     */
++    public static final String PARAMETER_AMQP_CHANNEL_NUMBER = "transport.amqp.ChannelNumber";
++
++    /**
++     * Configure the content type as a service parameter
++     */
++    public static final String PARAMETER_CONFIGURED_CONTENT_TYPE = "transport.amqp.ContentType";
++
++    /**
++     * Message context property to set the AMQP message content type.
++     */
++    public static final String PROPERTY_AMQP_CONTENT_TYPE = "AMQP_CONTENT_TYPE";
++
++    /**
++     * Message context property to set the AMQP message encoding.
++     */
++    public static final String PROPERTY_AMQP_CONTENT_ENCODING = "AMQP_CONTENT_ENCODING";
++
++
++    public static final String AMQP_HEADER = "AMQP_HEADER";
++
++    /**
++     * Message context property to set the AMQP message delivery mode.
++     */
++    public static final String PROPERTY_AMQP_DELIVER_MODE = "AMQP_DELIVERY_MODE";
++
++    /**
++     * Message context property to set the AMQP message priority.
++     */
++    public static final String PROPERTY_AMQP_PRIORITY = "AMQP_PRIORITY";
++
++    /**
++     * Message context property to set the AMQP message correlation id.
++     */
++    public static final String PROPERTY_AMQP_CORRELATION_ID = "AMQP_CORRELATION_ID";
++
++
++    /**
++     * Message context property to set the AMQP message reply to header.
++     */
++    public static final String PROPERTY_AMQP_REPLY_TO = "AMQP_REPLY_TO";
++
++
++    /**
++     * Message context property to set the AMQP expiration.
++     */
++    public static final String PROPERTY_AMQP_EXPIRATION = "AMQP_EXPIRATION";
++
++
++    /**
++     * Message context property to set the message id of the AMQP message.
++     */
++    public static final String PROPERTY_AMQP_MESSAGE_ID = "AMQP_MESSAGE_ID";
++
++
++    /**
++     * Message context property to set the timestamp of the AMQP message.
++     */
++    public static final String PROPERTY_AMQP_TIME_STAMP = "AMQP_TIME_STAMP";
++
++
++    /**
++     * Message context property to set the type of the AMQP message.
++     */
++    public static final String PROPERTY_AMQP_TYPE = "AMQP_TYPE";
++
++
++    /**
++     * Message context property to set the AMQP user id.
++     */
++    public static final String PROPERTY_AMQP_USER_ID = "AMQP_USER_ID";
++
++
++    /**
++     * Message context property to set the AMQP app id.
++     */
++    public static final String PROPERTY_AMQP_APP_ID = "AMQP_APP_ID";
++
++
++    /**
++     * Message context property to set the AMQP cluster id.
++     */
++    public static final String PROPERTY_AMQP_CLUSTER_ID = "AMQP_CLUSTER_ID";
++
++
++    /**
++     * Configure the executor service worker pool size.
++     */
++
++    public static final String PARAM_CONNECTION_FACTORY_POOL_SIZE = "connection-factory-pool-size";
++
++    public static final int CONNECTION_FACTORY_POOL_DEFAULT = 20;
++
++    public static final String PARAM_RESPONSE_HANDLING_POOL_SIZE = "response-handling-pool-size";
++
++    public static final int RESPONSE_HANDLING_POOL_DEFAULT = 20;
++
++    public static final String PARAM_WORKER_POOL_SIZE = "worker-pool-size";
++
++    public static final int WORKER_POOL_DEFAULT = 1000;
++
++    public static final String PARAM_SEMAPHORE_TIME_OUT = "semaphore-time-out";
++
++    public static final String AMQP_CORRELATION_ID = "AMQP_CORRELATION_ID";
++
++    public static final String AMQP_TRANSPORT_BUFFER_KEY = "AMQP_TRANSPORT_BUFFER_KEY";
++
++    public static final String AMQP_USE_TX = "tx";
++
++    public static final String AMQP_USE_LWPC = "lwpc";
++
++    public static final String DEFAULT_CONTENT_TYPE = "application/xml";
++
++    public static final String ROUTING_KEY_DELIMITER = ",";
++
++    public static final String RESPONSE_CONNECTION_FACTORY_NAME = "RESPONSE_CONNECTION_FACTORY_NAME";
++
++}
+\ No newline at end of file
 Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/connectionfactory/AMQPTransportConnectionFactory.java
 ===================================================================
 --- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/connectionfactory/AMQPTransportConnectionFactory.java	(nonexistent)
@@ -772,35 +2234,404 @@ Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/tr
 +        return parameters;
 +    }
 +}
-Index: java/modules/transports/optional/amqp/src/test/resources/amqp-transport.properties
+Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/connectionfactory/AMQPTransportConnectionFactoryManager.java
 ===================================================================
---- java/modules/transports/optional/amqp/src/test/resources/amqp-transport.properties	(nonexistent)
-+++ java/modules/transports/optional/amqp/src/test/resources/amqp-transport.properties	(revision 1507855)
-@@ -0,0 +1,7 @@
-+# Do not edit. This is for JUnit tests.
-+string=username@domain.com
-+int=10
-+long=13
-+double=14.4
-+boolean1=true
-+boolean2=false
+--- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/connectionfactory/AMQPTransportConnectionFactoryManager.java	(nonexistent)
++++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/connectionfactory/AMQPTransportConnectionFactoryManager.java	(revision 1507855)
+@@ -0,0 +1,115 @@
++/*
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.synapse.transport.amqp.connectionfactory;
++
++import org.apache.axis2.description.Parameter;
++import org.apache.axis2.description.ParameterInclude;
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.transport.amqp.AMQPTransportException;
++
++import java.io.IOException;
++import java.util.Map;
++import java.util.concurrent.ConcurrentHashMap;
++import java.util.concurrent.ExecutorService;
++
++/**
++ * Holds a list of {@link AMQPTransportConnectionFactory}.
++ */
++public class AMQPTransportConnectionFactoryManager {
++
++    private static Log log = LogFactory.getLog(AMQPTransportConnectionFactoryManager.class);
++
++    /**
++     * Keeps the list of connection factories defined.
++     */
++    private ConcurrentHashMap<String, AMQPTransportConnectionFactory> factories =
++            new ConcurrentHashMap<String, AMQPTransportConnectionFactory>();
++
++    /**
++     * Add the list of defined connection factories definition.
++     *
++     * @param transportInDescription The connection factory definition in axis2.xml
++     * @param es An instance of java.util.concurrent.ExecutorService to use with AMQP connection
++     *           factory
++     */
++    public void addConnectionFactories(ParameterInclude transportInDescription, ExecutorService es) {
++        for (Parameter p : transportInDescription.getParameters()) {
++            try {
++                addConnectionFactory(p, es);
++            } catch (AMQPTransportException e) {
++                log.error("Error whiling adding the connection factory with name '" + p.getName() +
++                        "'. ", e);
++            }
++        }
++    }
++
++    /**
++     * Add a connection factory definition into store.
++     */
++    public void addConnectionFactory(Parameter parameter, ExecutorService es)
++            throws AMQPTransportException {
++        factories.put(parameter.getName(), new AMQPTransportConnectionFactory(parameter, es));
++    }
++
++    /**
++     * Get the connection factory with this name.
++     *
++     * @param name connection factory name.
++     * @return the connection factory with this name.
++     * @throws AMQPTransportException throws in case of an error.
++     */
++    public AMQPTransportConnectionFactory getConnectionFactory(final String name)
++            throws AMQPTransportException {
++        if (factories.containsKey(name)) {
++            return factories.get(name);
++        }
++        throw new AMQPTransportException("No connection factory found with the name '" + name + "'");
++    }
++
++    /**
++     * Remove and return the connection factory with this name.
++     *
++     * @param name connection factory name.
++     * @throws AMQPTransportException throws in case of an error.
++     */
++    public void removeConnectionFactory(final String name) throws AMQPTransportException {
++        if (factories.containsKey(name)) {
++            try {
++                // shutdown and remove
++                AMQPTransportConnectionFactory factory = factories.remove(name);
++                factory.shutDownChannel();
++                factory.shutDownConnection();
++            } catch (IOException e) {
++                throw new AMQPTransportException("Could not remove the connection '" + name + "'", e);
++            }
++        }
++        throw new AMQPTransportException("No connection factory found with the name '" + name + "'");
++    }
++
++    /**
++     * Shutdown the open connections to the broker via the connection factory
++     */
++    public void shutDownConnectionFactories() throws AMQPTransportException {
++        try {
++            for (Map.Entry<String, AMQPTransportConnectionFactory> entry : factories.entrySet()) {
++                AMQPTransportConnectionFactory connectionFactory = entry.getValue();
++                connectionFactory.shutDownChannel();
++                connectionFactory.shutDownConnection();
++            }
++        } catch (IOException e) {
++            throw new AMQPTransportException("Error occurred whiling shutting down connections", e);
++        }
++    }
++}
+Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTaskFactory.java
+===================================================================
+--- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTaskFactory.java	(nonexistent)
++++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTaskFactory.java	(revision 1507855)
+@@ -0,0 +1,272 @@
++/*
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.apache.synapse.transport.amqp.pollingtask;
++
++import org.apache.axis2.AxisFault;
++import org.apache.axis2.description.AxisService;
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.transport.amqp.*;
++import org.apache.synapse.transport.amqp.connectionfactory.AMQPTransportConnectionFactory;
++
++import java.util.Map;
++import java.util.concurrent.ScheduledExecutorService;
++import java.util.concurrent.TimeUnit;
++
++/**
++ * The factory implementation for {@link AMQPTransportPollingTask}. Polling task(with multiple)
++ * consumers will be deployed for each deployed service.
++ */
++public class AMQPTransportPollingTaskFactory {
++
++    private static Log log = LogFactory.getLog(AMQPTransportPollingTaskFactory.class);
++
++    public static AMQPTransportPollingTask createPollingTaskForService(
++            AxisService service,
++            ScheduledExecutorService pool,
++            AMQPTransportEndpoint endpoint,
++            AMQPTransportConnectionFactory connectionFactory) throws AxisFault {
++
++        Map<String, String> svcParam =
++                AMQPTransportUtils.getServiceStringParameters(service.getParameters());
++        Map<String, String> conFacParam = connectionFactory.getParameters();
++
++
++        AMQPTransportPollingTask pt = new AMQPTransportPollingTask();
++
++        pt.setServiceName(service.getName());
++        pt.setEndpoint(endpoint);
++        pt.setPollingTaskScheduler(pool);
++
++        // set buffers to hold request/response messages for this task
++        pt.setBuffers(new AMQPTransportBuffers());
++
++        String exchangeName = AMQPTransportUtils.getOptionalStringParameter(
++                AMQPTransportConstant.PARAMETER_EXCHANGE_NAME, svcParam, conFacParam);
++        pt.setExchangeName(exchangeName);
++
++        Boolean isDurable = AMQPTransportUtils.getOptionalBooleanParameter(
++                AMQPTransportConstant.PARAMETER_EXCHANGE_IS_DURABLE, svcParam, conFacParam);
++        if (isDurable != null) {
++            pt.setExchangeDurable(isDurable);
++        }
++
++        Boolean isAutoDelete = AMQPTransportUtils.getOptionalBooleanParameter(
++                AMQPTransportConstant.PARAMETER_EXCHANGE_IS_AUTO_DELETE, svcParam, conFacParam);
++        if (isAutoDelete != null) {
++            pt.setExchangeAutoDelete(isAutoDelete);
++        }
++
++        String exchangeType = AMQPTransportUtils.getOptionalStringParameter(
++                AMQPTransportConstant.PARAMETER_EXCHANGE_TYPE, svcParam, conFacParam);
++        if (exchangeType != null) {
++            if (exchangeName == null) {
++                throw new AxisFault("Possible configuration error. No exchange name provided but " +
++                        "exchange type is set to '" + exchangeType + "'");
++            }
++
++            pt.setExchangeType(exchangeType);
++        }
++
++        Boolean isInternalExchange = AMQPTransportUtils.getOptionalBooleanParameter(
++                AMQPTransportConstant.PARAMETER_EXCHANGE_INTERNAL, svcParam, conFacParam);
++        if (isInternalExchange != null) {
++            if (exchangeName == null) {
++                throw new AxisFault("Possible configuration error. No exchange name provided but " +
++                        "exchange restricted as " + (isInternalExchange ? "internal." : "external."));
++            }
++            pt.setInternalExchange(isInternalExchange);
++        }
++
++
++        pt.setChannel(connectionFactory.getChannel());
++        pt.setConnectionFactoryName(connectionFactory.getName());
++
++        String responseConFac = AMQPTransportUtils.getOptionalStringParameter(
++                AMQPTransportConstant.PARAMETER_RESPONSE_CONNECTION_FACTORY_NAME, svcParam, conFacParam);
++        if (responseConFac != null) {
++            pt.setResponseConnectionFactory(responseConFac);
++        }
++
++        String consumerExchange = AMQPTransportUtils.getOptionalStringParameter(
++                AMQPTransportConstant.PARAMETER_BIND_EXCHANGE, svcParam, conFacParam);
++        if (consumerExchange != null) {
++            if (exchangeName != null && !consumerExchange.equals(exchangeName)) {
++                log.warn("Possible configuration error? Exchange name is set to '" +
++                        exchangeName + "' and consumer's exchange name is set to '" +
++                        consumerExchange + "'");
++            }
++            pt.setConsumerExchangeName(consumerExchange);
++        }
++
++        String bindingKeyString = AMQPTransportUtils.getOptionalStringParameter(
++                AMQPTransportConstant.PARAMETER_BINDING_KEYS, svcParam, conFacParam);
++
++        if (bindingKeyString != null) {
++            pt.setBindingsKeys(AMQPTransportUtils.split(
++                    bindingKeyString, AMQPTransportConstant.ROUTING_KEY_DELIMITER));
++        }
++
++        String queueName = AMQPTransportUtils.getOptionalStringParameter(
++                AMQPTransportConstant.PARAMETER_QUEUE_NAME, svcParam, conFacParam);
++        if (queueName == null) {
++            queueName = service.getName(); // set the service name as the queue name for default.
++        }
++        pt.setQueueName(queueName);
++
++        String configuredContentType = AMQPTransportUtils.getOptionalStringParameter(
++                AMQPTransportConstant.PARAMETER_CONFIGURED_CONTENT_TYPE, svcParam, conFacParam);
++        if (configuredContentType != null) {
++            pt.setConfiguredContentType(configuredContentType);
++        }
++
++        Boolean isQueueDurable = AMQPTransportUtils.getOptionalBooleanParameter(
++                AMQPTransportConstant.PARAMETER_QUEUE_DURABLE, svcParam, conFacParam);
++        if (isDurable != null) {
++            pt.setQueueDurable(isQueueDurable);
++        }
++
++        Boolean isQueueRestricted = AMQPTransportUtils.getOptionalBooleanParameter(
++                AMQPTransportConstant.PARAMETER_QUEUE_RESTRICTED, svcParam, conFacParam);
++        if (isQueueRestricted != null) {
++            pt.setQueueRestricted(isQueueRestricted);
++        }
++
++        Boolean isQueueAutoDelete = AMQPTransportUtils.getOptionalBooleanParameter(
++                AMQPTransportConstant.PARAMETER_QUEUE_AUTO_DELETE, svcParam, conFacParam);
++        if (isQueueAutoDelete != null) {
++            pt.setQueueAutoDelete(isQueueAutoDelete);
++        }
++
++        Boolean isBlockingMode = AMQPTransportUtils.getOptionalBooleanParameter(
++                AMQPTransportConstant.PARAMETER_OPERATE_ON_BLOCKING_MODE, svcParam, conFacParam);
++        if (isBlockingMode != null) {
++            pt.setBlockingMode(isBlockingMode);
++        }
++
++        try {
++            Integer noOfConsumers = AMQPTransportUtils.getOptionalIntParameter(
++                    AMQPTransportConstant.PARAMETER_NO_OF_CONCURRENT_CONSUMERS, svcParam, conFacParam);
++            if (noOfConsumers != null) {
++                pt.setNoOfConcurrentConsumers(noOfConsumers);
++            }
++        } catch (AMQPTransportException e) {
++            throw new AxisFault("Could not assign the number of concurrent consumers", e);
++        }
++
++        try {
++            Integer initialReconectionDuration = AMQPTransportUtils.getOptionalIntParameter(
++                    AMQPTransportConstant.PARAMETER_INITIAL_RE_CONNECTION_DURATION, svcParam, conFacParam);
++            if (initialReconectionDuration != null) {
++                pt.setInitialReconnectDuration(initialReconectionDuration);
++            }
++        } catch (AMQPTransportException e) {
++            throw new AxisFault("Could not assign the initial re-connection duration", e);
++        }
++
++        try {
++            Integer reconnectionFactor = AMQPTransportUtils.getOptionalIntParameter(
++                    AMQPTransportConstant.PARAMETER_RE_CONNECTION_PROGRESSION_FACTOR, svcParam, conFacParam);
++            if (reconnectionFactor != null) {
++                pt.setReconnectionFactor(reconnectionFactor);
++            }
++        } catch (AMQPTransportException e) {
++            throw new AxisFault("Could not assign reconnection factor", e);
++        }
++
++        try {
++            Integer dispatchingTask = AMQPTransportUtils.getOptionalIntParameter(
++                    AMQPTransportConstant.PARAMETER_DISPATCHING_TASK_SIZE, svcParam, conFacParam);
++            if (dispatchingTask != null) {
++                pt.setNoOfDispatchingTask(dispatchingTask);
++            }
++        } catch (AMQPTransportException e) {
++            throw new AxisFault("Could not assign number of dispatching task value", e);
++        }
++
++        Boolean isUseTx = AMQPTransportUtils.getOptionalBooleanParameter(
++                AMQPTransportConstant.PARAMETER_CONSUMER_TX, svcParam, conFacParam);
++        if (isUseTx != null) {
++            pt.setUseTx(isUseTx);
++        }
++
++        try {
++            Integer initialDelay = AMQPTransportUtils.getOptionalIntParameter(
++                    AMQPTransportConstant.PARAMETER_SCHEDULED_TASK_INITIAL_DELAY, svcParam, conFacParam);
++            if (initialDelay != null) {
++                pt.setScheduledTaskInitialDelay(initialDelay.intValue());
++            }
++        } catch (AMQPTransportException e) {
++            throw new AxisFault("Could not assign the scheduled task initial delay value", e);
++        }
++
++        try {
++            Integer delay = AMQPTransportUtils.getOptionalIntParameter(
++                    AMQPTransportConstant.PARAMETER_SCHEDULED_TASK_INITIAL_DELAY, svcParam, conFacParam);
++            if (delay != null) {
++                pt.setScheduledTaskDelay(delay.intValue());
++            }
++        } catch (AMQPTransportException e) {
++            throw new AxisFault("Could not assign the scheduled task delay value", e);
++        }
++
++        String timeUnit = AMQPTransportUtils.getOptionalStringParameter(
++                AMQPTransportConstant.PARAMETER_SCHEDULED_TASK_TIME_UNIT, svcParam, conFacParam);
++
++        if (timeUnit != null) {
++            pt.setScheduledTaskTimeUnit(getTimeUnit(timeUnit));
++        }
++
++        if (log.isDebugEnabled()) {
++            log.debug("A polling task for the service '" + service.getName() + "' was produced with " +
++                    "following parameters.\n" +
++                    "Exchange Name: '" + pt.getExchangeName() + "'\n" +
++                    "Exchange Type: '" + pt.getExchangeType() + "'\n" +
++                    "Exchange Durable?: '" + pt.isExchangeDurable() + "'\n" +
++                    "Exchange AutoDelete?: '" + pt.isExchangeAutoDelete() + "\n" +
++                    "Is internal exchange: '" + pt.isInternalExchange() + "'\n" +
++                    "Consumer Exchange: " + pt.getConsumerExchangeName() + "'\n" +
++                    "Routing Keys: '" + bindingKeyString + "'\n" +
++                    "QueueName: '" + pt.getQueueName() + "'\n" +
++                    "Is queue durable: '" + pt.isQueueDurable() + "'\n" +
++                    "Is queue restricted: '" + pt.isQueueRestricted() + "'\n" +
++                    "Is queue auto deleted: '" + pt.isQueueAutoDelete() + "'\n" +
++                    "Is blocking mode: '" + pt.isBlockingMode() + "'\n" +
++                    "Initial re-connection duration: '" + pt.getInitialReconnectDuration() + "(ms)'\n" +
++                    "Re-connection progression factor: '" + pt.getReconnectionFactor() + "'\n" +
++                    "Maximum re-connection duration: '" + pt.getMaxReconnectionDuration() + "'\n" +
++                    "Number of concurrent consumers: '" + pt.getNoOfConcurrentConsumers() + "'\n" +
++                    "Number of dispatching task: '" + pt.getNoOfDispatchingTask() + "'");
++        }
++
++        return pt;
++    }
++
++    private static TimeUnit getTimeUnit(String timeUnit) {
++
++        if ("days".equals(timeUnit)) {
++            return TimeUnit.DAYS;
++        } else if ("hours".equals(timeUnit)) {
++            return TimeUnit.HOURS;
++        } else if ("minutes".equals(timeUnit)) {
++            return TimeUnit.MINUTES;
++        } else if ("seconds".equals(timeUnit)) {
++            return TimeUnit.SECONDS;
++        } else if ("milliseconds".equals(timeUnit)) {
++            return TimeUnit.MILLISECONDS;
++        } else {
++            return TimeUnit.MICROSECONDS;
++        }
++    }
++}
 \ No newline at end of file
-Index: java/pom.xml
-===================================================================
---- java/pom.xml	(revision 1507854)
-+++ java/pom.xml	(revision 1507855)
-@@ -392,6 +392,11 @@
-                 <artifactId>synapse-vfs-transport</artifactId>
-                 <version>${project.version}</version>
-             </dependency>
-+            <dependency>
-+                <groupId>org.apache.synapse</groupId>
-+                <artifactId>synapse-amqp-transport</artifactId>
-+                <version>${project.version}</version>
-+            </dependency>
- 
-             <!-- Apache Axis2 -->
-             <dependency>
 Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTask.java
 ===================================================================
 --- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTask.java	(nonexistent)
@@ -1625,284 +3456,6 @@ Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/tr
 +                log.error("Retrieving task was interrupted", e);
 +                Thread.currentThread().interrupt();
 +            }
-+        }
-+    }
-+}
-\ No newline at end of file
-Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTaskFactory.java
-===================================================================
---- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTaskFactory.java	(nonexistent)
-+++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTaskFactory.java	(revision 1507855)
-@@ -0,0 +1,272 @@
-+/*
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ * http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ */
-+package org.apache.synapse.transport.amqp.pollingtask;
-+
-+import org.apache.axis2.AxisFault;
-+import org.apache.axis2.description.AxisService;
-+import org.apache.commons.logging.Log;
-+import org.apache.commons.logging.LogFactory;
-+import org.apache.synapse.transport.amqp.*;
-+import org.apache.synapse.transport.amqp.connectionfactory.AMQPTransportConnectionFactory;
-+
-+import java.util.Map;
-+import java.util.concurrent.ScheduledExecutorService;
-+import java.util.concurrent.TimeUnit;
-+
-+/**
-+ * The factory implementation for {@link AMQPTransportPollingTask}. Polling task(with multiple)
-+ * consumers will be deployed for each deployed service.
-+ */
-+public class AMQPTransportPollingTaskFactory {
-+
-+    private static Log log = LogFactory.getLog(AMQPTransportPollingTaskFactory.class);
-+
-+    public static AMQPTransportPollingTask createPollingTaskForService(
-+            AxisService service,
-+            ScheduledExecutorService pool,
-+            AMQPTransportEndpoint endpoint,
-+            AMQPTransportConnectionFactory connectionFactory) throws AxisFault {
-+
-+        Map<String, String> svcParam =
-+                AMQPTransportUtils.getServiceStringParameters(service.getParameters());
-+        Map<String, String> conFacParam = connectionFactory.getParameters();
-+
-+
-+        AMQPTransportPollingTask pt = new AMQPTransportPollingTask();
-+
-+        pt.setServiceName(service.getName());
-+        pt.setEndpoint(endpoint);
-+        pt.setPollingTaskScheduler(pool);
-+
-+        // set buffers to hold request/response messages for this task
-+        pt.setBuffers(new AMQPTransportBuffers());
-+
-+        String exchangeName = AMQPTransportUtils.getOptionalStringParameter(
-+                AMQPTransportConstant.PARAMETER_EXCHANGE_NAME, svcParam, conFacParam);
-+        pt.setExchangeName(exchangeName);
-+
-+        Boolean isDurable = AMQPTransportUtils.getOptionalBooleanParameter(
-+                AMQPTransportConstant.PARAMETER_EXCHANGE_IS_DURABLE, svcParam, conFacParam);
-+        if (isDurable != null) {
-+            pt.setExchangeDurable(isDurable);
-+        }
-+
-+        Boolean isAutoDelete = AMQPTransportUtils.getOptionalBooleanParameter(
-+                AMQPTransportConstant.PARAMETER_EXCHANGE_IS_AUTO_DELETE, svcParam, conFacParam);
-+        if (isAutoDelete != null) {
-+            pt.setExchangeAutoDelete(isAutoDelete);
-+        }
-+
-+        String exchangeType = AMQPTransportUtils.getOptionalStringParameter(
-+                AMQPTransportConstant.PARAMETER_EXCHANGE_TYPE, svcParam, conFacParam);
-+        if (exchangeType != null) {
-+            if (exchangeName == null) {
-+                throw new AxisFault("Possible configuration error. No exchange name provided but " +
-+                        "exchange type is set to '" + exchangeType + "'");
-+            }
-+
-+            pt.setExchangeType(exchangeType);
-+        }
-+
-+        Boolean isInternalExchange = AMQPTransportUtils.getOptionalBooleanParameter(
-+                AMQPTransportConstant.PARAMETER_EXCHANGE_INTERNAL, svcParam, conFacParam);
-+        if (isInternalExchange != null) {
-+            if (exchangeName == null) {
-+                throw new AxisFault("Possible configuration error. No exchange name provided but " +
-+                        "exchange restricted as " + (isInternalExchange ? "internal." : "external."));
-+            }
-+            pt.setInternalExchange(isInternalExchange);
-+        }
-+
-+
-+        pt.setChannel(connectionFactory.getChannel());
-+        pt.setConnectionFactoryName(connectionFactory.getName());
-+
-+        String responseConFac = AMQPTransportUtils.getOptionalStringParameter(
-+                AMQPTransportConstant.PARAMETER_RESPONSE_CONNECTION_FACTORY_NAME, svcParam, conFacParam);
-+        if (responseConFac != null) {
-+            pt.setResponseConnectionFactory(responseConFac);
-+        }
-+
-+        String consumerExchange = AMQPTransportUtils.getOptionalStringParameter(
-+                AMQPTransportConstant.PARAMETER_BIND_EXCHANGE, svcParam, conFacParam);
-+        if (consumerExchange != null) {
-+            if (exchangeName != null && !consumerExchange.equals(exchangeName)) {
-+                log.warn("Possible configuration error? Exchange name is set to '" +
-+                        exchangeName + "' and consumer's exchange name is set to '" +
-+                        consumerExchange + "'");
-+            }
-+            pt.setConsumerExchangeName(consumerExchange);
-+        }
-+
-+        String bindingKeyString = AMQPTransportUtils.getOptionalStringParameter(
-+                AMQPTransportConstant.PARAMETER_BINDING_KEYS, svcParam, conFacParam);
-+
-+        if (bindingKeyString != null) {
-+            pt.setBindingsKeys(AMQPTransportUtils.split(
-+                    bindingKeyString, AMQPTransportConstant.ROUTING_KEY_DELIMITER));
-+        }
-+
-+        String queueName = AMQPTransportUtils.getOptionalStringParameter(
-+                AMQPTransportConstant.PARAMETER_QUEUE_NAME, svcParam, conFacParam);
-+        if (queueName == null) {
-+            queueName = service.getName(); // set the service name as the queue name for default.
-+        }
-+        pt.setQueueName(queueName);
-+
-+        String configuredContentType = AMQPTransportUtils.getOptionalStringParameter(
-+                AMQPTransportConstant.PARAMETER_CONFIGURED_CONTENT_TYPE, svcParam, conFacParam);
-+        if (configuredContentType != null) {
-+            pt.setConfiguredContentType(configuredContentType);
-+        }
-+
-+        Boolean isQueueDurable = AMQPTransportUtils.getOptionalBooleanParameter(
-+                AMQPTransportConstant.PARAMETER_QUEUE_DURABLE, svcParam, conFacParam);
-+        if (isDurable != null) {
-+            pt.setQueueDurable(isQueueDurable);
-+        }
-+
-+        Boolean isQueueRestricted = AMQPTransportUtils.getOptionalBooleanParameter(
-+                AMQPTransportConstant.PARAMETER_QUEUE_RESTRICTED, svcParam, conFacParam);
-+        if (isQueueRestricted != null) {
-+            pt.setQueueRestricted(isQueueRestricted);
-+        }
-+
-+        Boolean isQueueAutoDelete = AMQPTransportUtils.getOptionalBooleanParameter(
-+                AMQPTransportConstant.PARAMETER_QUEUE_AUTO_DELETE, svcParam, conFacParam);
-+        if (isQueueAutoDelete != null) {
-+            pt.setQueueAutoDelete(isQueueAutoDelete);
-+        }
-+
-+        Boolean isBlockingMode = AMQPTransportUtils.getOptionalBooleanParameter(
-+                AMQPTransportConstant.PARAMETER_OPERATE_ON_BLOCKING_MODE, svcParam, conFacParam);
-+        if (isBlockingMode != null) {
-+            pt.setBlockingMode(isBlockingMode);
-+        }
-+
-+        try {
-+            Integer noOfConsumers = AMQPTransportUtils.getOptionalIntParameter(
-+                    AMQPTransportConstant.PARAMETER_NO_OF_CONCURRENT_CONSUMERS, svcParam, conFacParam);
-+            if (noOfConsumers != null) {
-+                pt.setNoOfConcurrentConsumers(noOfConsumers);
-+            }
-+        } catch (AMQPTransportException e) {
-+            throw new AxisFault("Could not assign the number of concurrent consumers", e);
-+        }
-+
-+        try {
-+            Integer initialReconectionDuration = AMQPTransportUtils.getOptionalIntParameter(
-+                    AMQPTransportConstant.PARAMETER_INITIAL_RE_CONNECTION_DURATION, svcParam, conFacParam);
-+            if (initialReconectionDuration != null) {
-+                pt.setInitialReconnectDuration(initialReconectionDuration);
-+            }
-+        } catch (AMQPTransportException e) {
-+            throw new AxisFault("Could not assign the initial re-connection duration", e);
-+        }
-+
-+        try {
-+            Integer reconnectionFactor = AMQPTransportUtils.getOptionalIntParameter(
-+                    AMQPTransportConstant.PARAMETER_RE_CONNECTION_PROGRESSION_FACTOR, svcParam, conFacParam);
-+            if (reconnectionFactor != null) {
-+                pt.setReconnectionFactor(reconnectionFactor);
-+            }
-+        } catch (AMQPTransportException e) {
-+            throw new AxisFault("Could not assign reconnection factor", e);
-+        }
-+
-+        try {
-+            Integer dispatchingTask = AMQPTransportUtils.getOptionalIntParameter(
-+                    AMQPTransportConstant.PARAMETER_DISPATCHING_TASK_SIZE, svcParam, conFacParam);
-+            if (dispatchingTask != null) {
-+                pt.setNoOfDispatchingTask(dispatchingTask);
-+            }
-+        } catch (AMQPTransportException e) {
-+            throw new AxisFault("Could not assign number of dispatching task value", e);
-+        }
-+
-+        Boolean isUseTx = AMQPTransportUtils.getOptionalBooleanParameter(
-+                AMQPTransportConstant.PARAMETER_CONSUMER_TX, svcParam, conFacParam);
-+        if (isUseTx != null) {
-+            pt.setUseTx(isUseTx);
-+        }
-+
-+        try {
-+            Integer initialDelay = AMQPTransportUtils.getOptionalIntParameter(
-+                    AMQPTransportConstant.PARAMETER_SCHEDULED_TASK_INITIAL_DELAY, svcParam, conFacParam);
-+            if (initialDelay != null) {
-+                pt.setScheduledTaskInitialDelay(initialDelay.intValue());
-+            }
-+        } catch (AMQPTransportException e) {
-+            throw new AxisFault("Could not assign the scheduled task initial delay value", e);
-+        }
-+
-+        try {
-+            Integer delay = AMQPTransportUtils.getOptionalIntParameter(
-+                    AMQPTransportConstant.PARAMETER_SCHEDULED_TASK_INITIAL_DELAY, svcParam, conFacParam);
-+            if (delay != null) {
-+                pt.setScheduledTaskDelay(delay.intValue());
-+            }
-+        } catch (AMQPTransportException e) {
-+            throw new AxisFault("Could not assign the scheduled task delay value", e);
-+        }
-+
-+        String timeUnit = AMQPTransportUtils.getOptionalStringParameter(
-+                AMQPTransportConstant.PARAMETER_SCHEDULED_TASK_TIME_UNIT, svcParam, conFacParam);
-+
-+        if (timeUnit != null) {
-+            pt.setScheduledTaskTimeUnit(getTimeUnit(timeUnit));
-+        }
-+
-+        if (log.isDebugEnabled()) {
-+            log.debug("A polling task for the service '" + service.getName() + "' was produced with " +
-+                    "following parameters.\n" +
-+                    "Exchange Name: '" + pt.getExchangeName() + "'\n" +
-+                    "Exchange Type: '" + pt.getExchangeType() + "'\n" +
-+                    "Exchange Durable?: '" + pt.isExchangeDurable() + "'\n" +
-+                    "Exchange AutoDelete?: '" + pt.isExchangeAutoDelete() + "\n" +
-+                    "Is internal exchange: '" + pt.isInternalExchange() + "'\n" +
-+                    "Consumer Exchange: " + pt.getConsumerExchangeName() + "'\n" +
-+                    "Routing Keys: '" + bindingKeyString + "'\n" +
-+                    "QueueName: '" + pt.getQueueName() + "'\n" +
-+                    "Is queue durable: '" + pt.isQueueDurable() + "'\n" +
-+                    "Is queue restricted: '" + pt.isQueueRestricted() + "'\n" +
-+                    "Is queue auto deleted: '" + pt.isQueueAutoDelete() + "'\n" +
-+                    "Is blocking mode: '" + pt.isBlockingMode() + "'\n" +
-+                    "Initial re-connection duration: '" + pt.getInitialReconnectDuration() + "(ms)'\n" +
-+                    "Re-connection progression factor: '" + pt.getReconnectionFactor() + "'\n" +
-+                    "Maximum re-connection duration: '" + pt.getMaxReconnectionDuration() + "'\n" +
-+                    "Number of concurrent consumers: '" + pt.getNoOfConcurrentConsumers() + "'\n" +
-+                    "Number of dispatching task: '" + pt.getNoOfDispatchingTask() + "'");
-+        }
-+
-+        return pt;
-+    }
-+
-+    private static TimeUnit getTimeUnit(String timeUnit) {
-+
-+        if ("days".equals(timeUnit)) {
-+            return TimeUnit.DAYS;
-+        } else if ("hours".equals(timeUnit)) {
-+            return TimeUnit.HOURS;
-+        } else if ("minutes".equals(timeUnit)) {
-+            return TimeUnit.MINUTES;
-+        } else if ("seconds".equals(timeUnit)) {
-+            return TimeUnit.SECONDS;
-+        } else if ("milliseconds".equals(timeUnit)) {
-+            return TimeUnit.MILLISECONDS;
-+        } else {
-+            return TimeUnit.MICROSECONDS;
 +        }
 +    }
 +}
@@ -2867,1529 +4420,6 @@ Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/tr
 +    }
 +}
 \ No newline at end of file
-Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPOutTransportInfo.java
-===================================================================
---- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPOutTransportInfo.java	(nonexistent)
-+++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPOutTransportInfo.java	(revision 1507855)
-@@ -0,0 +1,44 @@
-+/*
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ * http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ */
-+package org.apache.synapse.transport.amqp;
-+
-+import org.apache.axis2.transport.OutTransportInfo;
-+
-+import java.util.HashMap;
-+import java.util.Map;
-+
-+public class AMQPOutTransportInfo implements OutTransportInfo {
-+
-+    private String contentType;
-+
-+    private Map<String, String> params = new HashMap<String, String>();
-+
-+    public AMQPOutTransportInfo(String contentType, String connFacName, String queueName) {
-+        this.contentType = contentType;
-+        params.put(AMQPTransportConstant.PROPERTY_AMQP_REPLY_TO, queueName);
-+        params.put(AMQPTransportConstant.RESPONSE_CONNECTION_FACTORY_NAME, connFacName);
-+    }
-+
-+    public String getContentType() {
-+        return contentType;
-+    }
-+
-+    public void setContentType(String contentType) {
-+        this.contentType = contentType;
-+    }
-+
-+    public Map<String, String> getParams() {
-+        return params;
-+    }
-+}
-Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportMessage.java
-===================================================================
---- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportMessage.java	(nonexistent)
-+++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportMessage.java	(revision 1507855)
-@@ -0,0 +1,173 @@
-+/*
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ * http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ */
-+package org.apache.synapse.transport.amqp;
-+
-+import com.rabbitmq.client.BasicProperties;
-+import com.rabbitmq.client.Envelope;
-+import com.rabbitmq.client.QueueingConsumer;
-+import org.apache.axis2.transport.base.BaseConstants;
-+
-+import java.util.Date;
-+import java.util.Map;
-+
-+/**
-+ * Represent a AMQP message transfer between the broker and the consumer/producer.
-+ */
-+public class AMQPTransportMessage {
-+
-+    private String soapAction;
-+
-+    private String messageId;
-+
-+    private String contentType;
-+
-+    private String contentEncoding;
-+
-+    private Integer deliveryMode;
-+
-+    private Integer priority;
-+
-+    private String correlationId;
-+
-+    private String replyTo;
-+
-+    private String expiration;
-+
-+    private Date timestamp;
-+
-+    private String type;
-+
-+    private String userId;
-+
-+    private String appId;
-+
-+    private String clusterId;
-+
-+    private Map<String, Object> headers;
-+
-+    /**
-+     * Keeps a reference to the AMQP message.
-+     */
-+    private byte[] body;
-+
-+    private Envelope envelope;
-+
-+    private BasicProperties basicProperties;
-+
-+    private QueueingConsumer.Delivery delivery;
-+
-+    public AMQPTransportMessage(QueueingConsumer.Delivery delivery) {
-+        this.delivery = delivery;
-+        this.body = delivery.getBody();
-+        this.envelope = delivery.getEnvelope();
-+        this.basicProperties = delivery.getProperties();
-+        this.messageId = delivery.getProperties().getMessageId();
-+        this.contentType = delivery.getProperties().getContentType();
-+        this.contentEncoding = delivery.getProperties().getContentEncoding();
-+        this.deliveryMode = delivery.getProperties().getDeliveryMode();
-+        this.priority = delivery.getProperties().getPriority();
-+        this.correlationId = delivery.getProperties().getCorrelationId();
-+        this.replyTo = delivery.getProperties().getReplyTo();
-+        this.expiration = delivery.getProperties().getExpiration();
-+        this.timestamp = delivery.getProperties().getTimestamp();
-+        this.type = delivery.getProperties().getType();
-+        this.userId = delivery.getProperties().getUserId();
-+        this.appId = delivery.getProperties().getAppId();
-+        this.clusterId = delivery.getProperties().getClusterId();
-+        this.headers = delivery.getProperties().getHeaders();
-+
-+        if (delivery.getProperties().getHeaders() != null) {
-+            this.soapAction = (String) delivery.getProperties().getHeaders().get(BaseConstants.SOAPACTION);
-+        }
-+    }
-+
-+    public AMQPTransportMessage(BasicProperties basicProperties, byte[] message) {
-+        this.body = message;
-+        this.basicProperties = basicProperties;
-+    }
-+
-+    public String getSoapAction() {
-+        return soapAction;
-+    }
-+
-+    public String getMessageId() {
-+        return messageId;
-+    }
-+
-+
-+    public String getContentType() {
-+        return contentType;
-+    }
-+
-+    public String getContentEncoding() {
-+        return contentEncoding;
-+    }
-+
-+
-+    public Integer getDeliveryMode() {
-+        return deliveryMode;
-+    }
-+
-+    public Integer getPriority() {
-+        return priority;
-+    }
-+
-+    public String getCorrelationId() {
-+        return correlationId;
-+    }
-+
-+    public String getReplyTo() {
-+        return replyTo;
-+    }
-+
-+    public String getExpiration() {
-+        return expiration;
-+    }
-+
-+    public Date getTimestamp() {
-+        return timestamp;
-+    }
-+
-+    public String getType() {
-+        return type;
-+    }
-+
-+    public String getUserId() {
-+        return userId;
-+    }
-+
-+    public String getAppId() {
-+        return appId;
-+    }
-+
-+    public String getClusterId() {
-+        return clusterId;
-+    }
-+
-+    public Map<String, Object> getHeaders() {
-+        return headers;
-+    }
-+
-+    public byte[] getBody() {
-+        return body;
-+    }
-+
-+    public QueueingConsumer.Delivery getDelivery() {
-+        return delivery;
-+    }
-+
-+    public Envelope getEnvelope() {
-+        return envelope;
-+    }
-+}
-\ No newline at end of file
-Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportListener.java
-===================================================================
---- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportListener.java	(nonexistent)
-+++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportListener.java	(revision 1507855)
-@@ -0,0 +1,118 @@
-+/*
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ * http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ */
-+package org.apache.synapse.transport.amqp;
-+
-+import org.apache.axis2.AxisFault;
-+import org.apache.axis2.transport.base.AbstractTransportListenerEx;
-+import org.apache.synapse.transport.amqp.connectionfactory.AMQPTransportConnectionFactory;
-+import org.apache.synapse.transport.amqp.connectionfactory.AMQPTransportConnectionFactoryManager;
-+import org.apache.synapse.transport.amqp.pollingtask.AMQPTransportPollingTask;
-+
-+import java.util.concurrent.ExecutorService;
-+import java.util.concurrent.Executors;
-+import java.util.concurrent.ScheduledExecutorService;
-+
-+/**
-+ * The AMQP transport receiver implementation.
-+ */
-+public class AMQPTransportListener extends AbstractTransportListenerEx<AMQPTransportEndpoint> {
-+
-+    /**
-+     * The worker pool for polling tasks
-+     */
-+    private ScheduledExecutorService workerPool;
-+
-+    /**
-+     * The connection factories defined in axis2.xml for transport receiver section.
-+     */
-+    private AMQPTransportConnectionFactoryManager connectionFactoryManager;
-+
-+    private ExecutorService connectionFactoryES;
-+
-+    @Override
-+    protected void doInit() throws AxisFault {
-+
-+        // pass a custom executor service instance into the AMQP connection factory for better
-+        // control see http://www.rabbitmq.com/api-guide.html
-+        connectionFactoryES = Executors.newFixedThreadPool(
-+                AMQPTransportUtils.getIntProperty(
-+                        AMQPTransportConstant.PARAM_CONNECTION_FACTORY_POOL_SIZE,
-+                        AMQPTransportConstant.CONNECTION_FACTORY_POOL_DEFAULT));
-+
-+        connectionFactoryManager = new AMQPTransportConnectionFactoryManager();
-+        connectionFactoryManager.addConnectionFactories(
-+                getTransportInDescription(), connectionFactoryES);
-+
-+        workerPool = Executors.newScheduledThreadPool(
-+                AMQPTransportUtils.getIntProperty(AMQPTransportConstant.PARAM_WORKER_POOL_SIZE,
-+                        AMQPTransportConstant.WORKER_POOL_DEFAULT));
-+
-+        log.info("AMQP transport listener initializing..");
-+    }
-+
-+    @Override
-+    protected AMQPTransportEndpoint createEndpoint() {
-+        return new AMQPTransportEndpoint(workerPool, this);
-+    }
-+
-+    @Override
-+    protected void startEndpoint(AMQPTransportEndpoint endpoint) throws AxisFault {
-+        AMQPTransportPollingTask ptm = endpoint.getPollingTask();
-+        try {
-+            ptm.start();
-+        } catch (AMQPTransportException e) {
-+            throw new AxisFault(e.getMessage(), e);
-+        }
-+
-+        log.info("AMQP transport polling task started listen for service '" +
-+                ptm.getServiceName() + "'");
-+    }
-+
-+    @Override
-+    protected void stopEndpoint(AMQPTransportEndpoint endpoint) {
-+        AMQPTransportPollingTask ptm = endpoint.getPollingTask();
-+        ptm.stop();
-+
-+        log.info("AMQP transport polling task stopped listen for service '" +
-+                ptm.getServiceName() + "'");
-+    }
-+
-+    @Override
-+    public void stop() throws AxisFault {
-+        super.stop();
-+        workerPool.shutdown();
-+        try {
-+            connectionFactoryManager.shutDownConnectionFactories();
-+        } catch (AMQPTransportException e) {
-+            log.error("Error while shutting down connection factories, continue anyway...", e);
-+        }
-+        connectionFactoryES.shutdown();
-+    }
-+
-+    /**
-+     * Returns the connection factory with this name.
-+     *
-+     * @param name Name of the connection factory.
-+     * @return The connection factory with this name.
-+     * @throws AMQPTransportException throws in case of an error.
-+     */
-+    public AMQPTransportConnectionFactory getConnectionFactory(final String name)
-+            throws AMQPTransportException {
-+        if (connectionFactoryManager.getConnectionFactory(name) != null) {
-+            return connectionFactoryManager.getConnectionFactory(name);
-+        }
-+        return connectionFactoryManager.getConnectionFactory(
-+                AMQPTransportConstant.DEFAULT_CONNECTION_FACTORY_NAME);
-+    }
-+}
-Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/sendertask/AMQPSenderFactory.java
-===================================================================
---- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/sendertask/AMQPSenderFactory.java	(nonexistent)
-+++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/sendertask/AMQPSenderFactory.java	(revision 1507855)
-@@ -0,0 +1,154 @@
-+/*
-+ * ====================================================================
-+ * Licensed to the Apache Software Foundation (ASF) under one
-+ * or more contributor license agreements.  See the NOTICE file
-+ * distributed with this work for additional information
-+ * regarding copyright ownership.  The ASF licenses this file
-+ * to you under the Apache License, Version 2.0 (the
-+ * "License"); you may not use this file except in compliance
-+ * with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing,
-+ * software distributed under the License is distributed on an
-+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ * KIND, either express or implied.  See the License for the
-+ * specific language governing permissions and limitations
-+ * under the License.
-+ * ====================================================================
-+ *
-+ * This software consists of voluntary contributions made by many
-+ * individuals on behalf of the Apache Software Foundation.  For more
-+ * information on the Apache Software Foundation, please see
-+ * <http://www.apache.org/>.
-+ *
-+ */
-+package org.apache.synapse.transport.amqp.sendertask;
-+
-+import com.rabbitmq.client.Channel;
-+import org.apache.axis2.AxisFault;
-+import org.apache.commons.logging.Log;
-+import org.apache.commons.logging.LogFactory;
-+import org.apache.synapse.transport.amqp.AMQPTransportConstant;
-+import org.apache.synapse.transport.amqp.AMQPTransportException;
-+import org.apache.synapse.transport.amqp.AMQPTransportUtils;
-+import org.apache.synapse.transport.amqp.connectionfactory.AMQPTransportConnectionFactory;
-+import org.apache.synapse.transport.amqp.connectionfactory.AMQPTransportConnectionFactoryManager;
-+
-+import java.io.IOException;
-+import java.util.Map;
-+
-+public class AMQPSenderFactory {
-+
-+    private static Log log = LogFactory.getLog(AMQPSenderFactory.class);
-+
-+    public synchronized static AMQPSender createAMQPSender(
-+            AMQPTransportConnectionFactoryManager connectionFactoryManager,
-+            Map<String, String> params) throws IOException {
-+
-+        boolean isQueueDurable = false;
-+
-+        boolean isQueueRestricted = false;
-+
-+        boolean isQueueAutoDelete = true;
-+
-+        String exchangeType;
-+
-+        boolean isExchangeDurable = false;
-+
-+        boolean isExchangeAutoDelete = true;
-+
-+        boolean isInternalExchange = false;
-+
-+        String exchangeName;
-+
-+        Channel channel;
-+
-+        AMQPSender as = new AMQPSender();
-+
-+        AMQPTransportConnectionFactory connFac;
-+
-+        try {
-+            connFac = connectionFactoryManager.getConnectionFactory(
-+                    params.get(AMQPTransportConstant.PARAMETER_CONNECTION_FACTORY_NAME));
-+            channel = connFac.getChannel();
-+            as.setChannel(channel);
-+        } catch (AMQPTransportException e) {
-+            throw new AxisFault("Could not retrieve the channel", e);
-+        }
-+
-+        exchangeName = params.get(AMQPTransportConstant.PARAMETER_EXCHANGE_NAME);
-+        if (exchangeName != null) {
-+            as.setExchangeName(exchangeName);
-+        }
-+        exchangeType = params.get(AMQPTransportConstant.PARAMETER_EXCHANGE_TYPE);
-+        if (exchangeType == null) {
-+            exchangeType = "direct";
-+        }
-+
-+        Map<String, String> conFacParam = connFac.getParameters();
-+
-+        Boolean value;
-+        value = AMQPTransportUtils.getOptionalBooleanParameter(
-+                AMQPTransportConstant.PARAMETER_EXCHANGE_IS_DURABLE, params, conFacParam);
-+        if (value != null) {
-+            isExchangeDurable = value.booleanValue();
-+        }
-+
-+        value = AMQPTransportUtils.getOptionalBooleanParameter(
-+                AMQPTransportConstant.PARAMETER_EXCHANGE_IS_AUTO_DELETE, params, conFacParam);
-+        if (value != null) {
-+            isExchangeAutoDelete = value.booleanValue();
-+        }
-+
-+        value = AMQPTransportUtils.getOptionalBooleanParameter(
-+                AMQPTransportConstant.PARAMETER_EXCHANGE_INTERNAL, params, conFacParam);
-+        if (value != null) {
-+            isInternalExchange = value.booleanValue();
-+        }
-+
-+        String queueName = params.get(AMQPTransportConstant.PARAMETER_QUEUE_NAME);
-+        as.setQueueName(queueName);
-+
-+        String routingKey = AMQPTransportUtils.getOptionalStringParameter(
-+                AMQPTransportConstant.PARAMETER_ROUTING_KEY, params, conFacParam);
-+        if (routingKey != null) {
-+            as.setRoutingKey(routingKey);
-+        }
-+
-+        value = AMQPTransportUtils.getOptionalBooleanParameter(
-+                AMQPTransportConstant.PARAMETER_QUEUE_DURABLE, params, conFacParam);
-+        if (value != null) {
-+            isQueueDurable = value.booleanValue();
-+        }
-+
-+        value = AMQPTransportUtils.getOptionalBooleanParameter(
-+                AMQPTransportConstant.PARAMETER_QUEUE_RESTRICTED, params, conFacParam);
-+        if (value != null) {
-+            isQueueRestricted = value.booleanValue();
-+        }
-+
-+        value = AMQPTransportUtils.getOptionalBooleanParameter(
-+                AMQPTransportConstant.PARAMETER_QUEUE_AUTO_DELETE, params, conFacParam);
-+        if (value != null) {
-+            isQueueAutoDelete = value.booleanValue();
-+        }
-+
-+        /* use available, otherwise declare
-+        if (exchangeName != null) {
-+            channel.exchangeDeclare(
-+                    exchangeName,
-+                    exchangeType,
-+                    isExchangeDurable,
-+                    isExchangeAutoDelete,
-+                    isInternalExchange,
-+                    null);
-+        } else {
-+            channel.queueDeclare(queueName, isQueueDurable, isQueueRestricted, isQueueAutoDelete, null);
-+        }
-+        */
-+
-+        return as;
-+    }
-+}
-Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/sendertask/AMQPSender.java
-===================================================================
---- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/sendertask/AMQPSender.java	(nonexistent)
-+++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/sendertask/AMQPSender.java	(revision 1507855)
-@@ -0,0 +1,195 @@
-+/*
-+ * ====================================================================
-+ * Licensed to the Apache Software Foundation (ASF) under one
-+ * or more contributor license agreements.  See the NOTICE file
-+ * distributed with this work for additional information
-+ * regarding copyright ownership.  The ASF licenses this file
-+ * to you under the Apache License, Version 2.0 (the
-+ * "License"); you may not use this file except in compliance
-+ * with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing,
-+ * software distributed under the License is distributed on an
-+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ * KIND, either express or implied.  See the License for the
-+ * specific language governing permissions and limitations
-+ * under the License.
-+ * ====================================================================
-+ *
-+ * This software consists of voluntary contributions made by many
-+ * individuals on behalf of the Apache Software Foundation.  For more
-+ * information on the Apache Software Foundation, please see
-+ * <http://www.apache.org/>.
-+ *
-+ */
-+package org.apache.synapse.transport.amqp.sendertask;
-+
-+import com.rabbitmq.client.AMQP;
-+import com.rabbitmq.client.Channel;
-+import org.apache.axiom.om.OMOutputFormat;
-+import org.apache.axis2.AxisFault;
-+import org.apache.axis2.Constants;
-+import org.apache.axis2.context.MessageContext;
-+import org.apache.axis2.transport.MessageFormatter;
-+import org.apache.axis2.transport.base.BaseUtils;
-+import org.apache.axis2.util.MessageProcessorSelector;
-+import org.apache.synapse.transport.amqp.AMQPTransportConstant;
-+import org.apache.synapse.transport.amqp.AMQPTransportException;
-+
-+import java.io.ByteArrayOutputStream;
-+import java.io.IOException;
-+import java.util.Date;
-+import java.util.HashMap;
-+import java.util.Map;
-+
-+/**
-+ * Performs the actual sending of the AMQP message, this class is designed to be cached
-+ * ,so it accepts the message context from out side rather than from the constructor.
-+ *
-+ */
-+public class AMQPSender {
-+
-+    private Channel channel = null;
-+
-+    private String queueName = null;
-+
-+    private String exchangeName = null;
-+
-+    private String routingKey = null;
-+
-+    public void setChannel(Channel channel) {
-+        this.channel = channel;
-+    }
-+
-+    public void setExchangeName(String exchangeName) {
-+        this.exchangeName = exchangeName;
-+    }
-+
-+    public void setRoutingKey(String routingKey) {
-+        this.routingKey = routingKey;
-+    }
-+
-+    public void setQueueName(String queueName) {
-+        this.queueName = queueName;
-+    }
-+
-+    public Channel getChannel() {
-+        return channel;
-+    }
-+
-+    public void sendAMQPMessage(MessageContext mc, String correlationId, String replyTo)
-+            throws AMQPTransportException, IOException {
-+
-+        OMOutputFormat format = BaseUtils.getOMOutputFormat(mc);
-+        MessageFormatter formatter;
-+        try {
-+            formatter = MessageProcessorSelector.getMessageFormatter(mc);
-+        } catch (AxisFault axisFault) {
-+            throw new AxisFault("Unable to get the message formatter to use");
-+        }
-+
-+        AMQP.BasicProperties.Builder builder = new
-+                AMQP.BasicProperties().builder();
-+
-+        String msgId = getProperty(mc, AMQPTransportConstant.PROPERTY_AMQP_MESSAGE_ID);
-+        if (msgId == null) {
-+            msgId = mc.getMessageID();
-+        }
-+        builder.messageId(msgId);
-+
-+        String contentType = getProperty(mc, AMQPTransportConstant.PROPERTY_AMQP_CONTENT_TYPE);
-+        if (contentType == null) {
-+            contentType = getProperty(mc, Constants.Configuration.CONTENT_TYPE);
-+        }
-+        if (contentType != null) {
-+            builder.contentType(contentType);
-+        }
-+
-+        if (correlationId != null) {
-+            builder.correlationId(correlationId);
-+        }
-+
-+        if (replyTo != null) {
-+            builder.replyTo(replyTo);
-+        }
-+
-+        String encoding = getProperty(mc, AMQPTransportConstant.PROPERTY_AMQP_CONTENT_ENCODING);
-+        if (encoding == null) {
-+            encoding = getProperty(mc, Constants.Configuration.CHARACTER_SET_ENCODING);
-+        }
-+        if (encoding != null) {
-+            builder.contentEncoding(encoding);
-+        }
-+
-+        String deliverMode = getProperty(mc, AMQPTransportConstant.PROPERTY_AMQP_DELIVER_MODE);
-+        if (deliverMode != null) {
-+            builder.deliveryMode(Integer.parseInt(deliverMode));
-+        }
-+
-+        String priority = getProperty(mc, AMQPTransportConstant.PROPERTY_AMQP_PRIORITY);
-+        if (priority != null) {
-+            builder.priority(Integer.parseInt(priority));
-+        }
-+
-+
-+        String expiration = getProperty(mc, AMQPTransportConstant.PROPERTY_AMQP_EXPIRATION);
-+        if (expiration != null) {
-+            builder.expiration(expiration);
-+        }
-+
-+        String timeStamp = getProperty(mc, AMQPTransportConstant.PROPERTY_AMQP_TIME_STAMP);
-+        if (timeStamp != null) {
-+            builder.timestamp(new Date(Long.parseLong(timeStamp)));
-+        }
-+
-+        String type = getProperty(mc, AMQPTransportConstant.PROPERTY_AMQP_TYPE);
-+        if (type != null) {
-+            builder.type(type);
-+        }
-+
-+        String userId = getProperty(mc, AMQPTransportConstant.PROPERTY_AMQP_USER_ID);
-+        if (userId != null) {
-+            builder.type(userId);
-+        }
-+
-+        String appId = getProperty(mc, AMQPTransportConstant.PROPERTY_AMQP_APP_ID);
-+        if (appId != null) {
-+            builder.appId(appId);
-+        }
-+
-+        String clusterId = getProperty(mc, AMQPTransportConstant.PROPERTY_AMQP_CLUSTER_ID);
-+        if (clusterId != null) {
-+            builder.clusterId(clusterId);
-+        }
-+
-+        // add any custom properties set with AMQP_HEADER_* as headers
-+        Map<String, Object> headers = new HashMap<String, Object>();
-+        Map<String, Object> prop = mc.getProperties();
-+        for (String key : prop.keySet()) {
-+            if (key.contains(AMQPTransportConstant.AMQP_HEADER)) {
-+                headers.put(key, prop.get(key));
-+            }
-+        }
-+        builder.headers(headers);
-+
-+        ByteArrayOutputStream out = new ByteArrayOutputStream();
-+        formatter.writeTo(mc, format, out, false);
-+        byte[] msg = out.toByteArray();
-+
-+        if (exchangeName != null) {
-+            if (routingKey != null) {
-+                channel.basicPublish(exchangeName, routingKey, builder.build(), msg);
-+            } else {
-+                channel.basicPublish(exchangeName, "", builder.build(), msg);
-+            }
-+        } else {
-+            channel.basicPublish("", queueName, builder.build(), msg);
-+        }
-+    }
-+
-+    private String getProperty(MessageContext mc, String key) {
-+        return (String) mc.getProperty(key);
-+    }
-+}
-\ No newline at end of file
-Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/sendertask/AMQPSenderCache.java
-===================================================================
---- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/sendertask/AMQPSenderCache.java	(nonexistent)
-+++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/sendertask/AMQPSenderCache.java	(revision 1507855)
-@@ -0,0 +1,62 @@
-+/*
-+ * ====================================================================
-+ * Licensed to the Apache Software Foundation (ASF) under one
-+ * or more contributor license agreements.  See the NOTICE file
-+ * distributed with this work for additional information
-+ * regarding copyright ownership.  The ASF licenses this file
-+ * to you under the Apache License, Version 2.0 (the
-+ * "License"); you may not use this file except in compliance
-+ * with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing,
-+ * software distributed under the License is distributed on an
-+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ * KIND, either express or implied.  See the License for the
-+ * specific language governing permissions and limitations
-+ * under the License.
-+ * ====================================================================
-+ *
-+ * This software consists of voluntary contributions made by many
-+ * individuals on behalf of the Apache Software Foundation.  For more
-+ * information on the Apache Software Foundation, please see
-+ * <http://www.apache.org/>.
-+ *
-+ */
-+package org.apache.synapse.transport.amqp.sendertask;
-+
-+import java.util.concurrent.ConcurrentMap;
-+
-+/**
-+ * Simple cache for caching AMQP senders
-+ *
-+ */
-+public class AMQPSenderCache {
-+
-+    private ConcurrentMap<Integer, AMQPSender> cache;
-+
-+    public AMQPSenderCache(ConcurrentMap<Integer, AMQPSender> cache) {
-+        this.cache = cache;
-+    }
-+
-+    public boolean hit(Integer hashKey) {
-+        return cache.containsKey(hashKey);
-+    }
-+
-+    public void add(Integer hashKey, AMQPSender entry) {
-+        cache.put(hashKey, entry);
-+    }
-+
-+    public void remove(Integer hashKey) {
-+        cache.remove(hashKey);
-+    }
-+
-+    public AMQPSender get(Integer hashKey) {
-+        return cache.get(hashKey);
-+    }
-+
-+    public void clean() {
-+        cache.clear();
-+    }
-+}
-Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportConstant.java
-===================================================================
---- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportConstant.java	(nonexistent)
-+++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportConstant.java	(revision 1507855)
-@@ -0,0 +1,346 @@
-+/*
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ * http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ */
-+package org.apache.synapse.transport.amqp;
-+
-+/**
-+ * Constant decelerations for the AMQP transport.
-+ */
-+public final class AMQPTransportConstant {
-+
-+    /**
-+     * The transport prefix for AMQP transport.
-+     */
-+    public static final String AMQP_TRANSPORT_PREFIX = "amqp://";
-+
-+    /**
-+     * The default connection factory name.
-+     */
-+    public static final String DEFAULT_CONNECTION_FACTORY_NAME = "default";
-+
-+    /**
-+     * The parameter to specify the Uri of the form amqp://userName:password@hostName:portNumber/virtualHost.
-+     */
-+    public static final String PARAMETER_CONNECTION_URI = "transport.amqp.Uri";
-+
-+
-+    /**
-+     * The list of broker of the form, host1:port1,host2:port2... which will be used as the address array in AMQP
-+     * connection to the broker.
-+     */
-+    public static final String PARAMETER_BROKER_LIST = "transport.amqp.BrokerList";
-+
-+
-+    /**
-+     * The name of the exchange to be used.
-+     */
-+    public static final String PARAMETER_EXCHANGE_NAME = "transport.amqp.ExchangeName";
-+
-+
-+    /**
-+     * The durability of the exchange. One of durable, transient or auto-deleted.
-+     */
-+    public static final String PARAMETER_EXCHANGE_IS_DURABLE = "transport.amqp.IsExchangeDurable";
-+
-+
-+    /**
-+     * Should the exchange be deleted if it is no longer in use
-+     */
-+    public static final String PARAMETER_EXCHANGE_IS_AUTO_DELETE = "transport.amqp.IsExchangeAutoDelete";
-+
-+    /**
-+     * The channel pre fetch size for fair dispatch
-+     */
-+    public static final String PARAMETER_CHANNEL_PREFETCH_SIZE = "transport.amqp.ChannelPreFetchSize";
-+
-+    /**
-+     * The channel prefetch count for fair dispatch
-+     */
-+    public static final String PARAMETER_CHANNEL_PREFETCH_COUNT = "transport.amqp.ChannelPreFetchCountSize";
-+
-+    /**
-+     * Should the configuration be used in globally ?
-+     */
-+    public static final String PARAMETER_CHANNEL_QOS_GLOBAL = "transport.amqp.IsQoSGlobally";
-+
-+    /**
-+     * The type of the exchange. One of fanout, direct, header or topic.
-+     */
-+    public static final String PARAMETER_EXCHANGE_TYPE = "transport.amqp.ExchangeType";
-+
-+
-+    /**
-+     * Should the exchange be declared as internal? One of true of false.
-+     */
-+    public static final String PARAMETER_EXCHANGE_INTERNAL = "transport.amqp.ExchangeInternal";
-+
-+
-+    /**
-+     * The name of the exchange that the publisher/consumer should publish/consume message to.
-+     */
-+    public static final String PARAMETER_BIND_EXCHANGE = "transport.amqp.BindExchange";
-+
-+
-+    /**
-+     * The comma separated binding keys this queue should be bound into exchange.
-+     */
-+    public static final String PARAMETER_BINDING_KEYS = "transport.amqp.BindingKeys";
-+
-+
-+    /**
-+     * The routing key to be used by the publisher
-+     */
-+    public static final String PARAMETER_ROUTING_KEY = "transport.amqp.RoutingKey";
-+
-+    /**
-+     * True if requesting a mandatory publishing.
-+     */
-+    public static final String PARAMETER_PUBLISHER_MANDATORY_PUBLISH = "transport.amqp.MandatoryPublish";
-+
-+
-+    /**
-+     * True if requesting an immediate publishing.
-+     */
-+    public static final String PARAMETER_PUBLISHER_IMMEDIATE_PUBLISH = "transport.amqp.ImmediatePublish";
-+
-+
-+    /**
-+     * Use transactions at consumer side if set to true. By default this will be considered false
-+     * and explicit acknowledgement will be done
-+     */
-+    public static final String PARAMETER_CONSUMER_TX = "transport.amqp.ConsumerTx";
-+
-+    /**
-+     * Use transactions at producer side, possible values are lwpc(light weight publisher confirm),
-+     * tx(transaction). tx should be able to set per message basis
-+     */
-+    public static final String PROPERTY_PRODUCER_TX = "AMQP_PRODUCER_TX";
-+
-+    /**
-+     * The name of the queue
-+     */
-+    public static final String PARAMETER_QUEUE_NAME = "transport.amqp.QueueName";
-+
-+    /**
-+     * True if the queue is durable
-+     */
-+    public static final String PARAMETER_QUEUE_DURABLE = "transport.amqp.IsQueueDurable";
-+
-+
-+    /**
-+     * True of the queue is restricted(only within this connection)
-+     */
-+    public static final String PARAMETER_QUEUE_RESTRICTED = "transport.amqp.IsQueueRestricted";
-+
-+
-+    /**
-+     * True if the queue should be auto deleted
-+     */
-+    public static final String PARAMETER_QUEUE_AUTO_DELETE = "transport.amqp.IsQueueAutoDelete";
-+
-+
-+    /**
-+     * True if the polling task should wait until the she processed the accepted message. This can be used
-+     * in conjunction with a single thread polling task(in the whole transport, i.e. only a single AMQP proxy per flow)
-+     * to achieve in order delivery.
-+     */
-+    public static final String PARAMETER_OPERATE_ON_BLOCKING_MODE = "transport.amqp.OperateOnBlockingMode";
-+
-+
-+    /**
-+     * If a polling task encounter an exception due to some reason(most probably due to broker outage) the number of
-+     * milliseconds it should be suspended before next re-try.
-+     */
-+    public static final String PARAMETER_INITIAL_RE_CONNECTION_DURATION = "transport.amqp.InitialReconnectDuration";
-+
-+    /**
-+     * If the polling task fails again after the initial re-connection duration
-+     * {@link AMQPTransportConstant#PARAMETER_INITIAL_RE_CONNECTION_DURATION}
-+     * next suspend duration will be calculated using this
-+     * (PARAMETER_RE_CONNECTION_PROGRESSION_FACTOR * PARAMETER_INITIAL_RE_CONNECTION_DURATION).
-+     */
-+    public static final String PARAMETER_RE_CONNECTION_PROGRESSION_FACTOR = "transport.amqp.ReconnectionProgressionFactor";
-+
-+
-+    /**
-+     * The maximum duration to suspend the polling task in case of an error. The current suspend duration will reach this
-+     * value by following the series,
-+     * PARAMETER_RE_CONNECTION_PROGRESSION_FACTOR * PARAMETER_INITIAL_RE_CONNECTION_DURATION. This upper bound is there
-+     * because nobody wants to wait a long time until the next re-try if the broker is alive.
-+     */
-+    public static final String PARAMETER_MAX_RE_CONNECTION_DURATION = "transport.amqp.MaximumReconnectionDuration";
-+
-+
-+    /**
-+     * The connection factory to be used either with consumer or producer.
-+     */
-+    public static final String PARAMETER_CONNECTION_FACTORY_NAME = "transport.amqp.ConnectionFactoryName";
-+
-+    /**
-+     * In a two-way scenario which connection factory of the senders' should be used to send the response
-+     */
-+    public static final String PARAMETER_RESPONSE_CONNECTION_FACTORY_NAME =
-+            "transport.amqp.ResponseConnectionFactoryName";
-+
-+
-+    /**
-+     * The initial delay(in milliseconds) that the polling task should delay before initial attempt.
-+     * http://docs.oracle.com/javase/6/docs/api/index.html?java/util/concurrent/ScheduledExecutorService.html
-+     */
-+    public static final String PARAMETER_SCHEDULED_TASK_INITIAL_DELAY =
-+            "transport.amqp.ScheduledTaskInitialDelay";
-+
-+    /**
-+     * The delay(in milliseconds) that the polling task should delay before next attempt.
-+     * http://docs.oracle.com/javase/6/docs/api/index.html?java/util/concurrent/ScheduledExecutorService.html
-+     */
-+    public static final String PARAMETER_SCHEDULED_TASK_DELAY = "transport.amqp.ScheduledTaskDelay";
-+
-+    /**
-+     * The time unit which should use to calculate,
-+     * {@link AMQPTransportConstant#PARAMETER_SCHEDULED_TASK_INITIAL_DELAY} and
-+     * {@link AMQPTransportConstant#PARAMETER_SCHEDULED_TASK_DELAY}.
-+     */
-+    public static final String PARAMETER_SCHEDULED_TASK_TIME_UNIT = "transport.amqp.ScheduledTaskTimeUnit";
-+
-+    /**
-+     * Number of concurrent consumers per polling task.
-+     */
-+    public static final String PARAMETER_NO_OF_CONCURRENT_CONSUMERS = "transport.amqp.NoOfConcurrentConsumers";
-+
-+    /**
-+     * Number of dispatching task to use any request messages to actual processing task.
-+     */
-+    public static final String PARAMETER_DISPATCHING_TASK_SIZE = "transport.amqp.NoOfDispatchingTask";
-+
-+    /**
-+     * Use the given channel number if possible. See
-+     * http://www.rabbitmq.com/releases/rabbitmq-java-client/v3.0.1/rabbitmq-java-client-javadoc-3.0.1/com/rabbitmq/client/Connection.html#createChannel(int)
-+     */
-+    public static final String PARAMETER_AMQP_CHANNEL_NUMBER = "transport.amqp.ChannelNumber";
-+
-+    /**
-+     * Configure the content type as a service parameter
-+     */
-+    public static final String PARAMETER_CONFIGURED_CONTENT_TYPE = "transport.amqp.ContentType";
-+
-+    /**
-+     * Message context property to set the AMQP message content type.
-+     */
-+    public static final String PROPERTY_AMQP_CONTENT_TYPE = "AMQP_CONTENT_TYPE";
-+
-+    /**
-+     * Message context property to set the AMQP message encoding.
-+     */
-+    public static final String PROPERTY_AMQP_CONTENT_ENCODING = "AMQP_CONTENT_ENCODING";
-+
-+
-+    public static final String AMQP_HEADER = "AMQP_HEADER";
-+
-+    /**
-+     * Message context property to set the AMQP message delivery mode.
-+     */
-+    public static final String PROPERTY_AMQP_DELIVER_MODE = "AMQP_DELIVERY_MODE";
-+
-+    /**
-+     * Message context property to set the AMQP message priority.
-+     */
-+    public static final String PROPERTY_AMQP_PRIORITY = "AMQP_PRIORITY";
-+
-+    /**
-+     * Message context property to set the AMQP message correlation id.
-+     */
-+    public static final String PROPERTY_AMQP_CORRELATION_ID = "AMQP_CORRELATION_ID";
-+
-+
-+    /**
-+     * Message context property to set the AMQP message reply to header.
-+     */
-+    public static final String PROPERTY_AMQP_REPLY_TO = "AMQP_REPLY_TO";
-+
-+
-+    /**
-+     * Message context property to set the AMQP expiration.
-+     */
-+    public static final String PROPERTY_AMQP_EXPIRATION = "AMQP_EXPIRATION";
-+
-+
-+    /**
-+     * Message context property to set the message id of the AMQP message.
-+     */
-+    public static final String PROPERTY_AMQP_MESSAGE_ID = "AMQP_MESSAGE_ID";
-+
-+
-+    /**
-+     * Message context property to set the timestamp of the AMQP message.
-+     */
-+    public static final String PROPERTY_AMQP_TIME_STAMP = "AMQP_TIME_STAMP";
-+
-+
-+    /**
-+     * Message context property to set the type of the AMQP message.
-+     */
-+    public static final String PROPERTY_AMQP_TYPE = "AMQP_TYPE";
-+
-+
-+    /**
-+     * Message context property to set the AMQP user id.
-+     */
-+    public static final String PROPERTY_AMQP_USER_ID = "AMQP_USER_ID";
-+
-+
-+    /**
-+     * Message context property to set the AMQP app id.
-+     */
-+    public static final String PROPERTY_AMQP_APP_ID = "AMQP_APP_ID";
-+
-+
-+    /**
-+     * Message context property to set the AMQP cluster id.
-+     */
-+    public static final String PROPERTY_AMQP_CLUSTER_ID = "AMQP_CLUSTER_ID";
-+
-+
-+    /**
-+     * Configure the executor service worker pool size.
-+     */
-+
-+    public static final String PARAM_CONNECTION_FACTORY_POOL_SIZE = "connection-factory-pool-size";
-+
-+    public static final int CONNECTION_FACTORY_POOL_DEFAULT = 20;
-+
-+    public static final String PARAM_RESPONSE_HANDLING_POOL_SIZE = "response-handling-pool-size";
-+
-+    public static final int RESPONSE_HANDLING_POOL_DEFAULT = 20;
-+
-+    public static final String PARAM_WORKER_POOL_SIZE = "worker-pool-size";
-+
-+    public static final int WORKER_POOL_DEFAULT = 1000;
-+
-+    public static final String PARAM_SEMAPHORE_TIME_OUT = "semaphore-time-out";
-+
-+    public static final String AMQP_CORRELATION_ID = "AMQP_CORRELATION_ID";
-+
-+    public static final String AMQP_TRANSPORT_BUFFER_KEY = "AMQP_TRANSPORT_BUFFER_KEY";
-+
-+    public static final String AMQP_USE_TX = "tx";
-+
-+    public static final String AMQP_USE_LWPC = "lwpc";
-+
-+    public static final String DEFAULT_CONTENT_TYPE = "application/xml";
-+
-+    public static final String ROUTING_KEY_DELIMITER = ",";
-+
-+    public static final String RESPONSE_CONNECTION_FACTORY_NAME = "RESPONSE_CONNECTION_FACTORY_NAME";
-+
-+}
-\ No newline at end of file
-Index: java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPConsumerClient.java
-===================================================================
---- java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPConsumerClient.java	(nonexistent)
-+++ java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPConsumerClient.java	(revision 1507855)
-@@ -0,0 +1,34 @@
-+package org.apache.synapse.tranport.amqp;
-+
-+import com.rabbitmq.client.Channel;
-+import com.rabbitmq.client.Connection;
-+import com.rabbitmq.client.ConnectionFactory;
-+import com.rabbitmq.client.QueueingConsumer;
-+
-+import java.io.IOException;
-+
-+/**
-+ * The consumer client for AMQP transport
-+ */
-+public class AMQPConsumerClient {
-+
-+    public static final String QUEUE_NAME = "ProducerProxy";
-+
-+    public static void main(String[] args) throws IOException, InterruptedException {
-+
-+        ConnectionFactory factory = new ConnectionFactory();
-+        factory.setHost("localhost");
-+        Connection connection = factory.newConnection();
-+
-+        Channel channel = connection.createChannel();
-+        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-+
-+        QueueingConsumer consumer = new QueueingConsumer(channel);
-+        channel.basicConsume(QUEUE_NAME, true, consumer);
-+        System.out.println("Waiting for message on queue '" + QUEUE_NAME + "'");
-+
-+        QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-+        String message = new String(delivery.getBody());
-+        System.out.println("[x] received '" + message + "'");
-+    }
-+}
-Index: java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPTransportUtilsTest.java
-===================================================================
---- java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPTransportUtilsTest.java	(nonexistent)
-+++ java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPTransportUtilsTest.java	(revision 1507855)
-@@ -0,0 +1,155 @@
-+/*
-+ * Copyright WSO2, Inc. (http://wso2.com)
-+ *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ * http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ */
-+package org.apache.synapse.tranport.amqp;
-+
-+import com.rabbitmq.client.Address;
-+import junit.framework.TestCase;
-+import org.apache.axis2.description.AxisService;
-+import org.apache.synapse.transport.amqp.AMQPTransportConstant;
-+import org.apache.synapse.transport.amqp.AMQPTransportUtils;
-+
-+import java.util.HashMap;
-+import java.util.Map;
-+
-+public class AMQPTransportUtilsTest extends TestCase {
-+
-+    private Map<String, String> svcMap = new HashMap<String, String>();
-+
-+    private Map<String, String> cfMap = new HashMap<String, String>();
-+
-+    @Override
-+    public void setUp() throws Exception {
-+        super.setUp();
-+        // Do not edit the values, test may fail!
-+        svcMap.put(AMQPTransportConstant.PARAMETER_EXCHANGE_NAME, "directExchange");
-+        svcMap.put(AMQPTransportConstant.PARAMETER_EXCHANGE_INTERNAL, "true");
-+        svcMap.put(AMQPTransportConstant.PARAMETER_NO_OF_CONCURRENT_CONSUMERS, "2");
-+
-+        cfMap.put(AMQPTransportConstant.PARAMETER_EXCHANGE_TYPE, "direct");
-+        cfMap.put(AMQPTransportConstant.PARAMETER_QUEUE_DURABLE, "true");
-+        cfMap.put(AMQPTransportConstant.PARAMETER_INITIAL_RE_CONNECTION_DURATION, "10");
-+    }
-+
-+    public void testGetStringProperty() throws Exception {
-+        assertEquals("In valid string value received,",
-+                "username@domain.com", AMQPTransportUtils.getStringProperty("string", null));
-+    }
-+
-+    public void testGetIntProperty() throws Exception {
-+        assertEquals("In valid int value received,", 10, AMQPTransportUtils.getIntProperty("int", -1));
-+    }
-+
-+    public void testGetLongProperty() throws Exception {
-+        assertEquals("In valid long value received,", 13, AMQPTransportUtils.getLongProperty("long", -1));
-+    }
-+
-+    public void testGetDoubleProperty() throws Exception {
-+        assertEquals("In valid double value received,", 14.4, AMQPTransportUtils.getDoubleProperty("double", -1));
-+    }
-+
-+    public void testGetBooleanProperty() throws Exception {
-+        assertEquals(
-+                "In valid boolean value received,",
-+                false,
-+                AMQPTransportUtils.getBooleanProperty("boolean2", true).booleanValue());
-+
-+        assertEquals(
-+                "In valid boolean value received,",
-+                true,
-+                AMQPTransportUtils.getBooleanProperty("boolean1", false).booleanValue());
-+    }
-+
-+    public void testGetServiceStringParameters() throws Exception {
-+        AxisService service = new AxisService();
-+        service.addParameter("param1", "value1");
-+
-+        Map<String, String> paramMap =
-+                AMQPTransportUtils.getServiceStringParameters(service.getParameters());
-+        assertEquals("In valid parameter for key param1", "value1", paramMap.get("param1"));
-+    }
-+
-+    public void testGetOptionalStringParameter() throws Exception {
-+        assertEquals(
-+                "In valid value received",
-+                svcMap.get(AMQPTransportConstant.PARAMETER_EXCHANGE_NAME),
-+                AMQPTransportUtils.getOptionalStringParameter(
-+                        AMQPTransportConstant.PARAMETER_EXCHANGE_NAME, svcMap, cfMap));
-+
-+        assertEquals(
-+                "In valid value received",
-+                cfMap.get(AMQPTransportConstant.PARAMETER_EXCHANGE_TYPE),
-+                AMQPTransportUtils.getOptionalStringParameter(
-+                        AMQPTransportConstant.PARAMETER_EXCHANGE_TYPE, svcMap, cfMap));
-+    }
-+
-+    public void testGetOptionalBooleanParameter() throws Exception {
-+        assertEquals("Invalid value",
-+                Boolean.valueOf(svcMap.get(AMQPTransportConstant.PARAMETER_EXCHANGE_INTERNAL)),
-+                AMQPTransportUtils.getOptionalBooleanParameter(
-+                        AMQPTransportConstant.PARAMETER_EXCHANGE_INTERNAL, svcMap, cfMap));
-+
-+        assertEquals("Invalid value",
-+                Boolean.valueOf(cfMap.get(AMQPTransportConstant.PARAMETER_QUEUE_DURABLE)),
-+                AMQPTransportUtils.getOptionalBooleanParameter(
-+                        AMQPTransportConstant.PARAMETER_QUEUE_DURABLE, svcMap, cfMap));
-+    }
-+
-+    public void testGetOptionalIntParameter() throws Exception {
-+        assertEquals("Invalid value",
-+                Integer.parseInt(cfMap.get(AMQPTransportConstant.PARAMETER_INITIAL_RE_CONNECTION_DURATION)),
-+                AMQPTransportUtils.getOptionalIntParameter(
-+                        AMQPTransportConstant.PARAMETER_INITIAL_RE_CONNECTION_DURATION, svcMap, cfMap).intValue());
-+
-+        assertEquals("Invalid value",
-+                Integer.parseInt(svcMap.get(AMQPTransportConstant.PARAMETER_NO_OF_CONCURRENT_CONSUMERS)),
-+                AMQPTransportUtils.getOptionalIntParameter(
-+                        AMQPTransportConstant.PARAMETER_NO_OF_CONCURRENT_CONSUMERS, svcMap, cfMap).intValue());
-+    }
-+
-+    public void testGetBindingKeys() throws Exception {
-+        String keys[] = AMQPTransportUtils.split("ERROR,WARN,DEBUG", ",");
-+        assertEquals("Invalid value", "ERROR", keys[0]);
-+        assertEquals("Invalid value", "WARN", keys[1]);
-+        assertEquals("Invalid value", "DEBUG", keys[2]);
-+    }
-+
-+    public void testGetAddressArray() throws Exception {
-+        try {
-+            Address[] addresses1 = AMQPTransportUtils.getAddressArray(
-+                    "wso2.org:443,rajika.org:25", ",", ':');
-+            assertEquals("Invalid value", "wso2.org", addresses1[0].getHost());
-+            assertEquals("Invalid value", 25, addresses1[1].getPort());
-+            assertEquals("Invalid value", "rajika.org", addresses1[1].getHost());
-+        } catch (NumberFormatException e) {
-+            fail("Should not throw an exception, " + e.getMessage());
-+        }
-+
-+        try {
-+            AMQPTransportUtils.getAddressArray(
-+                    "hostName1:443,hostName2:25,hostName3:invalidPort", ",", ':');
-+            fail("Should not come here because above should throw an exception");
-+        } catch (NumberFormatException e) {
-+            // expected
-+        }
-+    }
-+
-+    public void testParseAMQPUri() throws Exception {
-+        String url = "amqp://SimpleStockQuoteService?transport.amqp.ConnectionFactoryName=producer&transport.amqp.QueueName=producer" ;
-+        Map<String, String> uriParam = AMQPTransportUtils.parseAMQPUri(url);
-+        assertEquals("Invalid value", "producer", uriParam.get(AMQPTransportConstant.PARAMETER_QUEUE_NAME));
-+
-+    }
-+}
-Index: java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPTwoWayProducerClient.java
-===================================================================
---- java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPTwoWayProducerClient.java	(nonexistent)
-+++ java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPTwoWayProducerClient.java	(revision 1507855)
-@@ -0,0 +1,109 @@
-+/*
-+ * ====================================================================
-+ * Licensed to the Apache Software Foundation (ASF) under one
-+ * or more contributor license agreements.  See the NOTICE file
-+ * distributed with this work for additional information
-+ * regarding copyright ownership.  The ASF licenses this file
-+ * to you under the Apache License, Version 2.0 (the
-+ * "License"); you may not use this file except in compliance
-+ * with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing,
-+ * software distributed under the License is distributed on an
-+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ * KIND, either express or implied.  See the License for the
-+ * specific language governing permissions and limitations
-+ * under the License.
-+ * ====================================================================
-+ *
-+ * This software consists of voluntary contributions made by many
-+ * individuals on behalf of the Apache Software Foundation.  For more
-+ * information on the Apache Software Foundation, please see
-+ * <http://www.apache.org/>.
-+ *
-+ */
-+package org.apache.synapse.tranport.amqp;
-+
-+import com.rabbitmq.client.*;
-+
-+import java.io.IOException;
-+
-+/**
-+ * A request/response producer client
-+ * author : rajika.kumarasiri@gmail.com
-+ */
-+public class AMQPTwoWayProducerClient {
-+
-+    private static final String MESSAGE =
-+            "<?xml version='1.0' encoding='UTF-8'?>\n" +
-+                    "   <soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
-+                    "      <soapenv:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\n" +
-+                    "         <wsa:To>http://localhost:8281/services/StockQuoteProxy</wsa:To>\n" +
-+                    "         <wsa:MessageID>urn:uuid:44d578a8-20e9-4ee4-8407-9b0a0768e5a8</wsa:MessageID>\n" +
-+                    "         <wsa:Action>urn:getQuote</wsa:Action>\n" +
-+                    "      </soapenv:Header>\n" +
-+                    "      <soapenv:Body>\n" +
-+                    "         <m0:getQuote xmlns:m0=\"http://services.samples\">\n" +
-+                    "            <m0:request>\n" +
-+                    "               <m0:symbol>IBM</m0:symbol>\n" +
-+                    "            </m0:request>\n" +
-+                    "         </m0:getQuote>\n" +
-+                    "      </soapenv:Body>\n" +
-+                    "   </soapenv:Envelope>";
-+
-+    private static final String MESSAGE2 =
-+            "<?xml version='1.0' encoding='UTF-8'?>\n" +
-+                    "         <m0:getQuote xmlns:m0=\"http://services.samples\">\n" +
-+                    "            <m0:request>\n" +
-+                    "               <m0:symbol>IBM</m0:symbol>\n" +
-+                    "            </m0:request>\n" +
-+                    "         </m0:getQuote>";
-+
-+    public static void main(String[] args) throws IOException, InterruptedException {
-+
-+        ConnectionFactory factory = new ConnectionFactory();
-+        factory.setHost("localhost");
-+        Connection connection = factory.newConnection();
-+
-+        Channel channel = connection.createChannel();
-+
-+        AMQPTwoWayProducerClient.produceAndConsume(
-+                MESSAGE2, channel, "consumer", "consumerReply");
-+
-+        channel.close();
-+        connection.close();
-+
-+    }
-+
-+
-+    private static void produceAndConsume(
-+            String message,
-+            Channel channel,
-+            String requestQueueName,
-+            String replyQueueName) throws IOException, InterruptedException {
-+
-+        AMQP.BasicProperties.Builder builder = new
-+                AMQP.BasicProperties().builder();
-+        String restCoID = Math.random() + "";
-+        builder.correlationId(restCoID);
-+        System.out.println("Request correlation Id : " + restCoID);
-+        builder.replyTo(replyQueueName);
-+        channel.basicPublish("", requestQueueName, builder.build(), message.getBytes());
-+        System.out.println("[x] sent to '" + requestQueueName + "' the message '\n" + message + "'");
-+
-+        channel.queueDeclare(replyQueueName, false, false, false, null);
-+        QueueingConsumer consumer = new QueueingConsumer(channel);
-+        channel.basicConsume(replyQueueName, true, consumer);
-+        System.out.println("Waiting for message on queue '" + replyQueueName + "'");
-+        while (true) {
-+            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-+            String replyMessage = new String(delivery.getBody());
-+            System.out.println("[x] received '" + replyMessage + "'");
-+            System.out.println("Response correlation Id : " + delivery.getProperties().getCorrelationId());
-+            break;
-+
-+        }
-+    }
-+}
-Index: java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPProducerClient.java
-===================================================================
---- java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPProducerClient.java	(nonexistent)
-+++ java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPProducerClient.java	(revision 1507855)
-@@ -0,0 +1,75 @@
-+package org.apache.synapse.tranport.amqp;
-+
-+import com.rabbitmq.client.Channel;
-+import com.rabbitmq.client.Connection;
-+import com.rabbitmq.client.ConnectionFactory;
-+
-+import java.io.IOException;
-+
-+/**
-+ * The producer for AMQP transport.
-+ */
-+public class AMQPProducerClient {
-+
-+    //    private static final String QUEUE_NAME = "ConsumerTxProxy";
-+//    private static final String QUEUE_NAME = "worker-queue";
-+    private static final String QUEUE_NAME = "ProducerProxy";
-+
-+    private static final String MESSAGE =
-+            "<?xml version='1.0' encoding='UTF-8'?>\n" +
-+                    "   <soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
-+                    "      <soapenv:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\n" +
-+                    "         <wsa:To>http://localhost:8281/services/StockQuoteProxy</wsa:To>\n" +
-+                    "         <wsa:MessageID>urn:uuid:44d578a8-20e9-4ee4-8407-9b0a0768e5a8</wsa:MessageID>\n" +
-+                    "         <wsa:Action>urn:getQuote</wsa:Action>\n" +
-+                    "      </soapenv:Header>\n" +
-+                    "      <soapenv:Body>\n" +
-+                    "         <m0:getQuote xmlns:m0=\"http://services.samples\">\n" +
-+                    "            <m0:request>\n" +
-+                    "               <m0:symbol>IBM</m0:symbol>\n" +
-+                    "            </m0:request>\n" +
-+                    "         </m0:getQuote>\n" +
-+                    "      </soapenv:Body>\n" +
-+                    "   </soapenv:Envelope>";
-+
-+    private static final String MESSAGE2 =
-+            "<?xml version='1.0' encoding='UTF-8'?>\n" +
-+                    "         <m0:getQuote xmlns:m0=\"http://services.samples\">\n" +
-+                    "            <m0:request>\n" +
-+                    "               <m0:symbol>IBM</m0:symbol>\n" +
-+                    "            </m0:request>\n" +
-+                    "         </m0:getQuote>";
-+
-+    public static void main(String[] args) throws IOException {
-+
-+        ConnectionFactory factory = new ConnectionFactory();
-+        factory.setHost("localhost");
-+        Connection connection = factory.newConnection();
-+
-+        Channel channel = connection.createChannel();
-+
-+        //channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-+        AMQPProducerClient.produce(MESSAGE2, channel, QUEUE_NAME);
-+//        AMQPProducerClient.publish(MESSAGE2, channel, "subscriber-exchange");
-+//        AMQPProducerClient.route(MESSAGE2, channel, "route-exchange", "fatal");
-+//        AMQPProducerClient.route(MESSAGE2, channel, "topic-exchange", "kern.critical");
-+
-+        channel.close();
-+        connection.close();
-+
-+    }
-+
-+
-+    private static void produce(String message, Channel channel, String queueName) throws IOException {
-+        channel.basicPublish("", queueName, null, message.getBytes());
-+    }
-+
-+    private static void publish(String message, Channel channel, String exchangeName) throws IOException {
-+        channel.basicPublish(exchangeName, "", null, message.getBytes());
-+    }
-+
-+    private static void route(String message, Channel channel, String exchangeName, String routeKey) throws IOException {
-+        channel.basicPublish(exchangeName, routeKey, null, message.getBytes());
-+    }
-+
-+}
 Index: java/modules/transports/optional/amqp/pom.xml
 ===================================================================
 --- java/modules/transports/optional/amqp/pom.xml	(nonexistent)
@@ -4489,52 +4519,22 @@ Index: java/modules/transports/optional/amqp/pom.xml
 +        </dependency>
 +    </dependencies>
 +</project>
-Index: java/repository/conf/axis2.xml
+Index: java/pom.xml
 ===================================================================
---- java/repository/conf/axis2.xml	(revision 1507854)
-+++ java/repository/conf/axis2.xml	(revision 1507855)
-@@ -266,6 +266,22 @@
-     <!--Uncomment this for UDP transport support
-     <transportReceiver name="udp" class="org.apache.axis2.transport.udp.UDPListener"/>-->
+--- java/pom.xml	(revision 1507854)
++++ java/pom.xml	(revision 1507855)
+@@ -392,6 +392,11 @@
+                 <artifactId>synapse-vfs-transport</artifactId>
+                 <version>${project.version}</version>
+             </dependency>
++            <dependency>
++                <groupId>org.apache.synapse</groupId>
++                <artifactId>synapse-amqp-transport</artifactId>
++                <version>${project.version}</version>
++            </dependency>
  
-+    <!--Uncomment this for AMQP transport support-->
-+    <!--<transportReceiver name="amqp" class="org.apache.synapse.transport.amqp.AMQPTransportListener">-->
-+        <!--<parameter name="consumer" locked="false">-->
-+            <!--<parameter name="transport.amqp.Uri" locked="false">amqp://localhost:5672</parameter>-->
-+        <!--</parameter>-->
-+        <!--<parameter name="worker-queue" locked="false">-->
-+            <!--<parameter name="transport.amqp.Uri" locked="false">amqp://localhost:5672</parameter>-->
-+            <!--<parameter name="transport.amqp.ChannelPreFetchCountSize" locked="false">1</parameter>-->
-+        <!--</parameter>-->
-+        <!--<parameter name="subscriber" locked="false">-->
-+            <!--<parameter name="transport.amqp.Uri" locked="false">amqp://localhost:5672</parameter>-->
-+        <!--</parameter>-->
-+    <!--</transportReceiver>-->
-+
-+    <!--Uncomment this for AMQP transport support -->
-+
-     <!-- ================================================= -->
-     <!-- Transport Outs -->
-     <!-- ================================================= -->
-@@ -348,6 +364,18 @@
-     <!--Uncomment this for UDP transport support
-     <transportSender name="udp" class="org.apache.axis2.transport.udp.UDPSender"/>-->
- 
-+
-+    <!--Uncomment this for AMQP transport support-->
-+    <!--<transportSender name="amqp" class="org.apache.synapse.transport.amqp.AMQPTransportSender">-->
-+        <!--<parameter name="producer" locked="false">-->
-+            <!--<parameter name="transport.amqp.Uri" locked="false">amqp://localhost:5672</parameter>-->
-+        <!--</parameter>-->
-+        <!--<parameter name="publisher" locked="false">-->
-+            <!--<parameter name="transport.amqp.Uri" locked="false">amqp://localhost:5672</parameter>-->
-+        <!--</parameter>-->
-+    <!--</transportSender>-->
-+
-+
-     <!-- ================================================= -->
-     <!-- Global Modules  -->
-     <!-- ================================================= -->
+             <!-- Apache Axis2 -->
+             <dependency>
 -*-*-*-
 Message: added amqp transport.
 -*-*-*-

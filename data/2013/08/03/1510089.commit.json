@@ -1,0 +1,27 @@
+{
+  "when": "2013-08-03T22:19:12-04:00", 
+  "message": "used the passed queue name.", 
+  "who": "rajikak", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-74,7 +74,7", 
+          "lines": [
+            "         }\n", 
+            " \n", 
+            "         if (queueName != null) {\n", 
+            "-            AMQPProducerClient.produce(MESSAGE2, channel, QUEUE_NAME);\n", 
+            "+            AMQPProducerClient.produce(MESSAGE2, channel, queueName);\n", 
+            "         } else {\n", 
+            "             if (routingKey != null) {\n", 
+            "                 AMQPProducerClient.route(MESSAGE2, channel, exchangeName, routingKey);\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPProducerClient.java", 
+      "from": "java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPProducerClient.java"
+    }
+  ], 
+  "id": "1510089"
+}

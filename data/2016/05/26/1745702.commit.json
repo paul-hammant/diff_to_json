@@ -1,0 +1,86 @@
+{
+  "when": "2016-05-26T20:44:03-04:00", 
+  "message": "Adding systemId, publicId and baseURL to the SchemaResourceLSInput. Applied patch from Senduran at SYNAPSE-1005", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-17,6 +17,9", 
+          "lines": [
+            " public class SchemaResourceLSInput implements LSInput {\n", 
+            " \n", 
+            "     InputStream byteStream = null;\n", 
+            "+    String systemId = null;\n", 
+            "+    String publicId = null;\n", 
+            "+    String baseURI = null;\n", 
+            " \n", 
+            "     public Reader getCharacterStream() {\n", 
+            "         return null;\n"
+          ]
+        }, 
+        {
+          "locn": "-43,27 +46,27", 
+          "lines": [
+            "     }\n", 
+            " \n", 
+            "     public String getSystemId() {\n", 
+            "-        return null;\n", 
+            "+        return systemId;\n", 
+            "     }\n", 
+            " \n", 
+            "     public void setSystemId(String systemId) {\n", 
+            "-\n", 
+            "+        this.systemId = systemId;\n", 
+            "     }\n", 
+            " \n", 
+            "     public String getPublicId() {\n", 
+            "-        return null;\n", 
+            "+        return publicId;\n", 
+            "     }\n", 
+            " \n", 
+            "     public void setPublicId(String publicId) {\n", 
+            "-\n", 
+            "+        this.publicId = publicId;\n", 
+            "     }\n", 
+            " \n", 
+            "     public String getBaseURI() {\n", 
+            "-        return null;\n", 
+            "+        return baseURI;\n", 
+            "     }\n", 
+            " \n", 
+            "     public void setBaseURI(String baseURI) {\n", 
+            "-\n", 
+            "+        this.baseURI = baseURI;\n", 
+            "     }\n", 
+            " \n", 
+            "     public String getEncoding() {\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/util/jaxp/SchemaResourceLSInput.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/util/jaxp/SchemaResourceLSInput.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-51,6 +51,9", 
+          "lines": [
+            "         }\n", 
+            "         SchemaResourceLSInput schemaResourceLSInput = new SchemaResourceLSInput();\n", 
+            "         schemaResourceLSInput.setByteStream(inputSource.getByteStream());\n", 
+            "+        schemaResourceLSInput.setSystemId(systemId);\n", 
+            "+        schemaResourceLSInput.setPublicId(publicId);\n", 
+            "+        schemaResourceLSInput.setBaseURI(baseURI);\n", 
+            "         return schemaResourceLSInput;\n", 
+            "     }\n", 
+            " }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/util/jaxp/SchemaResourceResolver.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/util/jaxp/SchemaResourceResolver.java"
+    }
+  ], 
+  "id": "1745702"
+}

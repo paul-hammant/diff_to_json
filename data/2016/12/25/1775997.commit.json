@@ -1,0 +1,33 @@
+{
+  "when": "2016-12-25T02:32:15-05:00", 
+  "message": "Add new contributors", 
+  "who": "isudana", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-1307,5 +1307,14", 
+          "lines": [
+            "         <contributor>\n", 
+            "             <name>Dave Irving</name>\n", 
+            "         </contributor>\n", 
+            "+        <contributor>\n", 
+            "+            <name>Vanjikumaran Sivajothy</name>\n", 
+            "+        </contributor>\n", 
+            "+        <contributor>\n", 
+            "+            <name>Prabath Ariyarathna</name>\n", 
+            "+        </contributor>\n", 
+            "+        <contributor>\n", 
+            "+            <name>Senduran Balasubramaniyam</name>\n", 
+            "+        </contributor>\n", 
+            "     </contributors>\n", 
+            " </project>\n"
+          ]
+        }
+      ], 
+      "to": "java/pom.xml", 
+      "from": "java/pom.xml"
+    }
+  ], 
+  "id": "1775997"
+}

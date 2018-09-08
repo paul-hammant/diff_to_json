@@ -1,0 +1,271 @@
+{
+  "when": "2013-07-28T20:07:39-04:00", 
+  "message": "Declaring RabbitMQ dependencies in the parent pom as per the synapse convention. Reworded a few lines in the AMQP docs.", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-837,12 +837,12", 
+          "lines": [
+            "         <section name=\"AMQP transport\" id=\"amqp_transport\">\n", 
+            "             <subsection name=\"Setting Up the Transport\" id=\"setting_up_the_amqp_transport\">\n", 
+            "                 <p>\n", 
+            "-                    AMQP transport is based on the excellent\n", 
+            "+                    AMQP transport is based on the widely used\n", 
+            "                     <a href=\"http://www.rabbitmq.com/java-client.html\">Java AMQP client</a> library from\n", 
+            "                     <a class=\"externalLink\" href=\"http://www.rabbitmq.com/\">RabbitMQ</a>.\n", 
+            "-                    Due to the license, the client library doesn't ship with Apache Synapse. In order to use\n", 
+            "-                    the AMQP transport download the RabbitMQ Java client library and copy\n", 
+            "-                    the client library(rabbitmq-client.jar) into Synapse classpath(lib folder).\n", 
+            "+                    The client library is not distributed with Apache Synapse, and hence in order to use\n", 
+            "+                    the AMQP transport, download the RabbitMQ Java client and copy the client library\n", 
+            "+                    (rabbitmq-client.jar) into Synapse classpath (SYNAPSE_HOME/lib directory).\n", 
+            "                 </p>\n", 
+            "                 <p>\n", 
+            "                     To enable the AMQP transport, uncomment the AMQP transport sender and AMQP transport\n"
+          ]
+        }, 
+        {
+          "locn": "-851,8 +851,8", 
+          "lines": [
+            "             </subsection>\n", 
+            "             <subsection name=\"AMQP Transport Parameters\" id=\"amqp_transport_parameters\">\n", 
+            "                 <p>\n", 
+            "-                    Following parameters can be configured as part of transport receiver, sender or\n", 
+            "-                    as part of the proxy service parameter or amqp endpoint deceleration.\n", 
+            "+                    Following parameters can be configured as part of AMQP transport receiver, sender,\n", 
+            "+                    a proxy service or an AMQP endpoint declaration.\n", 
+            "                 </p>\n", 
+            "                 <dl>\n", 
+            "                     <dt>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/documentation/src/site/xdoc/userguide/transports.xml", 
+      "from": "java/modules/documentation/src/site/xdoc/userguide/transports.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-12,7 +12,7", 
+          "lines": [
+            " \n", 
+            "     <groupId>org.apache.synapse</groupId>\n", 
+            "     <artifactId>synapse-amqp-transport</artifactId>\n", 
+            "-    <name>Apache Synapse - AMQP transport</name>\n", 
+            "+    <name>Apache Synapse - AMQP Transport</name>\n", 
+            "     <packaging>bundle</packaging>\n", 
+            "     <url>http://maven.apache.org</url>\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-65,30 +65,22", 
+          "lines": [
+            "         <dependency>\n", 
+            "             <groupId>junit</groupId>\n", 
+            "             <artifactId>junit</artifactId>\n", 
+            "-            <version>3.8.1</version>\n", 
+            "-            <scope>test</scope>\n", 
+            "         </dependency>\n", 
+            "         <dependency>\n", 
+            "             <groupId>com.rabbitmq</groupId>\n", 
+            "             <artifactId>amqp-client</artifactId>\n", 
+            "-            <version>3.1.2</version>\n", 
+            "-            <scope>compile</scope>\n", 
+            "-            <!-- put a compile time dependency due to license -->\n", 
+            "         </dependency>\n", 
+            "         <dependency>\n", 
+            "             <groupId>org.apache.axis2</groupId>\n", 
+            "             <artifactId>axis2-transport-base</artifactId>\n", 
+            "-            <version>${axis2.transport.version}</version>\n", 
+            "         </dependency>\n", 
+            "         <dependency>\n", 
+            "             <groupId>org.apache.axis2</groupId>\n", 
+            "             <artifactId>axis2-kernel</artifactId>\n", 
+            "-            <version>${axis2.version}</version>\n", 
+            "         </dependency>\n", 
+            "         <dependency>\n", 
+            "             <groupId>org.apache.axis2</groupId>\n", 
+            "             <artifactId>axis2-transport-http</artifactId>\n", 
+            "-            <version>${axis2.version}</version>\n", 
+            "         </dependency>\n", 
+            "     </dependencies>\n", 
+            " </project>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/optional/amqp/pom.xml", 
+      "from": "java/modules/transports/optional/amqp/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-977,6 +977,13", 
+          "lines": [
+            "                 <artifactId>snmp4j</artifactId>\n", 
+            "                 <version>${snmp4j.version}</version>\n", 
+            "             </dependency>\n", 
+            "+            <dependency>\n", 
+            "+                <!-- For AMQP transport -->\n", 
+            "+                <groupId>com.rabbitmq</groupId>\n", 
+            "+                <artifactId>amqp-client</artifactId>\n", 
+            "+                <version>${rabbitmq.version}</version>\n", 
+            "+                <scope>compile</scope>\n", 
+            "+            </dependency>\n", 
+            "         </dependencies>\n", 
+            "     </dependencyManagement>\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-1054,7 +1061,7", 
+          "lines": [
+            "         <module>modules/packaging/package-skeleton</module>\n", 
+            "         <module>modules/packaging/package-archetype</module>\n", 
+            "         <module>modules/integration</module>\n", 
+            "-\t<module>modules/documentation</module>\n", 
+            "+\t    <module>modules/documentation</module>\n", 
+            "     </modules>\n", 
+            " \n", 
+            "     <properties>\n"
+          ]
+        }, 
+        {
+          "locn": "-1116,6 +1123,7", 
+          "lines": [
+            "         <activemq.version>5.2.0</activemq.version>\n", 
+            "         <snmp4j.version>2.0.3</snmp4j.version>\n", 
+            "         <snmp4j.agent.version>2.0.5</snmp4j.agent.version>\n", 
+            "+        <rabbitmq.version>3.1.2</rabbitmq.version>\n", 
+            " \n", 
+            "         <!-- dependencies of Synapse extensions module -->\n", 
+            "         <wso2commons.version>1.2</wso2commons.version>\n"
+          ]
+        }
+      ], 
+      "to": "java/pom.xml", 
+      "from": "java/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-228,7 +228,7", 
+          "lines": [
+            "         \t<parameter name=\"java.naming.factory.initial\">org.apache.activemq.jndi.ActiveMQInitialContextFactory</parameter>\n", 
+            "         \t<parameter name=\"java.naming.provider.url\">tcp://localhost:61616</parameter>\n", 
+            "         \t<parameter name=\"transport.jms.ConnectionFactoryJNDIName\">TopicConnectionFactory</parameter>\n", 
+            "-\t\t<parameter name=\"transport.jms.ConnectionFactoryType\" locked=\"false\">topic</parameter>\n", 
+            "+\t\t    <parameter name=\"transport.jms.ConnectionFactoryType\" locked=\"false\">topic</parameter>\n", 
+            "         </parameter>\n", 
+            " \n", 
+            "         <parameter name=\"myQueueConnectionFactory\">\n"
+          ]
+        }, 
+        {
+          "locn": "-235,7 +235,7", 
+          "lines": [
+            "         \t<parameter name=\"java.naming.factory.initial\">org.apache.activemq.jndi.ActiveMQInitialContextFactory</parameter>\n", 
+            "         \t<parameter name=\"java.naming.provider.url\">tcp://localhost:61616</parameter>\n", 
+            "         \t<parameter name=\"transport.jms.ConnectionFactoryJNDIName\">QueueConnectionFactory</parameter>\n", 
+            "-\t\t<parameter name=\"transport.jms.ConnectionFactoryType\" locked=\"false\">queue</parameter>\n", 
+            "+\t\t    <parameter name=\"transport.jms.ConnectionFactoryType\" locked=\"false\">queue</parameter>\n", 
+            "         </parameter>\n", 
+            " \n", 
+            "         <parameter name=\"default\">\n"
+          ]
+        }, 
+        {
+          "locn": "-242,7 +242,7", 
+          "lines": [
+            "         \t<parameter name=\"java.naming.factory.initial\">org.apache.activemq.jndi.ActiveMQInitialContextFactory</parameter>\n", 
+            "         \t<parameter name=\"java.naming.provider.url\">tcp://localhost:61616</parameter>\n", 
+            "         \t<parameter name=\"transport.jms.ConnectionFactoryJNDIName\">QueueConnectionFactory</parameter>\n", 
+            "-\t\t<parameter name=\"transport.jms.ConnectionFactoryType\" locked=\"false\">queue</parameter>\n", 
+            "+\t\t    <parameter name=\"transport.jms.ConnectionFactoryType\" locked=\"false\">queue</parameter>\n", 
+            "         </parameter>\n", 
+            "     </transportReceiver>-->\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-266,22 +266,22", 
+          "lines": [
+            "     <!--Uncomment this for UDP transport support\n", 
+            "     <transportReceiver name=\"udp\" class=\"org.apache.axis2.transport.udp.UDPListener\"/>-->\n", 
+            " \n", 
+            "-    <!--Uncomment this for AMQP transport support-->\n", 
+            "-    <!--<transportReceiver name=\"amqp\" class=\"org.apache.synapse.transport.amqp.AMQPTransportListener\">-->\n", 
+            "-        <!--<parameter name=\"consumer\" locked=\"false\">-->\n", 
+            "-            <!--<parameter name=\"transport.amqp.Uri\" locked=\"false\">amqp://localhost:5672</parameter>-->\n", 
+            "-        <!--</parameter>-->\n", 
+            "-        <!--<parameter name=\"worker-queue\" locked=\"false\">-->\n", 
+            "-            <!--<parameter name=\"transport.amqp.Uri\" locked=\"false\">amqp://localhost:5672</parameter>-->\n", 
+            "-            <!--<parameter name=\"transport.amqp.ChannelPreFetchCountSize\" locked=\"false\">1</parameter>-->\n", 
+            "-        <!--</parameter>-->\n", 
+            "-        <!--<parameter name=\"subscriber\" locked=\"false\">-->\n", 
+            "-            <!--<parameter name=\"transport.amqp.Uri\" locked=\"false\">amqp://localhost:5672</parameter>-->\n", 
+            "-        <!--</parameter>-->\n", 
+            "-    <!--</transportReceiver>-->\n", 
+            "+    <!--Uncomment this for AMQP transport support>\n", 
+            "+    <transportReceiver name=\"amqp\" class=\"org.apache.synapse.transport.amqp.AMQPTransportListener\">\n", 
+            "+        <parameter name=\"consumer\" locked=\"false\">\n", 
+            "+            <parameter name=\"transport.amqp.Uri\" locked=\"false\">amqp://localhost:5672</parameter>\n", 
+            "+        </parameter>\n", 
+            " \n", 
+            "-    <!--Uncomment this for AMQP transport support -->\n", 
+            "+        <parameter name=\"worker-queue\" locked=\"false\">\n", 
+            "+            <parameter name=\"transport.amqp.Uri\" locked=\"false\">amqp://localhost:5672</parameter>\n", 
+            "+            <parameter name=\"transport.amqp.ChannelPreFetchCountSize\" locked=\"false\">1</parameter>\n", 
+            "+        </parameter>\n", 
+            " \n", 
+            "+        <parameter name=\"subscriber\" locked=\"false\">\n", 
+            "+            <parameter name=\"transport.amqp.Uri\" locked=\"false\">amqp://localhost:5672</parameter>\n", 
+            "+        </parameter>\n", 
+            "+    </transportReceiver-->\n", 
+            "+\n", 
+            "     <!-- ================================================= -->\n", 
+            "     <!-- Transport Outs -->\n", 
+            "     <!-- ================================================= -->\n"
+          ]
+        }, 
+        {
+          "locn": "-365,17 +365,18", 
+          "lines": [
+            "     <transportSender name=\"udp\" class=\"org.apache.axis2.transport.udp.UDPSender\"/>-->\n", 
+            " \n", 
+            " \n", 
+            "-    <!--Uncomment this for AMQP transport support-->\n", 
+            "-    <!--<transportSender name=\"amqp\" class=\"org.apache.synapse.transport.amqp.AMQPTransportSender\">-->\n", 
+            "-        <!--<parameter name=\"producer\" locked=\"false\">-->\n", 
+            "-            <!--<parameter name=\"transport.amqp.Uri\" locked=\"false\">amqp://localhost:5672</parameter>-->\n", 
+            "-        <!--</parameter>-->\n", 
+            "-        <!--<parameter name=\"publisher\" locked=\"false\">-->\n", 
+            "-            <!--<parameter name=\"transport.amqp.Uri\" locked=\"false\">amqp://localhost:5672</parameter>-->\n", 
+            "-        <!--</parameter>-->\n", 
+            "-    <!--</transportSender>-->\n", 
+            "+    <!--Uncomment this for AMQP transport support>\n", 
+            "+    <transportSender name=\"amqp\" class=\"org.apache.synapse.transport.amqp.AMQPTransportSender\">\n", 
+            "+        <parameter name=\"producer\" locked=\"false\">\n", 
+            "+            <parameter name=\"transport.amqp.Uri\" locked=\"false\">amqp://localhost:5672</parameter>\n", 
+            "+        </parameter>\n", 
+            " \n", 
+            "+        <parameter name=\"publisher\" locked=\"false\">\n", 
+            "+            <parameter name=\"transport.amqp.Uri\" locked=\"false\">amqp://localhost:5672</parameter>\n", 
+            "+        </parameter>\n", 
+            "+    </transportSender-->\n", 
+            " \n", 
+            "+\n", 
+            "     <!-- ================================================= -->\n", 
+            "     <!-- Global Modules  -->\n", 
+            "     <!-- ================================================= -->\n"
+          ]
+        }
+      ], 
+      "to": "java/repository/conf/axis2.xml", 
+      "from": "java/repository/conf/axis2.xml"
+    }
+  ], 
+  "id": "1507876"
+}

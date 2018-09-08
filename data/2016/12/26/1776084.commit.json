@@ -1,0 +1,27 @@
+{
+  "when": "2016-12-26T22:01:32-05:00", 
+  "message": "Increase default heap allocation to 512M", 
+  "who": "isudana", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-169,7 +169,7", 
+          "lines": [
+            " echo \"Using JAVA_HOME:       $JAVA_HOME\"\n", 
+            " echo \"Using SYNAPSE_XML:     $SYNAPSE_XML\"\n", 
+            " \n", 
+            "-$JAVA_HOME/bin/java -server -Xms128M -Xmx128M \\\n", 
+            "+$JAVA_HOME/bin/java -server -Xms512M -Xmx512M \\\n", 
+            "     $XDEBUG \\\n", 
+            "     $TEMP_PROPS \\\n", 
+            "     -Dorg.apache.xerces.xni.parser.XMLParserConfiguration=org.apache.xerces.parsers.XMLGrammarCachingConfiguration \\\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/distribution/src/main/bin/synapse.sh", 
+      "from": "java/modules/distribution/src/main/bin/synapse.sh"
+    }
+  ], 
+  "id": "1776084"
+}

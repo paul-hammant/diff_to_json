@@ -1,0 +1,27 @@
+{
+  "when": "2013-08-04T23:49:08-04:00", 
+  "message": "Fixing a typo", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-99,7 +99,7", 
+          "lines": [
+            "                     Axis2 server, which will send back a response to Synapse. So every 5 seconds you\n", 
+            "                     will notice that Axis2 is generating a quote and Synapse is receiving the stock\n", 
+            "                     quote response. You will also see the \"SampleProxy invoked\" message getting\n", 
+            "-                    loggedlog on the console.\n", 
+            "+                    logged on the console.\n", 
+            "                 </p>\n", 
+            "             </subsection>\n", 
+            "         </section>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/documentation/src/site/xdoc/userguide/samples/sample302.xml", 
+      "from": "java/modules/documentation/src/site/xdoc/userguide/samples/sample302.xml"
+    }
+  ], 
+  "id": "1510369"
+}

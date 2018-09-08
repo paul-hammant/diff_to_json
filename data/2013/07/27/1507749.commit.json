@@ -1,0 +1,101 @@
+{
+  "when": "2013-07-27T20:20:25-04:00", 
+  "message": "Adding sample300 (scheduled tasks) to the integration test suite.", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-0,0 +1,20", 
+          "lines": [
+            "+<synapseSample>\n", 
+            "+    <sampleID>300</sampleID>\n", 
+            "+    <sampleName>Introduction to Synapse Tasks</sampleName>\n", 
+            "+    <synapseConfig>\n", 
+            "+        <!--if we don't specify the optional values, framework will use defaults-->\n", 
+            "+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>\n", 
+            "+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>\n", 
+            "+        <synapseXml>repository/conf/sample/synapse_sample_300.xml</synapseXml>\n", 
+            "+    </synapseConfig>\n", 
+            "+    <backEndServerConfig>\n", 
+            "+        <axis2Server id='0'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+            <counterEnabled>true</counterEnabled>\n", 
+            "+        </axis2Server>\n", 
+            "+    </backEndServerConfig>\n", 
+            "+    <clientConfig>\n", 
+            "+        <clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>\n", 
+            "+    </clientConfig>\n", 
+            "+</synapseSample>\n", 
+            "\\ No newline at end of file\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/resources/sample300.xml", 
+      "from": "java/modules/integration/src/test/resources/sample300.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-22,6 +22,7", 
+          "lines": [
+            " import junit.framework.TestSuite;\n", 
+            " import org.apache.commons.logging.Log;\n", 
+            " import org.apache.commons.logging.LogFactory;\n", 
+            "+import org.apache.synapse.samples.framework.tests.tasks.Sample300;\n", 
+            " import org.apache.synapse.samples.framework.tests.transport.Sample250;\n", 
+            " import org.apache.synapse.samples.framework.tests.advanced.*;\n", 
+            " import org.apache.synapse.samples.framework.tests.endpoint.*;\n"
+          ]
+        }, 
+        {
+          "locn": "-209,6 +210,9", 
+          "lines": [
+            "         sampleClassRepo.put(\"250\", Sample250.class);\n", 
+            "         sampleClassRepo.put(\"251\", Sample251.class);\n", 
+            " \n", 
+            "+        //Tasks\n", 
+            "+        sampleClassRepo.put(\"300\", Sample300.class);\n", 
+            "+\n", 
+            "         //Advanced\n", 
+            "         sampleClassRepo.put(\"350\", Sample350.class);\n", 
+            "         sampleClassRepo.put(\"351\", Sample351.class);\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java", 
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-0,0 +1,18", 
+          "lines": [
+            "+package org.apache.synapse.samples.framework.tests.tasks;\n", 
+            "+\n", 
+            "+import org.apache.synapse.samples.framework.SynapseTestCase;\n", 
+            "+\n", 
+            "+public class Sample300 extends SynapseTestCase {\n", 
+            "+\n", 
+            "+    public Sample300() {\n", 
+            "+        super(300);\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public void testRestToPox() throws Exception {\n", 
+            "+        log.info(\"Waiting 10 seconds for the task to run...\");\n", 
+            "+        Thread.sleep(10000);\n", 
+            "+        int messageCount = getAxis2Server().getMessageCount(\"SimpleStockQuoteService\", \"getQuote\");\n", 
+            "+        log.info(\"Task sent \" + messageCount + \" messages.\");\n", 
+            "+        assertTrue(messageCount >= 2);\n", 
+            "+    }\n", 
+            "+}\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/tasks/Sample300.java", 
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/tasks/Sample300.java"
+    }
+  ], 
+  "id": "1507749"
+}

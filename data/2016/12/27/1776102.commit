@@ -1,0 +1,25 @@
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1776101)
++++ java/pom.xml	(revision 1776102)
+@@ -1316,5 +1316,14 @@
+         <contributor>
+             <name>Senduran Balasubramaniyam</name>
+         </contributor>
++        <contributor>
++            <name>Chanaka Fernando</name>
++        </contributor>
++        <contributor>
++            <name>Isuru Ranawaka</name>
++        </contributor>
++        <contributor>
++            <name>Buddhima Wijeweera</name>
++        </contributor>
+     </contributors>
+ </project>
+-*-*-*-
+Message: Add more contributors
+-*-*-*-
+When: 2016-12-27 05:31:49 -0500 
+-*-*-*-
+Who: isudana

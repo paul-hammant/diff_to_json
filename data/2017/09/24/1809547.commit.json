@@ -1,0 +1,59 @@
+{
+  "when": "2017-09-24T15:49:18-04:00", 
+  "message": "Typo correction and handling non-sql exception", 
+  "who": "vanji", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-85,8 +85,12", 
+          "lines": [
+            "             \n", 
+            "         } catch (SQLException e) {\n", 
+            "             handleException(\"Error executing statement : \" + stmnt.getRawStatement() +\n", 
+            "-                \" against DataSource : \" + getDSName(), e, msgCtx);\n", 
+            "-        } finally {\n", 
+            "+                    \" against DataSource : \" + getDSName(), e, msgCtx);\n", 
+            "+        } catch (Exception e) {\n", 
+            "+            handleException(\"Error executing statement : \" + stmnt.getRawStatement() +\n", 
+            "+                    \" against DataSource : \" + getDSName(), e, msgCtx);\n", 
+            "+        }\n", 
+            "+        finally {\n", 
+            "             if (rs != null) {\n", 
+            "                 try {\n", 
+            "                     rs.close();\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/db/DBLookupMediator.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/db/DBLookupMediator.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-74,9 +74,13", 
+          "lines": [
+            "             }\n", 
+            " \n", 
+            "         } catch (SQLException e) {\n", 
+            "-            handleException(\"Error execuring insert statement : \" + stmnt.getRawStatement() +\n", 
+            "+            handleException(\"Error executing insert statement : \" + stmnt.getRawStatement() +\n", 
+            "                     \" against DataSource : \" + getDSName(), e, msgCtx);\n", 
+            "-        } finally {\n", 
+            "+        } catch (Exception e){\n", 
+            "+            handleException(\"Error executing statement : \" + stmnt.getRawStatement() +\n", 
+            "+                    \" against DataSource : \" + getDSName(), e, msgCtx);\n", 
+            "+        }\n", 
+            "+        finally {\n", 
+            "             if (con != null) {\n", 
+            "                 try {\n", 
+            "                     con.close();\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/db/DBReportMediator.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/db/DBReportMediator.java"
+    }
+  ], 
+  "id": "1809547"
+}

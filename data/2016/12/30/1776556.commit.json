@@ -1,0 +1,500 @@
+{
+  "when": "2016-12-30T08:12:39-05:00", 
+  "message": "Reverting back to 3.0.0-SNAPSHOT", 
+  "who": "ravi", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-32,7 +32,7", 
+          "lines": [
+            " \n", 
+            "     <groupId>org.apache.synapse</groupId>\n", 
+            "     <artifactId>Apache-Synapse</artifactId>\n", 
+            "-    <version>3.0.1-SNAPSHOT</version>\n", 
+            "+    <version>3.0.0-SNAPSHOT</version>\n", 
+            " \n", 
+            "     <name>Apache Synapse</name>\n", 
+            "     <description>Apache Synapse</description>\n"
+          ]
+        }
+      ], 
+      "to": "java/pom.xml", 
+      "from": "java/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-25,7 +25,7", 
+          "lines": [
+            "     <parent>\n", 
+            "         <groupId>org.apache.synapse</groupId>\n", 
+            "         <artifactId>Apache-Synapse</artifactId>\n", 
+            "-        <version>3.0.1-SNAPSHOT</version>\n", 
+            "+        <version>3.0.0-SNAPSHOT</version>\n", 
+            "         <relativePath>../../pom.xml</relativePath>\n", 
+            "     </parent>\n", 
+            "     <artifactId>synapse-patches</artifactId>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/patches/pom.xml", 
+      "from": "java/modules/patches/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-16,5 +16,5", 
+          "lines": [
+            " # under the License.\n", 
+            " \n", 
+            " product.name=Apache Synapse\n", 
+            "-product.version=2.2.0-SNAPSHOT\n", 
+            "+product.version=3.0.0\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/test/resources/synapse-libraries/assembly/filter.properties", 
+      "from": "java/modules/core/src/test/resources/synapse-libraries/assembly/filter.properties"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-26,7 +26,7", 
+          "lines": [
+            "     <parent>\n", 
+            "         <groupId>org.apache.synapse</groupId>\n", 
+            "         <artifactId>Apache-Synapse</artifactId>\n", 
+            "-        <version>3.0.1-SNAPSHOT</version>\n", 
+            "+        <version>3.0.0-SNAPSHOT</version>\n", 
+            "         <relativePath>../../pom.xml</relativePath>\n", 
+            "     </parent>\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/pom.xml", 
+      "from": "java/modules/core/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-26,7 +26,7", 
+          "lines": [
+            "     <parent>\n", 
+            "         <groupId>org.apache.synapse</groupId>\n", 
+            "         <artifactId>Apache-Synapse</artifactId>\n", 
+            "-        <version>3.0.1-SNAPSHOT</version>\n", 
+            "+        <version>3.0.0-SNAPSHOT</version>\n", 
+            "         <relativePath>../../pom.xml</relativePath>\n", 
+            "     </parent>\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/war/pom.xml", 
+      "from": "java/modules/war/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-24,7 +24,7", 
+          "lines": [
+            "     <parent>\n", 
+            "         <groupId>org.apache.synapse</groupId>\n", 
+            "         <artifactId>Apache-Synapse</artifactId>\n", 
+            "-        <version>3.0.1-SNAPSHOT</version>\n", 
+            "+        <version>3.0.0-SNAPSHOT</version>\n", 
+            "         <relativePath>../../pom.xml</relativePath>\n", 
+            "     </parent>\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/xar-maven-plugin/pom.xml", 
+      "from": "java/modules/xar-maven-plugin/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-26,7 +26,7", 
+          "lines": [
+            "     <parent>\r\n", 
+            "         <groupId>org.apache.synapse</groupId>\r\n", 
+            "         <artifactId>Apache-Synapse</artifactId>\r\n", 
+            "-        <version>3.0.1-SNAPSHOT</version>\r\n", 
+            "+        <version>3.0.0-SNAPSHOT</version>\r\n", 
+            "         <relativePath>../../pom.xml</relativePath>\r\n", 
+            "     </parent>\r\n", 
+            " \r\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/experimental/pom.xml", 
+      "from": "java/modules/experimental/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-26,7 +26,7", 
+          "lines": [
+            "     <parent>\n", 
+            "         <groupId>org.apache.synapse</groupId>\n", 
+            "         <artifactId>Apache-Synapse</artifactId>\n", 
+            "-        <version>3.0.1-SNAPSHOT</version>\n", 
+            "+        <version>3.0.0-SNAPSHOT</version>\n", 
+            "         <relativePath>../../pom.xml</relativePath>\n", 
+            "     </parent>\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/extensions/pom.xml", 
+      "from": "java/modules/extensions/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-26,7 +26,7", 
+          "lines": [
+            "     <parent>\r\n", 
+            "         <groupId>org.apache.synapse</groupId>\r\n", 
+            "         <artifactId>Apache-Synapse</artifactId>\r\n", 
+            "-        <version>3.0.1-SNAPSHOT</version>\r\n", 
+            "+        <version>3.0.0-SNAPSHOT</version>\r\n", 
+            "         <relativePath>../../pom.xml</relativePath>\r\n", 
+            "     </parent>\r\n", 
+            "     <artifactId>synapse-securevault</artifactId>\r\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/securevault/pom.xml", 
+      "from": "java/modules/securevault/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-26,7 +26,7", 
+          "lines": [
+            "     <parent>\n", 
+            "         <groupId>org.apache.synapse</groupId>\n", 
+            "         <artifactId>Apache-Synapse</artifactId>\n", 
+            "-        <version>3.0.1-SNAPSHOT</version>\n", 
+            "+        <version>3.0.0-SNAPSHOT</version>\n", 
+            "         <relativePath>../../pom.xml</relativePath>\n", 
+            "     </parent>\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/samples/pom.xml", 
+      "from": "java/modules/samples/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-26,7 +26,7", 
+          "lines": [
+            "     <parent>\n", 
+            "         <groupId>org.apache.synapse</groupId>\n", 
+            "         <artifactId>Apache-Synapse</artifactId>\n", 
+            "-        <version>3.0.1-SNAPSHOT</version>\n", 
+            "+        <version>3.0.0-SNAPSHOT</version>\n", 
+            "         <relativePath>../../pom.xml</relativePath>\n", 
+            "     </parent>\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/documentation/pom.xml", 
+      "from": "java/modules/documentation/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-26,7 +26,7", 
+          "lines": [
+            "     <parent>\n", 
+            "         <groupId>org.apache.synapse</groupId>\n", 
+            "         <artifactId>Apache-Synapse</artifactId>\n", 
+            "-        <version>3.0.1-SNAPSHOT</version>\n", 
+            "+        <version>3.0.0-SNAPSHOT</version>\n", 
+            "         <relativePath>../../pom.xml</relativePath>\n", 
+            "     </parent>\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/commons/pom.xml", 
+      "from": "java/modules/commons/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-26,7 +26,7", 
+          "lines": [
+            "     <parent>\n", 
+            "         <groupId>org.apache.synapse</groupId>\n", 
+            "         <artifactId>Apache-Synapse</artifactId>\n", 
+            "-        <version>3.0.1-SNAPSHOT</version>\n", 
+            "+        <version>3.0.0-SNAPSHOT</version>\n", 
+            "         <relativePath>../../pom.xml</relativePath>\n", 
+            "     </parent>\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/handler/pom.xml", 
+      "from": "java/modules/handler/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-25,7 +25,7", 
+          "lines": [
+            "     <parent>\n", 
+            "         <groupId>org.apache.synapse</groupId>\n", 
+            "         <artifactId>Apache-Synapse</artifactId>\n", 
+            "-        <version>3.0.1-SNAPSHOT</version>\n", 
+            "+        <version>3.0.0-SNAPSHOT</version>\n", 
+            "         <relativePath>../../pom.xml</relativePath>\n", 
+            "     </parent>\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/distribution/pom.xml", 
+      "from": "java/modules/distribution/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-26,7 +26,7", 
+          "lines": [
+            " \t<parent>\n", 
+            "         <groupId>org.apache.synapse</groupId>\n", 
+            "         <artifactId>synapse-transports</artifactId>\n", 
+            "-        <version>3.0.1-SNAPSHOT</version>\n", 
+            "+        <version>3.0.0-SNAPSHOT</version>\n", 
+            "         <relativePath>../../pom.xml</relativePath>\n", 
+            "     </parent>\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/optional/amqp/pom.xml", 
+      "from": "java/modules/transports/optional/amqp/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-26,7 +26,7", 
+          "lines": [
+            "     <parent>\n", 
+            "         <groupId>org.apache.synapse</groupId>\n", 
+            "         <artifactId>synapse-transports</artifactId>\n", 
+            "-        <version>3.0.1-SNAPSHOT</version>\n", 
+            "+        <version>3.0.0-SNAPSHOT</version>\n", 
+            "         <relativePath>../../pom.xml</relativePath>\n", 
+            "     </parent>\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/optional/fix/pom.xml", 
+      "from": "java/modules/transports/optional/fix/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-26,7 +26,7", 
+          "lines": [
+            "     <parent>\n", 
+            "         <groupId>org.apache.synapse</groupId>\n", 
+            "         <artifactId>synapse-transports</artifactId>\n", 
+            "-        <version>3.0.1-SNAPSHOT</version>\n", 
+            "+        <version>3.0.0-SNAPSHOT</version>\n", 
+            "         <relativePath>../../pom.xml</relativePath>\n", 
+            "     </parent>\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/pom.xml", 
+      "from": "java/modules/transports/core/nhttp/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-26,7 +26,7", 
+          "lines": [
+            "     <parent>\n", 
+            "         <groupId>org.apache.synapse</groupId>\n", 
+            "         <artifactId>synapse-transports</artifactId>\n", 
+            "-        <version>3.0.1-SNAPSHOT</version>\n", 
+            "+        <version>3.0.0-SNAPSHOT</version>\n", 
+            "         <relativePath>../../pom.xml</relativePath>\n", 
+            "     </parent>\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/pipe/pom.xml", 
+      "from": "java/modules/transports/core/pipe/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-26,7 +26,7", 
+          "lines": [
+            "     <parent>\n", 
+            "         <groupId>org.apache.synapse</groupId>\n", 
+            "         <artifactId>synapse-transports</artifactId>\n", 
+            "-        <version>3.0.1-SNAPSHOT</version>\n", 
+            "+        <version>3.0.0-SNAPSHOT</version>\n", 
+            "         <relativePath>../../pom.xml</relativePath>\n", 
+            "     </parent>\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/vfs/pom.xml", 
+      "from": "java/modules/transports/core/vfs/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-26,7 +26,7", 
+          "lines": [
+            "     <parent>\n", 
+            "         <groupId>org.apache.synapse</groupId>\n", 
+            "         <artifactId>Apache-Synapse</artifactId>\n", 
+            "-        <version>3.0.1-SNAPSHOT</version>\n", 
+            "+        <version>3.0.0-SNAPSHOT</version>\n", 
+            "         <relativePath>../../pom.xml</relativePath>\n", 
+            "     </parent>\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/pom.xml", 
+      "from": "java/modules/transports/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-26,7 +26,7", 
+          "lines": [
+            "     <parent>\n", 
+            "         <groupId>org.apache.synapse</groupId>\n", 
+            "         <artifactId>Apache-Synapse</artifactId>\n", 
+            "-        <version>3.0.1-SNAPSHOT</version>\n", 
+            "+        <version>3.0.0-SNAPSHOT</version>\n", 
+            "         <relativePath>../../pom.xml</relativePath>\n", 
+            "     </parent>\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/pom.xml", 
+      "from": "java/modules/integration/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-26,7 +26,7", 
+          "lines": [
+            "     <parent>\n", 
+            "         <groupId>org.apache.synapse</groupId>\n", 
+            "         <artifactId>Apache-Synapse</artifactId>\n", 
+            "-        <version>3.0.1-SNAPSHOT</version>\n", 
+            "+        <version>3.0.0-SNAPSHOT</version>\n", 
+            "         <relativePath>../../pom.xml</relativePath>\n", 
+            "     </parent>\n", 
+            " \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/migrator/pom.xml", 
+      "from": "java/modules/migrator/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-34,7 +34,7", 
+          "lines": [
+            "             <activation>\n", 
+            "                 <property>\n", 
+            "                     <name>synapse.version</name>\n", 
+            "-                    <value>3.0.1-SNAPSHOT</value>\n", 
+            "+                    <value>3.0.0-SNAPSHOT</value>\n", 
+            "                 </property>\n", 
+            "             </activation>\n", 
+            "             <repositories>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/packaging/package-archetype/src/main/resources/archetype-resources/pom.xml", 
+      "from": "java/modules/packaging/package-archetype/src/main/resources/archetype-resources/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-25,7 +25,7", 
+          "lines": [
+            "     <parent>\n", 
+            "         <groupId>org.apache.synapse</groupId>\n", 
+            "         <artifactId>Apache-Synapse</artifactId>\n", 
+            "-        <version>3.0.1-SNAPSHOT</version>\n", 
+            "+        <version>3.0.0-SNAPSHOT</version>\n", 
+            "         <relativePath>../../../pom.xml</relativePath>\n", 
+            "     </parent>\n", 
+            "     <artifactId>synapse-package-archetype</artifactId>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/packaging/package-archetype/pom.xml", 
+      "from": "java/modules/packaging/package-archetype/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-25,7 +25,7", 
+          "lines": [
+            "     <parent>\n", 
+            "         <groupId>org.apache.synapse</groupId>\n", 
+            "         <artifactId>Apache-Synapse</artifactId>\n", 
+            "-        <version>3.0.1-SNAPSHOT</version>\n", 
+            "+        <version>3.0.0-SNAPSHOT</version>\n", 
+            "         <relativePath>../../../pom.xml</relativePath>\n", 
+            "     </parent>\n", 
+            "     <artifactId>synapse-package-skeleton</artifactId>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/packaging/package-skeleton/pom.xml", 
+      "from": "java/modules/packaging/package-skeleton/pom.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-26,7 +26,7", 
+          "lines": [
+            "     <parent>\r\n", 
+            "         <groupId>org.apache.synapse</groupId>\r\n", 
+            "         <artifactId>Apache-Synapse</artifactId>\r\n", 
+            "-        <version>3.0.1-SNAPSHOT</version>\r\n", 
+            "+        <version>3.0.0-SNAPSHOT</version>\r\n", 
+            "         <relativePath>../../pom.xml</relativePath>\r\n", 
+            "     </parent>\r\n", 
+            " \r\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/tasks/pom.xml", 
+      "from": "java/modules/tasks/pom.xml"
+    }
+  ], 
+  "id": "1776556"
+}

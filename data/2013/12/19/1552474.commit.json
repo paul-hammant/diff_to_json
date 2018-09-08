@@ -1,0 +1,31 @@
+{
+  "when": "2013-12-19T20:45:33-05:00", 
+  "message": "alter root pom adding myself as developer", 
+  "who": "dushan", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-1310,6 +1310,12", 
+          "lines": [
+            "             <email>isudana AT apache.org</email>\n", 
+            "             <organization>WSO2</organization>\n", 
+            "         </developer>\n", 
+            "+\t<developer>\n", 
+            "+            <name>Dushan Abeyruwan</name>\n", 
+            "+            <id>dushan</id>\n", 
+            "+            <email>dushan AT apache.org</email>\n", 
+            "+            <organization>WSO2</organization>\n", 
+            "+        </developer>\n", 
+            "     </developers>\n", 
+            " \n", 
+            "     <contributors>\n"
+          ]
+        }
+      ], 
+      "to": "java/pom.xml", 
+      "from": "java/pom.xml"
+    }
+  ], 
+  "id": "1552474"
+}

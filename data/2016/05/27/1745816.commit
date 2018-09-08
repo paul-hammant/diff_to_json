@@ -1,0 +1,39 @@
+Index: java/modules/core/src/test/java/org/apache/synapse/util/xpath/Base64DecodeFunctionTest.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/util/xpath/Base64DecodeFunctionTest.java	(revision 1745815)
++++ java/modules/core/src/test/java/org/apache/synapse/util/xpath/Base64DecodeFunctionTest.java	(revision 1745816)
+@@ -19,7 +19,6 @@
+ 
+ package org.apache.synapse.util.xpath;
+ 
+-import junit.framework.Assert;
+ import junit.framework.TestCase;
+ import org.jaxen.Context;
+ import org.jaxen.ContextSupport;
+Index: java/modules/core/src/main/java/org/apache/synapse/util/xpath/Base64DecodeFunction.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/util/xpath/Base64DecodeFunction.java	(revision 1745815)
++++ java/modules/core/src/main/java/org/apache/synapse/util/xpath/Base64DecodeFunction.java	(revision 1745816)
+@@ -82,15 +82,7 @@
+             return SynapseXPathConstants.NULL_STRING;
+         }
+ 
+-        byte[] decodedValue;
+-        try {
+-            decodedValue = new Base64().decode(value.getBytes(charset));
+-        } catch (UnsupportedEncodingException e) {
+-            String msg = "Unsupported Charset";
+-            log.error(msg, e);
+-            throw new FunctionCallException(msg, e);
+-        }
+-
++        byte[] decodedValue = new Base64().decode(value);
+         String decodedString;
+         try {
+             decodedString = new String(decodedValue, charset).trim();
+-*-*-*-
+Message: Removing unnecessary charset while decoding b64 string; SYNAPSE-1012
+-*-*-*-
+When: 2016-05-27 17:02:43 -0400 
+-*-*-*-
+Who: hiranya

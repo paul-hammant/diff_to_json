@@ -1,0 +1,337 @@
+Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample850.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples/sample850.xml	(revision 1776171)
++++ java/modules/documentation/src/site/xdoc/userguide/samples/sample850.xml	(revision 1776172)
+@@ -34,10 +34,7 @@
+         &lt;with-param xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/" xmlns:s12="http://www.w3.org/2003/05/soap-envelope" name="source_xpath" value="{{s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]}}"/&gt;
+         &lt;with-param xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/" xmlns:s12="http://www.w3.org/2003/05/soap-envelope" name="target_xpath" value="{{s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]}}"/&gt;
+     &lt;/call-template&gt;
+-     &lt;property name="RESPONSE" value="true"/&gt;
+-        &lt;header name="To" action="remove"/&gt;
+-        &lt;send/&gt;
+-        &lt;drop/&gt;
++     &lt;respond/&gt;
+ &lt;/sequence&gt;
+ &lt;/definitions&gt;</div>
+             <subsection name="Objective">
+Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample430.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples/sample430.xml	(revision 1776171)
++++ java/modules/documentation/src/site/xdoc/userguide/samples/sample430.xml	(revision 1776172)
+@@ -36,10 +36,7 @@
+                     xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
+                     xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/&gt;
+         &lt;/callout&gt;
+-        &lt;property name="RESPONSE" value="true"/&gt;
+-        &lt;header name="To" action="remove"/&gt;
+-        &lt;send/&gt;
+-        &lt;drop/&gt;
++        &lt;respond/&gt;
+     &lt;/sequence&gt;
+ 
+ &lt;/definitions&gt;</div>
+Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample431.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples/sample431.xml	(revision 1776171)
++++ java/modules/documentation/src/site/xdoc/userguide/samples/sample431.xml	(revision 1776172)
+@@ -39,10 +39,7 @@
+                     xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/&gt;
+             &lt;enableSec policy="sec_policy"/&gt;
+         &lt;/callout&gt;
+-        &lt;property name="RESPONSE" value="true"/&gt;
+-        &lt;header name="To" action="remove"/&gt;
+-        &lt;send/&gt;
+-        &lt;drop/&gt;
++        &lt;respond/&gt;
+     &lt;/sequence&gt;
+ 
+ &lt;/definitions&gt;</div>
+Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample432.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples/sample432.xml	(revision 1776171)
++++ java/modules/documentation/src/site/xdoc/userguide/samples/sample432.xml	(revision 1776172)
+@@ -40,10 +40,7 @@
+                     xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/&gt;
+             &lt;enableSec outboundPolicy="sec_policy_outbound" inboundPolicy="sec_policy_inbound"/&gt;
+         &lt;/callout&gt;
+-        &lt;property name="RESPONSE" value="true"/&gt;
+-        &lt;header name="To" action="remove"/&gt;
+-        &lt;send/&gt;
+-        &lt;drop/&gt;
++        &lt;respond/&gt;
+     &lt;/sequence&gt;
+ 
+ &lt;/definitions&gt;</div>
+Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample433.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples/sample433.xml	(revision 1776171)
++++ java/modules/documentation/src/site/xdoc/userguide/samples/sample433.xml	(revision 1776172)
+@@ -36,10 +36,7 @@
+                     xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
+                     xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/&gt;
+         &lt;/callout&gt;
+-        &lt;property name="RESPONSE" value="true"/&gt;
+-        &lt;header name="To" action="remove"/&gt;
+-        &lt;send/&gt;
+-        &lt;drop/&gt;
++        &lt;respond/&gt;
+     &lt;/sequence&gt;
+ 
+     &lt;endpoint name="StockQuoteServiceEndpoint"&gt;
+Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample434.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples/sample434.xml	(revision 1776171)
++++ java/modules/documentation/src/site/xdoc/userguide/samples/sample434.xml	(revision 1776172)
+@@ -38,10 +38,7 @@
+                     xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
+                     xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/&gt;
+         &lt;/callout&gt;
+-        &lt;property name="RESPONSE" value="true"/&gt;
+-        &lt;header name="To" action="remove"/&gt;
+-        &lt;send/&gt;
+-        &lt;drop/&gt;
++        &lt;respond/&gt;
+     &lt;/sequence&gt;
+ 
+ &lt;/definitions&gt;</div>
+Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample470.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples/sample470.xml	(revision 1776171)
++++ java/modules/documentation/src/site/xdoc/userguide/samples/sample470.xml	(revision 1776172)
+@@ -59,9 +59,7 @@
+                 &lt;bean action=&quot;GET_PROPERTY&quot; var=&quot;store&quot; property=&quot;address&quot; target=&quot;{//store/address/text()}&quot;/&gt;
+                 &lt;bean action=&quot;GET_PROPERTY&quot; var=&quot;store&quot; property=&quot;phoneNo&quot; target=&quot;{//store/phone/text()}&quot;/&gt;
+                 &lt;!-- Send the response back to the client of the ESB. --&gt;
+-                &lt;header name=&quot;To&quot; action=&quot;remove&quot;/&gt;
+-                &lt;property name=&quot;RESPONSE&quot; value=&quot;true&quot;/&gt;
+-                &lt;send/&gt;
++                &lt;respond/&gt;
+             &lt;/inSequence&gt;
+         &lt;/target&gt;
+     &lt;/proxy&gt;
+Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample471.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples/sample471.xml	(revision 1776171)
++++ java/modules/documentation/src/site/xdoc/userguide/samples/sample471.xml	(revision 1776172)
+@@ -66,9 +66,7 @@
+                         &lt;arg expression=&quot;get-property(&apos;TOTAL&apos;)&quot;/&gt;
+                     &lt;/args&gt;
+                 &lt;/payloadFactory&gt;
+-                &lt;property name=&quot;RESPONSE&quot; value=&quot;true&quot;/&gt;
+-                &lt;header name=&quot;To&quot; action=&quot;remove&quot;/&gt;
+-                &lt;send/&gt;
++                &lt;respond/&gt;
+             &lt;/onComplete&gt;
+         &lt;/aggregate&gt;
+     &lt;/sequence&gt;
+Index: java/modules/integration/src/test/resources/extras/synapse_sample_430_altered.xml
+===================================================================
+--- java/modules/integration/src/test/resources/extras/synapse_sample_430_altered.xml	(revision 1776171)
++++ java/modules/integration/src/test/resources/extras/synapse_sample_430_altered.xml	(revision 1776172)
+@@ -32,10 +32,7 @@
+                     xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
+                     xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
+         </callout>
+-        <property name="RESPONSE" value="true"/>
+-        <header name="To" action="remove"/>
+-        <send/>
+-        <drop/>
++        <respond/>
+     </sequence>
+ 
+ </definitions>
+Index: java/modules/integration/src/test/resources/extras/synapse_sample_431_altered.xml
+===================================================================
+--- java/modules/integration/src/test/resources/extras/synapse_sample_431_altered.xml	(revision 1776171)
++++ java/modules/integration/src/test/resources/extras/synapse_sample_431_altered.xml	(revision 1776172)
+@@ -35,10 +35,7 @@
+                     xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
+             <enableSec policy="sec_policy"/>
+         </callout>
+-        <property name="RESPONSE" value="true"/>
+-        <header name="To" action="remove"/>
+-        <send/>
+-        <drop/>
++        <respond/>
+     </sequence>
+ 
+ </definitions>
+Index: java/modules/integration/src/test/resources/extras/synapse_sample_432_altered.xml
+===================================================================
+--- java/modules/integration/src/test/resources/extras/synapse_sample_432_altered.xml	(revision 1776171)
++++ java/modules/integration/src/test/resources/extras/synapse_sample_432_altered.xml	(revision 1776172)
+@@ -36,10 +36,7 @@
+                     xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
+             <enableSec outboundPolicy="sec_policy_outbound" inboundPolicy="sec_policy_inbound"/>
+         </callout>
+-        <property name="RESPONSE" value="true"/>
+-        <header name="To" action="remove"/>
+-        <send/>
+-        <drop/>
++        <respond/>
+     </sequence>
+ 
+ </definitions>
+Index: java/modules/integration/src/test/resources/extras/synapse_sample_433_altered.xml
+===================================================================
+--- java/modules/integration/src/test/resources/extras/synapse_sample_433_altered.xml	(revision 1776171)
++++ java/modules/integration/src/test/resources/extras/synapse_sample_433_altered.xml	(revision 1776172)
+@@ -32,10 +32,7 @@
+                     xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
+                     xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
+         </callout>
+-        <property name="RESPONSE" value="true"/>
+-        <header name="To" action="remove"/>
+-        <send/>
+-        <drop/>
++        <respond/>
+     </sequence>
+ 
+     <endpoint name="StockQuoteServiceEndpoint">
+Index: java/modules/integration/src/test/resources/extras/synapse_sample_434_altered.xml
+===================================================================
+--- java/modules/integration/src/test/resources/extras/synapse_sample_434_altered.xml	(revision 1776171)
++++ java/modules/integration/src/test/resources/extras/synapse_sample_434_altered.xml	(revision 1776172)
+@@ -34,10 +34,7 @@
+                     xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
+                     xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
+         </callout>
+-        <property name="RESPONSE" value="true"/>
+-        <header name="To" action="remove"/>
+-        <send/>
+-        <drop/>
++        <respond/>
+     </sequence>
+ 
+ </definitions>
+Index: java/repository/conf/sample/synapse_sample_850.xml
+===================================================================
+--- java/repository/conf/sample/synapse_sample_850.xml	(revision 1776171)
++++ java/repository/conf/sample/synapse_sample_850.xml	(revision 1776172)
+@@ -28,9 +28,6 @@
+         <with-param xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/" xmlns:s12="http://www.w3.org/2003/05/soap-envelope" name="source_xpath" value="{{s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]}}"/>
+         <with-param xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/" xmlns:s12="http://www.w3.org/2003/05/soap-envelope" name="target_xpath" value="{{s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]}}"/>
+     </call-template>
+-     <property name="RESPONSE" value="true"/>
+-        <header name="To" action="remove"/>
+-        <send/>
+-        <drop/>
++    <respond/>
+ </sequence>
+ </definitions>
+Index: java/repository/conf/sample/synapse_sample_430.xml
+===================================================================
+--- java/repository/conf/sample/synapse_sample_430.xml	(revision 1776171)
++++ java/repository/conf/sample/synapse_sample_430.xml	(revision 1776172)
+@@ -31,10 +31,7 @@
+                     xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
+                     xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
+         </callout>
+-        <property name="RESPONSE" value="true"/>
+-        <header name="To" action="remove"/>
+-        <send/>
+-        <drop/>
++	<respond/>
+     </sequence>
+ 
+ </definitions>
+Index: java/repository/conf/sample/synapse_sample_431.xml
+===================================================================
+--- java/repository/conf/sample/synapse_sample_431.xml	(revision 1776171)
++++ java/repository/conf/sample/synapse_sample_431.xml	(revision 1776172)
+@@ -34,10 +34,7 @@
+                     xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
+             <enableSec policy="sec_policy"/>
+         </callout>
+-        <property name="RESPONSE" value="true"/>
+-        <header name="To" action="remove"/>
+-        <send/>
+-        <drop/>
++	<respond/>
+     </sequence>
+ 
+ </definitions>
+Index: java/repository/conf/sample/synapse_sample_432.xml
+===================================================================
+--- java/repository/conf/sample/synapse_sample_432.xml	(revision 1776171)
++++ java/repository/conf/sample/synapse_sample_432.xml	(revision 1776172)
+@@ -35,10 +35,7 @@
+                     xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
+             <enableSec outboundPolicy="sec_policy_outbound" inboundPolicy="sec_policy_inbound"/>
+         </callout>
+-        <property name="RESPONSE" value="true"/>
+-        <header name="To" action="remove"/>
+-        <send/>
+-        <drop/>
++	<respond/>
+     </sequence>
+ 
+ </definitions>
+Index: java/repository/conf/sample/synapse_sample_433.xml
+===================================================================
+--- java/repository/conf/sample/synapse_sample_433.xml	(revision 1776171)
++++ java/repository/conf/sample/synapse_sample_433.xml	(revision 1776172)
+@@ -31,10 +31,7 @@
+                     xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
+                     xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
+         </callout>
+-        <property name="RESPONSE" value="true"/>
+-        <header name="To" action="remove"/>
+-        <send/>
+-        <drop/>
++        <respond/>
+     </sequence>
+ 
+     <endpoint name="StockQuoteServiceEndpoint">
+Index: java/repository/conf/sample/synapse_sample_434.xml
+===================================================================
+--- java/repository/conf/sample/synapse_sample_434.xml	(revision 1776171)
++++ java/repository/conf/sample/synapse_sample_434.xml	(revision 1776172)
+@@ -33,10 +33,7 @@
+                     xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
+                     xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
+         </callout>
+-        <property name="RESPONSE" value="true"/>
+-        <header name="To" action="remove"/>
+-        <send/>
+-        <drop/>
++	<respond/>
+     </sequence>
+ 
+ </definitions>
+Index: java/repository/conf/sample/synapse_sample_470.xml
+===================================================================
+--- java/repository/conf/sample/synapse_sample_470.xml	(revision 1776171)
++++ java/repository/conf/sample/synapse_sample_470.xml	(revision 1776172)
+@@ -55,9 +55,7 @@
+                 <bean action="GET_PROPERTY" var="store" property="name" target="{//store/name/text()}"/>
+                 <bean action="GET_PROPERTY" var="store" property="address" target="{//store/address/text()}"/>
+                 <bean action="GET_PROPERTY" var="store" property="phoneNo" target="{//store/phone/text()}"/>
+-                <header name="To" action="remove"/>
+-                <property name="RESPONSE" value="true"/>
+-                <send/>
++		<respond/>
+             </inSequence>
+         </target>
+     </proxy>
+Index: java/repository/conf/sample/synapse_sample_471.xml
+===================================================================
+--- java/repository/conf/sample/synapse_sample_471.xml	(revision 1776171)
++++ java/repository/conf/sample/synapse_sample_471.xml	(revision 1776172)
+@@ -65,9 +65,7 @@
+                         <arg expression="get-property('TOTAL')"/>
+                     </args>
+                 </payloadFactory>
+-                <property name="RESPONSE" value="true"/>
+-                <header name="To" action="remove"/>
+-                <send/>
++                <respond/>
+             </onComplete>
+         </aggregate>
+     </sequence>
+-*-*-*-
+Message: Apply patch by Chanaka Fernando to fix SYNAPSE-1070 together with documentation update
+-*-*-*-
+When: 2016-12-27 11:51:50 -0500 
+-*-*-*-
+Who: isudana

@@ -1,0 +1,79 @@
+{
+  "when": "2013-07-22T17:49:10-04:00", 
+  "message": "Applying the patch for SYNAPSE-951 with a test case. Bug fix in endpoint serializer - adding a stray responseAction element.", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-99,4 +99,25", 
+          "lines": [
+            "         // the generated name should not show up in the serialization\n", 
+            "         assertTrue(compare(serializedOut,inputElement));\n", 
+            "     }\n", 
+            "+\n", 
+            "+    public void testAddressEndpointScenarioFive() throws Exception {\n", 
+            "+        String inputXML =\n", 
+            "+                \"<endpoint name=\\\"EchoServiceEp\\\" xmlns=\\\"http://ws.apache.org/ns/synapse\\\">\" +\n", 
+            "+                        \"<address uri=\\\"http://10.200.3.190:8281/services/echo\\\"><timeout>\" +\n", 
+            "+                        \"<duration>2000</duration></timeout><suspendOnFailure>\" +\n", 
+            "+                        \"<initialDuration>60000</initialDuration><progressionFactor>2.0\" +\n", 
+            "+                        \"</progressionFactor></suspendOnFailure><markForSuspension>\" +\n", 
+            "+                        \"<errorCodes>101000,101500</errorCodes><retriesBeforeSuspension>3\" +\n", 
+            "+                        \"</retriesBeforeSuspension></markForSuspension><retryConfig>\" +\n", 
+            "+                        \"<disabledErrorCodes>101507,101509</disabledErrorCodes></retryConfig>\" +\n", 
+            "+                        \"</address></endpoint>\" ;\n", 
+            "+\n", 
+            "+        OMElement inputElement = createOMElement(inputXML);\n", 
+            "+        AddressEndpoint endpoint = (AddressEndpoint) AddressEndpointFactory.getEndpointFromElement(\n", 
+            "+                inputElement, true, null);\n", 
+            "+        assertNotNull(endpoint.getName()); // make sure we generate names for anonymous endpoints\n", 
+            "+        OMElement serializedOut = AddressEndpointSerializer.getElementFromEndpoint(endpoint);\n", 
+            "+        // the generated name should not show up in the serialization\n", 
+            "+        assertTrue(compare(serializedOut,inputElement));\n", 
+            "+    }\n", 
+            " }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/test/java/org/apache/synapse/config/xml/endpoints/AddressEndpointSerializationTest.java", 
+      "from": "java/modules/core/src/test/java/org/apache/synapse/config/xml/endpoints/AddressEndpointSerializationTest.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-118,14 +118,17", 
+          "lines": [
+            "             duration.setText(Long.toString(endpointDefinition.getTimeoutDuration()));\n", 
+            "             timeout.addChild(duration);\n", 
+            " \n", 
+            "-            OMElement action = fac.createOMElement(\"responseAction\", SynapseConstants.SYNAPSE_OMNAMESPACE);\n", 
+            "-            if (endpointDefinition.getTimeoutAction() == SynapseConstants.DISCARD) {\n", 
+            "-                action.setText(\"discard\");\n", 
+            "-            } else if (endpointDefinition.getTimeoutAction()\n", 
+            "-                    == SynapseConstants.DISCARD_AND_FAULT) {\n", 
+            "-                action.setText(\"fault\");\n", 
+            "+            if (endpointDefinition.getTimeoutAction() != SynapseConstants.NONE) {\n", 
+            "+                OMElement action = fac.createOMElement(\"responseAction\",\n", 
+            "+                        SynapseConstants.SYNAPSE_OMNAMESPACE);\n", 
+            "+                if (endpointDefinition.getTimeoutAction() == SynapseConstants.DISCARD) {\n", 
+            "+                    action.setText(\"discard\");\n", 
+            "+                } else if (endpointDefinition.getTimeoutAction()\n", 
+            "+                        == SynapseConstants.DISCARD_AND_FAULT) {\n", 
+            "+                    action.setText(\"fault\");\n", 
+            "+                }\n", 
+            "+                timeout.addChild(action);\n", 
+            "             }\n", 
+            "-            timeout.addChild(action);\n", 
+            "         }\n", 
+            " \n", 
+            "         if (endpointDefinition.getInitialSuspendDuration() != -1 ||\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/EndpointDefinitionSerializer.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/EndpointDefinitionSerializer.java"
+    }
+  ], 
+  "id": "1505827"
+}

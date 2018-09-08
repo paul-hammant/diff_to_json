@@ -1,0 +1,55 @@
+{
+  "when": "2016-12-28T20:50:58-05:00", 
+  "message": "Fix for SYNAPSE-1087 by prabath", 
+  "who": "isudana", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-58,8 +58,8", 
+          "lines": [
+            "         <section name=\"Platform requirements\" id=\"Platform_requirements\">\n", 
+            " \n", 
+            "             <p>\n", 
+            "-                Synapse requires Java 1.5 or higher and has been tested on Java runtime environments\n", 
+            "-                from Sun, IBM and Apple. Note that the recommended Java version is 1.6. Synapse is\n", 
+            "+                Synapse requires Java 1.6 or higher and has been tested on Java runtime environments\n", 
+            "+                from Sun, IBM and Apple. Note that the recommended Java version is 1.7. Synapse is\n", 
+            "                 used on various operation systems, including Linux, Mac OS X, Solaris, Windows and AIX,\n", 
+            "                 as well as mainframe environments. The recommended operation system for production use\n", 
+            "                 is Linux since it offers a wider range of options to tune the TCP/IP stack. This is\n"
+          ]
+        }, 
+        {
+          "locn": "-145,7 +145,7", 
+          "lines": [
+            "             <subsection name=\"Using the standard binary distribution\" id=\"Using_the_standard_binary_distribution\">\n", 
+            "                 <p>\n", 
+            "                     The easiest way to get started with a stand-alone deployment is using the standard\n", 
+            "-                    binary distribution ZIP or tarball (see <a href=\"download.html\">download.html</a>).\n", 
+            "+                    binary distribution ZIP or tarball (see <a href=\"../download.html\">download.html</a>).\n", 
+            "                     It already contains everything that is needed to run Synapse stand-alone and you\n", 
+            "                     only need to customize it according to your requirements:\n", 
+            "                 </p>\n"
+          ]
+        }, 
+        {
+          "locn": "-322,7 +322,7", 
+          "lines": [
+            "                     for released versions.\n", 
+            "                 </li>\n", 
+            "                 <li>\n", 
+            "-                    <a class=\"externalLink\" href=\"http://hudson.zones.apache.org/hudson/job/Synapse%20-%20Trunk/org.apache.synapse$synapse-war/\">http://hudson.zones.apache.org/hudson/job/Synapse%20-%20Trunk/org.apache.synapse$synapse-war/\n", 
+            "+                    <a class=\"externalLink\" href=\"https://builds.apache.org/view/All/job/Synapse%20-%20Trunk/lastBuild/org.apache.synapse$synapse-war/\">https://builds.apache.org/view/All/job/Synapse%20-%20Trunk/lastBuild/org.apache.synapse$synapse-war/\n", 
+            "                     </a>\n", 
+            "                     for snapshot versions.\n", 
+            "                 </li>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/documentation/src/site/xdoc/userguide/deployment.xml", 
+      "from": "java/modules/documentation/src/site/xdoc/userguide/deployment.xml"
+    }
+  ], 
+  "id": "1776369"
+}

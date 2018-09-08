@@ -1,0 +1,331 @@
+{
+  "when": "2016-06-09T02:57:12-04:00", 
+  "message": "Supporting the DISABLE_CHUNKING property in the response path of HTTP message mediation; Applied patches from SYNAPSE-1023 and SYNAPSE-1029", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-519,6 +519,7", 
+          "lines": [
+            "         SourceResponse sourceResponse = SourceResponseFactory.create(msgContext,\n", 
+            "                 sourceRequest, sourceConfiguration);\n", 
+            " \n", 
+            "+        sourceResponse.processChunkingOptions(msgContext);\n", 
+            "         SourceContext.setResponse(conn, sourceResponse);\n", 
+            " \n", 
+            "         Boolean noEntityBody = (Boolean) msgContext.getProperty(PassThroughConstants.NO_ENTITY_BODY);\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-28,6 +28,12", 
+          "lines": [
+            " import org.apache.http.protocol.HttpCoreContext;\n", 
+            " import org.apache.synapse.transport.passthru.config.SourceConfiguration;\n", 
+            " import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;\n", 
+            "+import org.apache.axis2.AxisFault;\n", 
+            "+import org.apache.axis2.context.MessageContext;\n", 
+            "+import org.apache.axis2.util.MessageProcessorSelector;\n", 
+            "+import org.apache.synapse.transport.passthru.util.RelayUtils;\n", 
+            "+import org.apache.commons.io.output.CountingOutputStream;\n", 
+            "+import org.apache.commons.io.output.NullOutputStream;\n", 
+            " \n", 
+            " import java.io.IOException;\n", 
+            " import java.util.HashMap;\n"
+          ]
+        }, 
+        {
+          "locn": "-60,7 +66,8", 
+          "lines": [
+            " \n", 
+            "     private SourceRequest request = null;\n", 
+            " \n", 
+            "-    \n", 
+            "+    private boolean versionChangeRequired =false;\n", 
+            "+\n", 
+            "     public SourceResponse(SourceConfiguration config, int status, SourceRequest request) {\n", 
+            "         this(config, status, null, request);\n", 
+            "     }\n"
+          ]
+        }, 
+        {
+          "locn": "-93,7 +100,9", 
+          "lines": [
+            "                 request.getVersion(), HttpStatus.SC_OK,\n", 
+            "                 request.getConnection().getContext());\n", 
+            " \n", 
+            "-        if (statusLine != null) {\n", 
+            "+        if (versionChangeRequired) {\n", 
+            "+            response.setStatusLine(version, status);\n", 
+            "+        } else if (statusLine != null) {\n", 
+            "             response.setStatusLine(version, status, statusLine);\n", 
+            "         } else {\n", 
+            "             response.setStatusCode(status);\n"
+          ]
+        }, 
+        {
+          "locn": "-184,6 +193,55", 
+          "lines": [
+            "     \t}\n", 
+            "     }\n", 
+            " \n", 
+            "+    /**\n", 
+            "+     * Process the disable chunking option in response path.\n", 
+            "+     */\n", 
+            "+    public void processChunkingOptions(MessageContext responseMsgContext) throws IOException {\n", 
+            "+        boolean forceHttp10 = responseMsgContext.isPropertyTrue(\n", 
+            "+                PassThroughConstants.FORCE_HTTP_1_0, false);\n", 
+            "+        boolean disableChunking = responseMsgContext.isPropertyTrue(\n", 
+            "+                PassThroughConstants.DISABLE_CHUNKING, false);\n", 
+            "+        if (!forceHttp10 && !disableChunking) {\n", 
+            "+            return;\n", 
+            "+        }\n", 
+            "+        if (!responseMsgContext.isPropertyTrue(PassThroughConstants.MESSAGE_BUILDER_INVOKED, false)) {\n", 
+            "+            try {\n", 
+            "+                RelayUtils.buildMessage(responseMsgContext, false);\n", 
+            "+                responseMsgContext.getEnvelope().buildWithAttachments();\n", 
+            "+            } catch (Exception e) {\n", 
+            "+                throw new AxisFault(e.getMessage(), e);\n", 
+            "+            }\n", 
+            "+        }\n", 
+            "+        if (forceHttp10) {\n", 
+            "+            version = HttpVersion.HTTP_1_0;\n", 
+            "+            versionChangeRequired = true;\n", 
+            "+        }\n", 
+            "+        Boolean noEntityBody =\n", 
+            "+                (Boolean) responseMsgContext.getProperty(PassThroughConstants.NO_ENTITY_BODY);\n", 
+            "+        if (Boolean.TRUE.equals(noEntityBody)) {\n", 
+            "+            headers.remove(HTTP.CONTENT_TYPE);\n", 
+            "+            return;\n", 
+            "+        }\n", 
+            "+        TreeSet<String> contentLength = new TreeSet<String>();\n", 
+            "+        contentLength.add(Long.toString(getStreamLength(responseMsgContext)));\n", 
+            "+        headers.put(HTTP.CONTENT_LEN, contentLength);\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    /**\n", 
+            "+     * Write the stream to a temporary storage and calculate the content length\n", 
+            "+     */\n", 
+            "+    private long getStreamLength(MessageContext msgContext) throws IOException {\n", 
+            "+        CountingOutputStream counter = new CountingOutputStream(\n", 
+            "+                NullOutputStream.NULL_OUTPUT_STREAM);\n", 
+            "+        try {\n", 
+            "+            MessageProcessorSelector.getMessageFormatter(msgContext).writeTo(msgContext,\n", 
+            "+                     PassThroughTransportUtils.getOMOutputFormat(msgContext), counter, true);\n", 
+            "+        } finally {\n", 
+            "+            counter.close();\n", 
+            "+        }\n", 
+            "+        return counter.getCount();\n", 
+            "+    }\n", 
+            "+\n", 
+            "     public void setStatus(int status) {\n", 
+            "         this.status = status;\n", 
+            "     } \n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceResponse.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceResponse.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-207,7 +207,9", 
+          "lines": [
+            "         sampleClassRepo.put(\"155\", Sample155.class);\n", 
+            "         sampleClassRepo.put(\"156\", Sample156.class);\n", 
+            "         sampleClassRepo.put(\"157\", Sample157.class);\n", 
+            "+        sampleClassRepo.put(\"160\", Sample160.class);\n", 
+            "         sampleClassRepo.put(\"161\", Sample161.class);\n", 
+            "+\n", 
+            "         //Transport switching\n", 
+            "         sampleClassRepo.put(\"250\", Sample250.class);\n", 
+            "         sampleClassRepo.put(\"251\", Sample251.class);\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java", 
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-0,0 +1,59", 
+          "lines": [
+            "+/*\n", 
+            "+ * Licensed to the Apache Software Foundation (ASF) under one\n", 
+            "+ * or more contributor license agreements.  See the NOTICE file\n", 
+            "+ * distributed with this work for additional information\n", 
+            "+ * regarding copyright ownership.  The ASF licenses this file\n", 
+            "+ * to you under the Apache License, Version 2.0 (the\n", 
+            "+ * \"License\"); you may not use this file except in compliance\n", 
+            "+ * with the License.  You may obtain a copy of the License at\n", 
+            "+ *\n", 
+            "+ * http://www.apache.org/licenses/LICENSE-2.0\n", 
+            "+ *\n", 
+            "+ * Unless required by applicable law or agreed to in writing,\n", 
+            "+ * software distributed under the License is distributed on an\n", 
+            "+ *  * \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n", 
+            "+ * KIND, either express or implied.  See the License for the\n", 
+            "+ * specific language governing permissions and limitations\n", 
+            "+ * under the License.\n", 
+            "+ */\n", 
+            "+package org.apache.synapse.samples.framework.tests.proxy;\n", 
+            "+\n", 
+            "+import org.apache.http.HttpHeaders;\n", 
+            "+import org.apache.http.HttpStatus;\n", 
+            "+import org.apache.synapse.samples.framework.SynapseTestCase;\n", 
+            "+import org.apache.synapse.samples.framework.clients.BasicHttpClient;\n", 
+            "+import org.apache.synapse.samples.framework.clients.HttpResponse;\n", 
+            "+\n", 
+            "+public class Sample160 extends SynapseTestCase {\n", 
+            "+\n", 
+            "+    private String requestXml;\n", 
+            "+    private BasicHttpClient httpClient;\n", 
+            "+\n", 
+            "+    public Sample160() {\n", 
+            "+        super(160);\n", 
+            "+        httpClient = new BasicHttpClient();\n", 
+            "+        requestXml = \"<soap:Envelope xmlns:soap=\\\"http://www.w3.org/2003/05/soap-envelope\\\" xmlns:ser=\\\"http://services.samples\\\" xmlns:xsd=\\\"http://services.samples/xsd\\\">\\n\" +\n", 
+            "+                \"       <soap:Header/>\\n\" +\n", 
+            "+                \"       <soap:Body>\\n\" +\n", 
+            "+                \"          <ser:getQuote>\\n\" +\n", 
+            "+                \"             <ser:request>\\n\" +\n", 
+            "+                \"                <xsd:symbol>IBM</xsd:symbol>\\n\" +\n", 
+            "+                \"             </ser:request>\\n\" +\n", 
+            "+                \"          </ser:getQuote>\\n\" +\n", 
+            "+                \"       </soap:Body>\\n\" +\n", 
+            "+                \"    </soap:Envelope>\";\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public void testDisableChunkingWithBasicProxy() throws Exception {\n", 
+            "+        String url = \"http://localhost:8280/services/StockQuoteProxy\";\n", 
+            "+        HttpResponse response = httpClient.doPost(url, requestXml.getBytes(),\n", 
+            "+                \"application/soap+xml;charset=UTF-8\");\n", 
+            "+        assertEquals(HttpStatus.SC_OK, response.getStatus());\n", 
+            "+        assertFalse(HttpHeaders.TRANSFER_ENCODING + \" is present in the header\",\n", 
+            "+                response.getHeaders().containsKey(HttpHeaders.TRANSFER_ENCODING));\n", 
+            "+        assertTrue(HttpHeaders.CONTENT_LENGTH + \" is missing in the header\",\n", 
+            "+                response.getHeaders().containsKey(HttpHeaders.CONTENT_LENGTH));\n", 
+            "+\n", 
+            "+    }\n", 
+            "+\n", 
+            "+}\n", 
+            "\\ No newline at end of file\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample160.java", 
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample160.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-25,14 +25,14", 
+          "lines": [
+            " import org.apache.synapse.samples.framework.clients.HttpResponse;\n", 
+            " \n", 
+            " public class Sample161 extends SynapseTestCase {\n", 
+            "-    private String requestXml = \"<test>foo</test>\";\n", 
+            " \n", 
+            "+    private static final String requestXml = \"<test>foo</test>\";\n", 
+            "+\n", 
+            "     public Sample161() {\n", 
+            "         super(161);\n", 
+            "     }\n", 
+            " \n", 
+            "     public void testRespondMediator() throws Exception {\n", 
+            "-\n", 
+            "         String url = \"http://localhost:8280/services/EchoService\";\n", 
+            "         BasicHttpClient client = new BasicHttpClient();\n", 
+            "         HttpResponse response = client.doPost(url, requestXml.getBytes(), \"application/xml\");\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample161.java", 
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample161.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-0,0 +1,35", 
+          "lines": [
+            "+<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n", 
+            "+<!--\n", 
+            "+  ~  Licensed to the Apache Software Foundation (ASF) under one\n", 
+            "+  ~  or more contributor license agreements.  See the NOTICE file\n", 
+            "+  ~  distributed with this work for additional information\n", 
+            "+  ~  regarding copyright ownership.  The ASF licenses this file\n", 
+            "+  ~  to you under the Apache License, Version 2.0 (the\n", 
+            "+  ~  \"License\"); you may not use this file except in compliance\n", 
+            "+  ~  with the License.  You may obtain a copy of the License at\n", 
+            "+  ~\n", 
+            "+  ~   http://www.apache.org/licenses/LICENSE-2.0\n", 
+            "+  ~\n", 
+            "+  ~  Unless required by applicable law or agreed to in writing,\n", 
+            "+  ~  software distributed under the License is distributed on an\n", 
+            "+  ~   * \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n", 
+            "+  ~  KIND, either express or implied.  See the License for the\n", 
+            "+  ~  specific language governing permissions and limitations\n", 
+            "+  ~  under the License.\n", 
+            "+  -->\n", 
+            "+\n", 
+            "+<!-- DISABLE_CHUNKING in response path proxy services -->\n", 
+            "+<definitions xmlns=\"http://ws.apache.org/ns/synapse\">\n", 
+            "+    <proxy name=\"StockQuoteProxy\">\n", 
+            "+        <target>\n", 
+            "+            <endpoint>\n", 
+            "+                <address uri=\"http://localhost:9000/services/SimpleStockQuoteService\"/>\n", 
+            "+            </endpoint>\n", 
+            "+            <outSequence>\n", 
+            "+                <property name=\"DISABLE_CHUNKING\" value=\"true\" scope=\"axis2\"/>\n", 
+            "+                <send/>\n", 
+            "+            </outSequence>\n", 
+            "+        </target>\n", 
+            "+        <publishWSDL uri=\"file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl\"/>\n", 
+            "+    </proxy>\n", 
+            "+</definitions>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/resources/extras/synapse_sample_160.xml", 
+      "from": "java/modules/integration/src/test/resources/extras/synapse_sample_160.xml"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-0,0 +1,18", 
+          "lines": [
+            "+<synapseSample>\n", 
+            "+    <sampleID>160</sampleID>\n", 
+            "+    <sampleName>DISABLE_CHUNKING in response path proxy services</sampleName>\n", 
+            "+    <synapseConfig>\n", 
+            "+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>\n", 
+            "+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>\n", 
+            "+        <synapseXml>modules/integration/src/test/resources/extras/synapse_sample_160.xml</synapseXml>\n", 
+            "+    </synapseConfig>\n", 
+            "+    <backEndServerConfig>\n", 
+            "+        <axis2Server id='0'>\n", 
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n", 
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n", 
+            "+        </axis2Server>\n", 
+            "+    </backEndServerConfig>\n", 
+            "+    <clientConfig>\n", 
+            "+\t    <clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>\n", 
+            "+    </clientConfig>\n", 
+            "+</synapseSample>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/integration/src/test/resources/sample160.xml", 
+      "from": "java/modules/integration/src/test/resources/sample160.xml"
+    }
+  ], 
+  "id": "1747502"
+}

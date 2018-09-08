@@ -1,0 +1,26 @@
+{
+  "when": "2013-07-28T21:25:17-04:00", 
+  "message": "excluded rabbitmq java client from packaging.", 
+  "who": "rajikak", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-191,6 +191,7", 
+          "lines": [
+            "                 <exclude>quickfixj:quickfixj-all:jar</exclude>\r\n", 
+            "                 <exclude>org.snmp4j:snmp4j</exclude>\r\n", 
+            "                 <exclude>org.snmp4j:snmp4j-agent</exclude>\r\n", 
+            "+                <exclude>com.rabbitmq:amqp-client:jar</exclude>\r\n", 
+            "                 \r\n", 
+            "                 <!-- Dependencies that are only used by the Axis2 sample server -->\r\n", 
+            "                 <exclude>org.apache.axis2:axis2-jaxws:jar</exclude>\r\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/distribution/src/main/assembly/bin.xml", 
+      "from": "java/modules/distribution/src/main/assembly/bin.xml"
+    }
+  ], 
+  "id": "1507879"
+}

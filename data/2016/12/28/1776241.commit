@@ -1,0 +1,50 @@
+Index: java/modules/distribution/pom.xml
+===================================================================
+--- java/modules/distribution/pom.xml	(revision 1776240)
++++ java/modules/distribution/pom.xml	(revision 1776241)
+@@ -110,11 +110,22 @@
+             <artifactId>axis2-codegen</artifactId>
+         </dependency>
+ 
+-	<!-- JSON Support --> 
+-	<dependency>
+-		<groupId>org.apache.axis2</groupId>
+-		<artifactId>axis2-json</artifactId>
+-	</dependency>
++	    <!-- JSON Support -->
++        <dependency>
++            <groupId>org.apache.axis2</groupId>
++            <artifactId>axis2-json</artifactId>
++            <exclusions>
++                <exclusion>
++                    <groupId>org.codehaus.jettison</groupId>
++                    <artifactId>jettison</artifactId>
++                </exclusion>
++            </exclusions>
++        </dependency>
++        <dependency>
++            <groupId>org.codehaus.jettison</groupId>
++            <artifactId>jettison</artifactId>
++            <version>${jettison.version}</version>
++        </dependency>
+ 
+         <!-- Additional transports -->
+         <dependency>
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1776240)
++++ java/pom.xml	(revision 1776241)
+@@ -1042,6 +1042,7 @@
+         <axis2.version>1.7.3</axis2.version>
+         <axiom.version>1.2.19</axiom.version>
+         <wsdl4j.version>1.6.2</wsdl4j.version>
++        <jettison.version>1.3.8</jettison.version>
+ 
+         <!-- addressing, rampart, neethi -->
+         <addressing.version>${axis2.version}</addressing.version>
+-*-*-*-
+Message: Fix for SYNAPSE-1077
+-*-*-*-
+When: 2016-12-28 03:35:14 -0500 
+-*-*-*-
+Who: ravi

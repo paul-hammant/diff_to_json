@@ -1,3 +1,64 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/resequence/ResequencingProcessor.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/message/processors/resequence/ResequencingProcessor.java	(revision 1510864)
++++ java/modules/core/src/main/java/org/apache/synapse/message/processors/resequence/ResequencingProcessor.java	(revision 1510865)
+@@ -33,7 +33,7 @@
+ 
+ /**
+  * This class will be used as the processor of the resequencer and set up
+- * the necessary environment for the ReequencingJob.
++ * the necessary environment for the ResequencingJob.
+  * This should be run periodically after given time interval and
+  * for that this should be inherited from ScheduledMessageProcessor class
+  */
+@@ -126,8 +126,6 @@
+      * This method use to find the minimum sequence number in the message store at the startup
+      */
+     private void findFirstSeqNum() {
+-
+-
+         MessageStore store = configuration.getMessageStore(messageStore);
+         SynapseXPath seqNoxPath = null;
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/resequence/ResequencingJob.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/message/processors/resequence/ResequencingJob.java	(revision 1510864)
++++ java/modules/core/src/main/java/org/apache/synapse/message/processors/resequence/ResequencingJob.java	(revision 1510865)
+@@ -78,18 +78,18 @@
+         }
+ 
+         /** Extract the number of messages interested to come */
+-        if (parameters != null && parameters.get(ResequencingProcessor.REQ_INIT_MSGS) != null) {
++        if (parameters.get(ResequencingProcessor.REQ_INIT_MSGS) != null) {
+             processor.setRequiredInitMsgs(new AtomicInteger(Integer.parseInt((String) parameters.get(
+                     ResequencingProcessor.REQ_INIT_MSGS))));
+         }
+         /** Extract the delay wait until the interested messages come */
+-        if (parameters != null && parameters.get(ResequencingProcessor.REQ_INIT_MSGS_DELAY) != null) {
++        if (parameters.get(ResequencingProcessor.REQ_INIT_MSGS_DELAY) != null) {
+             processor.setRequiredInitMsgsDelay(new AtomicInteger(Integer.parseInt((String) parameters.get(
+                     ResequencingProcessor.REQ_INIT_MSGS_DELAY))));
+         }
+ 
+         /** Extract whether to delete duplicate messages */
+-        if (parameters != null && parameters.get(ResequencingProcessor.DELETE_DUPLICATES) != null) {
++        if (parameters.get(ResequencingProcessor.DELETE_DUPLICATES) != null) {
+             String result=(String) parameters.get(ResequencingProcessor.DELETE_DUPLICATES);
+             if(result.equalsIgnoreCase("TRUE")){
+                 processor.setDeleteDuplicates(new AtomicBoolean(true));
+Index: java/modules/core/src/main/java/org/apache/synapse/startup/quartz/SimpleQuartz.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/startup/quartz/SimpleQuartz.java	(revision 1510864)
++++ java/modules/core/src/main/java/org/apache/synapse/startup/quartz/SimpleQuartz.java	(revision 1510865)
+@@ -37,7 +37,7 @@
+ import java.util.Map;
+ import java.util.Set;
+ 
+-/*
++/**
+  * This class is instantiated by SimpleQuartzFactory (or by hand)
+  * When it is initialized it creates a Quartz Scheduler with a job and a trigger
+  * The class it starts is always an instance of SimpleQuartzJob
 Index: java/modules/core/src/test/java/org/apache/synapse/config/xml/endpoints/RecipientListEndpointSerializationTest.java
 ===================================================================
 --- java/modules/core/src/test/java/org/apache/synapse/config/xml/endpoints/RecipientListEndpointSerializationTest.java	(nonexistent)
@@ -91,67 +152,6 @@ Index: java/modules/core/src/test/java/org/apache/synapse/config/xml/endpoints/R
 +        assertTrue(compare(serializedOut, inputElement));
 +    }
 +}
-Index: java/modules/core/src/main/java/org/apache/synapse/startup/quartz/SimpleQuartz.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/startup/quartz/SimpleQuartz.java	(revision 1510864)
-+++ java/modules/core/src/main/java/org/apache/synapse/startup/quartz/SimpleQuartz.java	(revision 1510865)
-@@ -37,7 +37,7 @@
- import java.util.Map;
- import java.util.Set;
- 
--/*
-+/**
-  * This class is instantiated by SimpleQuartzFactory (or by hand)
-  * When it is initialized it creates a Quartz Scheduler with a job and a trigger
-  * The class it starts is always an instance of SimpleQuartzJob
-Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/resequence/ResequencingJob.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/message/processors/resequence/ResequencingJob.java	(revision 1510864)
-+++ java/modules/core/src/main/java/org/apache/synapse/message/processors/resequence/ResequencingJob.java	(revision 1510865)
-@@ -78,18 +78,18 @@
-         }
- 
-         /** Extract the number of messages interested to come */
--        if (parameters != null && parameters.get(ResequencingProcessor.REQ_INIT_MSGS) != null) {
-+        if (parameters.get(ResequencingProcessor.REQ_INIT_MSGS) != null) {
-             processor.setRequiredInitMsgs(new AtomicInteger(Integer.parseInt((String) parameters.get(
-                     ResequencingProcessor.REQ_INIT_MSGS))));
-         }
-         /** Extract the delay wait until the interested messages come */
--        if (parameters != null && parameters.get(ResequencingProcessor.REQ_INIT_MSGS_DELAY) != null) {
-+        if (parameters.get(ResequencingProcessor.REQ_INIT_MSGS_DELAY) != null) {
-             processor.setRequiredInitMsgsDelay(new AtomicInteger(Integer.parseInt((String) parameters.get(
-                     ResequencingProcessor.REQ_INIT_MSGS_DELAY))));
-         }
- 
-         /** Extract whether to delete duplicate messages */
--        if (parameters != null && parameters.get(ResequencingProcessor.DELETE_DUPLICATES) != null) {
-+        if (parameters.get(ResequencingProcessor.DELETE_DUPLICATES) != null) {
-             String result=(String) parameters.get(ResequencingProcessor.DELETE_DUPLICATES);
-             if(result.equalsIgnoreCase("TRUE")){
-                 processor.setDeleteDuplicates(new AtomicBoolean(true));
-Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/resequence/ResequencingProcessor.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/message/processors/resequence/ResequencingProcessor.java	(revision 1510864)
-+++ java/modules/core/src/main/java/org/apache/synapse/message/processors/resequence/ResequencingProcessor.java	(revision 1510865)
-@@ -33,7 +33,7 @@
- 
- /**
-  * This class will be used as the processor of the resequencer and set up
-- * the necessary environment for the ReequencingJob.
-+ * the necessary environment for the ResequencingJob.
-  * This should be run periodically after given time interval and
-  * for that this should be inherited from ScheduledMessageProcessor class
-  */
-@@ -126,8 +126,6 @@
-      * This method use to find the minimum sequence number in the message store at the startup
-      */
-     private void findFirstSeqNum() {
--
--
-         MessageStore store = configuration.getMessageStore(messageStore);
-         SynapseXPath seqNoxPath = null;
- 
 -*-*-*-
 Message: Adding a recipient list endpoint serialization test
 -*-*-*-

@@ -1,0 +1,58 @@
+{
+  "when": "2016-05-26T19:14:02-04:00", 
+  "message": "Improved error handling in the AbstractListMediator; Triggering the fault sequence for all non-SynapseExceptions. Applying the patch provided by Buddhima at SYNAPSE-1011", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-19,10 +19,7", 
+          "lines": [
+            " \n", 
+            " package org.apache.synapse.mediators;\n", 
+            " \n", 
+            "-import org.apache.synapse.ManagedLifecycle;\n", 
+            "-import org.apache.synapse.Mediator;\n", 
+            "-import org.apache.synapse.MessageContext;\n", 
+            "-import org.apache.synapse.SynapseLog;\n", 
+            "+import org.apache.synapse.*;\n", 
+            " import org.apache.synapse.core.SynapseEnvironment;\n", 
+            " import org.apache.synapse.core.axis2.Axis2MessageContext;\n", 
+            " import org.apache.synapse.transport.passthru.util.RelayUtils;\n"
+          ]
+        }, 
+        {
+          "locn": "-59,7 +56,7", 
+          "lines": [
+            " \n", 
+            "             if (contentAware) {\n", 
+            "                 try {\n", 
+            "-                    RelayUtils.buildMessage(((Axis2MessageContext) synCtx).getAxis2MessageContext(),false);\n", 
+            "+                    RelayUtils.buildMessage(((Axis2MessageContext) synCtx).getAxis2MessageContext(), false);\n", 
+            "                 } catch (Exception e) {\n", 
+            "                     handleException(\"Error while building message\", e, synCtx);\n", 
+            "                 }\n"
+          ]
+        }, 
+        {
+          "locn": "-72,6 +69,10", 
+          "lines": [
+            "                     return false;\n", 
+            "                 }\n", 
+            "             }\n", 
+            "+        } catch (SynapseException e) {\n", 
+            "+            throw e;\n", 
+            "+        } catch (Exception e) {\n", 
+            "+            handleException(\"Runtime error occurred while mediating the message\", e, synCtx);\n", 
+            "         } finally {\n", 
+            "             synCtx.setTracingState(parentsEffectiveTraceState);\n", 
+            "         }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/AbstractListMediator.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/AbstractListMediator.java"
+    }
+  ], 
+  "id": "1745677"
+}

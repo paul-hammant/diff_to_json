@@ -1,49 +1,3 @@
-Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/DynamicLoadbalanceEndpointFactory.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/DynamicLoadbalanceEndpointFactory.java	(revision 1511903)
-+++ java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/DynamicLoadbalanceEndpointFactory.java	(revision 1511904)
-@@ -129,9 +129,13 @@
-                             getFirstChildWithName(new QName(SynapseConstants.SYNAPSE_NAMESPACE,
-                                                             "membershipHandler"));
-             if (eventHandler != null) {
--                String clazz =
--                        eventHandler.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE,
--                                                                 "class")).trim();
-+                String clazz = eventHandler.getAttributeValue(new QName(
-+                        XMLConfigConstants.NULL_NAMESPACE, "class"));
-+                if (clazz == null) {
-+                    handleException("class attribute is required on the membershipHandler element");
-+                } else {
-+                    clazz = clazz.trim();
-+                }
-                 try {
-                     LoadBalanceMembershipHandler lbMembershipHandler =
-                             (LoadBalanceMembershipHandler) Class.forName(clazz).newInstance();
-@@ -157,9 +161,10 @@
-                 } catch (Exception e) {
-                     String msg = "Could not instantiate " +
-                             "LoadBalanceMembershipHandler implementation " + clazz;
--                    log.error(msg, e);
--                    throw new SynapseException(msg, e);
-+                    handleException(msg, e);
-                 }
-+            } else {
-+                handleException("membershipHandler element is required");
-             }
- 
-             processProperties(loadbalanceEndpoint, epConfig);
-Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2LoadBalanceMembershipHandler.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2LoadBalanceMembershipHandler.java	(revision 1511903)
-+++ java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2LoadBalanceMembershipHandler.java	(revision 1511904)
-@@ -16,6 +16,7 @@
-  *  specific language governing permissions and limitations
-  *  under the License.
-  */
-+
- package org.apache.synapse.core.axis2;
- 
- import org.apache.axis2.clustering.ClusteringAgent;
 Index: java/modules/core/src/test/java/org/apache/synapse/config/xml/endpoints/DynamicLoadbalanceEndpointSerializationTest.java
 ===================================================================
 --- java/modules/core/src/test/java/org/apache/synapse/config/xml/endpoints/DynamicLoadbalanceEndpointSerializationTest.java	(nonexistent)
@@ -125,6 +79,52 @@ Index: java/modules/core/src/test/java/org/apache/synapse/config/xml/endpoints/D
 +        assertTrue(compare(serializedOut,inputElement));
 +    }
 +}
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/DynamicLoadbalanceEndpointFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/DynamicLoadbalanceEndpointFactory.java	(revision 1511903)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/DynamicLoadbalanceEndpointFactory.java	(revision 1511904)
+@@ -129,9 +129,13 @@
+                             getFirstChildWithName(new QName(SynapseConstants.SYNAPSE_NAMESPACE,
+                                                             "membershipHandler"));
+             if (eventHandler != null) {
+-                String clazz =
+-                        eventHandler.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE,
+-                                                                 "class")).trim();
++                String clazz = eventHandler.getAttributeValue(new QName(
++                        XMLConfigConstants.NULL_NAMESPACE, "class"));
++                if (clazz == null) {
++                    handleException("class attribute is required on the membershipHandler element");
++                } else {
++                    clazz = clazz.trim();
++                }
+                 try {
+                     LoadBalanceMembershipHandler lbMembershipHandler =
+                             (LoadBalanceMembershipHandler) Class.forName(clazz).newInstance();
+@@ -157,9 +161,10 @@
+                 } catch (Exception e) {
+                     String msg = "Could not instantiate " +
+                             "LoadBalanceMembershipHandler implementation " + clazz;
+-                    log.error(msg, e);
+-                    throw new SynapseException(msg, e);
++                    handleException(msg, e);
+                 }
++            } else {
++                handleException("membershipHandler element is required");
+             }
+ 
+             processProperties(loadbalanceEndpoint, epConfig);
+Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2LoadBalanceMembershipHandler.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2LoadBalanceMembershipHandler.java	(revision 1511903)
++++ java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2LoadBalanceMembershipHandler.java	(revision 1511904)
+@@ -16,6 +16,7 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.core.axis2;
+ 
+ import org.apache.axis2.clustering.ClusteringAgent;
 -*-*-*-
 Message: Adding a serialization test case for dynamic load balance endpoint
 -*-*-*-

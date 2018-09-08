@@ -1,0 +1,156 @@
+Index: java/modules/distribution/pom.xml
+===================================================================
+--- java/modules/distribution/pom.xml	(revision 1776243)
++++ java/modules/distribution/pom.xml	(revision 1776244)
+@@ -18,9 +18,9 @@
+   -->
+ 
+ <project
+-    xmlns="http://maven.apache.org/POM/4.0.0"
+-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++        xmlns="http://maven.apache.org/POM/4.0.0"
++        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
++        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+@@ -102,7 +102,7 @@
+             <artifactId>addressing</artifactId>
+             <type>mar</type>
+         </dependency>
+-        
++
+         <!-- Because of a design flaw in Axis2 (see AXIS2-4265), axis2-codegen is required
+              to deploy some modules => include this explicitly. -->
+         <dependency>
+@@ -110,7 +110,7 @@
+             <artifactId>axis2-codegen</artifactId>
+         </dependency>
+ 
+-	    <!-- JSON Support -->
++        <!-- JSON Support -->
+         <dependency>
+             <groupId>org.apache.axis2</groupId>
+             <artifactId>axis2-json</artifactId>
+@@ -143,7 +143,7 @@
+             <artifactId>xmltask</artifactId>
+             <version>1.14</version>
+         </dependency>
+-        
++
+         <!-- Patches -->
+         <dependency>
+             <groupId>org.apache.synapse</groupId>
+@@ -155,7 +155,7 @@
+             <groupId>xerces</groupId>
+             <artifactId>xercesImpl</artifactId>
+         </dependency-->
+-        
++
+         <!-- Libraries packaged with the sample Axis2 server (but that are not useful for Synapse itself) -->
+         <dependency>
+             <groupId>org.apache.axis2</groupId>
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1776243)
++++ java/pom.xml	(revision 1776244)
+@@ -174,7 +174,7 @@
+             </build>
+         </profile>
+     </profiles>
+-    
++
+     <build>
+         <pluginManagement>
+             <plugins>
+@@ -427,8 +427,8 @@
+                 <groupId>org.apache.axis2</groupId>
+                 <artifactId>axis2-transport-mail</artifactId>
+                 <version>${axis2.version}</version>
+-	    </dependency>
+-	    <dependency>
++            </dependency>
++            <dependency>
+                 <groupId>org.apache.axis2</groupId>
+                 <artifactId>axis2-json</artifactId>
+                 <version>${axis2.version}</version>
+@@ -438,7 +438,7 @@
+                         <artifactId>jettison</artifactId>
+                     </exclusion>
+                 </exclusions>
+-	    </dependency>
++            </dependency>
+             <dependency>
+                 <groupId>org.codehaus.jettison</groupId>
+                 <artifactId>jettison</artifactId>
+@@ -783,19 +783,19 @@
+ 
+             <!-- Saxon -->
+             <dependency>
+-                 <groupId>net.sf.saxon</groupId>
+-                 <artifactId>saxon</artifactId>
+-                 <version>${saxon.version}</version>
++                <groupId>net.sf.saxon</groupId>
++                <artifactId>saxon</artifactId>
++                <version>${saxon.version}</version>
+             </dependency>
+             <dependency>
+-                 <groupId>net.sf.saxon</groupId>
+-                 <artifactId>saxon-dom</artifactId>
+-                 <version>${saxon.version}</version>
++                <groupId>net.sf.saxon</groupId>
++                <artifactId>saxon-dom</artifactId>
++                <version>${saxon.version}</version>
+             </dependency>
+             <dependency>
+-                 <groupId>net.sf.saxon</groupId>
+-                 <artifactId>saxon-xqj</artifactId>
+-                 <version>${saxon.version}</version>
++                <groupId>net.sf.saxon</groupId>
++                <artifactId>saxon-xqj</artifactId>
++                <version>${saxon.version}</version>
+             </dependency>
+ 
+             <!-- Spring Framework -->
+@@ -1030,7 +1030,7 @@
+     <properties>
+         <!-- Sets the source encoding to UTF-8 -->
+         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+-        
++
+         <!-- The Java version used to build Synapse. This property is used in the configuration
+              of the maven-compiler-plugin as well as certain ant tasks executed using
+              maven-antrun-plugin. -->
+@@ -1272,7 +1272,7 @@
+             <id>kasun</id>
+             <email>kasun AT apache.org</email>
+             <organization>WSO2</organization>
+-        </developer> 
++        </developer>
+         <developer>
+             <name>Udayanga Wickramasinghe</name>
+             <id>uswick</id>
+@@ -1297,13 +1297,13 @@
+             <email>isudana AT apache.org</email>
+             <organization>WSO2</organization>
+         </developer>
+-	<developer>
++        <developer>
+             <name>Dushan Abeyruwan</name>
+             <id>dushan</id>
+             <email>dushan AT apache.org</email>
+             <organization>WSO2</organization>
+-    	</developer>
+-	<developer>
++        </developer>
++        <developer>
+             <name>Ravi Undupitiya</name>
+             <id>ravi</id>
+             <email>ravi AT apache.org</email>
+-*-*-*-
+Message: Fixing indents
+-*-*-*-
+When: 2016-12-28 03:47:40 -0500 
+-*-*-*-
+Who: ravi

@@ -1,3 +1,28 @@
+Index: java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPTransportUtilsTest.java
+===================================================================
+--- java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPTransportUtilsTest.java	(revision 1509451)
++++ java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPTransportUtilsTest.java	(revision 1509452)
+@@ -40,7 +40,7 @@
+ 
+         cfMap.put(AMQPTransportConstant.PARAMETER_EXCHANGE_TYPE, "direct");
+         cfMap.put(AMQPTransportConstant.PARAMETER_QUEUE_DURABLE, "true");
+-        cfMap.put(AMQPTransportConstant.PARAMETER_INITIAL_RE_CONNECTION_DURATION, "10");
++        cfMap.put(AMQPTransportConstant.PARAM_INITIAL_RE_CONNECTION_DURATION, "10");
+     }
+ 
+     public void testGetStringProperty() throws Exception {
+@@ -109,9 +109,9 @@
+ 
+     public void testGetOptionalIntParameter() throws Exception {
+         assertEquals("Invalid value",
+-                Integer.parseInt(cfMap.get(AMQPTransportConstant.PARAMETER_INITIAL_RE_CONNECTION_DURATION)),
++                Integer.parseInt(cfMap.get(AMQPTransportConstant.PARAM_INITIAL_RE_CONNECTION_DURATION)),
+                 AMQPTransportUtils.getOptionalIntParameter(
+-                        AMQPTransportConstant.PARAMETER_INITIAL_RE_CONNECTION_DURATION, svcMap, cfMap).intValue());
++                        AMQPTransportConstant.PARAM_INITIAL_RE_CONNECTION_DURATION, svcMap, cfMap).intValue());
+ 
+         assertEquals("Invalid value",
+                 Integer.parseInt(svcMap.get(AMQPTransportConstant.PARAMETER_NO_OF_CONCURRENT_CONSUMERS)),
 Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportListener.java
 ===================================================================
 --- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/AMQPTransportListener.java	(revision 1509451)
@@ -89,42 +114,6 @@ Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/tr
  
  
      /**
-Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/connectionfactory/AMQPTransportConnectionFactoryManager.java
-===================================================================
---- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/connectionfactory/AMQPTransportConnectionFactoryManager.java	(revision 1509451)
-+++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/connectionfactory/AMQPTransportConnectionFactoryManager.java	(revision 1509452)
-@@ -41,8 +41,8 @@
-      * Add the list of defined connection factories definition.
-      *
-      * @param transportInDescription The connection factory definition in axis2.xml
--     * @param es An instance of java.util.concurrent.ExecutorService to use with AMQP connection
--     *           factory
-+     * @param es                     An instance of java.util.concurrent.ExecutorService to use with AMQP connection
-+     *                               factory
-      */
-     public void addConnectionFactories(ParameterInclude transportInDescription, ExecutorService es) {
-         for (Parameter p : transportInDescription.getParameters()) {
-@@ -63,6 +63,10 @@
-         factories.put(parameter.getName(), new AMQPTransportConnectionFactory(parameter, es));
-     }
- 
-+    public void addConnectionFactory(String name, AMQPTransportConnectionFactory cf) {
-+        factories.put(name, cf);
-+    }
-+
-     /**
-      * Get the connection factory with this name.
-      *
-@@ -112,4 +116,9 @@
-             throw new AMQPTransportException("Error occurred whiling shutting down connections", e);
-         }
-     }
-+
-+    public ConcurrentHashMap<String, AMQPTransportConnectionFactory> getAllFactories() {
-+        return factories;
-+    }
-+
- }
 Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/connectionfactory/AMQPTransportConnectionFactory.java
 ===================================================================
 --- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/connectionfactory/AMQPTransportConnectionFactory.java	(revision 1509451)
@@ -327,6 +316,42 @@ Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/tr
 +    }
 +}
 \ No newline at end of file
+Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/connectionfactory/AMQPTransportConnectionFactoryManager.java
+===================================================================
+--- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/connectionfactory/AMQPTransportConnectionFactoryManager.java	(revision 1509451)
++++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/connectionfactory/AMQPTransportConnectionFactoryManager.java	(revision 1509452)
+@@ -41,8 +41,8 @@
+      * Add the list of defined connection factories definition.
+      *
+      * @param transportInDescription The connection factory definition in axis2.xml
+-     * @param es An instance of java.util.concurrent.ExecutorService to use with AMQP connection
+-     *           factory
++     * @param es                     An instance of java.util.concurrent.ExecutorService to use with AMQP connection
++     *                               factory
+      */
+     public void addConnectionFactories(ParameterInclude transportInDescription, ExecutorService es) {
+         for (Parameter p : transportInDescription.getParameters()) {
+@@ -63,6 +63,10 @@
+         factories.put(parameter.getName(), new AMQPTransportConnectionFactory(parameter, es));
+     }
+ 
++    public void addConnectionFactory(String name, AMQPTransportConnectionFactory cf) {
++        factories.put(name, cf);
++    }
++
+     /**
+      * Get the connection factory with this name.
+      *
+@@ -112,4 +116,9 @@
+             throw new AMQPTransportException("Error occurred whiling shutting down connections", e);
+         }
+     }
++
++    public ConcurrentHashMap<String, AMQPTransportConnectionFactory> getAllFactories() {
++        return factories;
++    }
++
+ }
 Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTaskFactory.java
 ===================================================================
 --- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTaskFactory.java	(revision 1509451)
@@ -455,67 +480,6 @@ Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/tr
          }
          return null;
      }
-Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/ha/AMQPTransportHAEntry.java
-===================================================================
---- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/ha/AMQPTransportHAEntry.java	(nonexistent)
-+++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/ha/AMQPTransportHAEntry.java	(revision 1509452)
-@@ -0,0 +1,56 @@
-+/*
-+ * ====================================================================
-+ * Licensed to the Apache Software Foundation (ASF) under one
-+ * or more contributor license agreements.  See the NOTICE file
-+ * distributed with this work for additional information
-+ * regarding copyright ownership.  The ASF licenses this file
-+ * to you under the Apache License, Version 2.0 (the
-+ * "License"); you may not use this file except in compliance
-+ * with the License.  You may obtain a copy of the License at
-+ *
-+ *   http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing,
-+ * software distributed under the License is distributed on an
-+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-+ * KIND, either express or implied.  See the License for the
-+ * specific language governing permissions and limitations
-+ * under the License.
-+ * ====================================================================
-+ *
-+ * This software consists of voluntary contributions made by many
-+ * individuals on behalf of the Apache Software Foundation.  For more
-+ * information on the Apache Software Foundation, please see
-+ * <http://www.apache.org/>.
-+ *
-+ */
-+package org.apache.synapse.transport.amqp.ha;
-+
-+import java.util.concurrent.Semaphore;
-+
-+public class AMQPTransportHAEntry {
-+
-+    private Semaphore lock;
-+
-+    private String key;
-+
-+    private String connFacName;
-+
-+    public AMQPTransportHAEntry(Semaphore lock, String key, String connFacName) {
-+        this.lock = lock;
-+        this.key = key;
-+        this.connFacName = connFacName;
-+    }
-+
-+    public Semaphore getLock() {
-+        return lock;
-+    }
-+
-+    public String getKey() {
-+        return key;
-+    }
-+
-+    public String getConnectionFactoryName() {
-+        return connFacName;
-+    }
-+}
 Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/ha/AMQPTransportReconnectHandler.java
 ===================================================================
 --- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/ha/AMQPTransportReconnectHandler.java	(nonexistent)
@@ -726,31 +690,67 @@ Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/tr
 +        return connection;
 +    }
 +}
-Index: java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPTransportUtilsTest.java
+Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/ha/AMQPTransportHAEntry.java
 ===================================================================
---- java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPTransportUtilsTest.java	(revision 1509451)
-+++ java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPTransportUtilsTest.java	(revision 1509452)
-@@ -40,7 +40,7 @@
- 
-         cfMap.put(AMQPTransportConstant.PARAMETER_EXCHANGE_TYPE, "direct");
-         cfMap.put(AMQPTransportConstant.PARAMETER_QUEUE_DURABLE, "true");
--        cfMap.put(AMQPTransportConstant.PARAMETER_INITIAL_RE_CONNECTION_DURATION, "10");
-+        cfMap.put(AMQPTransportConstant.PARAM_INITIAL_RE_CONNECTION_DURATION, "10");
-     }
- 
-     public void testGetStringProperty() throws Exception {
-@@ -109,9 +109,9 @@
- 
-     public void testGetOptionalIntParameter() throws Exception {
-         assertEquals("Invalid value",
--                Integer.parseInt(cfMap.get(AMQPTransportConstant.PARAMETER_INITIAL_RE_CONNECTION_DURATION)),
-+                Integer.parseInt(cfMap.get(AMQPTransportConstant.PARAM_INITIAL_RE_CONNECTION_DURATION)),
-                 AMQPTransportUtils.getOptionalIntParameter(
--                        AMQPTransportConstant.PARAMETER_INITIAL_RE_CONNECTION_DURATION, svcMap, cfMap).intValue());
-+                        AMQPTransportConstant.PARAM_INITIAL_RE_CONNECTION_DURATION, svcMap, cfMap).intValue());
- 
-         assertEquals("Invalid value",
-                 Integer.parseInt(svcMap.get(AMQPTransportConstant.PARAMETER_NO_OF_CONCURRENT_CONSUMERS)),
+--- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/ha/AMQPTransportHAEntry.java	(nonexistent)
++++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/ha/AMQPTransportHAEntry.java	(revision 1509452)
+@@ -0,0 +1,56 @@
++/*
++ * ====================================================================
++ * Licensed to the Apache Software Foundation (ASF) under one
++ * or more contributor license agreements.  See the NOTICE file
++ * distributed with this work for additional information
++ * regarding copyright ownership.  The ASF licenses this file
++ * to you under the Apache License, Version 2.0 (the
++ * "License"); you may not use this file except in compliance
++ * with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing,
++ * software distributed under the License is distributed on an
++ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ * KIND, either express or implied.  See the License for the
++ * specific language governing permissions and limitations
++ * under the License.
++ * ====================================================================
++ *
++ * This software consists of voluntary contributions made by many
++ * individuals on behalf of the Apache Software Foundation.  For more
++ * information on the Apache Software Foundation, please see
++ * <http://www.apache.org/>.
++ *
++ */
++package org.apache.synapse.transport.amqp.ha;
++
++import java.util.concurrent.Semaphore;
++
++public class AMQPTransportHAEntry {
++
++    private Semaphore lock;
++
++    private String key;
++
++    private String connFacName;
++
++    public AMQPTransportHAEntry(Semaphore lock, String key, String connFacName) {
++        this.lock = lock;
++        this.key = key;
++        this.connFacName = connFacName;
++    }
++
++    public Semaphore getLock() {
++        return lock;
++    }
++
++    public String getKey() {
++        return key;
++    }
++
++    public String getConnectionFactoryName() {
++        return connFacName;
++    }
++}
 -*-*-*-
 Message: added initial ha implementations.
 -*-*-*-

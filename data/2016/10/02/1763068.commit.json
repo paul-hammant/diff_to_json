@@ -1,0 +1,30 @@
+{
+  "when": "2016-10-02T10:43:35-04:00", 
+  "message": "fixing thread blocking issue when a connectivity issue with the backend", 
+  "who": "isudana", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-145,6 +145,11", 
+          "lines": [
+            "                 }\n", 
+            "                 targetErrorHandler.handleError(msgCtx, errorCode, errorMessage,\n", 
+            "                         null, ProtocolState.REQUEST_READY);\n", 
+            "+                synchronized (msgCtx) {\n", 
+            "+                    msgCtx.setProperty(PassThroughConstants.WAIT_BUILDER_IN_STREAM_COMPLETE,\n", 
+            "+                                       Boolean.TRUE);\n", 
+            "+                    msgCtx.notifyAll();\n", 
+            "+                }\n", 
+            "             }\n", 
+            "         } else {\n", 
+            "             throw new IllegalStateException(\"Queue cannot be null for: \" + key);\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/DeliveryAgent.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/DeliveryAgent.java"
+    }
+  ], 
+  "id": "1763068"
+}

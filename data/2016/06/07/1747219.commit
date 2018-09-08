@@ -1,0 +1,87 @@
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughConstants.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughConstants.java	(revision 1747218)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughConstants.java	(revision 1747219)
+@@ -74,9 +74,9 @@
+ 
+     protected static final String PASS_THROUGH_TRANSPORT_WORKER_POOL =
+             "PASS_THROUGH_TRANSPORT_WORKER_POOL";
+-    protected static final String PASS_THROUGH_SOURCE_CONFIGURATION =
++    public static final String PASS_THROUGH_SOURCE_CONFIGURATION =
+             "PASS_THROUGH_SOURCE_CONFIGURATION";
+-    protected static final String PASS_THROUGH_SOURCE_CONNECTION = "pass-through.Source-Connection";
++    public static final String PASS_THROUGH_SOURCE_CONNECTION = "pass-through.Source-Connection";
+     protected static final String PASS_THROUGH_SOURCE_REQUEST = "pass-through.Source-Request";
+ 
+     protected static final String PASS_THROUGH_TARGET_CONNECTION = "pass-through.Target-Connection";
+@@ -138,4 +138,7 @@
+     
+     //Http method type constants to be used in synapse
+     public static final String HTTP_HEAD = "HEAD";
++
++    //use to create source buffer in passthrough transport
++    public static final String SOURCE ="source";
+ }
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/Pipe.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/Pipe.java	(revision 1747218)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/Pipe.java	(revision 1747219)
+@@ -288,6 +288,10 @@
+         return buffer;
+     }
+ 
++    public synchronized boolean isSerializationComplete(){
++        return serializationComplete;
++    }
++
+     private void setInputMode(ByteBuffer buffer, AtomicBoolean inputMode) {
+         if (inputMode.compareAndSet(false, true)) {
+             if (buffer.hasRemaining()) {
+Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/SynapseCallbackReceiver.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/core/axis2/SynapseCallbackReceiver.java	(revision 1747218)
++++ java/modules/core/src/main/java/org/apache/synapse/core/axis2/SynapseCallbackReceiver.java	(revision 1747219)
+@@ -33,6 +33,7 @@
+ import org.apache.axis2.wsdl.WSDLConstants;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
++import org.apache.http.nio.NHttpServerConnection;
+ import org.apache.synapse.FaultHandler;
+ import org.apache.synapse.SynapseConstants;
+ import org.apache.synapse.SynapseException;
+@@ -45,6 +46,9 @@
+ import org.apache.synapse.endpoints.Endpoint;
+ import org.apache.synapse.endpoints.dispatch.Dispatcher;
+ import org.apache.synapse.transport.nhttp.NhttpConstants;
++import org.apache.synapse.transport.passthru.PassThroughConstants;
++import org.apache.synapse.transport.passthru.Pipe;
++import org.apache.synapse.transport.passthru.config.SourceConfiguration;
+ import org.apache.synapse.util.ResponseAcceptEncodingProcessor;
+ 
+ import java.util.*;
+@@ -249,6 +253,19 @@
+         Object o = response.getProperty(SynapseConstants.SENDING_FAULT);
+         if (o != null && Boolean.TRUE.equals(o)) {
+ 
++            Pipe pipe = (Pipe) ((Axis2MessageContext) synapseOutMsgCtx).getAxis2MessageContext()
++                    .getProperty(PassThroughConstants.PASS_THROUGH_PIPE);
++            if (pipe != null && pipe.isSerializationComplete()) {
++                NHttpServerConnection conn = (NHttpServerConnection) ((Axis2MessageContext) synapseOutMsgCtx).
++                        getAxis2MessageContext().getProperty(PassThroughConstants.PASS_THROUGH_SOURCE_CONNECTION);
++                SourceConfiguration sourceConfiguration = (SourceConfiguration) ((Axis2MessageContext) synapseOutMsgCtx)
++                        .getAxis2MessageContext().getProperty(PassThroughConstants.PASS_THROUGH_SOURCE_CONFIGURATION);
++                Pipe newPipe = new Pipe(conn, sourceConfiguration.getBufferFactory().getBuffer(),
++                        PassThroughConstants.SOURCE, sourceConfiguration);
++                ((Axis2MessageContext) synapseOutMsgCtx).getAxis2MessageContext()
++                        .setProperty(PassThroughConstants.PASS_THROUGH_PIPE, newPipe);
++            }
++
+             StatisticsReporter.reportFaultForAll(synapseOutMsgCtx,
+                     ErrorLogFactory.createErrorLog(response));
+             // there is a sending fault. propagate the fault to fault handlers.
+-*-*-*-
+Message: Patch by Isuru Janith Ranawaka that fixes send mediator inside a fault mediator from hanging when SSL exception occurs. SYNAPSE-1039
+-*-*-*-
+When: 2016-06-07 09:13:32 -0400 
+-*-*-*-
+Who: ravi

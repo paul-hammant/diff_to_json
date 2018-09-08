@@ -1,0 +1,563 @@
+{
+  "when": "2016-08-28T16:09:19-04:00", 
+  "message": "Fix by Senduran for SYNAPSE-1015", 
+  "who": "ravi", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-22,6 +22,7", 
+          "lines": [
+            " import org.apache.axis2.context.MessageContext;\n", 
+            " import org.apache.http.nio.NHttpConnection;\n", 
+            " import org.apache.synapse.transport.passthru.config.TargetConfiguration;\n", 
+            "+import org.apache.synapse.transport.passthru.util.ControlledByteBuffer;\n", 
+            " \n", 
+            " import java.nio.ByteBuffer;\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-114,7 +115,7", 
+          "lines": [
+            "         }\n", 
+            " \n", 
+            "         if (writer != null) {\n", 
+            "-            ByteBuffer buffer = writer.getBuffer();\n", 
+            "+            ControlledByteBuffer buffer = writer.getBuffer();\n", 
+            "             buffer.clear();\n", 
+            "             targetConfiguration.getBufferFactory().release(buffer);\n", 
+            "         }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetContext.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetContext.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-23,10 +23,9", 
+          "lines": [
+            " import org.apache.http.nio.ContentDecoder;\n", 
+            " import org.apache.http.nio.ContentEncoder;\n", 
+            " import org.apache.synapse.transport.passthru.config.BaseConfiguration;\n", 
+            "+import org.apache.synapse.transport.passthru.util.ControlledByteBuffer;\n", 
+            " \n", 
+            " import java.io.*;\n", 
+            "-import java.nio.ByteBuffer;\n", 
+            "-import java.util.concurrent.atomic.AtomicBoolean;\n", 
+            " import java.util.concurrent.locks.Condition;\n", 
+            " import java.util.concurrent.locks.Lock;\n", 
+            " import java.util.concurrent.locks.ReentrantLock;\n"
+          ]
+        }, 
+        {
+          "locn": "-43,9 +42,9", 
+          "lines": [
+            "     private IOControl consumerIoControl;\n", 
+            " \n", 
+            "     /** Fixed size buffer to read and write data */\n", 
+            "-    private ByteBuffer buffer;\n", 
+            "+    private ControlledByteBuffer buffer;\n", 
+            " \n", 
+            "-    private ByteBuffer outputBuffer;\n", 
+            "+    private ControlledByteBuffer outputBuffer;\n", 
+            " \n", 
+            "     private boolean producerCompleted = false;\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-70,13 +69,10", 
+          "lines": [
+            " \n", 
+            "   \tprivate boolean hasHttpProducer = true;\n", 
+            " \n", 
+            "-    private AtomicBoolean inBufferInputMode = new AtomicBoolean(true);\n", 
+            "-    private AtomicBoolean outBufferInputMode;\n", 
+            "-\n", 
+            "     private ByteBufferInputStream inputStream;\n", 
+            "     private ByteBufferOutputStream outputStream;\n", 
+            " \n", 
+            "-    public Pipe(IOControl producerIoControl, ByteBuffer buffer,\n", 
+            "+    public Pipe(IOControl producerIoControl, ControlledByteBuffer buffer,\n", 
+            "                 String name, BaseConfiguration baseConfig) {\n", 
+            "         this.producerIoControl = producerIoControl;\n", 
+            "         this.buffer = buffer;\n"
+          ]
+        }, 
+        {
+          "locn": "-84,7 +80,7", 
+          "lines": [
+            "         this.baseConfig = baseConfig;\n", 
+            "     }\n", 
+            " \n", 
+            "-    public Pipe(ByteBuffer buffer, String name, BaseConfiguration baseConfig) {\n", 
+            "+    public Pipe(ControlledByteBuffer buffer, String name, BaseConfiguration baseConfig) {\n", 
+            "         this.buffer = buffer;\n", 
+            "         this.name += \"_\" + name;\n", 
+            "         this.baseConfig = baseConfig;\n"
+          ]
+        }, 
+        {
+          "locn": "-118,14 +114,11", 
+          "lines": [
+            "         }\n", 
+            " \n", 
+            "         lock.lock();\n", 
+            "-        ByteBuffer consumerBuffer;\n", 
+            "-        AtomicBoolean inputMode;\n", 
+            "+        ControlledByteBuffer consumerBuffer;\n", 
+            "         if (outputBuffer != null) {\n", 
+            "             consumerBuffer = outputBuffer;\n", 
+            "-            inputMode = outBufferInputMode;\n", 
+            "         } else {\n", 
+            "             consumerBuffer = buffer;\n", 
+            "-            inputMode = inBufferInputMode;\n", 
+            "         }\n", 
+            "         try {\n", 
+            "             // if producer at error we have to stop the encoding and return immediately\n"
+          ]
+        }, 
+        {
+          "locn": "-134,9 +127,9", 
+          "lines": [
+            "                 return -1;\n", 
+            "             }\n", 
+            " \n", 
+            "-            setOutputMode(consumerBuffer, inputMode);\n", 
+            "-            int bytesWritten = encoder.write(consumerBuffer);\n", 
+            "-            setInputMode(consumerBuffer, inputMode);\n", 
+            "+            setOutputMode(consumerBuffer);\n", 
+            "+            int bytesWritten = encoder.write(consumerBuffer.getByteBuffer());\n", 
+            "+            setInputMode(consumerBuffer);\n", 
+            " \n", 
+            "             if (consumerBuffer.position() == 0) {\n", 
+            "                 if (outputBuffer == null) {\n"
+          ]
+        }, 
+        {
+          "locn": "-179,8 +172,8", 
+          "lines": [
+            " \n", 
+            "         lock.lock();\n", 
+            "         try {\n", 
+            "-            setInputMode(buffer, inBufferInputMode);\n", 
+            "-            int bytesRead = decoder.read(buffer);\n", 
+            "+            setInputMode(buffer);\n", 
+            "+            int bytesRead = decoder.read(buffer.getByteBuffer());\n", 
+            " \n", 
+            "             // if consumer is at error we have to let the producer complete\n", 
+            "             if (consumerError) {\n"
+          ]
+        }, 
+        {
+          "locn": "-258,7 +251,6", 
+          "lines": [
+            "     public synchronized OutputStream getOutputStream() {\n", 
+            "         if (outputStream == null) {\n", 
+            "             outputBuffer = baseConfig.getBufferFactory().getBuffer();\n", 
+            "-            outBufferInputMode = new AtomicBoolean(true);\n", 
+            "             outputStream = new ByteBufferOutputStream();\n", 
+            "         }\n", 
+            "         return outputStream;\n"
+          ]
+        }, 
+        {
+          "locn": "-267,7 +259,7", 
+          "lines": [
+            "     public synchronized void setSerializationComplete(boolean serializationComplete) {\n", 
+            "         if (!this.serializationComplete) {\n", 
+            "             this.serializationComplete = serializationComplete;\n", 
+            "-            if (consumerIoControl != null && hasData(outputBuffer, outBufferInputMode)) {\n", 
+            "+            if (consumerIoControl != null && hasData(outputBuffer)) {\n", 
+            "                 consumerIoControl.requestOutput();\n", 
+            "             }\n", 
+            "         }\n"
+          ]
+        }, 
+        {
+          "locn": "-284,7 +276,7", 
+          "lines": [
+            "     \tthis.rawSerializationComplete = rawSerializationComplete;\n", 
+            "     }\n", 
+            " \n", 
+            "-\tpublic ByteBuffer getBuffer() {\n", 
+            "+\tpublic ControlledByteBuffer getBuffer() {\n", 
+            "         return buffer;\n", 
+            "     }\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-292,8 +284,8", 
+          "lines": [
+            "         return serializationComplete;\n", 
+            "     }\n", 
+            " \n", 
+            "-    private void setInputMode(ByteBuffer buffer, AtomicBoolean inputMode) {\n", 
+            "-        if (inputMode.compareAndSet(false, true)) {\n", 
+            "+    private void setInputMode(ControlledByteBuffer buffer) {\n", 
+            "+        if (buffer.setInputMode()) {\n", 
+            "             if (buffer.hasRemaining()) {\n", 
+            "                 buffer.compact();\n", 
+            "             } else {\n"
+          ]
+        }, 
+        {
+          "locn": "-302,16 +294,16", 
+          "lines": [
+            "         }\n", 
+            "     }\n", 
+            " \n", 
+            "-    private void setOutputMode(ByteBuffer buffer, AtomicBoolean inputMode) {\n", 
+            "-        if (inputMode.compareAndSet(true, false)) {\n", 
+            "+    private void setOutputMode(ControlledByteBuffer buffer) {\n", 
+            "+        if (buffer.setOutputMode()) {\n", 
+            "             buffer.flip();\n", 
+            "         }\n", 
+            "     }\n", 
+            " \n", 
+            "-    private boolean hasData(ByteBuffer buffer, AtomicBoolean inputMode) {\n", 
+            "+    private boolean hasData(ControlledByteBuffer buffer) {\n", 
+            "         lock.lock();\n", 
+            "         try {\n", 
+            "-            setOutputMode(buffer, inputMode);\n", 
+            "+            setOutputMode(buffer);\n", 
+            "             return buffer.hasRemaining();\n", 
+            "         } finally {\n", 
+            "             lock.unlock();\n"
+          ]
+        }, 
+        {
+          "locn": "-324,7 +316,7", 
+          "lines": [
+            "         public int read() throws IOException {\n", 
+            "             lock.lock();\n", 
+            "             try {\n", 
+            "-                if (!hasData(buffer, inBufferInputMode)) {\n", 
+            "+                if (!hasData(buffer)) {\n", 
+            "                     waitForData();\n", 
+            "                     if (producerError) {\n", 
+            "                         return -1;\n"
+          ]
+        }, 
+        {
+          "locn": "-346,13 +338,13", 
+          "lines": [
+            " \n", 
+            "             lock.lock();\n", 
+            "             try {\n", 
+            "-                if (!hasData(buffer, inBufferInputMode)) {\n", 
+            "+                if (!hasData(buffer)) {\n", 
+            "                     waitForData();\n", 
+            "                 }\n", 
+            "                 if (isEndOfStream()) {\n", 
+            "                     return -1;\n", 
+            "                 }\n", 
+            "-                setOutputMode(buffer, inBufferInputMode);\n", 
+            "+                setOutputMode(buffer);\n", 
+            "                 int chunk = len;\n", 
+            "                 if (chunk > buffer.remaining()) {\n", 
+            "                     chunk = buffer.remaining();\n"
+          ]
+        }, 
+        {
+          "locn": "-368,7 +360,7", 
+          "lines": [
+            "             lock.lock();\n", 
+            "             try {\n", 
+            "                 try {\n", 
+            "-                    while (!hasData(buffer, inBufferInputMode) && !producerCompleted) {\n", 
+            "+                    while (!hasData(buffer) && !producerCompleted) {\n", 
+            "                         if (producerError) {\n", 
+            "                             break;\n", 
+            "                         }\n"
+          ]
+        }, 
+        {
+          "locn": "-384,7 +376,7", 
+          "lines": [
+            "         }\n", 
+            " \n", 
+            "         private boolean isEndOfStream() {\n", 
+            "-            return !hasData(buffer, inBufferInputMode) && producerCompleted;\n", 
+            "+            return !hasData(buffer) && producerCompleted;\n", 
+            "         }\n", 
+            "     }\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-394,10 +386,10", 
+          "lines": [
+            "         public void write(int b) throws IOException {\n", 
+            "             lock.lock();\n", 
+            "             try {\n", 
+            "-                setInputMode(outputBuffer, outBufferInputMode);\n", 
+            "+                setInputMode(outputBuffer);\n", 
+            "                 if (!outputBuffer.hasRemaining()) {\n", 
+            "                     flushContent();\n", 
+            "-                    setInputMode(outputBuffer, outBufferInputMode);\n", 
+            "+                    setInputMode(outputBuffer);\n", 
+            "                 }\n", 
+            "                 outputBuffer.put((byte) b);\n", 
+            "             } finally {\n"
+          ]
+        }, 
+        {
+          "locn": "-411,7 +403,7", 
+          "lines": [
+            "             }\n", 
+            "             lock.lock();\n", 
+            "             try {\n", 
+            "-                setInputMode(outputBuffer, outBufferInputMode);\n", 
+            "+                setInputMode(outputBuffer);\n", 
+            "                 int remaining = len;\n", 
+            "                 while (remaining > 0) {\n", 
+            "                     if (!outputBuffer.hasRemaining()) {\n"
+          ]
+        }, 
+        {
+          "locn": "-420,7 +412,7", 
+          "lines": [
+            "                             buffer.clear();\n", 
+            "                             break;\n", 
+            "                         }\n", 
+            "-                        setInputMode(outputBuffer, outBufferInputMode);\n", 
+            "+                        setInputMode(outputBuffer);\n", 
+            "                     }\n", 
+            "                     int chunk = Math.min(remaining, outputBuffer.remaining());\n", 
+            "                     outputBuffer.put(b, off, chunk);\n"
+          ]
+        }, 
+        {
+          "locn": "-441,7 +433,7", 
+          "lines": [
+            "             \n", 
+            "             try {\n", 
+            "                 try {\n", 
+            "-\t\t\t\t\twhile (hasData(outputBuffer, outBufferInputMode)) {\n", 
+            "+\t\t\t\t\twhile (hasData(outputBuffer)) {\n", 
+            "                         if(consumerError) {\n", 
+            "                             break;\n", 
+            "                         }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/Pipe.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/Pipe.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-21,13 +21,12", 
+          "lines": [
+            " import org.apache.http.nio.util.ByteBufferAllocator;\n", 
+            " import org.apache.http.nio.util.HeapByteBufferAllocator;\n", 
+            " \n", 
+            "-import java.nio.ByteBuffer;\n", 
+            " import java.util.concurrent.locks.Lock;\n", 
+            " import java.util.concurrent.locks.ReentrantLock;\n", 
+            " \n", 
+            " public class BufferFactory {\n", 
+            " \n", 
+            "-    private volatile ByteBuffer [] buffers;\n", 
+            "+    private volatile ControlledByteBuffer [] buffers;\n", 
+            " \n", 
+            "     private volatile int marker = -1;\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-45,34 +44,36", 
+          "lines": [
+            "             this.allocator = HeapByteBufferAllocator.INSTANCE;\n", 
+            "         }\n", 
+            " \n", 
+            "-        buffers = new ByteBuffer[size];\n", 
+            "+        buffers = new ControlledByteBuffer[size];\n", 
+            "     }\n", 
+            " \n", 
+            "-    public ByteBuffer getBuffer() {\n", 
+            "+    public ControlledByteBuffer getBuffer() {\n", 
+            "         if (marker == -1) {\n", 
+            "-            return allocator.allocate(bufferSize);\n", 
+            "+            return new ControlledByteBuffer(allocator.allocate(bufferSize));\n", 
+            "         } else {\n", 
+            "             try {\n", 
+            "                 lock.lock();\n", 
+            "                 if (marker >= 0) {\n", 
+            "-                    ByteBuffer b = buffers[marker];\n", 
+            "-                    b.clear();\n", 
+            "+                    ControlledByteBuffer controlledByteBuffer = buffers[marker];\n", 
+            "+                    controlledByteBuffer.clear();\n", 
+            "+                    controlledByteBuffer.forceSetInputMode();\n", 
+            "                     buffers[marker] = null;\n", 
+            "                     marker--;\n", 
+            "-                    return b;\n", 
+            "+                    return controlledByteBuffer;\n", 
+            "                 }\n", 
+            "             } finally {\n", 
+            "                 lock.unlock();\n", 
+            "             }\n", 
+            "         }\n", 
+            "-        return allocator.allocate(bufferSize);\n", 
+            "+        return new ControlledByteBuffer(allocator.allocate(bufferSize));\n", 
+            "     }\n", 
+            " \n", 
+            "-    public void release(ByteBuffer buffer) {\n", 
+            "+    public void release(ControlledByteBuffer buffer) {\n", 
+            "         try {\n", 
+            "             lock.lock();\n", 
+            "             if (marker < buffers.length - 1) {\n", 
+            "                 buffer.clear();\n", 
+            "+                buffer.forceSetInputMode();\n", 
+            "                 buffers[++marker] = buffer;\n", 
+            "             }\n", 
+            "         } finally {\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/BufferFactory.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/BufferFactory.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-0,0 +1,93", 
+          "lines": [
+            "+/*\n", 
+            "+ *  Licensed to the Apache Software Foundation (ASF) under one\n", 
+            "+ *  or more contributor license agreements.  See the NOTICE file\n", 
+            "+ *  distributed with this work for additional information\n", 
+            "+ *  regarding copyright ownership.  The ASF licenses this file\n", 
+            "+ *  to you under the Apache License, Version 2.0 (the\n", 
+            "+ *  \"License\"); you may not use this file except in compliance\n", 
+            "+ *  with the License.  You may obtain a copy of the License at\n", 
+            "+ *\n", 
+            "+ *   http://www.apache.org/licenses/LICENSE-2.0\n", 
+            "+ *\n", 
+            "+ *  Unless required by applicable law or agreed to in writing,\n", 
+            "+ *  software distributed under the License is distributed on an\n", 
+            "+ *   * \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n", 
+            "+ *  KIND, either express or implied.  See the License for the\n", 
+            "+ *  specific language governing permissions and limitations\n", 
+            "+ *  under the License.\n", 
+            "+ */\n", 
+            "+\n", 
+            "+package org.apache.synapse.transport.passthru.util;\n", 
+            "+\n", 
+            "+import java.nio.ByteBuffer;\n", 
+            "+import java.util.concurrent.atomic.AtomicBoolean;\n", 
+            "+\n", 
+            "+public class ControlledByteBuffer {\n", 
+            "+    private ByteBuffer byteBuffer;\n", 
+            "+\n", 
+            "+    private AtomicBoolean inputMode = new AtomicBoolean(true);\n", 
+            "+\n", 
+            "+    public ControlledByteBuffer(ByteBuffer byteBuffer) {\n", 
+            "+        this.byteBuffer = byteBuffer;\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public ByteBuffer getByteBuffer() {\n", 
+            "+        return this.byteBuffer;\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public boolean setInputMode() {\n", 
+            "+        return this.inputMode.compareAndSet(false, true);\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public boolean setOutputMode() {\n", 
+            "+        return this.inputMode.compareAndSet(true, false);\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public void forceSetInputMode() {\n", 
+            "+        this.inputMode = new AtomicBoolean(true);\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public void flip() {\n", 
+            "+        this.byteBuffer.flip();\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public void clear() {\n", 
+            "+        this.byteBuffer.clear();\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public void compact() {\n", 
+            "+        this.byteBuffer.compact();\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public int position() {\n", 
+            "+        return this.byteBuffer.position();\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public void put(byte b) {\n", 
+            "+        this.byteBuffer.put(b);\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public void putInt(int value) {\n", 
+            "+        this.byteBuffer.putInt(value);\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public ByteBuffer put(byte[] src, int offset, int length) {\n", 
+            "+        return this.byteBuffer.put(src, offset, length);\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public boolean hasRemaining() {\n", 
+            "+        return this.byteBuffer.hasRemaining();\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public byte get() {\n", 
+            "+        return this.byteBuffer.get();\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public ByteBuffer get(byte[] dst, int offset, int length) {\n", 
+            "+        return this.byteBuffer.get(dst, offset, length);\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public int remaining() {\n", 
+            "+        return this.byteBuffer.remaining();\n", 
+            "+    }\n", 
+            "+}\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/ControlledByteBuffer.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/ControlledByteBuffer.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-21,6 +21,7", 
+          "lines": [
+            " \n", 
+            " import org.apache.http.nio.NHttpConnection;\n", 
+            " import org.apache.synapse.transport.passthru.config.SourceConfiguration;\n", 
+            "+import org.apache.synapse.transport.passthru.util.ControlledByteBuffer;\n", 
+            " \n", 
+            " import java.nio.ByteBuffer;\n", 
+            " \n"
+          ]
+        }, 
+        {
+          "locn": "-85,7 +86,7", 
+          "lines": [
+            "         }\n", 
+            " \n", 
+            "         if (writer != null) {\n", 
+            "-            ByteBuffer buffer = writer.getBuffer();\n", 
+            "+            ControlledByteBuffer buffer = writer.getBuffer();\n", 
+            "             buffer.clear();\n", 
+            "             sourceConfiguration.getBufferFactory().release(buffer);\n", 
+            "         }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceContext.java", 
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceContext.java"
+    }
+  ], 
+  "id": "1758147"
+}

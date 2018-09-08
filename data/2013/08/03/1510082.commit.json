@@ -1,0 +1,147 @@
+{
+  "when": "2013-08-03T20:36:25-04:00", 
+  "message": "adding sample throttle mediator serialization test", 
+  "who": "hiranya", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-0,0 +1,77", 
+          "lines": [
+            "+/*\n", 
+            "+ *  Licensed to the Apache Software Foundation (ASF) under one\n", 
+            "+ *  or more contributor license agreements.  See the NOTICE file\n", 
+            "+ *  distributed with this work for additional information\n", 
+            "+ *  regarding copyright ownership.  The ASF licenses this file\n", 
+            "+ *  to you under the Apache License, Version 2.0 (the\n", 
+            "+ *  \"License\"); you may not use this file except in compliance\n", 
+            "+ *  with the License.  You may obtain a copy of the License at\n", 
+            "+ *\n", 
+            "+ *   http://www.apache.org/licenses/LICENSE-2.0\n", 
+            "+ *\n", 
+            "+ *  Unless required by applicable law or agreed to in writing,\n", 
+            "+ *  software distributed under the License is distributed on an\n", 
+            "+ *   * \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n", 
+            "+ *  KIND, either express or implied.  See the License for the\n", 
+            "+ *  specific language governing permissions and limitations\n", 
+            "+ *  under the License.\n", 
+            "+ */\n", 
+            "+\n", 
+            "+package org.apache.synapse.config.xml;\n", 
+            "+\n", 
+            "+public class SamplingThrottleMediatorSerializationTest extends AbstractTestCase {\n", 
+            "+\n", 
+            "+    private SamplingThrottleMediatorFactory factory;\n", 
+            "+    private SamplingThrottleMediatorSerializer serializer;\n", 
+            "+\n", 
+            "+    public SamplingThrottleMediatorSerializationTest() {\n", 
+            "+        super(SamplingThrottleMediatorSerializationTest.class.getName());\n", 
+            "+        factory = new SamplingThrottleMediatorFactory();\n", 
+            "+        serializer = new SamplingThrottleMediatorSerializer();\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public void testSamplerMediatorSerializationScenarioOne() throws Exception {\n", 
+            "+        String inputXml = \"<sampler xmlns=\\\"http://ws.apache.org/ns/synapse\\\">\" +\n", 
+            "+                \"<target sequence=\\\"foo\\\"/></sampler>\";\n", 
+            "+        assertTrue(serialization(inputXml, factory, serializer));\n", 
+            "+        assertTrue(serialization(inputXml, serializer));\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public void testSamplerMediatorSerializationScenarioTwo() throws Exception {\n", 
+            "+        String inputXml = \"<sampler xmlns=\\\"http://ws.apache.org/ns/synapse\\\" rate=\\\"10\\\" unitTime=\\\"60000\\\">\" +\n", 
+            "+                \"<target sequence=\\\"foo\\\"/></sampler>\";\n", 
+            "+        assertTrue(serialization(inputXml, factory, serializer));\n", 
+            "+        assertTrue(serialization(inputXml, serializer));\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public void testSamplerMediatorSerializationScenarioThree() throws Exception {\n", 
+            "+        String inputXml = \"<sampler xmlns=\\\"http://ws.apache.org/ns/synapse\\\" id=\\\"bar\\\">\" +\n", 
+            "+                \"<target sequence=\\\"foo\\\"/></sampler>\";\n", 
+            "+        assertTrue(serialization(inputXml, factory, serializer));\n", 
+            "+        assertTrue(serialization(inputXml, serializer));\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public void testSamplerMediatorSerializationScenarioFour() throws Exception {\n", 
+            "+        String inputXml = \"<sampler xmlns=\\\"http://ws.apache.org/ns/synapse\\\">\" +\n", 
+            "+                \"<messageQueue class=\\\"org.apache.synapse.mediators.eip.sample.UnboundedMessageQueue\\\"/>\" +\n", 
+            "+                \"<target sequence=\\\"foo\\\"/></sampler>\";\n", 
+            "+        assertTrue(serialization(inputXml, factory, serializer));\n", 
+            "+        assertTrue(serialization(inputXml, serializer));\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public void testSamplerMediatorSerializationScenarioFive() throws Exception {\n", 
+            "+        String inputXml = \"<sampler xmlns=\\\"http://ws.apache.org/ns/synapse\\\" id=\\\"test\\\" rate=\\\"10\\\" unitTime=\\\"60000\\\">\" +\n", 
+            "+                \"<messageQueue class=\\\"org.apache.synapse.mediators.eip.sample.UnboundedMessageQueue\\\"/>\" +\n", 
+            "+                \"<target sequence=\\\"foo\\\"/></sampler>\";\n", 
+            "+        assertTrue(serialization(inputXml, factory, serializer));\n", 
+            "+        assertTrue(serialization(inputXml, serializer));\n", 
+            "+    }\n", 
+            "+\n", 
+            "+    public void testSamplerMediatorSerializationScenarioSix() throws Exception {\n", 
+            "+        String inputXml = \"<sampler xmlns=\\\"http://ws.apache.org/ns/synapse\\\" id=\\\"test\\\" rate=\\\"10\\\" unitTime=\\\"60000\\\">\" +\n", 
+            "+                \"<messageQueue class=\\\"org.apache.synapse.mediators.eip.sample.UnboundedMessageQueue\\\"/>\" +\n", 
+            "+                \"<target><sequence><log/></sequence></target></sampler>\";\n", 
+            "+        assertTrue(serialization(inputXml, factory, serializer));\n", 
+            "+        assertTrue(serialization(inputXml, serializer));\n", 
+            "+    }\n", 
+            "+}\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/test/java/org/apache/synapse/config/xml/SamplingThrottleMediatorSerializationTest.java", 
+      "from": "java/modules/core/src/test/java/org/apache/synapse/config/xml/SamplingThrottleMediatorSerializationTest.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-33,8 +33,9", 
+          "lines": [
+            " import java.util.TimerTask;\n", 
+            " \n", 
+            " /**\n", 
+            "- * This implements the well known <code>Sample</code> EIP (Enterprise Integration Pattern), which controls the flow\n", 
+            "- * of messages and limit the rate at which the messages are flowing through the sampler</p>\n", 
+            "+ * <p>This implements the well known <code>Sample</code> EIP (Enterprise Integration Pattern),\n", 
+            "+ * which controls the flow of messages and limit the rate at which the messages are flowing\n", 
+            "+ * through the sampler</p>\n", 
+            "  *\n", 
+            "  * <p>Please note that the usage of this will require the sampler to be on the out-flow as well to correctly\n", 
+            "  * determine & to manage the rate.</p>\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/eip/sample/SamplingThrottleMediator.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/eip/sample/SamplingThrottleMediator.java"
+    }, 
+    {
+      "chunks": [
+        {
+          "locn": "-42,10 +42,14", 
+          "lines": [
+            "         if (samplingThrottleMediator.getId() != null) {\n", 
+            "             samplerElem.addAttribute(\"id\", samplingThrottleMediator.getId(), nullNS);\n", 
+            "         }\n", 
+            "-        samplerElem.addAttribute(\"rate\",\n", 
+            "-                Integer.toString(samplingThrottleMediator.getSamplingRate()), nullNS);\n", 
+            "-        samplerElem.addAttribute(\"unitTime\",\n", 
+            "-                Long.toString(samplingThrottleMediator.getUnitTime()), nullNS);\n", 
+            "+        if (samplingThrottleMediator.getSamplingRate() != 1) {\n", 
+            "+            samplerElem.addAttribute(\"rate\",\n", 
+            "+                    Integer.toString(samplingThrottleMediator.getSamplingRate()), nullNS);\n", 
+            "+        }\n", 
+            "+        if (samplingThrottleMediator.getUnitTime() != 1000) {\n", 
+            "+            samplerElem.addAttribute(\"unitTime\",\n", 
+            "+                    Long.toString(samplingThrottleMediator.getUnitTime()), nullNS);\n", 
+            "+        }\n", 
+            " \n", 
+            "         if (samplingThrottleMediator.isMessageQueueExplicitlySet()) {\n", 
+            "             OMElement messageQueueElem = fac.createOMElement(\"messageQueue\", synNS);\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/SamplingThrottleMediatorSerializer.java", 
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/SamplingThrottleMediatorSerializer.java"
+    }
+  ], 
+  "id": "1510082"
+}

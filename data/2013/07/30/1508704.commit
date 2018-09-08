@@ -1,3 +1,30 @@
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/crl/CRLVerifier.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/crl/CRLVerifier.java	(revision 1508703)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/crl/CRLVerifier.java	(revision 1508704)
+@@ -42,9 +42,10 @@
+  */
+ public class CRLVerifier implements RevocationVerifier {
+ 
+-    private CRLCache cache;
+     private static final Log log = LogFactory.getLog(CRLVerifier.class);
+ 
++    private CRLCache cache;
++
+     public CRLVerifier(CRLCache cache) {
+         this.cache = cache;
+     }
+@@ -82,8 +83,9 @@
+             try {
+                 X509CRL x509CRL = downloadCRLFromWeb(crlUrl);
+                 if (x509CRL != null) {
+-                    if (cache != null)
++                    if (cache != null) {
+                         cache.setCacheValue(crlUrl, x509CRL);
++                    }
+                     return getRevocationStatus(x509CRL, peerCert);
+                 }
+             } catch (Exception e) {
 Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/crl/CRLCache.java
 ===================================================================
 --- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/crl/CRLCache.java	(revision 1508703)
@@ -38,46 +65,6 @@ Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/trans
          }
          hashMap.put(crlUrl, cacheValue);
          if (log.isDebugEnabled()) {
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/crl/CRLVerifier.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/crl/CRLVerifier.java	(revision 1508703)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/crl/CRLVerifier.java	(revision 1508704)
-@@ -42,9 +42,10 @@
-  */
- public class CRLVerifier implements RevocationVerifier {
- 
--    private CRLCache cache;
-     private static final Log log = LogFactory.getLog(CRLVerifier.class);
- 
-+    private CRLCache cache;
-+
-     public CRLVerifier(CRLCache cache) {
-         this.cache = cache;
-     }
-@@ -82,8 +83,9 @@
-             try {
-                 X509CRL x509CRL = downloadCRLFromWeb(crlUrl);
-                 if (x509CRL != null) {
--                    if (cache != null)
-+                    if (cache != null) {
-                         cache.setCacheValue(crlUrl, x509CRL);
-+                    }
-                     return getRevocationStatus(x509CRL, peerCert);
-                 }
-             } catch (Exception e) {
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/cache/CacheController.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/cache/CacheController.java	(revision 1508703)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/cache/CacheController.java	(revision 1508704)
-@@ -19,7 +19,7 @@
- 
- package org.apache.synapse.transport.utils.sslcert.cache;
- 
--public class CacheController implements CacheControllerMBean{
-+public class CacheController implements CacheControllerMBean {
- 
-     private ManageableCache cache;
-     private CacheManager cacheManager;
 Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/cache/CacheManager.java
 ===================================================================
 --- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/cache/CacheManager.java	(revision 1508703)
@@ -198,6 +185,41 @@ Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/trans
                  }
              }
  
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/cache/CacheController.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/cache/CacheController.java	(revision 1508703)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/cache/CacheController.java	(revision 1508704)
+@@ -19,7 +19,7 @@
+ 
+ package org.apache.synapse.transport.utils.sslcert.cache;
+ 
+-public class CacheController implements CacheControllerMBean{
++public class CacheController implements CacheControllerMBean {
+ 
+     private ManageableCache cache;
+     private CacheManager cacheManager;
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/ocsp/OCSPCache.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/ocsp/OCSPCache.java	(revision 1508703)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/ocsp/OCSPCache.java	(revision 1508704)
+@@ -102,7 +102,7 @@
+         return hashMap.size();
+     }
+ 
+-    public void resetIterator(){
++    public synchronized void resetIterator(){
+         iterator = hashMap.entrySet().iterator();
+     }
+ 
+@@ -117,7 +117,7 @@
+         try {
+             String serviceUrl = cacheValue.serviceUrl;
+             OCSPReq request = cacheValue.request;
+-            OCSPResp response= ocspVerifier.getOCSPResponce(serviceUrl, request);
++            OCSPResp response= ocspVerifier.getOCSPResponse(serviceUrl, request);
+ 
+             if (OCSPRespStatus.SUCCESSFUL != response.getStatus())
+                 throw new CertificateVerificationException("OCSP response status not SUCCESSFUL");
 Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/ocsp/OCSPVerifier.java
 ===================================================================
 --- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/ocsp/OCSPVerifier.java	(revision 1508703)
@@ -304,28 +326,6 @@ Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/trans
  
          return ocspUrlList;
      }
-Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/ocsp/OCSPCache.java
-===================================================================
---- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/ocsp/OCSPCache.java	(revision 1508703)
-+++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/sslcert/ocsp/OCSPCache.java	(revision 1508704)
-@@ -102,7 +102,7 @@
-         return hashMap.size();
-     }
- 
--    public void resetIterator(){
-+    public synchronized void resetIterator(){
-         iterator = hashMap.entrySet().iterator();
-     }
- 
-@@ -117,7 +117,7 @@
-         try {
-             String serviceUrl = cacheValue.serviceUrl;
-             OCSPReq request = cacheValue.request;
--            OCSPResp response= ocspVerifier.getOCSPResponce(serviceUrl, request);
-+            OCSPResp response= ocspVerifier.getOCSPResponse(serviceUrl, request);
- 
-             if (OCSPRespStatus.SUCCESSFUL != response.getStatus())
-                 throw new CertificateVerificationException("OCSP response status not SUCCESSFUL");
 -*-*-*-
 Message: Some cleanup and refactoring
 -*-*-*-

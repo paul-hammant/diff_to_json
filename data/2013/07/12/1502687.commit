@@ -1,3 +1,15 @@
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/StockQuoteSampleClient.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/StockQuoteSampleClient.java	(revision 1502686)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/StockQuoteSampleClient.java	(revision 1502687)
+@@ -170,6 +170,7 @@
+             payload = StockQuoteHandler.createStandardQuoteRequest(
+                     symbol, 1);
+             serviceClient.getOptions().setAction("urn:getQuote");
++            serviceClient.getOptions().setUseSeparateListener(true);
+             setCompleted(false);
+             serviceClient.sendReceiveNonBlocking(payload, new StockQuoteCallback(this));
+ 
 Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
 ===================================================================
 --- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1502686)
@@ -29,18 +41,6 @@ Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framewo
          sampleClassRepo.put("157", Sample157.class);
  
          //Advanced
-Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/StockQuoteSampleClient.java
-===================================================================
---- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/StockQuoteSampleClient.java	(revision 1502686)
-+++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/StockQuoteSampleClient.java	(revision 1502687)
-@@ -170,6 +170,7 @@
-             payload = StockQuoteHandler.createStandardQuoteRequest(
-                     symbol, 1);
-             serviceClient.getOptions().setAction("urn:getQuote");
-+            serviceClient.getOptions().setUseSeparateListener(true);
-             setCompleted(false);
-             serviceClient.sendReceiveNonBlocking(payload, new StockQuoteCallback(this));
- 
 Index: java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_def.xml
 ===================================================================
 --- java/modules/integration/src/test/resources/axis2Xml/synapse/axis2_def.xml	(revision 1502686)

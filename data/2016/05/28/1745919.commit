@@ -1,0 +1,147 @@
+Index: java/modules/core/src/test/java/org/apache/synapse/config/xml/HeaderMediatorConfigurationTest.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/config/xml/HeaderMediatorConfigurationTest.java	(revision 1745918)
++++ java/modules/core/src/test/java/org/apache/synapse/config/xml/HeaderMediatorConfigurationTest.java	(revision 1745919)
+@@ -31,7 +31,7 @@
+ 
+     public void testNamespaceUnqualifiedScenarioOne() {
+         try {
+-            String inputXml = "<header xmlns=\"http://ws.apache.org/ns/synapse\" name=\"MyHeader\" value=\"MyValue\"/>";
++            String inputXml = "<s:header xmlns:s=\"http://ws.apache.org/ns/synapse\" name=\"MyHeader\" value=\"MyValue\"/>";
+             HeaderMediatorFactory fac = new HeaderMediatorFactory();
+             fac.createMediator(AXIOMUtil.stringToOM(inputXml), new Properties());
+             fail("HeaderMediator created with namespace unqualified SOAP header");
+@@ -42,7 +42,7 @@
+         }
+ 
+         try {
+-            String inputXml = "<header xmlns=\"http://ws.apache.org/ns/synapse\" name=\"MyHeader\" action=\"remove\"/>";
++            String inputXml = "<s:header xmlns:s=\"http://ws.apache.org/ns/synapse\" name=\"MyHeader\" action=\"remove\"/>";
+             HeaderMediatorFactory fac = new HeaderMediatorFactory();
+             fac.createMediator(AXIOMUtil.stringToOM(inputXml), new Properties());
+             fail("HeaderMediator created with namespace unqualified SOAP header");
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/OMElementUtils.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/OMElementUtils.java	(revision 1745918)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/OMElementUtils.java	(revision 1745919)
+@@ -19,11 +19,9 @@
+ 
+ package org.apache.synapse.config.xml;
+ 
+-import org.apache.axiom.om.OMContainer;
+ import org.apache.axiom.om.OMElement;
+ import org.apache.axiom.om.OMNamespace;
+ import org.apache.commons.logging.Log;
+-import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.SynapseException;
+ import org.jaxen.JaxenException;
+ import org.jaxen.XPath;
+@@ -34,40 +32,7 @@
+  * Holds Axiom utility methods used by Synapse
+  */
+ public class OMElementUtils {
+-
+-    private static final Log log = LogFactory.getLog(OMElementUtils.class);
+-
+     /**
+-     * Return the namespace with the given prefix, using the given element
+-     * @param prefix the prefix looked up
+-     * @param elem the source element to use
+-     * @return the namespace which maps to the prefix or null
+-     */
+-    public static String getNameSpaceWithPrefix(String prefix, OMElement elem) {
+-        if (prefix == null || elem == null) {
+-            log.warn("Searching for null NS prefix and/or using null OMElement");
+-            return null;
+-        }
+-        
+-        OMElement currentElem = elem;
+-        while (true) {
+-            Iterator iter = currentElem.getAllDeclaredNamespaces();
+-            while (iter.hasNext()) {
+-                OMNamespace ns = (OMNamespace) iter.next();
+-                if (prefix.equals(ns.getPrefix())) {
+-                    return ns.getNamespaceURI();     
+-                }
+-            }
+-            OMContainer parent = currentElem.getParent();
+-            if (parent != null && parent instanceof OMElement) {
+-                currentElem = (OMElement)parent;
+-            } else {
+-                return null;
+-            }
+-        }
+-    }
+-
+-    /**
+      * Add the namespace declarations of a given {@link OMElement} to the namespace
+      * context of an XPath expression. Typically this method is used with an XPath
+      * expression appearing in an attribute of the given element.
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/HeaderMediatorFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/HeaderMediatorFactory.java	(revision 1745918)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/HeaderMediatorFactory.java	(revision 1745919)
+@@ -139,20 +139,14 @@
+ 
+     private void setSOAPHeader(HeaderMediator headerMediator, OMElement elem, OMAttribute name) {
+         String nameAtt = name.getAttributeValue();
+-        int colonPos = nameAtt.indexOf(":");
+-        if (colonPos != -1) {
+-            // has a NS prefix.. find it and the NS it maps into
+-            String prefix = nameAtt.substring(0, colonPos);
+-            String namespaceURI = OMElementUtils.getNameSpaceWithPrefix(prefix, elem);
+-            if (namespaceURI == null) {
+-                handleException("Invalid namespace prefix '" + prefix + "' in name attribute");
+-            } else {
+-                headerMediator.setQName(new QName(namespaceURI, nameAtt.substring(colonPos+1),
+-                                                  prefix));
+-            }
++        QName qname = elem.resolveQName(nameAtt);
++        if (qname == null) {
++            handleException("Invalid QName '" + nameAtt + "' in name attribute");
++        } else if (qname.getNamespaceURI().isEmpty()) {
++            handleException("Invalid SOAP header: " + nameAtt + " specified at the " +
++                    "header mediator. All SOAP headers must be namespace qualified.");
+         } else {
+-            handleException("Invalid SOAP header: " + nameAtt + " specified at the " +
+-                            "header mediator. All SOAP headers must be namespace qualified.");
++            headerMediator.setQName(qname);
+         }
+     }
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/FaultMediatorFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/FaultMediatorFactory.java	(revision 1745918)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/FaultMediatorFactory.java	(revision 1745919)
+@@ -106,19 +106,14 @@
+ 
+             if (value != null) {
+                 String strValue = value.getAttributeValue();
+-                String prefix = null;
+-                String name = null;
+-                if (strValue.indexOf(":") != -1) {
+-                    prefix = strValue.substring(0, strValue.indexOf(":"));
+-                    name = strValue.substring(strValue.indexOf(":")+1);
++                QName qname = code.resolveQName(strValue);
++                if (qname == null) {
++                    handleException("Invalid QName '" + strValue + "' in code attribute");
++                } else if (qname.getNamespaceURI().isEmpty()) {
++                    handleException("A QName is expected for fault code as prefix:name");
+                 } else {
+-                    handleException("A QName is expected for fault code as prefix:name");
++                    faultMediator.setFaultCodeValue(qname);
+                 }
+-                String namespaceURI = OMElementUtils.getNameSpaceWithPrefix(prefix, code);
+-                if (namespaceURI == null) {
+-                    handleException("Invalid namespace prefix '" + prefix + "' in code attribute");
+-                }
+-                faultMediator.setFaultCodeValue(new QName(namespaceURI, name, prefix));
+             } else if (expression != null) {
+                 try {
+                     faultMediator.setFaultCodeExpr(
+-*-*-*-
+Message: Use the proper Axiom API to resolve QNames.
+-*-*-*-
+When: 2016-05-28 14:43:42 -0400 
+-*-*-*-
+Who: veithen

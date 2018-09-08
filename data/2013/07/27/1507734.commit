@@ -1,16 +1,3 @@
-Index: java/modules/tasks/src/main/java/org/apache/synapse/task/TaskScheduler.java
-===================================================================
---- java/modules/tasks/src/main/java/org/apache/synapse/task/TaskScheduler.java	(revision 1507733)
-+++ java/modules/tasks/src/main/java/org/apache/synapse/task/TaskScheduler.java	(revision 1507734)
-@@ -326,7 +326,7 @@
-                 log.debug("Deleting a Job with [ Name :" + name + " ]" +
-                         " [ Group :" + group + " ]");
-             }
--            scheduler.deleteJob(name, group);
-+            scheduler.deleteJob(new JobKey(name, group));
-         } catch (SchedulerException e) {
-             throw new SynapseTaskException("Error deleting a job with  [ Name :" + name + " ]" +
-                     " [ Group :" + group + " ]");
 Index: java/modules/tasks/src/main/java/org/apache/synapse/task/DefaultTaskJobDetailFactory.java
 ===================================================================
 --- java/modules/tasks/src/main/java/org/apache/synapse/task/DefaultTaskJobDetailFactory.java	(revision 1507733)
@@ -165,6 +152,19 @@ Index: java/modules/tasks/src/main/java/org/apache/synapse/task/DefaultTaskTrigg
          return trigger;
      }
  }
+Index: java/modules/tasks/src/main/java/org/apache/synapse/task/TaskScheduler.java
+===================================================================
+--- java/modules/tasks/src/main/java/org/apache/synapse/task/TaskScheduler.java	(revision 1507733)
++++ java/modules/tasks/src/main/java/org/apache/synapse/task/TaskScheduler.java	(revision 1507734)
+@@ -326,7 +326,7 @@
+                 log.debug("Deleting a Job with [ Name :" + name + " ]" +
+                         " [ Group :" + group + " ]");
+             }
+-            scheduler.deleteJob(name, group);
++            scheduler.deleteJob(new JobKey(name, group));
+         } catch (SchedulerException e) {
+             throw new SynapseTaskException("Error deleting a job with  [ Name :" + name + " ]" +
+                     " [ Group :" + group + " ]");
 Index: java/modules/tasks/pom.xml
 ===================================================================
 --- java/modules/tasks/pom.xml	(revision 1507733)
@@ -178,19 +178,18 @@ Index: java/modules/tasks/pom.xml
              <artifactId>quartz</artifactId>
          </dependency>
          <dependency>
-Index: java/modules/core/src/main/java/org/apache/synapse/startup/quartz/SimpleQuartzJob.java
+Index: java/modules/core/pom.xml
 ===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/startup/quartz/SimpleQuartzJob.java	(revision 1507733)
-+++ java/modules/core/src/main/java/org/apache/synapse/startup/quartz/SimpleQuartzJob.java	(revision 1507734)
-@@ -44,7 +44,7 @@
- 
-     public void execute(JobExecutionContext ctx) throws JobExecutionException {
- 
--        String jobName = ctx.getJobDetail().getFullName();
-+        String jobName = ctx.getJobDetail().getKey().getName();
-         if (log.isDebugEnabled()) {
-             log.debug("Executing task : " + jobName);
-         }
+--- java/modules/core/pom.xml	(revision 1507733)
++++ java/modules/core/pom.xml	(revision 1507734)
+@@ -245,6 +245,7 @@
+                             javax.xml.soap; version=0.0.0,
+                             !org.apache.commons.io,
+                             org.apache.commons.io; version=0.0.0,
++                            org.quartz.*; version=0.0.0,
+                             *;resolution:=optional,
+                         </Import-Package>
+                         <DynamicImport-Package>*</DynamicImport-Package>
 Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/resequence/ResequencingProcessor.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/message/processors/resequence/ResequencingProcessor.java	(revision 1507733)
@@ -425,18 +424,19 @@ Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/Sch
              scheduler.shutdown(true);
          } catch (SchedulerException e) {
              log.error("Error while destroying the task " + e);
-Index: java/modules/core/pom.xml
+Index: java/modules/core/src/main/java/org/apache/synapse/startup/quartz/SimpleQuartzJob.java
 ===================================================================
---- java/modules/core/pom.xml	(revision 1507733)
-+++ java/modules/core/pom.xml	(revision 1507734)
-@@ -245,6 +245,7 @@
-                             javax.xml.soap; version=0.0.0,
-                             !org.apache.commons.io,
-                             org.apache.commons.io; version=0.0.0,
-+                            org.quartz.*; version=0.0.0,
-                             *;resolution:=optional,
-                         </Import-Package>
-                         <DynamicImport-Package>*</DynamicImport-Package>
+--- java/modules/core/src/main/java/org/apache/synapse/startup/quartz/SimpleQuartzJob.java	(revision 1507733)
++++ java/modules/core/src/main/java/org/apache/synapse/startup/quartz/SimpleQuartzJob.java	(revision 1507734)
+@@ -44,7 +44,7 @@
+ 
+     public void execute(JobExecutionContext ctx) throws JobExecutionException {
+ 
+-        String jobName = ctx.getJobDetail().getFullName();
++        String jobName = ctx.getJobDetail().getKey().getName();
+         if (log.isDebugEnabled()) {
+             log.debug("Executing task : " + jobName);
+         }
 Index: java/pom.xml
 ===================================================================
 --- java/pom.xml	(revision 1507733)

@@ -1,0 +1,28 @@
+{
+  "when": "2013-08-09T02:31:24-04:00", 
+  "message": "fixed temp file object creation.", 
+  "who": "rajikak", 
+  "changes": [
+    {
+      "chunks": [
+        {
+          "locn": "-312,8 +312,6", 
+          "lines": [
+            "     private FileObject getTempFileObject(FileSystemManager fsManager,\n", 
+            "                                          FileObject originalFileObj,\n", 
+            "                                          String fileName) throws FileSystemException {\n", 
+            "-        FileObject pareFileObject = originalFileObj.getParent();\n", 
+            "-        String parentURL = pareFileObject.getURL().toString();\n", 
+            "-        return fsManager.resolveFile(parentURL.concat(File.separator).concat(fileName));\n", 
+            "+        return fsManager.resolveFile(originalFileObj.getParent(), fileName);\n", 
+            "     }\n", 
+            " }\n"
+          ]
+        }
+      ], 
+      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java", 
+      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java"
+    }
+  ], 
+  "id": "1512152"
+}

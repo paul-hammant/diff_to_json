@@ -1,0 +1,2942 @@
+Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample101.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples/sample101.xml	(revision 1531436)
++++ java/modules/documentation/src/site/xdoc/userguide/samples/sample101.xml	(nonexistent)
+@@ -1,228 +0,0 @@
+-<?xml version="1.0" encoding="ISO-8859-1" ?>
+-<!--
+-  ~  Licensed to the Apache Software Foundation (ASF) under one
+-  ~  or more contributor license agreements.  See the NOTICE file
+-  ~  distributed with this work for additional information
+-  ~  regarding copyright ownership.  The ASF licenses this file
+-  ~  to you under the Apache License, Version 2.0 (the
+-  ~  "License"); you may not use this file except in compliance
+-  ~  with the License.  You may obtain a copy of the License at
+-  ~
+-  ~   http://www.apache.org/licenses/LICENSE-2.0
+-  ~
+-  ~  Unless required by applicable law or agreed to in writing,
+-  ~  software distributed under the License is distributed on an
+-  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-  ~  KIND, either express or implied.  See the License for the
+-  ~  specific language governing permissions and limitations
+-  ~  under the License.
+-  -->
+-
+-<document>
+-    <properties>
+-        <title>Apache Synapse - Sample 101</title>
+-    </properties>
+-    <body>
+-        <section name="Sample 101: Using WS-ReliableMessaging for Outgoing Messages">
+-            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+-
+-    &lt;sequence name="main"&gt;
+-        &lt;in&gt;
+-            &lt;RMSequence single="true" version="1.0"/&gt;
+-            &lt;send&gt;
+-                &lt;endpoint name="reliable"&gt;
+-                    &lt;address uri="http://localhost:9000/services/ReliableStockQuoteService"&gt;
+-                        &lt;enableRM/&gt;
+-                        &lt;enableAddressing/&gt;
+-                    &lt;/address&gt;
+-                &lt;/endpoint&gt;
+-            &lt;/send&gt;
+-        &lt;/in&gt;
+-        &lt;out&gt;
+-            &lt;send/&gt;
+-        &lt;/out&gt;
+-    &lt;/sequence&gt;
+-
+-&lt;/definitions&gt;</div>
+-            <subsection name="Objective">
+-                <p>
+-                    Demonstrate the ability of Synapse to exchange messages with an endpoint
+-                    reliably, using WS-ReliableMessaging
+-                </p>
+-            </subsection>
+-            <subsection name="Pre-requisites">
+-                <p>
+-                    <ul>
+-                        <li>
+-                            Deploy the ReliableStockQuoteService in the sample Axis2 server and start Axis2
+-                        </li>
+-                        <li>
+-                            Start Synapse using the configuration numbered 101 (repository/conf/sample/synapse_sample_101.xml)
+-                            <div class="command">
+-                                Unix/Linux: sh synapse.sh -sample 101<br/>
+-                                Windows: synapse.bat -sample 101
+-                            </div>
+-                        </li>
+-                    </ul>
+-                </p>
+-            </subsection>
+-            <subsection name="Executing the Client">
+-                <p>
+-                    In the above configuration, WS-RM is engaged on the endpoint using the
+-                    &lt;enableRM/&gt; tag. It is possible to engage WS-RM to both Address and WSDL
+-                    endpoints using this tag. In addition to the RM enabled endpoint, RMSequence
+-                    mediator is specified before the send mediator. This mediator is used to specify
+-                    the set of messages to be sent using a single RM sequence. In this sample it is
+-                    specified as single message per sequence. It also specifies the version of the
+-                    WS-RM to be used. Refer to the Synapse configuration language documentation for
+-                    more information about the RMSequence mediator. RM related SOAP headers are
+-                    removed form the message in the out mediator as WS-RM message exchange takes
+-                    place only between the Synapse and the server. Now run the sample client using
+-                    the following command.
+-                </p>
+-                <div class="command">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8280</div>
+-                <p>
+-                    You can observe the client output displaying the quote price for IBM as follows:
+-                </p>
+-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+-                <p>
+-                    There is no difference to be observed between the normal message exchange and
+-                    WS-RM enabled message exchange as far as client and server outputs are considered.
+-                    But if you look at the wire level messages, you would observe additional WS-RM
+-                    messages and WS-RM headers. Synapse, the initiator of the RM sequence, first try
+-                    to create a sequence by sending a message with CreateSequence element.
+-                </p>
+-                <div class="consoleOutput">...
+-&lt;soapenv:Body&gt;
+-   &lt;wsrm:CreateSequence xmlns:wsrm=&quot;http://schemas.xmlsoap.org/ws/2005/02/rm&quot;&gt;
+-      &lt;wsrm:AcksTo&gt;
+-         &lt;wsa:Address&gt;http://www.w3.org/2005/08/addressing/anonymous&lt;/wsa:Address&gt;
+-      &lt;/wsrm:AcksTo&gt;
+-      &lt;wsrm:Offer&gt;
+-         &lt;wsrm:Identifier&gt;urn:uuid:546F6F33FB7D8BBE351179807372769&lt;/wsrm:Identifier&gt;
+-      &lt;/wsrm:Offer&gt;
+-   &lt;/wsrm:CreateSequence&gt;
+-&lt;/soapenv:Body&gt;
+-...</div>
+-                <p>
+-                    Sample Axis2 server responds to CreateSequence request with the following
+-                    message:
+-                </p>
+-                <div class="consoleOutput">...
+-&lt;soapenv:Body&gt;
+-   &lt;wsrm:CreateSequenceResponse xmlns:wsrm=&quot;http://schemas.xmlsoap.org/ws/2005/02/rm&quot;&gt;
+-      &lt;wsrm:Identifier&gt;urn:uuid:879853A6871A66641C1179807373270&lt;/wsrm:Identifier&gt;
+-      &lt;wsrm:Accept&gt;
+-         &lt;wsrm:AcksTo&gt;
+-            &lt;wsa:Address&gt;http://localhost:9000/services/ReliableStockQuoteService&lt;/wsa:Address&gt;
+-         &lt;/wsrm:AcksTo&gt;
+-      &lt;/wsrm:Accept&gt;
+-   &lt;/wsrm:CreateSequenceResponse&gt;
+-&lt;/soapenv:Body&gt;
+-...</div>
+-                <p>
+-                    Once the sequence is established, Synapse sends the request to the server with
+-                    the pre-negotiated sequence ID.
+-                </p>
+-                <div class="consoleOutput">&lt;soapenv:Envelope xmlns:wsa=&quot;http://www.w3.org/2005/08/addressing&quot;
+-                  xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+-    &lt;soapenv:Header&gt;
+-        &lt;wsa:To&gt;http://localhost:9000/services/ReliableStockQuoteService&lt;/wsa:To&gt;
+-        &lt;wsa:MessageID&gt;urn:uuid:DB9A5257B637DDA38B1179807372560712002-1515891720&lt;/wsa:MessageID&gt;
+-        &lt;wsa:Action&gt;urn:getQuote&lt;/wsa:Action&gt;
+-        &lt;wsrm:Sequence xmlns:wsrm=&quot;http://schemas.xmlsoap.org/ws/2005/02/rm&quot;
+-                       soapenv:mustUnderstand=&quot;1&quot;&gt;
+-            &lt;wsrm:Identifier&gt;urn:uuid:879853A6871A66641C1179807373270&lt;/wsrm:Identifier&gt;
+-            &lt;wsrm:MessageNumber&gt;1&lt;/wsrm:MessageNumber&gt;
+-            &lt;wsrm:LastMessage/&gt;
+-        &lt;/wsrm:Sequence&gt;
+-    &lt;/soapenv:Header&gt;
+-    &lt;soapenv:Body&gt;
+-        &lt;m0:getQuote xmlns:m0=&quot;http://services.samples&quot;&gt;
+-            &lt;m0:request&gt;
+-                &lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;
+-            &lt;/m0:request&gt;
+-        &lt;/m0:getQuote&gt;
+-    &lt;/soapenv:Body&gt;
+-&lt;/soapenv:Envelope&gt;</div>
+-                <p>
+-                    Synapse keeps on sending the above message till the server responds with a valid
+-                    response message with 200 OK HTTP header. If the server is not ready with a
+-                    response, it will respond with 202 Accepted HTTP header for all requests. Once
+-                    the server is ready with a response it will send the response message with
+-                    sequence ID as follows.
+-                </p>
+-                <div class="consoleOutput">&lt;soapenv:Envelope xmlns:wsa=&quot;http://www.w3.org/2005/08/addressing&quot;
+-                  xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+-    &lt;soapenv:Header&gt;
+-        &lt;wsa:MessageID&gt;urn:uuid:879853A6871A66641C1179807373804&lt;/wsa:MessageID&gt;
+-        &lt;wsa:Action&gt;http://services.samples/ReliableStockQuoteServicePortType/getQuoteResponse
+-        &lt;/wsa:Action&gt;
+-        &lt;wsa:RelatesTo&gt;urn:uuid:DB9A5257B637DDA38B1179807372560712002-1515891720&lt;/wsa:RelatesTo&gt;
+-        &lt;wsrm:Sequence xmlns:wsrm=&quot;http://schemas.xmlsoap.org/ws/2005/02/rm&quot;
+-                       soapenv:mustUnderstand=&quot;1&quot;&gt;
+-            &lt;wsrm:Identifier&gt;urn:uuid:546F6F33FB7D8BBE351179807372769&lt;/wsrm:Identifier&gt;
+-            &lt;wsrm:MessageNumber&gt;1&lt;/wsrm:MessageNumber&gt;
+-            &lt;wsrm:LastMessage/&gt;
+-        &lt;/wsrm:Sequence&gt;
+-        &lt;wsrm:SequenceAcknowledgement xmlns:wsrm=&quot;http://schemas.xmlsoap.org/ws/2005/02/rm&quot;
+-                                      soapenv:mustUnderstand=&quot;1&quot;&gt;
+-            &lt;wsrm:Identifier&gt;urn:uuid:879853A6871A66641C1179807373270&lt;/wsrm:Identifier&gt;
+-            &lt;wsrm:AcknowledgementRange Lower=&quot;1&quot; Upper=&quot;1&quot;/&gt;
+-        &lt;/wsrm:SequenceAcknowledgement&gt;
+-    &lt;/soapenv:Header&gt;
+-    &lt;soapenv:Body&gt;
+-        &lt;ns:getQuoteResponse xmlns:ns=&quot;http://services.samples&quot;&gt;
+-...</div>
+-                <p>
+-                    Now both Synapse and the server are done with the actual message exchange. Then
+-                    Synapse sends a request to terminate the sequence as follows:
+-                </p>
+-                <div class="consoleOutput">&lt;soapenv:Envelope xmlns:wsa=&quot;http://www.w3.org/2005/08/addressing&quot;
+-                  xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+-    &lt;soapenv:Header&gt;
+-        &lt;wsa:To&gt;http://localhost:9000/services/ReliableStockQuoteService&lt;/wsa:To&gt;
+-        &lt;wsa:MessageID&gt;urn:uuid:546F6F33FB7D8BBE351179807379591&lt;/wsa:MessageID&gt;
+-        &lt;wsa:Action&gt;http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence&lt;/wsa:Action&gt;
+-        &lt;wsrm:SequenceAcknowledgement xmlns:wsrm=&quot;http://schemas.xmlsoap.org/ws/2005/02/rm&quot;
+-                                      soapenv:mustUnderstand=&quot;1&quot;&gt;
+-            &lt;wsrm:Identifier&gt;urn:uuid:546F6F33FB7D8BBE351179807372769&lt;/wsrm:Identifier&gt;
+-            &lt;wsrm:AcknowledgementRange Lower=&quot;1&quot; Upper=&quot;1&quot;/&gt;
+-        &lt;/wsrm:SequenceAcknowledgement&gt;
+-    &lt;/soapenv:Header&gt;
+-    &lt;soapenv:Body&gt;
+-        &lt;wsrm:TerminateSequence xmlns:wsrm=&quot;http://schemas.xmlsoap.org/ws/2005/02/rm&quot;&gt;
+-            &lt;wsrm:Identifier&gt;urn:uuid:879853A6871A66641C1179807373270&lt;/wsrm:Identifier&gt;
+-        &lt;/wsrm:TerminateSequence&gt;
+-    &lt;/soapenv:Body&gt;
+-&lt;/soapenv:Envelope&gt;</div>
+-                <p>
+-                    Server responds to the sequence termination message, accepting to terminate the
+-                    sequence as follows.
+-                </p>
+-                <div class="consoleOutput">&lt;soapenv:Envelope xmlns:wsa=&quot;http://www.w3.org/2005/08/addressing&quot;
+-                  xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+-    &lt;soapenv:Header&gt;
+-        &lt;wsa:ReplyTo&gt;
+-            &lt;wsa:Address&gt;http://localhost:9000/services/ReliableStockQuoteService&lt;/wsa:Address&gt;
+-        &lt;/wsa:ReplyTo&gt;
+-        &lt;wsa:MessageID&gt;urn:uuid:879853A6871A66641C1179807380190&lt;/wsa:MessageID&gt;
+-        &lt;wsa:Action&gt;http://schemas.xmlsoap.org/ws/2005/02/rm/TerminateSequence&lt;/wsa:Action&gt;
+-    &lt;/soapenv:Header&gt;
+-    &lt;soapenv:Body&gt;
+-        &lt;wsrm:TerminateSequence xmlns:wsrm=&quot;http://schemas.xmlsoap.org/ws/2005/02/rm&quot;&gt;
+-            &lt;wsrm:Identifier&gt;urn:uuid:546F6F33FB7D8BBE351179807372769&lt;/wsrm:Identifier&gt;
+-        &lt;/wsrm:TerminateSequence&gt;
+-    &lt;/soapenv:Body&gt;
+-&lt;/soapenv:Envelope&gt;</div>
+-                <p>
+-                    Note that although each of above messages are separate SOAP messages, in most
+-                    cases they will be exchanged in a single socket connection as HTTP Keep-Alive
+-                    header is being used.
+-                </p>
+-
+-            </subsection>
+-        </section>
+-        <p><a href="../samples.html">Back to Catalog</a></p>        
+-    </body>
+-</document>
+\ No newline at end of file
+Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample102.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples/sample102.xml	(revision 1531436)
++++ java/modules/documentation/src/site/xdoc/userguide/samples/sample102.xml	(nonexistent)
+@@ -1,74 +0,0 @@
+-<?xml version="1.0" encoding="ISO-8859-1" ?>
+-<!--
+-  ~  Licensed to the Apache Software Foundation (ASF) under one
+-  ~  or more contributor license agreements.  See the NOTICE file
+-  ~  distributed with this work for additional information
+-  ~  regarding copyright ownership.  The ASF licenses this file
+-  ~  to you under the Apache License, Version 2.0 (the
+-  ~  "License"); you may not use this file except in compliance
+-  ~  with the License.  You may obtain a copy of the License at
+-  ~
+-  ~   http://www.apache.org/licenses/LICENSE-2.0
+-  ~
+-  ~  Unless required by applicable law or agreed to in writing,
+-  ~  software distributed under the License is distributed on an
+-  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-  ~  KIND, either express or implied.  See the License for the
+-  ~  specific language governing permissions and limitations
+-  ~  under the License.
+-  -->
+-
+-<document>
+-    <properties>
+-        <title>Apache Synapse - Sample 102</title>
+-    </properties>
+-    <body>
+-        <section name="Sample 102:Reliable message exchange between Synapse and the back-end server using WS-ReliableMessaging 1.1 ">
+-            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+-
+-    &lt;sequence name="main"&gt;
+-        &lt;in&gt;
+-            &lt;RMSequence single="true" version="1.1"/&gt;
+-            &lt;send&gt;
+-                &lt;endpoint name="reliable"&gt;
+-                    &lt;address uri="http://localhost:9000/services/ReliableStockQuoteService"&gt;
+-                        &lt;enableRM/&gt;
+-                        &lt;enableAddressing/&gt;
+-                    &lt;/address&gt;
+-                &lt;/endpoint&gt;
+-            &lt;/send&gt;
+-        &lt;/in&gt;
+-        &lt;out&gt;
+-            &lt;send/&gt;
+-        &lt;/out&gt;
+-    &lt;/sequence&gt;
+-
+-&lt;/definitions&gt;</div>
+-            <subsection name="Objective">
+-                <p>
+-               	 	Demonstrate the message exchange between Synapse and the server using WS-ReliableMessaging (WS-RM) - 1.1
+-			    </p>
+-            </subsection>
+-            <subsection name="Pre-requisites">
+-                <p>
+-                    <ul>
+-                        <li>
+-                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+-                        </li>
+-                        <li>
+-                            Start Synapse using the configuration numbered 102 (repository/conf/sample/synapse_sample_102.xml)
+-                            <div class="command">
+-                                Unix/Linux: sh synapse.sh -sample 102<br/>
+-                                Windows: synapse.bat -sample 102
+-                            </div>
+-                        </li>
+-                    </ul>
+-                </p>
+-            </subsection>
+-            <subsection name="Executing the Client">
+-             	<p>This sample is as same as the previous one except it uses WS-RM 1.1 version where as the previous sample is using the RM version 1.0</p>
+-             </subsection>
+-        </section>
+-        <p><a href="../samples.html">Back to Catalog</a></p>        
+-    </body>
+-</document>
+\ No newline at end of file
+Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample201.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples/sample201.xml	(revision 1531436)
++++ java/modules/documentation/src/site/xdoc/userguide/samples/sample201.xml	(nonexistent)
+@@ -1,89 +0,0 @@
+-<?xml version="1.0" encoding="ISO-8859-1" ?>
+-<!--
+-  ~  Licensed to the Apache Software Foundation (ASF) under one
+-  ~  or more contributor license agreements.  See the NOTICE file
+-  ~  distributed with this work for additional information
+-  ~  regarding copyright ownership.  The ASF licenses this file
+-  ~  to you under the Apache License, Version 2.0 (the
+-  ~  "License"); you may not use this file except in compliance
+-  ~  with the License.  You may obtain a copy of the License at
+-  ~
+-  ~   http://www.apache.org/licenses/LICENSE-2.0
+-  ~
+-  ~  Unless required by applicable law or agreed to in writing,
+-  ~  software distributed under the License is distributed on an
+-  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-  ~  KIND, either express or implied.  See the License for the
+-  ~  specific language governing permissions and limitations
+-  ~  under the License.
+-  -->
+-
+-<document>
+-    <properties>
+-        <title>Apache Synapse - Sample 201</title>
+-    </properties>
+-    <body>
+-        <section name="Sample 201: Reliable Communication Between the Client and Proxy Services Using WS-ReliableMessaging">
+-            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+-
+-    &lt;proxy name="StockQuoteProxy"&gt;
+-        &lt;target&gt;
+-            &lt;inSequence&gt;
+-                &lt;send&gt;
+-                    &lt;endpoint&gt;
+-                        &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
+-                    &lt;/endpoint&gt;
+-                &lt;/send&gt;
+-            &lt;/inSequence&gt;
+-            &lt;outSequence&gt;
+-                &lt;send/&gt;
+-            &lt;/outSequence&gt;
+-        &lt;/target&gt;
+-        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+-        &lt;enableRM/&gt;
+-    &lt;/proxy&gt;
+-
+-&lt;/definitions&gt;</div>
+-            <subsection name="Objective">
+-                <p>
+-                    Show case how to engage WS-ReliableMessaging on proxy services so that the
+-                    communication between client and the proxy service is reliable
+-                </p>
+-            </subsection>
+-            <subsection name="Pre-requisites">
+-                <p>
+-                    <ul>
+-                        <li>
+-                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+-                        </li>
+-                        <li>
+-                            Start Synapse using the configuration numbered 201 (repository/conf/sample/synapse_sample_201.xml)
+-                            <div class="command">
+-                                Unix/Linux: sh synapse.sh -sample 201<br/>
+-                                Windows: synapse.bat -sample 201
+-                            </div>
+-                        </li>
+-                    </ul>
+-                </p>
+-            </subsection>
+-            <subsection name="Executing the Client">
+-                <p>
+-                    In the above configuration, a proxy service is created with WS-RM enabled using
+-                    the &lt;enableRM/&gt; tag. Therefore, this proxy service is capable of
+-                    communicating with a WS-RM client. It also removes the WS-RM headers in the
+-                    inSequence before the message is sent to the backend server. This is required as
+-                    the reliable messaging is applicable only between the client and Synapse. Now
+-                    start the client with WS-RM as follows:
+-                </p>
+-                <div class="command">ant stockquote -Dsymbol=IBM -Dmode=quote -Daddurl=http://localhost:8280/services/StockQuoteProxy -Dwsrm=true</div>
+-                <p>
+-                    In this case, client sends a WS-RM enabled request to Synapse where Synapse sends
+-                    normal requests to the server. This can be observed by examining the wire level
+-                    messages between the client and Synapse. These messages would be similar to the
+-                    wire level messages shown in <a href="sample101.html">sample 101</a>.
+-                </p>                
+-            </subsection>
+-        </section>
+-        <p><a href="../samples.html">Back to Catalog</a></p>        
+-    </body>
+-</document>
+\ No newline at end of file
+Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample202.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples/sample202.xml	(revision 1531436)
++++ java/modules/documentation/src/site/xdoc/userguide/samples/sample202.xml	(nonexistent)
+@@ -1,78 +0,0 @@
+-<?xml version="1.0" encoding="ISO-8859-1" ?>
+-<!--
+-  ~  Licensed to the Apache Software Foundation (ASF) under one
+-  ~  or more contributor license agreements.  See the NOTICE file
+-  ~  distributed with this work for additional information
+-  ~  regarding copyright ownership.  The ASF licenses this file
+-  ~  to you under the Apache License, Version 2.0 (the
+-  ~  "License"); you may not use this file except in compliance
+-  ~  with the License.  You may obtain a copy of the License at
+-  ~
+-  ~   http://www.apache.org/licenses/LICENSE-2.0
+-  ~
+-  ~  Unless required by applicable law or agreed to in writing,
+-  ~  software distributed under the License is distributed on an
+-  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-  ~  KIND, either express or implied.  See the License for the
+-  ~  specific language governing permissions and limitations
+-  ~  under the License.
+-  -->
+-
+-<document>
+-    <properties>
+-        <title>Apache Synapse - Sample 202</title>
+-    </properties>
+-    <body>
+-        <section name="Sample 202: ">
+-            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+-
+-    &lt;proxy name="StockQuoteProxy"&gt;
+-        &lt;target&gt;
+-            &lt;inSequence&gt;
+-                &lt;send&gt;
+-                    &lt;endpoint&gt;
+-                        &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
+-                    &lt;/endpoint&gt;
+-                &lt;/send&gt;
+-            &lt;/inSequence&gt;
+-            &lt;outSequence&gt;
+-                &lt;send/&gt;
+-            &lt;/outSequence&gt;
+-        &lt;/target&gt;
+-        &lt;publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/&gt;
+-        &lt;enableRM/&gt;
+-    &lt;/proxy&gt;
+-
+-&lt;/definitions&gt;</div>
+-            <subsection name="Objective">
+-                <p>
+-
+-                </p>
+-            </subsection>
+-            <subsection name="Pre-requisites">
+-                <p>
+-                    <ul>
+-                        <li>
+-                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+-                        </li>
+-                        <li>
+-                            Start Synapse using the configuration numbered 202 (repository/conf/sample/synapse_sample_202.xml)
+-                            <div class="command">
+-                                Unix/Linux: sh synapse.sh -sample 202<br/>
+-                                Windows: synapse.bat -sample 202
+-                            </div>
+-                        </li>
+-                    </ul>
+-                </p>
+-            </subsection>
+-            <subsection name="Executing the Client">
+-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
+-
+-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
+-
+-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+-            </subsection>
+-        </section>
+-        <p><a href="../samples.html">Back to Catalog</a></p>        
+-    </body>
+-</document>
+\ No newline at end of file
+Index: java/modules/core/src/test/java/org/apache/synapse/config/xml/RMSequenceMediatorSerializationTest.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/config/xml/RMSequenceMediatorSerializationTest.java	(revision 1531436)
++++ java/modules/core/src/test/java/org/apache/synapse/config/xml/RMSequenceMediatorSerializationTest.java	(nonexistent)
+@@ -1,45 +0,0 @@
+-/*
+- *  Licensed to the Apache Software Foundation (ASF) under one
+- *  or more contributor license agreements.  See the NOTICE file
+- *  distributed with this work for additional information
+- *  regarding copyright ownership.  The ASF licenses this file
+- *  to you under the Apache License, Version 2.0 (the
+- *  "License"); you may not use this file except in compliance
+- *  with the License.  You may obtain a copy of the License at
+- *
+- *   http://www.apache.org/licenses/LICENSE-2.0
+- *
+- *  Unless required by applicable law or agreed to in writing,
+- *  software distributed under the License is distributed on an
+- *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+- *  KIND, either express or implied.  See the License for the
+- *  specific language governing permissions and limitations
+- *  under the License.
+- */
+-
+-package org.apache.synapse.config.xml;
+-
+-public class RMSequenceMediatorSerializationTest extends AbstractTestCase {
+-
+-    private RMSequenceMediatorFactory rmSequenceMediatorFactory;
+-    private RMSequenceMediatorSerializer rmSequenceMediatorSerializer;
+-
+-    public RMSequenceMediatorSerializationTest() {
+-        rmSequenceMediatorFactory = new RMSequenceMediatorFactory();
+-        rmSequenceMediatorSerializer = new RMSequenceMediatorSerializer();
+-    }
+-
+-    public void testRMSequenceSerializationTestScenarioOne() {
+-        String inputXml = "<RMSequence xmlns=\"http://ws.apache.org/ns/synapse\" " +
+-                          "single=\"true\" version=\"1.0\"/>";
+-        assertTrue(serialization(inputXml, rmSequenceMediatorFactory, rmSequenceMediatorSerializer));
+-        assertTrue(serialization(inputXml, rmSequenceMediatorSerializer));
+-    }
+-
+-    public void testRMSequenceSerializationTestScenarioTwo() {
+-        String inputXml = "<RMSequence xmlns=\"http://ws.apache.org/ns/synapse\" " +
+-                          "correlation=\"get-property('To')\" last-message=\"get-property('To')\" version=\"1.1\"/>";
+-        assertTrue(serialization(inputXml, rmSequenceMediatorFactory, rmSequenceMediatorSerializer));
+-        assertTrue(serialization(inputXml, rmSequenceMediatorSerializer));
+-    }
+-}
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/RMSequenceMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/RMSequenceMediator.java	(revision 1531436)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/RMSequenceMediator.java	(nonexistent)
+@@ -1,227 +0,0 @@
+-/*
+- *  Licensed to the Apache Software Foundation (ASF) under one
+- *  or more contributor license agreements.  See the NOTICE file
+- *  distributed with this work for additional information
+- *  regarding copyright ownership.  The ASF licenses this file
+- *  to you under the Apache License, Version 2.0 (the
+- *  "License"); you may not use this file except in compliance
+- *  with the License.  You may obtain a copy of the License at
+- *
+- *   http://www.apache.org/licenses/LICENSE-2.0
+- *
+- *  Unless required by applicable law or agreed to in writing,
+- *  software distributed under the License is distributed on an
+- *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+- *  KIND, either express or implied.  See the License for the
+- *  specific language governing permissions and limitations
+- *  under the License.
+- */
+-
+-package org.apache.synapse.mediators.builtin;
+-
+-import org.apache.axiom.om.OMElement;
+-import org.apache.axiom.util.UIDGenerator;
+-import org.apache.sandesha2.client.SandeshaClientConstants;
+-import org.apache.synapse.MessageContext;
+-import org.apache.synapse.SynapseLog;
+-import org.apache.synapse.config.Entry;
+-import org.apache.synapse.config.xml.XMLConfigConstants;
+-import org.apache.synapse.core.axis2.Axis2MessageContext;
+-import org.apache.synapse.mediators.AbstractMediator;
+-import org.apache.synapse.util.xpath.SynapseXPath;
+-import org.jaxen.JaxenException;
+-
+-import java.util.Collections;
+-import java.util.HashMap;
+-import java.util.Map;
+-
+-public class RMSequenceMediator extends AbstractMediator {
+-
+-    private SynapseXPath correlation = null;
+-    private SynapseXPath lastMessage = null;
+-    private Boolean single = null;
+-    private String version = null;
+-
+-    private static final String WSRM_SpecVersion_1_0 = "Spec_2005_02";
+-    private static final String WSRM_SpecVersion_1_1 = "Spec_2007_02";
+-    // set sequence expiry time to 5 minutes
+-    private static final long SEQUENCE_EXPIRY_TIME = 300000;
+-    private static final Map<String, Entry> sequenceMap =
+-            Collections.synchronizedMap(new HashMap<String, Entry>());
+-
+-    public boolean mediate(MessageContext synCtx) {
+-
+-        SynapseLog synLog = getLog(synCtx);
+-
+-        if (synLog.isTraceOrDebugEnabled()) {
+-            synLog.traceOrDebug("Start : RMSequence mediator");
+-
+-            if (synLog.isTraceTraceEnabled()) {
+-                synLog.traceTrace("Message : " + synCtx.getEnvelope());
+-            }
+-        }
+-
+-        if (!(synCtx instanceof Axis2MessageContext)) {
+-            synLog.traceOrDebug("Only axis2 message contexts are supported");
+-
+-        } else {
+-            Axis2MessageContext axis2MessageCtx = (Axis2MessageContext) synCtx;
+-            org.apache.axis2.context.MessageContext orgMessageCtx =
+-                axis2MessageCtx.getAxis2MessageContext();
+-
+-            cleanupSequenceMap();
+-
+-            String version = getVersionValue();
+-            orgMessageCtx.getOptions().setProperty(
+-                SandeshaClientConstants.RM_SPEC_VERSION, version);
+-
+-            // always we need to start a new sequence if there is an terminated sequence
+-            orgMessageCtx.getOptions().setProperty(
+-                        SandeshaClientConstants.AUTO_START_NEW_SEQUENCE, "true");
+-
+-            if (isSingle()) {
+-                orgMessageCtx.getOptions().setProperty(
+-                    SandeshaClientConstants.LAST_MESSAGE, "true");
+-
+-                if (synLog.isTraceOrDebugEnabled()) {
+-                    synLog.traceOrDebug("Using WS-RM version " + version);
+-                }
+-
+-            } else {
+-
+-                String correlationValue = getCorrelationValue(synCtx);
+-                boolean lastMessage = isLastMessage(synCtx);
+-                String offeredSeqID = null;
+-
+-                if (!sequenceMap.containsKey(correlationValue)) {
+-                    offeredSeqID = UIDGenerator.generateURNString();
+-                    orgMessageCtx.getOptions().setProperty(
+-                        SandeshaClientConstants.OFFERED_SEQUENCE_ID, offeredSeqID);
+-                }
+-
+-                String sequenceID = retrieveSequenceID(correlationValue);
+-                orgMessageCtx.getOptions().setProperty(
+-                    SandeshaClientConstants.SEQUENCE_KEY, sequenceID);
+-
+-                if (lastMessage) {
+-                    orgMessageCtx.getOptions().setProperty(
+-                        SandeshaClientConstants.LAST_MESSAGE, "true");
+-                    sequenceMap.remove(correlationValue);
+-                }
+-
+-                if (synLog.isTraceOrDebugEnabled()) {
+-                    synLog.traceOrDebug("Correlation value : " + correlationValue +
+-                            " last message = " + lastMessage + " using sequence : " + sequenceID +
+-                            (offeredSeqID != null ? " offering sequence : " + offeredSeqID : ""));
+-                }
+-            }
+-        }
+-
+-        synLog.traceOrDebug("End : RMSequence mediator");
+-        return true;
+-    }
+-
+-    private String retrieveSequenceID(String correlationValue) {
+-        String sequenceID;
+-        if (!sequenceMap.containsKey(correlationValue)) {
+-            sequenceID = UIDGenerator.generateURNString();
+-            if (log.isDebugEnabled()) {
+-                log.debug("setting sequenceID " + sequenceID + " for correlation " + correlationValue);
+-            }
+-            Entry sequenceEntry = new Entry();
+-            sequenceEntry.setValue(sequenceID);
+-            sequenceEntry.setExpiryTime(System.currentTimeMillis() + SEQUENCE_EXPIRY_TIME);
+-            sequenceMap.put(correlationValue, sequenceEntry);
+-        } else {
+-            sequenceID = (String) ((Entry) sequenceMap.get(correlationValue)).getValue();
+-            if (log.isDebugEnabled()) {
+-                log.debug("got sequenceID " + sequenceID + " for correlation " + correlationValue);
+-            }
+-        }
+-        return sequenceID;
+-    }
+-
+-    private String getCorrelationValue(MessageContext smc) {
+-        try {
+-            OMElement node = (OMElement) getCorrelation().selectSingleNode(smc);
+-            if (node != null) {
+-                return node.getText();
+-            } else {
+-                handleException("XPath expression : " + getCorrelation() +
+-                        " did not return any node", smc);
+-            }
+-
+-        } catch (JaxenException e) {
+-            handleException("Error evaluating XPath expression to determine correlation : " +
+-                    getCorrelation(), e, smc);
+-        }
+-        return null; // never called
+-    }
+-
+-    private String getVersionValue() {
+-        if (XMLConfigConstants.SEQUENCE_VERSION_1_1.equals(getVersion())) {
+-            return WSRM_SpecVersion_1_1;
+-        } else {
+-            return WSRM_SpecVersion_1_0;
+-        }
+-    }
+-
+-    private boolean isLastMessage(MessageContext smc) {
+-        if (getLastMessage() == null) {
+-            return false;
+-        } else {
+-            try {
+-                return getLastMessage().booleanValueOf(smc);
+-            } catch (JaxenException e) {
+-                handleException("Error evaluating XPath expression to determine if last message : " +
+-                    getLastMessage(), e, smc);
+-            }
+-            return false;
+-        }
+-    }
+-
+-    private synchronized void cleanupSequenceMap() {
+-        for (String key : sequenceMap.keySet()) {
+-            Entry sequenceEntry = sequenceMap.get(key);
+-            if (sequenceEntry.isExpired()) {
+-                sequenceMap.remove(key);
+-            }
+-        }
+-    }
+-
+-    public boolean isSingle() {
+-        return getSingle() != null && getSingle();
+-    }
+-
+-    public SynapseXPath getCorrelation() {
+-        return correlation;
+-    }
+-
+-    public void setCorrelation(SynapseXPath correlation) {
+-        this.correlation = correlation;
+-    }
+-
+-    public SynapseXPath getLastMessage() {
+-        return lastMessage;
+-    }
+-
+-    public void setLastMessage(SynapseXPath lastMessage) {
+-        this.lastMessage = lastMessage;
+-    }
+-
+-    public Boolean getSingle() {
+-        return single;
+-    }
+-
+-    public void setSingle(Boolean single) {
+-        this.single = single;
+-    }
+-
+-    public String getVersion() {
+-        return version;
+-    }
+-
+-    public void setVersion(String version) {
+-        this.version = version;
+-    }
+-}
+
+Property changes on: java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/RMSequenceMediator.java
+___________________________________________________________________
+Deleted: svn:eol-style
+## -1 +0,0 ##
+-native
+\ No newline at end of property
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/RMSequenceMediatorFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/RMSequenceMediatorFactory.java	(revision 1531436)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/RMSequenceMediatorFactory.java	(nonexistent)
+@@ -1,151 +0,0 @@
+-/*
+- *  Licensed to the Apache Software Foundation (ASF) under one
+- *  or more contributor license agreements.  See the NOTICE file
+- *  distributed with this work for additional information
+- *  regarding copyright ownership.  The ASF licenses this file
+- *  to you under the Apache License, Version 2.0 (the
+- *  "License"); you may not use this file except in compliance
+- *  with the License.  You may obtain a copy of the License at
+- *
+- *   http://www.apache.org/licenses/LICENSE-2.0
+- *
+- *  Unless required by applicable law or agreed to in writing,
+- *  software distributed under the License is distributed on an
+- *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+- *  KIND, either express or implied.  See the License for the
+- *  specific language governing permissions and limitations
+- *  under the License.
+- */
+-
+-package org.apache.synapse.config.xml;
+-
+-import org.apache.axiom.om.OMAttribute;
+-import org.apache.axiom.om.OMElement;
+-import org.apache.synapse.Mediator;
+-import org.apache.synapse.SynapseException;
+-import org.apache.synapse.mediators.builtin.RMSequenceMediator;
+-import org.jaxen.JaxenException;
+-
+-import javax.xml.namespace.QName;
+-import java.util.Properties;
+-
+-/**
+- * Factory for {@link RMSequenceMediator} instances.
+- * <p>
+- * Configuration syntax:
+- * <pre>
+- * &lt;RMSequence (correlation="xpath" [last-message="xpath"]) | single="true" [version="1.0|1.1"]/&gt;
+- * </pre>
+- */
+-public class RMSequenceMediatorFactory extends AbstractMediatorFactory {
+-
+-    private static final QName SEQUENCE_Q
+-            = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "RMSequence");
+-    private static final QName ATT_CORR = new QName("correlation");
+-    private static final QName ATT_LASTMSG = new QName("last-message");
+-    private static final QName ATT_VERSION = new QName("version");
+-    private static final QName ATT_SINGLE = new QName("single");
+-
+-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+-
+-        RMSequenceMediator sequenceMediator = new RMSequenceMediator();
+-        OMAttribute correlation = elem.getAttribute(ATT_CORR);
+-        OMAttribute lastMessage = elem.getAttribute(ATT_LASTMSG);
+-        OMAttribute single = elem.getAttribute(ATT_SINGLE);
+-        OMAttribute version = elem.getAttribute(ATT_VERSION);
+-
+-        if (single == null && correlation == null) {
+-            String msg = "The 'single' attribute value of true or a 'correlation' attribute is " +
+-                "required for the configuration of a RMSequence mediator";
+-            log.error(msg);
+-            throw new SynapseException(msg);
+-        }
+-
+-        if (correlation != null) {
+-            if (correlation.getAttributeValue() != null &&
+-                correlation.getAttributeValue().trim().length() == 0) {
+-                String msg = "Invalid attribute value specified for correlation";
+-                log.error(msg);
+-                throw new SynapseException(msg);
+-
+-            } else {
+-                try {
+-                    sequenceMediator.setCorrelation(
+-                        SynapseXPathFactory.getSynapseXPath(elem, ATT_CORR));
+-                } catch (JaxenException e) {
+-                    String msg = "Invalid XPath expression for attribute correlation : "
+-                        + correlation.getAttributeValue();
+-                    log.error(msg);
+-                    throw new SynapseException(msg);
+-                }
+-            }
+-        }
+-
+-        if (single != null) {
+-            sequenceMediator.setSingle(Boolean.valueOf(single.getAttributeValue()));
+-        }
+-
+-        if (sequenceMediator.isSingle() && sequenceMediator.getCorrelation() != null) {
+-            String msg = "Invalid RMSequence mediator. A RMSequence can't have both a "
+-                + "single attribute value of true and a correlation attribute specified.";
+-            log.error(msg);
+-            throw new SynapseException(msg);
+-
+-        } else if (!sequenceMediator.isSingle() && sequenceMediator.getCorrelation() == null) {
+-            String msg = "Invalid RMSequence mediator. A RMSequence must have a "
+-                + "single attribute value of true or a correlation attribute specified.";
+-            log.error(msg);
+-            throw new SynapseException(msg);
+-        }
+-
+-        if (lastMessage != null) {
+-            if (lastMessage.getAttributeValue() != null &&
+-                lastMessage.getAttributeValue().trim().length() == 0) {
+-                String msg = "Invalid attribute value specified for last-message";
+-                log.error(msg);
+-                throw new SynapseException(msg);
+-
+-            } else {
+-                try {
+-                    sequenceMediator.setLastMessage(
+-                        SynapseXPathFactory.getSynapseXPath(elem, ATT_LASTMSG));
+-                } catch (JaxenException e) {
+-                    String msg = "Invalid XPath expression for attribute last-message : "
+-                        + lastMessage.getAttributeValue();
+-                    log.error(msg);
+-                    throw new SynapseException(msg);
+-                }
+-            }
+-        }
+-
+-        if (sequenceMediator.isSingle() && sequenceMediator.getLastMessage() != null) {
+-            String msg = "Invalid RMSequence mediator. A RMSequence can't have both a "
+-                + "single attribute value of true and a last-message attribute specified.";
+-            log.error(msg);
+-            throw new SynapseException(msg);
+-        }
+-
+-        if (version != null) {
+-            if (!XMLConfigConstants.SEQUENCE_VERSION_1_0.equals(version.getAttributeValue()) &&
+-                !XMLConfigConstants.SEQUENCE_VERSION_1_1.equals(version.getAttributeValue())) {
+-                String msg = "Only '" + XMLConfigConstants.SEQUENCE_VERSION_1_0 + "' or '" +
+-                    XMLConfigConstants.SEQUENCE_VERSION_1_1
+-                    + "' values are allowed for attribute version for a RMSequence mediator"
+-                    + ", Unsupported version " + version.getAttributeValue();
+-                log.error(msg);
+-                throw new SynapseException(msg);
+-            }
+-            sequenceMediator.setVersion(version.getAttributeValue());
+-        }
+-
+-        // after successfully creating the mediator
+-        // set its common attributes such as tracing etc
+-        processAuditStatus(sequenceMediator, elem);
+-
+-        return sequenceMediator;
+-    }
+-
+-    public QName getTagQName() {
+-        return SEQUENCE_Q;
+-    }
+-}
+
+Property changes on: java/modules/core/src/main/java/org/apache/synapse/config/xml/RMSequenceMediatorFactory.java
+___________________________________________________________________
+Deleted: svn:eol-style
+## -1 +0,0 ##
+-native
+\ No newline at end of property
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/RMSequenceMediatorSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/RMSequenceMediatorSerializer.java	(revision 1531436)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/RMSequenceMediatorSerializer.java	(nonexistent)
+@@ -1,77 +0,0 @@
+-/*
+- *  Licensed to the Apache Software Foundation (ASF) under one
+- *  or more contributor license agreements.  See the NOTICE file
+- *  distributed with this work for additional information
+- *  regarding copyright ownership.  The ASF licenses this file
+- *  to you under the Apache License, Version 2.0 (the
+- *  "License"); you may not use this file except in compliance
+- *  with the License.  You may obtain a copy of the License at
+- *
+- *   http://www.apache.org/licenses/LICENSE-2.0
+- *
+- *  Unless required by applicable law or agreed to in writing,
+- *  software distributed under the License is distributed on an
+- *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+- *  KIND, either express or implied.  See the License for the
+- *  specific language governing permissions and limitations
+- *  under the License.
+- */
+-
+-package org.apache.synapse.config.xml;
+-
+-import org.apache.axiom.om.OMElement;
+-import org.apache.synapse.Mediator;
+-import org.apache.synapse.mediators.builtin.RMSequenceMediator;
+-
+-/**
+- * Serializer for {@link RMSequenceMediator} instances.
+- * 
+- * @see RMSequenceMediatorFactory
+- */
+-public class RMSequenceMediatorSerializer extends AbstractMediatorSerializer {
+-
+-    public OMElement serializeSpecificMediator(Mediator m) {
+-
+-        if (!(m instanceof RMSequenceMediator)) {
+-            handleException("Unsupported mediator passed in for serialization : " + m.getType());
+-        }
+-
+-        RMSequenceMediator mediator = (RMSequenceMediator) m;
+-        OMElement sequence = fac.createOMElement("RMSequence", synNS);
+-        saveTracingState(sequence, mediator);
+-        
+-        if(mediator.isSingle() && mediator.getCorrelation() != null) {
+-            handleException("Invalid RMSequence mediator. A RMSequence can't have both a " 
+-                    + "single attribute value of true and a correlation attribute specified.");
+-        }
+-        if(mediator.isSingle() && mediator.getLastMessage() != null) {
+-            handleException("Invalid RMSequence mediator. A RMSequence can't have both a " 
+-                    + "single attribute value of true and a last-message attribute specified.");
+-        }
+-        
+-        if (mediator.isSingle()) {
+-            sequence.addAttribute(fac.createOMAttribute("single", nullNS, String.valueOf(mediator.isSingle())));
+-        } else if (mediator.getCorrelation() != null) {
+-            SynapseXPathSerializer.serializeXPath(
+-                mediator.getCorrelation(), sequence, "correlation");
+-        } else {
+-            handleException("Invalid RMSequence mediator. Specify a single message sequence " 
+-                    + "or a correlation attribute.");
+-        }
+-        
+-        if (mediator.getLastMessage() != null) {
+-            SynapseXPathSerializer.serializeXPath(
+-                mediator.getLastMessage(), sequence, "last-message");
+-        }
+-        
+-        if (mediator.getVersion() != null) {
+-            sequence.addAttribute(fac.createOMAttribute("version", nullNS, mediator.getVersion()));
+-        }
+-
+-        return sequence;
+-    }
+-
+-    public String getMediatorClassName() {
+-        return RMSequenceMediator.class.getName();
+-    }
+-}
+
+Property changes on: java/modules/core/src/main/java/org/apache/synapse/config/xml/RMSequenceMediatorSerializer.java
+___________________________________________________________________
+Deleted: svn:eol-style
+## -1 +0,0 ##
+-native
+\ No newline at end of property
+Index: java/modules/samples/services/ReliableStockQuoteService/build.xml
+===================================================================
+--- java/modules/samples/services/ReliableStockQuoteService/build.xml	(revision 1531436)
++++ java/modules/samples/services/ReliableStockQuoteService/build.xml	(nonexistent)
+@@ -1,70 +0,0 @@
+-<!--
+-  ~  Licensed to the Apache Software Foundation (ASF) under one
+-  ~  or more contributor license agreements.  See the NOTICE file
+-  ~  distributed with this work for additional information
+-  ~  regarding copyright ownership.  The ASF licenses this file
+-  ~  to you under the Apache License, Version 2.0 (the
+-  ~  "License"); you may not use this file except in compliance
+-  ~  with the License.  You may obtain a copy of the License at
+-  ~
+-  ~   http://www.apache.org/licenses/LICENSE-2.0
+-  ~
+-  ~  Unless required by applicable law or agreed to in writing,
+-  ~  software distributed under the License is distributed on an
+-  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-  ~  KIND, either express or implied.  See the License for the
+-  ~  specific language governing permissions and limitations
+-  ~  under the License.
+-  -->
+-
+-<project default="build-service">
+-
+-    <property name="synapse.home" value="../../../.."/>
+-    <property name="temp.dir" value="temp"/>
+-    <property name="classes" value="${temp.dir}/classes"/>
+-    <property name="src" value="src"/>
+-    <property name="services" value="../../repository/services"/>
+-
+-    <path id="synapse.class.path">
+-        <pathelement path="${java.class.path}"/>
+-        <fileset dir="${synapse.home}">
+-            <include name="lib/*.jar"/>
+-            <include name="webapp/WEB-INF/lib/*.jar"/>
+-        </fileset>
+-    </path>
+-
+-    <target name="init" depends="clean">
+-        <mkdir dir="${temp.dir}"/>
+-        <mkdir dir="${classes}"/>
+-        <mkdir dir="${services}"/>
+-    </target>
+-
+-    <target name="clean">
+-        <delete dir="${temp.dir}"/>
+-    </target>
+-
+-    <target name="compile-all" depends="init">
+-        <javac debug="on" destdir="${classes}">
+-            <src path="${src}"/>
+-            <classpath refid="synapse.class.path"/>
+-        </javac>
+-    </target>
+-
+-    <target name="build-service" depends="compile-all">
+-        <property name="RSQ.dir" value="${temp.dir}/ReliableStockQuoteService"/>
+-        <mkdir dir="${RSQ.dir}"/>
+-
+-        <mkdir dir="${RSQ.dir}/META-INF"/>
+-        <copy file="conf/services.xml" tofile="${RSQ.dir}/META-INF/services.xml"/>
+-        <copy toDir="${RSQ.dir}">
+-            <fileset dir="${classes}">
+-                <include name="**/*.class"/>
+-            </fileset>
+-        </copy>
+-
+-        <jar destfile="${services}/ReliableStockQuoteService.aar">
+-            <fileset dir="${RSQ.dir}"/>
+-        </jar>
+-    </target>
+-
+-</project>
+Index: java/modules/samples/services/ReliableStockQuoteService/conf/services.xml
+===================================================================
+--- java/modules/samples/services/ReliableStockQuoteService/conf/services.xml	(revision 1531436)
++++ java/modules/samples/services/ReliableStockQuoteService/conf/services.xml	(nonexistent)
+@@ -1,60 +0,0 @@
+-<!--
+-  ~  Licensed to the Apache Software Foundation (ASF) under one
+-  ~  or more contributor license agreements.  See the NOTICE file
+-  ~  distributed with this work for additional information
+-  ~  regarding copyright ownership.  The ASF licenses this file
+-  ~  to you under the Apache License, Version 2.0 (the
+-  ~  "License"); you may not use this file except in compliance
+-  ~  with the License.  You may obtain a copy of the License at
+-  ~
+-  ~   http://www.apache.org/licenses/LICENSE-2.0
+-  ~
+-  ~  Unless required by applicable law or agreed to in writing,
+-  ~  software distributed under the License is distributed on an
+-  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-  ~  KIND, either express or implied.  See the License for the
+-  ~  specific language governing permissions and limitations
+-  ~  under the License.
+-  -->
+-
+-<serviceGroup>
+-    <service name="ReliableStockQuoteService">
+-        
+-        <module ref="sandesha2"/>
+-        
+-        <schema> 
+-            <mapping package="samples.services" namespace="http://services.samples"/> 
+-        </schema>
+-         
+-        <messageReceivers>
+-            <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
+-                             class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver" />
+-            <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+-                             class="org.apache.axis2.rpc.receivers.RPCMessageReceiver" />
+-        </messageReceivers>
+-        <parameter locked="false" name="ServiceClass">samples.services.ReliableStockQuoteService</parameter>
+-        <operation name="placeOrder">
+-            <messageReceiver class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver"/>
+-            <actionMapping>urn:placeOrder</actionMapping>
+-        </operation>
+-        <operation name="getQuote">
+-            <messageReceiver class="org.apache.axis2.rpc.receivers.RPCMessageReceiver"/>
+-            <actionMapping>urn:getQuote</actionMapping>
+-        </operation>
+-        <supported-policy-namespaces namespaces="http://ws.apache.org/sandesha2/policy" />
+-        
+-        <wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" 
+-            xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+-            xmlns:wsrm="http://ws.apache.org/sandesha2/policy" wsu:Id="RMPolicy">
+-                
+-            <!-- Following policy value has been overrided from the default values.-->> 
+-            <wsrm:AcknowledgementInterval>3500</wsrm:AcknowledgementInterval>
+-            <wsrm:RetransmissionInterval>6000</wsrm:RetransmissionInterval>
+-            <wsrm:InactivityTimeout>1</wsrm:InactivityTimeout>
+-            <wsrm:InactivityTimeoutMeasure>minutes</wsrm:InactivityTimeoutMeasure>
+-            <wsrm:InvokeInOrder>true</wsrm:InvokeInOrder>
+-           
+-        </wsp:Policy>
+-        
+-    </service>
+-</serviceGroup>
+\ No newline at end of file
+Index: java/modules/samples/services/ReliableStockQuoteService/src/samples/services/GetQuote.java
+===================================================================
+--- java/modules/samples/services/ReliableStockQuoteService/src/samples/services/GetQuote.java	(revision 1531436)
++++ java/modules/samples/services/ReliableStockQuoteService/src/samples/services/GetQuote.java	(nonexistent)
+@@ -1,38 +0,0 @@
+-/*
+- *  Licensed to the Apache Software Foundation (ASF) under one
+- *  or more contributor license agreements.  See the NOTICE file
+- *  distributed with this work for additional information
+- *  regarding copyright ownership.  The ASF licenses this file
+- *  to you under the Apache License, Version 2.0 (the
+- *  "License"); you may not use this file except in compliance
+- *  with the License.  You may obtain a copy of the License at
+- *
+- *   http://www.apache.org/licenses/LICENSE-2.0
+- *
+- *  Unless required by applicable law or agreed to in writing,
+- *  software distributed under the License is distributed on an
+- *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+- *  KIND, either express or implied.  See the License for the
+- *  specific language governing permissions and limitations
+- *  under the License.
+- */
+-package samples.services;
+-
+-public class GetQuote {
+-    String symbol;
+-
+-    public GetQuote() {
+-    }
+-
+-    public GetQuote(String symbol) {
+-        this.symbol = symbol;
+-    }
+-
+-    public String getSymbol() {
+-        return symbol;
+-    }
+-
+-    public void setSymbol(String symbol) {
+-        this.symbol = symbol;
+-    }
+-}
+Index: java/modules/samples/services/ReliableStockQuoteService/src/samples/services/PlaceOrder.java
+===================================================================
+--- java/modules/samples/services/ReliableStockQuoteService/src/samples/services/PlaceOrder.java	(revision 1531436)
++++ java/modules/samples/services/ReliableStockQuoteService/src/samples/services/PlaceOrder.java	(nonexistent)
+@@ -1,49 +0,0 @@
+-/*
+- *  Licensed to the Apache Software Foundation (ASF) under one
+- *  or more contributor license agreements.  See the NOTICE file
+- *  distributed with this work for additional information
+- *  regarding copyright ownership.  The ASF licenses this file
+- *  to you under the Apache License, Version 2.0 (the
+- *  "License"); you may not use this file except in compliance
+- *  with the License.  You may obtain a copy of the License at
+- *
+- *   http://www.apache.org/licenses/LICENSE-2.0
+- *
+- *  Unless required by applicable law or agreed to in writing,
+- *  software distributed under the License is distributed on an
+- *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+- *  KIND, either express or implied.  See the License for the
+- *  specific language governing permissions and limitations
+- *  under the License.
+- */
+-package samples.services;
+-
+-public class PlaceOrder {
+-    String symbol;
+-    int quantity;
+-    double price;
+-
+-    public String getSymbol() {
+-        return symbol;
+-    }
+-
+-    public void setSymbol(String symbol) {
+-        this.symbol = symbol;
+-    }
+-
+-    public int getQuantity() {
+-        return quantity;
+-    }
+-
+-    public void setQuantity(int quantity) {
+-        this.quantity = quantity;
+-    }
+-
+-    public double getPrice() {
+-        return price;
+-    }
+-
+-    public void setPrice(double price) {
+-        this.price = price;
+-    }
+-}
+Index: java/modules/samples/services/ReliableStockQuoteService/src/samples/services/ReliableStockQuoteService.java
+===================================================================
+--- java/modules/samples/services/ReliableStockQuoteService/src/samples/services/ReliableStockQuoteService.java	(revision 1531436)
++++ java/modules/samples/services/ReliableStockQuoteService/src/samples/services/ReliableStockQuoteService.java	(nonexistent)
+@@ -1,37 +0,0 @@
+-/*
+- *  Licensed to the Apache Software Foundation (ASF) under one
+- *  or more contributor license agreements.  See the NOTICE file
+- *  distributed with this work for additional information
+- *  regarding copyright ownership.  The ASF licenses this file
+- *  to you under the Apache License, Version 2.0 (the
+- *  "License"); you may not use this file except in compliance
+- *  with the License.  You may obtain a copy of the License at
+- *
+- *   http://www.apache.org/licenses/LICENSE-2.0
+- *
+- *  Unless required by applicable law or agreed to in writing,
+- *  software distributed under the License is distributed on an
+- *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+- *  KIND, either express or implied.  See the License for the
+- *  specific language governing permissions and limitations
+- *  under the License.
+- */
+-package samples.services;
+-import java.util.Date;
+-
+-public class ReliableStockQuoteService {
+-
+-    // in-out
+-    public GetQuoteResponse getQuote(GetQuote request) {
+-        System.out.println(new Date() + " " + this.getClass().getName() +
+-            " :: Generating quote for : " + request.getSymbol());
+-        return new GetQuoteResponse(request.getSymbol());
+-    }
+-
+-    // in only
+-    public void placeOrder(PlaceOrder order) {
+-        System.out.println(new Date() + " " + this.getClass().getName() +
+-            "  :: Accepted order for : " + order.getQuantity() +
+-            " stocks of " + order.getSymbol() + " at $ " + order.getPrice());
+-    }
+-}
+Index: java/modules/samples/services/ReliableStockQuoteService/src/samples/services/GetQuoteResponse.java
+===================================================================
+--- java/modules/samples/services/ReliableStockQuoteService/src/samples/services/GetQuoteResponse.java	(revision 1531436)
++++ java/modules/samples/services/ReliableStockQuoteService/src/samples/services/GetQuoteResponse.java	(nonexistent)
+@@ -1,177 +0,0 @@
+-/*
+- *  Licensed to the Apache Software Foundation (ASF) under one
+- *  or more contributor license agreements.  See the NOTICE file
+- *  distributed with this work for additional information
+- *  regarding copyright ownership.  The ASF licenses this file
+- *  to you under the Apache License, Version 2.0 (the
+- *  "License"); you may not use this file except in compliance
+- *  with the License.  You may obtain a copy of the License at
+- *
+- *   http://www.apache.org/licenses/LICENSE-2.0
+- *
+- *  Unless required by applicable law or agreed to in writing,
+- *  software distributed under the License is distributed on an
+- *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+- *  KIND, either express or implied.  See the License for the
+- *  specific language governing permissions and limitations
+- *  under the License.
+- */
+-package samples.services;
+-
+-import java.util.Date;
+-
+-public class GetQuoteResponse {
+-    String symbol;
+-    double last;
+-    String lastTradeTimestamp;
+-    double change;
+-    double open;
+-    double high;
+-    double low;
+-    int volume;
+-    double marketCap;
+-    double prevClose;
+-    double percentageChange;
+-    double earnings;
+-    double peRatio;
+-    String name;
+-
+-    public GetQuoteResponse() {
+-    }
+-
+-    public GetQuoteResponse(String symbol) {
+-        this.symbol = symbol;
+-        this.last = getRandom(100, 0.9, true);
+-        this.lastTradeTimestamp = new Date().toString();
+-        this.change = getRandom(3, 0.5, false);
+-        this.open = getRandom(last, 0.05, false);
+-        this.high = getRandom(last, 0.05, false);
+-        this.low = getRandom(last, 0.05, false);
+-        this.volume = (int) getRandom(10000, 1.0, true);
+-        this.marketCap = getRandom(10E6, 5.0, false);
+-        this.prevClose = getRandom(last, 0.15, false);
+-        this.percentageChange = change / prevClose * 100;
+-        this.earnings = getRandom(10, 0.4, false);
+-        this.peRatio = getRandom(20, 0.30, false);
+-        this.name = symbol + " Company";
+-    }
+-
+-    public String getSymbol() {
+-        return symbol;
+-    }
+-
+-    public void setSymbol(String symbol) {
+-        this.symbol = symbol;
+-    }
+-
+-    public double getLast() {
+-        return last;
+-    }
+-
+-    public void setLast(double last) {
+-        this.last = last;
+-    }
+-
+-    public String getLastTradeTimestamp() {
+-        return lastTradeTimestamp;
+-    }
+-
+-    public void setLastTradeTimestamp(String lastTradeTimestamp) {
+-        this.lastTradeTimestamp = lastTradeTimestamp;
+-    }
+-
+-    public double getChange() {
+-        return change;
+-    }
+-
+-    public void setChange(double change) {
+-        this.change = change;
+-    }
+-
+-    public double getOpen() {
+-        return open;
+-    }
+-
+-    public void setOpen(double open) {
+-        this.open = open;
+-    }
+-
+-    public double getHigh() {
+-        return high;
+-    }
+-
+-    public void setHigh(double high) {
+-        this.high = high;
+-    }
+-
+-    public double getLow() {
+-        return low;
+-    }
+-
+-    public void setLow(double low) {
+-        this.low = low;
+-    }
+-
+-    public int getVolume() {
+-        return volume;
+-    }
+-
+-    public void setVolume(int volume) {
+-        this.volume = volume;
+-    }
+-
+-    public double getMarketCap() {
+-        return marketCap;
+-    }
+-
+-    public void setMarketCap(double marketCap) {
+-        this.marketCap = marketCap;
+-    }
+-
+-    public double getPrevClose() {
+-        return prevClose;
+-    }
+-
+-    public void setPrevClose(double prevClose) {
+-        this.prevClose = prevClose;
+-    }
+-
+-    public double getPercentageChange() {
+-        return percentageChange;
+-    }
+-
+-    public void setPercentageChange(double percentageChange) {
+-        this.percentageChange = percentageChange;
+-    }
+-
+-    public double getEarnings() {
+-        return earnings;
+-    }
+-
+-    public void setEarnings(double earnings) {
+-        this.earnings = earnings;
+-    }
+-
+-    public double getPeRatio() {
+-        return peRatio;
+-    }
+-
+-    public void setPeRatio(double peRatio) {
+-        this.peRatio = peRatio;
+-    }
+-
+-    public String getName() {
+-        return name;
+-    }
+-
+-    public void setName(String name) {
+-        this.name = name;
+-    }
+-
+-    private static double getRandom(double base, double varience, boolean onlypositive) {
+-        double rand = Math.random();
+-        return (base + ((rand > 0.5 ? 1 : -1) * varience * base * rand))
+-            * (onlypositive ? 1 : (rand > 0.5 ? 1 : -1));
+-    }
+-
+-}
+Index: java/repository/schema/mediators/advanced/rm_sequence.xsd
+===================================================================
+--- java/repository/schema/mediators/advanced/rm_sequence.xsd	(revision 1531436)
++++ java/repository/schema/mediators/advanced/rm_sequence.xsd	(nonexistent)
+@@ -1,46 +0,0 @@
+-<?xml version="1.0" encoding="ISO-8859-1"?>
+-<!--
+-  ~  Licensed to the Apache Software Foundation (ASF) under one
+-  ~  or more contributor license agreements.  See the NOTICE file
+-  ~  distributed with this work for additional information
+-  ~  regarding copyright ownership.  The ASF licenses this file
+-  ~  to you under the Apache License, Version 2.0 (the
+-  ~  "License"); you may not use this file except in compliance
+-  ~  with the License.  You may obtain a copy of the License at
+-  ~
+-  ~   http://www.apache.org/licenses/LICENSE-2.0
+-  ~
+-  ~  Unless required by applicable law or agreed to in writing,
+-  ~  software distributed under the License is distributed on an
+-  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-  ~  KIND, either express or implied.  See the License for the
+-  ~  specific language governing permissions and limitations
+-  ~  under the License.
+-  -->
+-
+-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+-           targetNamespace="http://ws.apache.org/ns/synapse"
+-           xmlns="http://ws.apache.org/ns/synapse">
+-
+-    <xs:element name="RMSequence">
+-        <xs:annotation>
+-            <xs:documentation source="description">
+-                RMSequence mediator to process reliable messaging properties of the message
+-            </xs:documentation>
+-        </xs:annotation>
+-        <xs:complexType>
+-            <xs:attribute name="correlation" type="xs:string" use="optional"/>
+-            <xs:attribute name="last-message" type="xs:string" use="optional"/>
+-            <xs:attribute name="single" type="xs:boolean" default="true" use="optional"/>
+-            <xs:attribute name="version" default="1.0" use="required">
+-                <xs:simpleType>
+-                    <xs:restriction base="xs:double">
+-                        <xs:enumeration value="1.0"/>
+-                        <xs:enumeration value="1.1"/>
+-                    </xs:restriction>
+-                </xs:simpleType>
+-            </xs:attribute>
+-        </xs:complexType>
+-    </xs:element>
+-
+-</xs:schema>
+\ No newline at end of file
+Index: java/repository/conf/sample/synapse_sample_201.xml
+===================================================================
+--- java/repository/conf/sample/synapse_sample_201.xml	(revision 1531436)
++++ java/repository/conf/sample/synapse_sample_201.xml	(nonexistent)
+@@ -1,41 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+-  ~  Licensed to the Apache Software Foundation (ASF) under one
+-  ~  or more contributor license agreements.  See the NOTICE file
+-  ~  distributed with this work for additional information
+-  ~  regarding copyright ownership.  The ASF licenses this file
+-  ~  to you under the Apache License, Version 2.0 (the
+-  ~  "License"); you may not use this file except in compliance
+-  ~  with the License.  You may obtain a copy of the License at
+-  ~
+-  ~   http://www.apache.org/licenses/LICENSE-2.0
+-  ~
+-  ~  Unless required by applicable law or agreed to in writing,
+-  ~  software distributed under the License is distributed on an
+-  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-  ~  KIND, either express or implied.  See the License for the
+-  ~  specific language governing permissions and limitations
+-  ~  under the License.
+-  -->
+-
+-<!-- Reliable message exchange between the client and proxy services using WS-ReliableMessaging -->
+-<definitions xmlns="http://ws.apache.org/ns/synapse">
+-
+-    <proxy name="StockQuoteProxy">
+-        <target>
+-            <inSequence>
+-                <send>
+-                    <endpoint>
+-                        <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+-                    </endpoint>
+-                </send>
+-            </inSequence>
+-            <outSequence>
+-                <send/>
+-            </outSequence>
+-        </target>
+-        <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
+-        <enableRM/>
+-    </proxy>
+-
+-</definitions>
+Index: java/repository/conf/sample/synapse_sample_202.xml
+===================================================================
+--- java/repository/conf/sample/synapse_sample_202.xml	(revision 1531436)
++++ java/repository/conf/sample/synapse_sample_202.xml	(nonexistent)
+@@ -1,41 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+-  ~  Licensed to the Apache Software Foundation (ASF) under one
+-  ~  or more contributor license agreements.  See the NOTICE file
+-  ~  distributed with this work for additional information
+-  ~  regarding copyright ownership.  The ASF licenses this file
+-  ~  to you under the Apache License, Version 2.0 (the
+-  ~  "License"); you may not use this file except in compliance
+-  ~  with the License.  You may obtain a copy of the License at
+-  ~
+-  ~   http://www.apache.org/licenses/LICENSE-2.0
+-  ~
+-  ~  Unless required by applicable law or agreed to in writing,
+-  ~  software distributed under the License is distributed on an
+-  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-  ~  KIND, either express or implied.  See the License for the
+-  ~  specific language governing permissions and limitations
+-  ~  under the License.
+-  -->
+-
+-<!-- Reliable message exchange between the client and proxy services using WS-ReliableMessaging -->
+-<definitions xmlns="http://ws.apache.org/ns/synapse">
+-
+-    <proxy name="StockQuoteProxy">
+-        <target>
+-            <inSequence>
+-                <send>
+-                    <endpoint>
+-                        <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
+-                    </endpoint>
+-                </send>
+-            </inSequence>
+-            <outSequence>
+-                <send/>
+-            </outSequence>
+-        </target>
+-        <publishWSDL uri="file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl"/>
+-        <enableRM/>
+-    </proxy>
+-
+-</definitions>
+Index: java/repository/conf/sample/synapse_sample_101.xml
+===================================================================
+--- java/repository/conf/sample/synapse_sample_101.xml	(revision 1531436)
++++ java/repository/conf/sample/synapse_sample_101.xml	(nonexistent)
+@@ -1,41 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+-  ~  Licensed to the Apache Software Foundation (ASF) under one
+-  ~  or more contributor license agreements.  See the NOTICE file
+-  ~  distributed with this work for additional information
+-  ~  regarding copyright ownership.  The ASF licenses this file
+-  ~  to you under the Apache License, Version 2.0 (the
+-  ~  "License"); you may not use this file except in compliance
+-  ~  with the License.  You may obtain a copy of the License at
+-  ~
+-  ~   http://www.apache.org/licenses/LICENSE-2.0
+-  ~
+-  ~  Unless required by applicable law or agreed to in writing,
+-  ~  software distributed under the License is distributed on an
+-  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-  ~  KIND, either express or implied.  See the License for the
+-  ~  specific language governing permissions and limitations
+-  ~  under the License.
+-  -->
+-
+-<!-- Reliable message exchange between Synapse and the back-end server using WS-ReliableMessaging -->
+-<definitions xmlns="http://ws.apache.org/ns/synapse">
+-
+-    <sequence name="main">
+-        <in>
+-            <RMSequence single="true" version="1.0"/>
+-            <send>
+-                <endpoint name="reliable">
+-                    <address uri="http://localhost:9000/services/ReliableStockQuoteService">
+-                        <enableRM/>
+-                        <enableAddressing/>
+-                    </address>
+-                </endpoint>
+-            </send>
+-        </in>
+-        <out>
+-            <send/>
+-        </out>
+-    </sequence>
+-
+-</definitions>
+Index: java/repository/conf/sample/synapse_sample_102.xml
+===================================================================
+--- java/repository/conf/sample/synapse_sample_102.xml	(revision 1531436)
++++ java/repository/conf/sample/synapse_sample_102.xml	(nonexistent)
+@@ -1,41 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+-  ~  Licensed to the Apache Software Foundation (ASF) under one
+-  ~  or more contributor license agreements.  See the NOTICE file
+-  ~  distributed with this work for additional information
+-  ~  regarding copyright ownership.  The ASF licenses this file
+-  ~  to you under the Apache License, Version 2.0 (the
+-  ~  "License"); you may not use this file except in compliance
+-  ~  with the License.  You may obtain a copy of the License at
+-  ~
+-  ~   http://www.apache.org/licenses/LICENSE-2.0
+-  ~
+-  ~  Unless required by applicable law or agreed to in writing,
+-  ~  software distributed under the License is distributed on an
+-  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-  ~  KIND, either express or implied.  See the License for the
+-  ~  specific language governing permissions and limitations
+-  ~  under the License.
+-  -->
+-
+-<!-- Reliable message exchange between Synapse and the back-end server using WS-ReliableMessaging -->
+-<definitions xmlns="http://ws.apache.org/ns/synapse">
+-
+-    <sequence name="main">
+-        <in>
+-            <RMSequence single="true" version="1.1"/>
+-            <send>
+-                <endpoint name="reliable">
+-                    <address uri="http://localhost:9000/services/ReliableStockQuoteService">
+-                        <enableRM/>
+-                        <enableAddressing/>
+-                    </address>
+-                </endpoint>
+-            </send>
+-        </in>
+-        <out>
+-            <send/>
+-        </out>
+-    </sequence>
+-
+-</definitions>
+Index: java/repository/conf/sample/resources/policy/sample_rm_policy_1.xml
+===================================================================
+--- java/repository/conf/sample/resources/policy/sample_rm_policy_1.xml	(revision 1531436)
++++ java/repository/conf/sample/resources/policy/sample_rm_policy_1.xml	(nonexistent)
+@@ -1,27 +0,0 @@
+-<!--
+-  ~  Licensed to the Apache Software Foundation (ASF) under one
+-  ~  or more contributor license agreements.  See the NOTICE file
+-  ~  distributed with this work for additional information
+-  ~  regarding copyright ownership.  The ASF licenses this file
+-  ~  to you under the Apache License, Version 2.0 (the
+-  ~  "License"); you may not use this file except in compliance
+-  ~  with the License.  You may obtain a copy of the License at
+-  ~
+-  ~   http://www.apache.org/licenses/LICENSE-2.0
+-  ~
+-  ~  Unless required by applicable law or agreed to in writing,
+-  ~  software distributed under the License is distributed on an
+-  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-  ~  KIND, either express or implied.  See the License for the
+-  ~  specific language governing permissions and limitations
+-  ~  under the License.
+-  -->
+-
+-<wsp:Policy xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+-		xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+-	    xmlns:wsrm="http://ws.apache.org/sandesha2/policy" wsu:Id="RMPolicy">
+-	        
+-	      <!-- Following policy value has been overrided from the default values.-->> 
+-	      <wsrm:AcknowledgementInterval>3500</wsrm:AcknowledgementInterval>
+-	    
+-</wsp:Policy>
+\ No newline at end of file
+
+Property changes on: java/repository/conf/sample/resources/policy/sample_rm_policy_1.xml
+___________________________________________________________________
+Deleted: svn:eol-style
+## -1 +0,0 ##
+-native
+\ No newline at end of property
+Index: java/modules/core/pom.xml
+===================================================================
+--- java/modules/core/pom.xml	(revision 1531436)
++++ java/modules/core/pom.xml	(revision 1531437)
+@@ -277,10 +277,6 @@
+             <artifactId>wso2eventing-api</artifactId>
+         </dependency>
+         <dependency>
+-            <groupId>org.apache.sandesha2</groupId>
+-            <artifactId>sandesha2-core</artifactId>
+-        </dependency>
+-        <dependency>
+             <groupId>org.wso2.caching</groupId>
+             <artifactId>wso2caching-core</artifactId>
+         </dependency>
+@@ -331,6 +327,14 @@
+             <groupId>org.apache.ws.commons.axiom</groupId>
+             <artifactId>axiom-dom</artifactId>
+         </dependency>
++        <dependency>
++            <groupId>org.apache.neethi</groupId>
++            <artifactId>neethi</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>org.apache.axis2</groupId>
++            <artifactId>axis2-adb</artifactId>
++        </dependency>
+ 	    <dependency>
+ 	        <!-- Required for validate mediator tests on JDK 5 -->
+             <groupId>xerces</groupId>
+Index: java/modules/samples/src/main/java/samples/userguide/StockQuoteClient.java
+===================================================================
+--- java/modules/samples/src/main/java/samples/userguide/StockQuoteClient.java	(revision 1531436)
++++ java/modules/samples/src/main/java/samples/userguide/StockQuoteClient.java	(revision 1531437)
+@@ -22,7 +22,6 @@
+ import org.apache.axiom.om.OMElement;
+ import org.apache.axiom.om.OMXMLBuilderFactory;
+ import org.apache.axiom.soap.SOAP12Constants;
+-import org.apache.axiom.util.UIDGenerator;
+ import org.apache.axis2.Constants;
+ import org.apache.axis2.addressing.EndpointReference;
+ import org.apache.axis2.client.Options;
+@@ -34,9 +33,6 @@
+ import org.apache.neethi.Policy;
+ import org.apache.neethi.PolicyEngine;
+ import org.apache.rampart.RampartMessageData;
+-import org.apache.sandesha2.client.SandeshaClientConstants;
+-import org.apache.sandesha2.client.SandeshaClient;
+-import org.apache.sandesha2.Sandesha2Constants;
+ import samples.common.StockQuoteHandler;
+ 
+ import java.io.File;
+@@ -117,8 +113,6 @@
+         String repo = getProperty("repository", "client_repo");
+         String svcPolicy = getProperty("policy", null);
+         String rest = getProperty("rest", null);
+-        String wsrm = getProperty("wsrm", null);
+-        String wsrm11 = getProperty("wsrm11", null);
+         String itr = getProperty("itr", "1");
+         int iterations = 1;
+         boolean infinite = false;
+@@ -139,7 +133,7 @@
+ 
+         double price = 0;
+         int quantity = 0;
+-        ConfigurationContext configContext = null;
++        ConfigurationContext configContext;
+ 
+         Options options = new Options();
+         OMElement payload = null;
+@@ -212,15 +206,6 @@
+             System.out.println("Sending as REST");
+             options.setProperty(Constants.Configuration.ENABLE_REST, Constants.VALUE_TRUE);
+         }
+-        if (Boolean.parseBoolean(wsrm) || Boolean.parseBoolean(wsrm11)) {
+-            System.out.println("Using WS-RM");
+-            serviceClient.engageModule("sandesha2");
+-            if (Boolean.parseBoolean(wsrm11)){
+-               options.setProperty(SandeshaClientConstants.RM_SPEC_VERSION, Sandesha2Constants.SPEC_VERSIONS.v1_1);
+-            }
+-            options.setProperty(SandeshaClientConstants.LAST_MESSAGE, Constants.VALUE_TRUE);
+-            options.setProperty(SandeshaClientConstants.OFFERED_SEQUENCE_ID, UIDGenerator.generateURNString());
+-        }
+ 
+         if ("soap12".equals(soapVer)) {
+             options.setSoapVersionURI(SOAP12Constants. SOAP_ENVELOPE_NAMESPACE_URI);
+@@ -246,17 +231,6 @@
+                 InnerStruct.RESULT = serviceClient.sendReceive(payload);
+                 i++;
+                 printResult();
+-                if (Boolean.parseBoolean(wsrm) || Boolean.parseBoolean(wsrm11)) {
+-                    // give some time for RM to terminate normally
+-                    if (Boolean.parseBoolean(wsrm11)){
+-                        SandeshaClient.terminateSequence(serviceClient);
+-                    }
+-                    Thread.sleep(5000);
+-                    if (configContext != null) {
+-                        configContext.getListenerManager().stop();
+-                    }
+-                    serviceClient.cleanup();
+-                }
+             }
+         }
+     }
+@@ -280,10 +254,10 @@
+         }
+     }
+ 
+-    private static double getRandom(double base, double varience, boolean onlypositive) {
++    private static double getRandom(double base, double variance, boolean onlyPositive) {
+         double rand = Math.random();
+-        return (base + ((rand > 0.5 ? 1 : -1) * varience * base * rand))
+-                * (onlypositive ? 1 : (rand > 0.5 ? 1 : -1));
++        return (base + ((rand > 0.5 ? 1 : -1) * variance * base * rand))
++                * (onlyPositive ? 1 : (rand > 0.5 ? 1 : -1));
+     }
+ 
+ }
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1531436)
++++ java/pom.xml	(revision 1531437)
+@@ -562,6 +562,11 @@
+                 </exclusions>
+                 <type>mar</type>
+             </dependency>
++            <dependency>
++                <groupId>org.apache.neethi</groupId>
++                <artifactId>neethi</artifactId>
++                <version>${neethi.version}</version>
++            </dependency>
+ 
+             <!-- Apache Axiom -->
+             <dependency>
+@@ -587,36 +592,6 @@
+                 <version>${xml_schema.version}</version>
+             </dependency>
+ 
+-            <!-- Apache Sandesha -->
+-            <dependency>
+-                <groupId>org.apache.sandesha2</groupId>
+-                <artifactId>sandesha2-core</artifactId>
+-                <version>${sandesha2.version}</version>
+-            </dependency>
+-            <dependency>
+-                <groupId>org.apache.sandesha2</groupId>
+-                <artifactId>sandesha2</artifactId>
+-                <version>${sandesha2.version}</version>
+-                <exclusions>
+-                    <exclusion>
+-                        <groupId>org.apache.axis2</groupId>
+-                        <artifactId>axis2</artifactId>
+-                    </exclusion>
+-                </exclusions>
+-                <type>mar</type>
+-            </dependency>
+-            <dependency>
+-                <groupId>org.apache.sandesha2</groupId>
+-                <artifactId>sandesha2-policy</artifactId>
+-                <version>${sandesha2.version}</version>
+-                <exclusions>
+-                    <exclusion>
+-                        <groupId>org.apache.axis2</groupId>
+-                        <artifactId>axis2</artifactId>
+-                    </exclusion>
+-                </exclusions>
+-            </dependency>
+-
+             <!-- Apache Commons -->
+             <dependency>
+                 <groupId>commons-dbcp</groupId>
+@@ -1095,10 +1070,10 @@
+         <xml_schema.version>1.4.3</xml_schema.version>
+         <wsdl4j.version>1.6.2</wsdl4j.version>
+ 
+-        <!-- addressing, rampart -->
++        <!-- addressing, rampart, neethi -->
+         <addressing.version>${axis2.version}</addressing.version>
+         <rampart.version>1.7.0-SNAPSHOT</rampart.version>
+-        <sandesha2.version>1.7.0-SNAPSHOT</sandesha2.version>
++        <neethi.version>3.0.3-SNAPSHOT</neethi.version>
+         <jruby.version>1.3.0</jruby.version>
+         <bcprov.jdk15.version>140</bcprov.jdk15.version>
+ 
+Index: java/repository/schema/endpoint.xsd
+===================================================================
+--- java/repository/schema/endpoint.xsd	(revision 1531436)
++++ java/repository/schema/endpoint.xsd	(revision 1531437)
+@@ -216,11 +216,6 @@
+             </xs:documentation>
+         </xs:annotation>
+         <xs:all>
+-            <xs:element name="enableRM" minOccurs="0" maxOccurs="1">
+-                <xs:complexType>
+-                    <xs:attribute name="policy" type="xs:string" use="optional"/>
+-                </xs:complexType>
+-            </xs:element>
+             <xs:element name="enableSec" minOccurs="0" maxOccurs="1">
+                 <xs:complexType>
+                     <xs:attribute name="policy" type="xs:string" use="required"/>
+Index: java/modules/documentation/src/site/xdoc/userguide/samples.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples.xml	(revision 1531436)
++++ java/modules/documentation/src/site/xdoc/userguide/samples.xml	(revision 1531437)
+@@ -73,7 +73,6 @@
+                 <p>
+                     <ul>
+                         <li><a href="samples/sample100.html">Sample 100: Using WS-Security for outgoing messages</a></li>
+-                        <li><a href="samples/sample101.html">Sample 101: Using WS-ReliableMessaging for outgoing messages</a></li>
+                     </ul>
+                 </p>
+             </subsection>
+@@ -96,7 +95,6 @@
+                 <p>
+                     <ul>
+                         <li><a href="samples/sample200.html">Sample 200: Engaging WS-Security on proxy services</a></li>
+-                        <li><a href="samples/sample201.html">Sample 201: Reliable communication between the client and proxy services using WS-ReliableMessaging</a></li>
+                     </ul>
+                 </p>
+             </subsection>
+Index: java/modules/documentation/src/site/xdoc/userguide/config.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/config.xml	(revision 1531436)
++++ java/modules/documentation/src/site/xdoc/userguide/config.xml	(revision 1531437)
+@@ -737,7 +737,6 @@
+                 <div class="xmlConf">&lt;address uri="<em>endpoint address</em>" [format="soap11|soap12|pox|get"] [optimize="mtom|swa"]
+          [encoding="<em>charset encoding</em>"]
+          [statistics="enable|disable"] [trace="enable|disable"]&gt;
+-    &lt;enableRM [policy="<em>key</em>"]/&gt;?
+     &lt;enableSec [policy="<em>key</em>"]/&gt;?
+     &lt;enableAddressing [version="final|submission"] [separateListener="true|false"]/&gt;?
+ 
+@@ -764,9 +763,9 @@
+                     attributes of the endpoint directly in the configuration. The 'uri' attribute
+                     of the address element contains the EPR of the target endpoint. Message format
+                     for the endpoint and the method to optimize attachments can be specified in the
+-                    'format' and 'optimize' attributes respectively. Reliable messaging and security
++                    'format' and 'optimize' attributes respectively. Security
+                     policies for the endpoint can be specified in the policy attribute of the
+-                    'enableRM' and 'enableSec' elements respectively. WS-Addressing can be engaged
++                    'enableSec' element. WS-Addressing can be engaged
+                     for the messages sent to the endpoint by using the 'enableAddressing' element.
+                 </p>
+                 <p>
+@@ -844,7 +843,7 @@
+                     Default endpoint is an endpoint defined for adding QoS and other configurations
+                     to the endpoint which is resolved from the 'To' address of the message context.
+                     All the configurations such as message format for the endpoint, the method to
+-                    optimize attachments, reliable messaging, security policies for the endpoint
++                    optimize attachments, and security policies for the endpoint
+                     can be specified as in the case of Address Endpoint. This endpoint differs from
+                     the address endpoint only in the 'uri' attribute which will not be present in
+                     this endpoint. Following section describes the configuration of a default
+@@ -853,7 +852,6 @@
+                 <div class="xmlConf">&lt;default [format="soap11|soap12|pox|get"] [optimize="mtom|swa"]
+          [encoding="<em>charset encoding</em>"]
+          [statistics="enable|disable"] [trace="enable|disable"]&gt;
+-    &lt;enableRM [policy="<em>key</em>"]/&gt;?
+     &lt;enableSec [policy="<em>key</em>"]/&gt;?
+     &lt;enableAddressing [version="final|submission"] [separateListener="true|false"]/&gt;?
+ 
+@@ -882,13 +880,12 @@
+                     WSDL document can be specified either as a URI or as an inline definition within
+                     the configuration. The service and port name containing the target EPR has to be
+                     specified with the 'service' and 'port' (or 'endpoint') attributes respectively.
+-                    Elements like 'enableRM', 'enableSec', 'enableAddressing', 'suspendOnFailure' and
++                    Elements like 'enableSec', 'enableAddressing', 'suspendOnFailure' and
+                     'timeout' are same as for an Address endpoint.
+                 </p>
+                 <div class="xmlConf">&lt;wsdl [uri="wsdl-uri"] service="qname" port/endpoint="qname"&gt;
+     &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt;?
+     &lt;wsdl20:description&gt;...&lt;/wsdl20:description&gt;?
+-    &lt;enableRM [policy="key"]/&gt;?
+     &lt;enableSec [policy="key"]/&gt;?
+     &lt;enableAddressing/&gt;?
+ 
+@@ -1035,7 +1032,6 @@
+     &lt;/publishWSDL&gt;?
+     &lt;enableAddressing/&gt;?
+     &lt;enableSec/&gt;?
+-    &lt;enableRM/&gt;?
+     &lt;policy key="string" [type="(in | out)"]/&gt;? // optional service or message level policies such as (e.g. WS-Security and/or WS-RM policies)
+     &lt;parameter name="string"&gt;  // optional service parameters such as (e.g. transport.jms.ConnectionFactory)
+         string | xml
+@@ -1084,7 +1080,7 @@
+                 elements (e.g. the JMS destination etc). If the proxy service should enable
+                 WS-Reliable Messaging or Security, the appropriate modules should be engaged, and
+                 specified service level policies will apply. To engage the required modules, one may
+-                use the 'enableSec', 'enableRM' and 'enableAddressing' elements.
++                use the 'enableSec', and 'enableAddressing' elements.
+             </p>
+             <p>
+                 A dynamic proxy may be defined by specifying the properties of the proxy as dynamic
+Index: java/modules/distribution/src/main/assembly/bin.xml
+===================================================================
+--- java/modules/distribution/src/main/assembly/bin.xml	(revision 1531436)
++++ java/modules/distribution/src/main/assembly/bin.xml	(revision 1531437)
+@@ -182,7 +182,6 @@
+                 <exclude>org.apache.synapse:synapse-documentation:zip:docs</exclude>
+                 <exclude>org.apache.axis2:addressing:mar</exclude>
+                 <exclude>org.apache.rampart:rampart:mar</exclude>
+-                <exclude>org.apache.sandesha2:sandesha2:mar</exclude>
+                 <exclude>javax.servlet:servlet-api:jar</exclude>
+                 <exclude>xml-apis:xml-apis:jar</exclude>
+                 <exclude>xerces:xercesImpl:jar</exclude>
+@@ -245,7 +244,6 @@
+             <includes>
+                 <include>org.apache.axis2:addressing:mar</include>
+                 <include>org.apache.rampart:rampart:mar</include>
+-                <include>org.apache.sandesha2:sandesha2:mar</include>
+             </includes>
+             <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+         </dependencySet>
+@@ -256,7 +254,6 @@
+             <includes>
+                 <include>org.apache.axis2:addressing:mar</include>
+                 <include>org.apache.rampart:rampart:mar</include>
+-                <include>org.apache.sandesha2:sandesha2:mar</include>
+             </includes>
+             <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+         </dependencySet>
+@@ -267,7 +264,6 @@
+             <includes>
+                 <include>org.apache.axis2:addressing:mar</include>
+                 <include>org.apache.rampart:rampart:mar</include>
+-                <include>org.apache.sandesha2:sandesha2:mar</include>
+             </includes>
+             <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+         </dependencySet>
+Index: java/modules/distribution/pom.xml
+===================================================================
+--- java/modules/distribution/pom.xml	(revision 1531436)
++++ java/modules/distribution/pom.xml	(revision 1531437)
+@@ -98,15 +98,6 @@
+             <type>mar</type>
+         </dependency>
+         <dependency>
+-            <groupId>org.apache.sandesha2</groupId>
+-            <artifactId>sandesha2</artifactId>
+-            <type>mar</type>
+-        </dependency>
+-        <dependency>
+-            <groupId>org.apache.sandesha2</groupId>
+-            <artifactId>sandesha2-policy</artifactId>
+-        </dependency>
+-        <dependency>
+             <groupId>org.apache.axis2</groupId>
+             <artifactId>addressing</artifactId>
+             <type>mar</type>
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java	(revision 1531436)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java	(revision 1531437)
+@@ -425,15 +425,6 @@
+ 
+         final MessageContext mc = axis2Request.getMsgContext();
+ 
+-        // if the request message is a sandesha messag we ignore the
+-        // exception handling
+-        // we cannot use the declared sandesha2 constant since
+-        // nhttp transport shouldn't take a sandesha2 dependency
+-        String done = (String) mc.getProperty("Sandesha2AppProcessingDone");
+-		if (JavaUtils.isTrueExplicitly(done)) {
+-			return;
+-		}
+-
+         if (mc.getAxisOperation() != null &&
+                 mc.getAxisOperation().getMessageReceiver() != null) {
+ 
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1531436)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1531437)
+@@ -194,7 +194,6 @@
+ 
+         //QoS
+         sampleClassRepo.put("100", Sample100.class);
+-        sampleClassRepo.put("101", Sample101.class);
+ 
+         //Proxy Service
+         sampleClassRepo.put("150", Sample150.class);
+Index: java/modules/integration/pom.xml
+===================================================================
+--- java/modules/integration/pom.xml	(revision 1531436)
++++ java/modules/integration/pom.xml	(revision 1531437)
+@@ -167,31 +167,6 @@
+                                     <fileset dir="${SSQ3.dir}"/>
+                                 </jar>
+ 
+-                                <property name="src4" value="../samples/services/ReliableStockQuoteService/src"/>
+-                                <delete dir="${temp.dir}"/>
+-                                <mkdir dir="${temp.dir}"/>
+-                                <mkdir dir="${classes}"/>
+-                                <javac debug="on" destdir="${classes}" fork="true" includeantruntime="false">
+-                                    <src path="${src4}"/>
+-                                    <classpath refid="maven.compile.classpath"/>
+-                                </javac>
+-                                <property name="RSQ.dir" value="${temp.dir}/ReliableStockQuoteService"/>
+-                                <mkdir dir="${RSQ.dir}"/>
+-
+-                                <mkdir dir="${RSQ.dir}/META-INF"/>
+-                                <copy file="${src4}/../conf/services.xml" tofile="${RSQ.dir}/META-INF/services.xml"/>
+-                                <!--<copy file="${src4}/../wsdl/ReliableStockQuoteService.wsdl"-->
+-                                <!--tofile="${RSQ.dir}/META-INF/service.wsdl"/>-->
+-                                <copy toDir="${RSQ.dir}">
+-                                    <fileset dir="${classes}">
+-                                        <include name="**/*.class"/>
+-                                    </fileset>
+-                                </copy>
+-
+-                                <jar destfile="${services}/ReliableStockQuoteService.aar">
+-                                    <fileset dir="${RSQ.dir}"/>
+-                                </jar>
+-
+                                 <property name="src5" value="../samples/services/LoadbalanceFailoverService/src"/>
+                                 <delete dir="${temp.dir}"/>
+                                 <mkdir dir="${temp.dir}"/>
+@@ -270,14 +245,6 @@
+                                     </outputDirectory>
+                                 </artifactItem>
+                                 <artifactItem>
+-                                    <groupId>org.apache.sandesha2</groupId>
+-                                    <artifactId>sandesha2</artifactId>
+-                                    <version>${sandesha2.version}</version>
+-                                    <type>mar</type>
+-                                    <outputDirectory>target/test_repos/axis2Server/modules
+-                                    </outputDirectory>
+-                                </artifactItem>
+-                                <artifactItem>
+                                     <groupId>org.apache.axis2</groupId>
+                                     <artifactId>addressing</artifactId>
+                                     <version>${addressing.version}</version>
+@@ -309,15 +276,6 @@
+                                     <outputDirectory>target/test_repos/synapse/modules
+                                     </outputDirectory>
+                                 </artifactItem>
+-                                <artifactItem>
+-                                    <groupId>org.apache.sandesha2</groupId>
+-                                    <artifactId>sandesha2</artifactId>
+-                                    <version>${sandesha2.version}</version>
+-                                    <type>mar</type>
+-                                    <outputDirectory>target/test_repos/synapse/modules
+-                                    </outputDirectory>
+-                                </artifactItem>
+-
+                             </artifactItems>
+                         </configuration>
+                     </execution>
+@@ -393,11 +351,6 @@
+             </exclusions>
+         </dependency>
+         <dependency>
+-            <groupId>org.apache.sandesha2</groupId>
+-            <artifactId>sandesha2-core</artifactId>
+-            <scope>test</scope>
+-        </dependency>
+-        <dependency>
+             <groupId>org.apache.axis2</groupId>
+             <artifactId>axis2-transport-base</artifactId>
+             <scope>test</scope>
+Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/SynapseCallbackReceiver.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/core/axis2/SynapseCallbackReceiver.java	(revision 1531436)
++++ java/modules/core/src/main/java/org/apache/synapse/core/axis2/SynapseCallbackReceiver.java	(revision 1531437)
+@@ -33,7 +33,6 @@
+ import org.apache.axis2.wsdl.WSDLConstants;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+-import org.apache.sandesha2.client.SandeshaClientConstants;
+ import org.apache.synapse.FaultHandler;
+ import org.apache.synapse.SynapseConstants;
+ import org.apache.synapse.SynapseException;
+@@ -199,7 +198,7 @@
+                     messageID = relatesTo.getValue();
+                 }
+             }
+-        } else if (messageCtx.getProperty(SandeshaClientConstants.SEQUENCE_KEY) == null) {
++        } else {
+             messageID = (String) messageCtx.getProperty(SynapseConstants.RELATES_TO_FOR_POX);
+         }
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2BlockingClient.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2BlockingClient.java	(revision 1531436)
++++ java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2BlockingClient.java	(revision 1531437)
+@@ -146,7 +146,7 @@
+ 
+         AxisService anonymousService = AnonymousServiceFactory.getAnonymousService(null,
+                 configurationContext.getAxisConfiguration(), endpointDefinition.isAddressingOn(),
+-                false, endpointDefinition.isSecurityOn(), false);
++                endpointDefinition.isSecurityOn(), false);
+         anonymousService.getParent().addParameter(SynapseConstants.HIDDEN_SERVICE_PARAM, "true");
+         ServiceGroupContext serviceGroupContext = new ServiceGroupContext(configurationContext, (AxisServiceGroup) anonymousService.getParent());
+         ServiceContext serviceCtx = serviceGroupContext.getServiceContext(anonymousService);
+Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/AnonymousServiceFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/core/axis2/AnonymousServiceFactory.java	(revision 1531436)
++++ java/modules/core/src/main/java/org/apache/synapse/core/axis2/AnonymousServiceFactory.java	(revision 1531437)
+@@ -42,9 +42,7 @@
+     private static final String NONE            = "__NONE__";
+     private static final String ADDR_ONLY       = "__ADDR_ONLY__";
+     private static final String SEC_ONLY        = "__SEC_ONLY__";
+-    private static final String RM_AND_ADDR     = "__RM_AND_ADDR__";
+     private static final String SEC_AND_ADDR    = "__SEC_AND_ADDR__";
+-    private static final String RM_SEC_AND_ADDR = "__RM_SEC_AND_ADDR__";
+ 
+     public static final String OUT_IN_OPERATION   = "anonOutInOp";
+     public static final String OUT_ONLY_OPERATION = "anonOutonlyOp";
+@@ -57,14 +55,13 @@
+      * @param synCfg   Synapse configuration
+      * @param axisCfg  Axis2 configuration
+      * @param wsAddrOn whether addressing is on or not
+-     * @param wsRMOn   whether RM is on ot not
+      * @param wsSecOn  whether security is on or not
+      * @return An Axis service for the requested QoS
+      */
+     public static AxisService getAnonymousService(SynapseConfiguration synCfg,
+                                                   AxisConfiguration axisCfg, boolean wsAddrOn,
+-                                                  boolean wsRMOn, boolean wsSecOn) {
+-        return getAnonymousService(synCfg, axisCfg, wsAddrOn, wsRMOn, wsSecOn, true);
++                                                  boolean wsSecOn) {
++        return getAnonymousService(synCfg, axisCfg, wsAddrOn, wsSecOn, true);
+     }
+ 
+ 
+@@ -74,7 +71,6 @@
+      * @param synCfg Synapse configuration
+      * @param axisCfg Axis2 configuration
+      * @param wsAddrOn whether addressing is on or not
+-     * @param wsRMOn whether RM is on ot not
+      * @param wsSecOn whether security is on or not
+      * @param setCallback whether to register a synapse callback receiver or not
+      * @return An Axis service for the requested QoS
+@@ -81,7 +77,7 @@
+      */
+     public static AxisService getAnonymousService(SynapseConfiguration synCfg,
+                                                   AxisConfiguration axisCfg, boolean wsAddrOn,
+-                                                  boolean wsRMOn, boolean wsSecOn, boolean setCallback) {
++                                                  boolean wsSecOn, boolean setCallback) {
+ 
+         // if non of addressing, security and rm is engaged then checkbit is 0
+         int checkbit = 0;
+@@ -89,8 +85,6 @@
+         if (wsAddrOn) { checkbit += 1; }
+         // if security is on increase the checkbit by 2
+         if (wsSecOn) { checkbit += 2; }
+-        // if reliable messaging is on increase the checkbit by 4
+-        if (wsRMOn) { checkbit += 4; }
+ 
+         String servicekey;
+         switch (checkbit) {
+@@ -106,18 +100,6 @@
+             case 3 :
+                 servicekey = SEC_AND_ADDR;
+                 break;
+-            case 4 :
+-                servicekey = RM_AND_ADDR;
+-                break;
+-            case 5 :
+-                servicekey = RM_AND_ADDR;
+-                break;
+-            case 6:
+-                servicekey = RM_SEC_AND_ADDR;
+-                break;
+-            case 7:
+-                servicekey = RM_SEC_AND_ADDR;
+-                break;
+             default :
+                 servicekey = NONE;
+                 break;
+@@ -139,11 +121,6 @@
+                     if (wsAddrOn) {
+                         service.engageModule(axisCfg.getModule(
+                             SynapseConstants.ADDRESSING_MODULE_NAME), axisCfg);
+-
+-                        if (wsRMOn) {
+-                            service.engageModule(axisCfg.getModule(
+-                                SynapseConstants.RM_MODULE_NAME), axisCfg);
+-                        }
+                     }
+                     // if WS-A is off, WS-RM should be too
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java	(revision 1531436)
++++ java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java	(revision 1531437)
+@@ -19,7 +19,6 @@
+ 
+ package org.apache.synapse.core.axis2;
+ 
+-import org.apache.axiom.om.OMElement;
+ import org.apache.axis2.AxisFault;
+ import org.apache.axis2.Constants;
+ import org.apache.axis2.addressing.AddressingConstants;
+@@ -26,7 +25,6 @@
+ import org.apache.axis2.addressing.EndpointReference;
+ import org.apache.axis2.client.OperationClient;
+ import org.apache.axis2.client.Options;
+-import org.apache.axis2.client.ServiceClient;
+ import org.apache.axis2.context.ConfigurationContext;
+ import org.apache.axis2.context.MessageContext;
+ import org.apache.axis2.context.ServiceContext;
+@@ -39,11 +37,6 @@
+ import org.apache.axis2.wsdl.WSDLConstants;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+-import org.apache.sandesha2.Sandesha2Constants;
+-import org.apache.sandesha2.client.SandeshaClient;
+-import org.apache.sandesha2.client.SandeshaClientConstants;
+-import org.apache.sandesha2.policy.SandeshaPolicyBean;
+-import org.apache.sandesha2.policy.builders.RMAssertionBuilder;
+ import org.apache.synapse.SynapseConstants;
+ import org.apache.synapse.endpoints.EndpointDefinition;
+ import org.apache.synapse.rest.RESTConstants;
+@@ -81,8 +74,6 @@
+         String wsSecPolicyKey = null;
+         String inboundWsSecPolicyKey = null;
+         String outboundWsSecPolicyKey = null;
+-        boolean wsRMEnabled = false;
+-        String wsRMPolicyKey = null;
+         boolean wsAddressingEnabled = false;
+         String wsAddressingVersion = null;
+ 
+@@ -92,9 +83,7 @@
+             wsSecPolicyKey = endpoint.getWsSecPolicyKey();
+             inboundWsSecPolicyKey = endpoint.getInboundWsSecPolicyKey();
+             outboundWsSecPolicyKey = endpoint.getOutboundWsSecPolicyKey();
+-            wsRMEnabled = endpoint.isReliableMessagingOn();
+-            wsRMPolicyKey = endpoint.getWsRMPolicyKey();
+-            wsAddressingEnabled = endpoint.isAddressingOn() || wsRMEnabled;
++            wsAddressingEnabled = endpoint.isAddressingOn();
+             wsAddressingVersion = endpoint.getAddressingVersion();
+         }
+ 
+@@ -109,7 +98,6 @@
+             log.debug(
+                 "Sending [add = " + wsAddressingEnabled +
+                 "] [sec = " + wsSecurityEnabled +
+-                "] [rm = " + wsRMEnabled +
+                 (endpoint != null ?
+                     "] [mtom = " + endpoint.isUseMTOM() +
+                     "] [swa = " + endpoint.isUseSwa() +
+@@ -329,7 +317,7 @@
+ 
+         AxisService anonymousService =
+             AnonymousServiceFactory.getAnonymousService(synapseOutMessageContext.getConfiguration(),
+-                    axisCfg, wsAddressingEnabled, wsRMEnabled, wsSecurityEnabled);
++                    axisCfg, wsAddressingEnabled, wsSecurityEnabled);
+         // mark the anon services created to be used in the client side of synapse as hidden
+         // from the server side of synapse point of view
+         anonymousService.getParent().addParameter(SynapseConstants.HIDDEN_SERVICE_PARAM, "true");
+@@ -349,20 +337,6 @@
+ 
+         Options clientOptions = MessageHelper.cloneOptions(originalInMsgCtx.getOptions());
+         clientOptions.setUseSeparateListener(separateListener);
+-        // if RM is requested,
+-        if (wsRMEnabled) {
+-            // if a WS-RM policy is specified, use it
+-            if (wsRMPolicyKey != null) {
+-                Object property = synapseOutMessageContext.getEntry(wsRMPolicyKey);
+-                if (property instanceof OMElement) {
+-                    OMElement policyOMElement = (OMElement) property;
+-                    RMAssertionBuilder builder = new RMAssertionBuilder();
+-                    SandeshaPolicyBean sandeshaPolicyBean = (SandeshaPolicyBean) builder.build(policyOMElement, null);
+-                    Parameter policyParam = new Parameter(Sandesha2Constants.SANDESHA_PROPERTY_BEAN, sandeshaPolicyBean);
+-                    anonymousService.addParameter(policyParam);
+-                }
+-            }
+-        }
+ 
+         // if security is enabled,
+         if (wsSecurityEnabled) {
+@@ -416,7 +390,7 @@
+ 
+         // this is a temporary fix for converting messages from HTTP 1.1 chunking to HTTP 1.0.
+         // Without this HTTP transport can block & become unresponsive because we are streaming
+-        // HTTP 1.1 messages and HTTP 1.0 require the whole message to caculate the content length
++        // HTTP 1.1 messages and HTTP 1.0 require the whole message to calculate the content length
+         if (originalInMsgCtx.isPropertyTrue(NhttpConstants.FORCE_HTTP_1_0)) {
+             synapseOutMessageContext.getEnvelope().toString();
+         }
+@@ -436,19 +410,6 @@
+         }
+ 
+         mepClient.execute(true);
+-        if (wsRMEnabled) {
+-            Object rm11 = clientOptions.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);
+-            if ((rm11 != null) && rm11.equals(Sandesha2Constants.SPEC_VERSIONS.v1_1)){
+-                ServiceClient serviceClient = new ServiceClient(
+-                        axisOutMsgCtx.getConfigurationContext(), axisOutMsgCtx.getAxisService());
+-                serviceClient.setTargetEPR(
+-                        new EndpointReference(endpoint.getAddress(synapseOutMessageContext)));
+-                serviceClient.setOptions(clientOptions);
+-                serviceClient.getOptions().setTo(
+-                        new EndpointReference(endpoint.getAddress(synapseOutMessageContext)));
+-                SandeshaClient.terminateSequence(serviceClient);
+-            }
+-        }
+    }
+ 
+     private static MessageContext cloneForSend(MessageContext ori, String preserveAddressing)
+Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/ProxyService.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/core/axis2/ProxyService.java	(revision 1531436)
++++ java/modules/core/src/main/java/org/apache/synapse/core/axis2/ProxyService.java	(revision 1531437)
+@@ -75,7 +75,6 @@
+  *       <resource location="..." key="..."/>*
+  *    </publishWSDL>?
+  *    <enableSec/>?
+- *    <enableRM/>?
+  *    <policy key="string" [type=("in" |"out")] [operationName="string"]
+  *      [operationNamespace="string"]>?
+  *       // optional service parameters
+@@ -184,10 +183,6 @@
+      */
+     private boolean wsAddrEnabled = false;
+     /**
+-     * Should WS RM be engaged on this service
+-     */
+-    private boolean wsRMEnabled = false;
+-    /**
+      * Should WS Sec be engaged on this service
+      */
+     private boolean wsSecEnabled = false;
+@@ -605,17 +600,6 @@
+             }
+         }
+ 
+-        // should RM be engaged on this service?
+-        if (wsRMEnabled) {
+-            auditInfo("WS-Reliable messaging is enabled for service : " + name);
+-            try {
+-                proxyService.engageModule(axisCfg.getModule(
+-                    SynapseConstants.RM_MODULE_NAME), axisCfg);
+-            } catch (AxisFault axisFault) {
+-                handleException("Error loading WS RM module on proxy service : " + name, axisFault);
+-            }
+-        }
+-
+         // should Security be engaged on this service?
+         if (wsSecEnabled) {
+             auditInfo("WS-Security is enabled for service : " + name);
+@@ -628,7 +612,7 @@
+             }
+         }
+ 
+-        moduleEngaged = wsSecEnabled || wsRMEnabled || wsAddrEnabled;
++        moduleEngaged = wsSecEnabled || wsAddrEnabled;
+         wsdlPublished = wsdlFound;
+ 
+         auditInfo("Successfully created the Axis2 service for Proxy service : " + name);
+@@ -874,14 +858,6 @@
+         this.wsAddrEnabled = wsAddrEnabled;
+     }
+ 
+-    public boolean isWsRMEnabled() {
+-        return wsRMEnabled;
+-    }
+-
+-    public void setWsRMEnabled(boolean wsRMEnabled) {
+-        this.wsRMEnabled = wsRMEnabled;
+-    }
+-
+     public boolean isWsSecEnabled() {
+         return wsSecEnabled;
+     }
+Index: java/modules/core/src/main/java/org/apache/synapse/core/relay/ServiceRequestEarlyBuilder.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/core/relay/ServiceRequestEarlyBuilder.java	(revision 1531436)
++++ java/modules/core/src/main/java/org/apache/synapse/core/relay/ServiceRequestEarlyBuilder.java	(revision 1531437)
+@@ -26,7 +26,6 @@
+ import org.apache.axis2.engine.AxisConfiguration;
+ import org.apache.axis2.handlers.AbstractHandler;
+ import org.apache.axis2.wsdl.WSDLConstants;
+-import org.apache.sandesha2.Sandesha2Constants;
+ import org.apache.synapse.SynapseConstants;
+ import org.apache.synapse.config.SynapseConfiguration;
+ import org.apache.synapse.core.axis2.ProxyService;
+@@ -84,12 +83,6 @@
+                     outMessage.getProperty(RelayConstants.FORCE_RESPONSE_EARLY_BUILD))) {
+                 return buildMessage(messageContext);
+             }
+-
+-            AxisOperation operation = messageContext.getAxisOperation();
+-            if (operation != null && operation.getName().getLocalPart().
+-                    startsWith(Sandesha2Constants.SANDESHA_OP_PREFIX)) {
+-                return buildMessage(messageContext);
+-            }
+         }
+ 
+         return InvocationResponse.CONTINUE;
+Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/EndpointDefinition.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/endpoints/EndpointDefinition.java	(revision 1531436)
++++ java/modules/core/src/main/java/org/apache/synapse/endpoints/EndpointDefinition.java	(revision 1531437)
+@@ -43,10 +43,6 @@
+      */
+     private String address = null;
+     /**
+-     * Should messages be sent in an WS-RM Sequence ?
+-     */
+-    private boolean reliableMessagingOn = false;
+-    /**
+      * Should messages be sent using WS-A?
+      */
+     private boolean addressingOn = false;
+@@ -59,10 +55,6 @@
+      */
+     private boolean securityOn = false;
+     /**
+-     * The "key" for any WS-RM Policy overrides to be used
+-     */
+-    private String wsRMPolicyKey = null;
+-    /**
+      * The "key" for any Rampart Security Policy to be used
+      */
+     private String wsSecPolicyKey = null;
+@@ -220,24 +212,6 @@
+     }
+ 
+     /**
+-     * Is RM turned on on this endpoint?
+-     *
+-     * @return true if on
+-     */
+-    public boolean isReliableMessagingOn() {
+-        return reliableMessagingOn;
+-    }
+-
+-    /**
+-     * Request that RM be turned on/off on this endpoint
+-     *
+-     * @param reliableMessagingOn a boolean flag indicating RM is on or not
+-     */
+-    public void setReliableMessagingOn(boolean reliableMessagingOn) {
+-        this.reliableMessagingOn = reliableMessagingOn;
+-    }
+-
+-    /**
+      * Is WS-A turned on on this endpoint?
+      *
+      * @return true if on
+@@ -348,24 +322,6 @@
+         this.outboundWsSecPolicyKey = outboundWsSecPolicyKey;
+     }
+ 
+-    /**
+-     * Get the WS-RM configuration policys' 'key' to be used
+-     *
+-     * @return the WS-RM configuration policys' 'key' to be used
+-     */
+-    public String getWsRMPolicyKey() {
+-        return wsRMPolicyKey;
+-    }
+-
+-    /**
+-     * Set the WS-RM configuration policys' 'key' to be used
+-     *
+-     * @param wsRMPolicyKey the WS-RM configuration policys' 'key' to be used
+-     */
+-    public void setWsRMPolicyKey(String wsRMPolicyKey) {
+-        this.wsRMPolicyKey = wsRMPolicyKey;
+-    }
+-
+     public void setUseSeparateListener(boolean b) {
+         this.useSeparateListener = b;
+     }
+Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/AbstractEndpoint.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/endpoints/AbstractEndpoint.java	(revision 1531436)
++++ java/modules/core/src/main/java/org/apache/synapse/endpoints/AbstractEndpoint.java	(revision 1531437)
+@@ -219,8 +219,7 @@
+ 
+         contentAware = definition != null &&
+                 ((definition.getFormat() != null && !definition.getFormat().equals(SynapseConstants.FORMAT_REST)) ||
+-                definition.isSecurityOn() || definition.isReliableMessagingOn() ||
+-                definition.isAddressingOn());
++                definition.isSecurityOn() || definition.isAddressingOn());
+     }
+ 
+     public boolean readyToSend() {
+Index: java/modules/core/src/main/java/org/apache/synapse/SynapseConstants.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/SynapseConstants.java	(revision 1531436)
++++ java/modules/core/src/main/java/org/apache/synapse/SynapseConstants.java	(revision 1531437)
+@@ -51,8 +51,6 @@
+     public static final QName SYNAPSE_OPERATION_NAME = new QName("mediate");
+ 
+     //- names of modules to be engaged at runtime -
+-    /** The Name of the WS-RM module */
+-    public static final String RM_MODULE_NAME = "sandesha2";
+     /** The Name of the WS-A Addressing module */
+     public static final String ADDRESSING_MODULE_NAME = "addressing";
+     /** The Name of the WS-Security module */
+@@ -97,10 +95,8 @@
+     public static final String RAMPART_POLICY = "rampartPolicy";
+     /** The Axis2 client options property name for the Rampart in message policy */
+     public static final String RAMPART_IN_POLICY = "rampartInPolicy";
+-    /** The Axis2 client options property name for the Rampart out messsage policy */
++    /** The Axis2 client options property name for the Rampart out message policy */
+     public static final String RAMPART_OUT_POLICY = "rampartOutPolicy";
+-    /** The Axis2 client options property name for the Sandesha policy */
+-	public static final String SANDESHA_POLICY = "sandeshaPolicy";
+     /** ServerManager MBean category and id */
+     public static final String SERVER_MANAGER_MBEAN = "ServerManager";
+     public static final String RECEIVING_SEQUENCE = "RECEIVING_SEQUENCE";
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/ProxyServiceFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/ProxyServiceFactory.java	(revision 1531436)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/ProxyServiceFactory.java	(revision 1531437)
+@@ -56,7 +56,6 @@
+  *    &lt;/publishWSDL&gt;?
+  *    &lt;enableAddressing/&gt;?
+  *    &lt;enableSec/&gt;?
+- *    &lt;enableRM/&gt;?
+  *    &lt;policy key="string"/&gt;?
+  *    &lt;policy key="string" type=(in | out)/&gt;?
+  *       // optional service parameters
+@@ -352,11 +351,6 @@
+         }
+ 
+         if (elem.getFirstChildWithName(
+-                new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "enableRM")) != null) {
+-            proxy.setWsRMEnabled(true);
+-        }
+-
+-        if (elem.getFirstChildWithName(
+                 new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "enableSec")) != null) {
+             proxy.setWsSecEnabled(true);
+         }
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/WSDLEndpointFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/WSDLEndpointFactory.java	(revision 1531436)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/WSDLEndpointFactory.java	(revision 1531437)
+@@ -52,7 +52,6 @@
+  *     &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt;?
+  *     &lt;wsdl20:description&gt;...&lt;/wsdl20:description&gt;?
+  *
+- *     &lt;enableRM [policy="<em>key</em>"]/&gt;?
+  *     &lt;enableSec [policy="<em>key</em>"]/&gt;?
+  *     &lt;enableAddressing [version="final|submission"] [separateListener="true|false"]/&gt;?
+  *
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/DefaultEndpointFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/DefaultEndpointFactory.java	(revision 1531436)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/DefaultEndpointFactory.java	(revision 1531437)
+@@ -42,7 +42,6 @@
+  *          [statistics="enable|disable"] [trace="enable|disable"]&gt;
+  *     .. extensibility ..
+  *
+- *     &lt;enableRM [policy="<em>key</em>"]/&gt;?
+  *     &lt;enableSec [policy="<em>key</em>"]/&gt;?
+  *     &lt;enableAddressing [version="final|submission"] [separateListener="true|false"]/&gt;?
+  *
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/EndpointDefinitionFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/EndpointDefinitionFactory.java	(revision 1531436)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/EndpointDefinitionFactory.java	(revision 1531437)
+@@ -31,7 +31,8 @@
+ import javax.xml.namespace.QName;
+ import java.util.StringTokenizer;
+ 
+-public class EndpointDefinitionFactory implements DefinitionFactory{
++public class EndpointDefinitionFactory implements DefinitionFactory {
++
+     public static final Log log = LogFactory.getLog(EndpointDefinitionFactory.class);
+ 
+     /**
+@@ -126,19 +127,6 @@
+             }
+         }
+ 
+-        OMElement wsRm = elem.getFirstChildWithName(
+-                new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "enableRM"));
+-        if (wsRm != null) {
+-
+-            definition.setReliableMessagingOn(true);
+-
+-            OMAttribute policy
+-                    = wsRm.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE, "policy"));
+-            if (policy != null) {
+-                definition.setWsRMPolicyKey(policy.getAttributeValue());
+-            }
+-        }
+-
+         // set the timeout configuration
+         OMElement timeout = elem.getFirstChildWithName(
+                 new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "timeout"));
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/EndpointDefinitionSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/EndpointDefinitionSerializer.java	(revision 1531436)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/EndpointDefinitionSerializer.java	(revision 1531437)
+@@ -77,16 +77,6 @@
+             element.addChild(addressing);
+         }
+ 
+-        if (endpointDefinition.isReliableMessagingOn()) {
+-            OMElement rm = fac.createOMElement("enableRM", SynapseConstants.SYNAPSE_OMNAMESPACE);
+-
+-            if (endpointDefinition.getWsRMPolicyKey() != null) {
+-                rm.addAttribute(fac.createOMAttribute(
+-                        "policy", null, endpointDefinition.getWsRMPolicyKey()));
+-            }
+-            element.addChild(rm);
+-        }
+-
+         if (endpointDefinition.isSecurityOn()) {
+             OMElement sec = fac.createOMElement("enableSec", SynapseConstants.SYNAPSE_OMNAMESPACE);
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/AddressEndpointFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/AddressEndpointFactory.java	(revision 1531436)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/AddressEndpointFactory.java	(revision 1531437)
+@@ -42,7 +42,6 @@
+  *            [statistics="enable|disable"] [trace="enable|disable"]&gt;
+  *     .. extensibility ..
+  *
+- *     &lt;enableRM [policy="<em>key</em>"]/&gt;?
+  *     &lt;enableSec [policy="<em>key</em>"]/&gt;?
+  *     &lt;enableAddressing [version="final|submission"] [separateListener="true|false"]/&gt;?
+  *
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java	(revision 1531436)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java	(revision 1531437)
+@@ -47,7 +47,6 @@
+         SwitchMediatorSerializer.class,
+         InMediatorSerializer.class,
+         OutMediatorSerializer.class,
+-        RMSequenceMediatorSerializer.class,     
+         ClassMediatorSerializer.class,
+         ValidateMediatorSerializer.class,
+         XSLTMediatorSerializer.class,
+@@ -134,7 +133,7 @@
+     /**
+      * This method will return the serializer Map registered with the Finder
+      * 
+-     * @return Map of serilaizers already registered with the Finder
++     * @return Map of serializers already registered with the Finder
+      */
+     public Map<String, MediatorSerializer> getSerializerMap() {
+         return serializerMap;
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/ProxyServiceSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/ProxyServiceSerializer.java	(revision 1531436)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/ProxyServiceSerializer.java	(revision 1531437)
+@@ -209,9 +209,6 @@
+         if (service.isWsAddrEnabled()) {
+             proxy.addChild(fac.createOMElement("enableAddressing", synNS));
+         }
+-        if (service.isWsRMEnabled()) {
+-            proxy.addChild(fac.createOMElement("enableRM", synNS));
+-        }
+         if (service.isWsSecEnabled()) {
+             proxy.addChild(fac.createOMElement("enableSec", synNS));
+         }        
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java	(revision 1531436)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java	(revision 1531437)
+@@ -60,7 +60,6 @@
+         SwitchMediatorFactory.class,
+         InMediatorFactory.class,
+         OutMediatorFactory.class,
+-        RMSequenceMediatorFactory.class,
+         ClassMediatorFactory.class,
+         ValidateMediatorFactory.class,
+         XSLTMediatorFactory.class,
+Index: java/modules/war/pom.xml
+===================================================================
+--- java/modules/war/pom.xml	(revision 1531436)
++++ java/modules/war/pom.xml	(revision 1531437)
+@@ -113,13 +113,6 @@
+                                     <outputDirectory>target/temp/lib</outputDirectory>
+                                 </artifactItem>
+                                 <artifactItem>
+-                                    <groupId>org.apache.sandesha2</groupId>
+-                                    <artifactId>sandesha2</artifactId>
+-                                    <version>${sandesha2.version}</version>
+-                                    <type>mar</type>
+-                                    <outputDirectory>target/temp/lib</outputDirectory>
+-                                </artifactItem>
+-                                <artifactItem>
+                                     <groupId>org.apache.rampart</groupId>
+                                     <artifactId>rampart</artifactId>
+                                     <version>${rampart.version}</version>
+@@ -208,7 +201,6 @@
+                             <includes>
+                                 <include>addressing-${addressing.version}.mar</include>
+                                 <include>rampart-${rampart.version}.mar</include>
+-                                <include>sandesha2-${sandesha2.version}.mar</include>
+                             </includes>
+                         </resource>
+                         <resource>
+Index: java/modules/samples/pom.xml
+===================================================================
+--- java/modules/samples/pom.xml	(revision 1531436)
++++ java/modules/samples/pom.xml	(revision 1531437)
+@@ -300,17 +300,6 @@
+                                             </outputDirectory>
+                                         </artifactItem>
+                                         <artifactItem>
+-                                            <groupId>org.apache.sandesha2</groupId>
+-                                            <artifactId>sandesha2</artifactId>
+-                                            <version>${sandesha2.version}</version>
+-                                            <type>mar</type>
+-                                            <overWrite>true</overWrite>
+-                                            <outputDirectory>target/test_repos/axis2Server/modules
+-                                            </outputDirectory>
+-                                        </artifactItem>
+-
+-
+-                                        <artifactItem>
+                                             <groupId>org.apache.axis2</groupId>
+                                             <artifactId>addressing</artifactId>
+                                             <version>${addressing.version}</version>
+@@ -329,15 +318,6 @@
+                                             </outputDirectory>
+                                         </artifactItem>
+                                         <artifactItem>
+-                                            <groupId>org.apache.sandesha2</groupId>
+-                                            <artifactId>sandesha2</artifactId>
+-                                            <version>${sandesha2.version}</version>
+-                                            <type>mar</type>
+-                                            <overWrite>true</overWrite>
+-                                            <outputDirectory>target/test_repos/synapse/modules
+-                                            </outputDirectory>
+-                                        </artifactItem>
+-                                        <artifactItem>
+                                             <groupId>org.apache.synapse</groupId>
+                                             <artifactId>synapse</artifactId>
+                                             <version>${synapse.version}</version>
+Index: java/repository/schema/mediators/mediators.xsd
+===================================================================
+--- java/repository/schema/mediators/mediators.xsd	(revision 1531436)
++++ java/repository/schema/mediators/mediators.xsd	(revision 1531437)
+@@ -38,7 +38,6 @@
+     <xs:include schemaLocation="transformation/xslt.xsd"/>
+     <xs:include schemaLocation="transformation/xquery.xsd"/>
+     <xs:include schemaLocation="transformation/rewrite.xsd"/>
+-    <xs:include schemaLocation="advanced/rm_sequence.xsd"/>
+     <xs:include schemaLocation="advanced/db_mediators.xsd"/>
+     <xs:include schemaLocation="advanced/cache.xsd"/>
+     <xs:include schemaLocation="advanced/event.xsd"/>
+@@ -77,7 +76,6 @@
+             <xs:element ref="validate"/>
+             <xs:element ref="filter"/>
+             <xs:element ref="switch"/>
+-            <xs:element ref="RMSequence"/>
+             <xs:element ref="makefault"/>
+             <xs:element ref="script"/>
+             <xs:element ref="xslt"/>
+Index: java/repository/schema/proxy.xsd
+===================================================================
+--- java/repository/schema/proxy.xsd	(revision 1531436)
++++ java/repository/schema/proxy.xsd	(revision 1531437)
+@@ -60,7 +60,6 @@
+             </xs:element>
+             <xs:element name="enableAddressing" minOccurs="0" maxOccurs="1"/>
+             <xs:element name="enableSec" minOccurs="0" maxOccurs="1"/>
+-            <xs:element name="enableRM" minOccurs="0" maxOccurs="1"/>
+             <xs:element name="policy" minOccurs="0" maxOccurs="unbounded">
+                 <xs:complexType>
+                     <xs:attribute name="key" type="xs:string" use="required"/>
+-*-*-*-
+Message: Retiring sandesha and RM related code - See http://osdir.com/ml/dev-synapse.apache.org/2013-09/msg00025.html for the mail thread
+-*-*-*-
+When: 2013-10-11 17:50:39 -0400 
+-*-*-*-
+Who: hiranya

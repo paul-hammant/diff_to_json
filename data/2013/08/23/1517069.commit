@@ -1,0 +1,659 @@
+Index: java/repository/conf/sample/synapse_sample_433.xml
+===================================================================
+--- java/repository/conf/sample/synapse_sample_433.xml	(revision 1517068)
++++ java/repository/conf/sample/synapse_sample_433.xml	(revision 1517069)
+@@ -22,7 +22,8 @@
+ <definitions xmlns="http://ws.apache.org/ns/synapse">
+ 
+     <sequence name="main">
+-        <callout endpointKey="StockQuoteServiceEndpoint">
++        <callout>
++            <endpoint key="StockQuoteServiceEndpoint"/>
+             <source xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
+                     xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
+                     xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
+Index: java/repository/conf/sample/synapse_sample_434.xml
+===================================================================
+--- java/repository/conf/sample/synapse_sample_434.xml	(nonexistent)
++++ java/repository/conf/sample/synapse_sample_434.xml	(revision 1517069)
+@@ -0,0 +1,42 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!--
++  ~  Licensed to the Apache Software Foundation (ASF) under one
++  ~  or more contributor license agreements.  See the NOTICE file
++  ~  distributed with this work for additional information
++  ~  regarding copyright ownership.  The ASF licenses this file
++  ~  to you under the Apache License, Version 2.0 (the
++  ~  "License"); you may not use this file except in compliance
++  ~  with the License.  You may obtain a copy of the License at
++  ~
++  ~   http://www.apache.org/licenses/LICENSE-2.0
++  ~
++  ~  Unless required by applicable law or agreed to in writing,
++  ~  software distributed under the License is distributed on an
++  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++  ~  KIND, either express or implied.  See the License for the
++  ~  specific language governing permissions and limitations
++  ~  under the License.
++  -->
++
++<!-- Callout  mediator Inline Endpoint Sample-->
++<definitions xmlns="http://ws.apache.org/ns/synapse">
++
++    <sequence name="main">
++        <callout>
++            <endpoint>
++                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
++            </endpoint>
++            <source xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
++                    xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
++                    xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
++            <target xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
++                    xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
++                    xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
++        </callout>
++        <property name="RESPONSE" value="true"/>
++        <header name="To" action="remove"/>
++        <send/>
++        <drop/>
++    </sequence>
++
++</definitions>
+Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2BlockingClient.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2BlockingClient.java	(revision 1517068)
++++ java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2BlockingClient.java	(revision 1517069)
+@@ -41,6 +41,7 @@
+ import org.apache.synapse.endpoints.AbstractEndpoint;
+ import org.apache.synapse.endpoints.Endpoint;
+ import org.apache.synapse.endpoints.EndpointDefinition;
++import org.apache.synapse.endpoints.IndirectEndpoint;
+ import org.apache.synapse.transport.nhttp.NhttpConstants;
+ import org.apache.synapse.util.MessageHelper;
+ 
+@@ -94,6 +95,11 @@
+             log.debug("Start Sending the Message ");
+         }
+ 
++        if (endpoint instanceof IndirectEndpoint) {
++            // Get the real endpoint if endpoint is an indirect one
++            endpoint = ((IndirectEndpoint) endpoint).getRealEndpoint(synapseInMsgCtx);
++        }
++
+         AbstractEndpoint abstractEndpoint = (AbstractEndpoint) endpoint;
+         if (!abstractEndpoint.isLeafEndpoint()) {
+             handleException("Endpoint type not supported. Only leaf endpoints are supported");
+Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/IndirectEndpoint.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/endpoints/IndirectEndpoint.java	(revision 1517068)
++++ java/modules/core/src/main/java/org/apache/synapse/endpoints/IndirectEndpoint.java	(revision 1517069)
+@@ -113,11 +113,22 @@
+     }
+ 
+     /**
++     * Get the real endpoint
++     *
++     * @param synCtx Message Context
++     * @return real endpoint which is referred by the indirect endpoint
++     */
++    public Endpoint getRealEndpoint(MessageContext synCtx) {
++        reLoadAndInitEndpoint(((Axis2MessageContext) synCtx).
++                getAxis2MessageContext().getConfigurationContext());
++        return realEndpoint;
++    }
++
++    /**
+      * Reload as needed , either from registry , local entries or predefined endpoints 
+      * @param cc ConfigurationContext
+      */
+     private synchronized void reLoadAndInitEndpoint(ConfigurationContext cc) {
+-
+         Parameter parameter = cc.getAxisConfiguration().getParameter(
+                 SynapseConstants.SYNAPSE_CONFIG);
+         Parameter synEnvParameter = cc.getAxisConfiguration().getParameter(
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/CalloutMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/CalloutMediator.java	(revision 1517068)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/CalloutMediator.java	(revision 1517069)
+@@ -48,6 +48,7 @@
+ /**
+  * <callout [serviceURL="string"] [action="string"][passHeaders="true|false"]>
+  * <configuration [axis2xml="string"] [repository="string"]/>?
++ * <endpoint/>?
+  * <source xpath="expression" | key="string">? <!-- key can be a MC property or entry key -->
+  * <target xpath="expression" | key="string"/>?
+  * <enableSec policy="string" | outboundPolicy="String" | inboundPolicy="String"/>?
+@@ -81,11 +82,11 @@
+ 
+     private String outboundWsSecPolicyKey = null;
+ 
+-    private String endpointKey = null;
++    private Endpoint endpoint = null;
+ 
+-    private Endpoint endpoint;
++    private boolean isWrappingEndpointCreated = false;
+ 
+-    Axis2BlockingClient blockingMsgSender = null;
++    private Axis2BlockingClient blockingMsgSender = null;
+ 
+     public boolean mediate(MessageContext synCtx) {
+ 
+@@ -100,28 +101,28 @@
+         }
+ 
+         try {
+-            if (endpoint == null && endpointKey != null) {
+-                endpoint = synCtx.getEndpoint(endpointKey);
+-                if (synLog.isTraceOrDebugEnabled()) {
++
++            if (synLog.isTraceOrDebugEnabled()) {
++                if (!isWrappingEndpointCreated) {
+                     synLog.traceOrDebug("Using the defined endpoint : " + endpoint.getName());
+-                }
+-            } else if (synLog.isTraceOrDebugEnabled()) {
+-                if (serviceURL != null) {
+-                    synLog.traceOrDebug("Using the serviceURL : " + serviceURL);
+                 } else {
+-                    synLog.traceOrDebug("Using the To header as the EPR ");
+-                }
+-                if (securityOn) {
+-                    synLog.traceOrDebug("Security enabled within the Callout Mediator config");
+-                    if (wsSecPolicyKey != null) {
+-                        synLog.traceOrDebug("Using security policy key : " + wsSecPolicyKey);
++                    if (serviceURL != null) {
++                        synLog.traceOrDebug("Using the serviceURL : " + serviceURL);
+                     } else {
+-                        if (inboundWsSecPolicyKey != null) {
+-                            synLog.traceOrDebug("Using inbound security policy key : " + inboundWsSecPolicyKey);
++                        synLog.traceOrDebug("Using the To header as the EPR ");
++                    }
++                    if (securityOn) {
++                        synLog.traceOrDebug("Security enabled within the Callout Mediator config");
++                        if (wsSecPolicyKey != null) {
++                            synLog.traceOrDebug("Using security policy key : " + wsSecPolicyKey);
++                        } else {
++                            if (inboundWsSecPolicyKey != null) {
++                                synLog.traceOrDebug("Using inbound security policy key : " + inboundWsSecPolicyKey);
++                            }
++                            if (outboundWsSecPolicyKey != null) {
++                                synLog.traceOrDebug("Using outbound security policy key : " + outboundWsSecPolicyKey);
++                            }
+                         }
+-                        if (outboundWsSecPolicyKey != null) {
+-                            synLog.traceOrDebug("Using outbound security policy key : " + outboundWsSecPolicyKey);
+-                        }
+                     }
+                 }
+             }
+@@ -285,18 +286,24 @@
+         blockingMsgSender = new Axis2BlockingClient(clientRepository, axis2xml);
+ 
+         EndpointDefinition endpointDefinition = null;
++
+         if (serviceURL != null) {
++            // If Service URL is specified, it is given the highest priority
+             endpoint = new AddressEndpoint();
+             endpointDefinition = new EndpointDefinition();
+             endpointDefinition.setAddress(serviceURL);
+             ((AddressEndpoint) endpoint).setDefinition(endpointDefinition);
+-        } else if (endpointKey == null) {
++            isWrappingEndpointCreated = true;
++        } else if (endpoint == null) {
+             // Use a default endpoint in this case - i.e. the To header
+             endpoint = new DefaultEndpoint();
+             endpointDefinition = new EndpointDefinition();
+             ((DefaultEndpoint) endpoint).setDefinition(endpointDefinition);
++            isWrappingEndpointCreated = true;
++        } else {
++            endpoint.init(synEnv);
+         }
+-        // If the endpointKey is specified, we'll look it up at mediation time
++        // If the endpoint is specified, we'll look it up at mediation time.
+ 
+         if (endpointDefinition != null && isSecurityOn()) {
+             endpointDefinition.setSecurityOn(true);
+@@ -314,6 +321,9 @@
+     }
+ 
+     public void destroy() {
++        if (!isWrappingEndpointCreated) {
++            endpoint.destroy();
++        }
+         try {
+             blockingMsgSender.cleanup();
+         } catch (AxisFault ignore) {}
+@@ -467,12 +477,25 @@
+         this.inboundWsSecPolicyKey = inboundWsSecPolicyKey;
+     }
+ 
+-    public void setEndpointKey(String key) {
+-        this.endpointKey = key;
++    /**
++     * Get the defined endpoint
++     *
++     * @return endpoint
++     */
++    public Endpoint getEndpoint() {
++        if (!isWrappingEndpointCreated) {
++            return endpoint;
++        }
++        return null;
+     }
+ 
+-    public String getEndpointKey() {
+-        return endpointKey;
++    /**
++     * Set the defined endpoint
++     *
++     * @param endpoint defined endpoint
++     */
++    public void setEndpoint(Endpoint endpoint) {
++        this.endpoint = endpoint;
+     }
+ 
+ }
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorSerializer.java	(revision 1517068)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorSerializer.java	(revision 1517069)
+@@ -21,6 +21,8 @@
+ 
+ import org.apache.axiom.om.OMElement;
+ import org.apache.synapse.Mediator;
++import org.apache.synapse.config.xml.endpoints.EndpointSerializer;
++import org.apache.synapse.endpoints.Endpoint;
+ import org.apache.synapse.mediators.builtin.CalloutMediator;
+ 
+ /**
+@@ -27,8 +29,9 @@
+  * <pre>
+  * &lt;callout [serviceURL="string"] [action="string"][passHeaders="true|false"]&gt;
+  *      &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
+- *      &lt;source xpath="expression" | key="string"&gt;
+- *      &lt;target xpath="expression" | key="string"/&gt;
++ *      &lt;endpoint/&gt;?
++ *      &lt;source xpath="expression" | key="string"&gt;?
++ *      &lt;target xpath="expression" | key="string"/&gt;?
+  *      &lt;enableSec policy="string" | outboundPolicy="String" | inboundPolicy="String" /&gt;?
+  * &lt;/callout&gt;
+  * </pre>
+@@ -48,10 +51,13 @@
+ 
+         if (mediator.getServiceURL() != null) {
+             callout.addAttribute(fac.createOMAttribute("serviceURL", nullNS, mediator.getServiceURL()));
+-        } else if (mediator.getEndpointKey() != null) {
+-            callout.addAttribute(fac.createOMAttribute("endpointKey", nullNS, mediator.getEndpointKey()));
+         }
+ 
++        Endpoint endpoint = mediator.getEndpoint();
++        if (endpoint != null) {
++            callout.addChild(EndpointSerializer.getElementFromEndpoint(endpoint));
++        }
++
+         if (mediator.getAction() != null) {
+             callout.addAttribute(fac.createOMAttribute("action", nullNS, mediator.getAction()));
+         }
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorFactory.java	(revision 1517068)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorFactory.java	(revision 1517069)
+@@ -23,6 +23,9 @@
+ import org.apache.axiom.om.OMElement;
+ import org.apache.axis2.util.JavaUtils;
+ import org.apache.synapse.Mediator;
++import org.apache.synapse.config.xml.endpoints.EndpointFactory;
++import org.apache.synapse.endpoints.AbstractEndpoint;
++import org.apache.synapse.endpoints.Endpoint;
+ import org.apache.synapse.mediators.builtin.CalloutMediator;
+ import org.jaxen.JaxenException;
+ 
+@@ -36,8 +39,9 @@
+  * <pre>
+  * &lt;callout [serviceURL="string"] [action="string"][passHeaders="true|false"]&gt;
+  *      &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
+- *      &lt;source xpath="expression" | key="string"&gt;
+- *      &lt;target xpath="expression" | key="string"/&gt;
++ *      &lt;endpoint/&gt;?
++ *      &lt;source xpath="expression" | key="string"&gt;?
++ *      &lt;target xpath="expression" | key="string"/&gt;?
+  *      &lt;enableSec policy="string" | outboundPolicy="String" | inboundPolicy="String" /&gt;?
+  * &lt;/callout&gt;
+  * </pre>
+@@ -65,7 +69,7 @@
+                 = new QName(XMLConfigConstants.NULL_NAMESPACE, "outboundPolicy");
+     private static final QName ATT_INBOUND_SEC_POLICY
+                 = new QName(XMLConfigConstants.NULL_NAMESPACE, "inboundPolicy");
+-    private static final QName ATT_ENDPOINT = new QName("endpointKey");
++    private static final QName Q_ENDPOINT = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "endpoint");
+ 
+     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+ 
+@@ -72,9 +76,9 @@
+         CalloutMediator callout = new CalloutMediator();
+ 
+         OMAttribute attServiceURL = elem.getAttribute(ATT_URL);
+-        OMAttribute attEndpoint = elem.getAttribute(ATT_ENDPOINT);
+         OMAttribute attAction     = elem.getAttribute(ATT_ACTION);
+         OMAttribute attPassHeaders = elem.getAttribute(ATT_PASS_HEADERS);
++        OMElement epElement = elem.getFirstChildWithName(Q_ENDPOINT);
+         OMElement   configElt     = elem.getFirstChildWithName(Q_CONFIG);
+         OMElement   sourceElt     = elem.getFirstChildWithName(Q_SOURCE);
+         OMElement   targetElt     = elem.getFirstChildWithName(Q_TARGET);
+@@ -82,10 +86,20 @@
+ 
+         if (attServiceURL != null) {
+             callout.setServiceURL(attServiceURL.getAttributeValue());
+-        } else if (attEndpoint != null) {
+-            callout.setEndpointKey(attEndpoint.getAttributeValue());
+         }
+ 
++        if (epElement != null) {
++            Endpoint endpoint = EndpointFactory.getEndpointFromElement(epElement, true, properties);
++            if (endpoint != null) {
++                if (endpoint instanceof AbstractEndpoint &&
++                        ((AbstractEndpoint) endpoint).isLeafEndpoint()) {
++                    callout.setEndpoint(endpoint);
++                } else {
++                    handleException("Callout mediator only supports leaf endpoints");
++                }
++            }
++        }
++
+         if (attAction != null) {
+             callout.setAction(attAction.getAttributeValue());
+         }
+Index: java/modules/core/src/test/java/org/apache/synapse/config/xml/CalloutMediatorSerializationTest.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/config/xml/CalloutMediatorSerializationTest.java	(revision 1517068)
++++ java/modules/core/src/test/java/org/apache/synapse/config/xml/CalloutMediatorSerializationTest.java	(revision 1517069)
+@@ -109,11 +109,22 @@
+     }
+ 
+     public void testCalloutMediatorSerializationScenarioSix() {
+-        String inputXml = "<callout xmlns=\"http://ws.apache.org/ns/synapse\" " +
+-                "endpointKey=\"endpoint\"/>";
++        String inputXml = "<callout xmlns=\"http://ws.apache.org/ns/synapse\">" +
++                          "<endpoint key=\"endpointKey\"/>" +
++                          "</callout>";
+         assertTrue(serialization(inputXml, calloutMediatorFactory, calloutMediatorSerializer));
+         assertTrue(serialization(inputXml, calloutMediatorSerializer));
+     }
+ 
++    public void testCalloutMediatorSerializationScenarioSeven() {
++        String inputXml = "<callout xmlns=\"http://ws.apache.org/ns/synapse\">" +
++                          "<endpoint>" +
++                          "<address uri=\"http://localhost:9000/services/SimpleStockQuoteService\"/>" +
++                          "</endpoint>" +
++                          "</callout>";
++        assertTrue(serialization(inputXml, calloutMediatorFactory, calloutMediatorSerializer));
++        assertTrue(serialization(inputXml, calloutMediatorSerializer));
++    }
++
+ }
+ 
+Index: java/modules/documentation/src/site/xdoc/userguide/samples.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples.xml	(revision 1517068)
++++ java/modules/documentation/src/site/xdoc/userguide/samples.xml	(revision 1517069)
+@@ -201,6 +201,7 @@
+                         <li><a href="samples/sample431.html">Sample 431: Callout Mediator with WS-Security for Outgoing Messages</a></li>
+                         <li><a href="samples/sample432.html">Sample 432: Callout Mediator - Invoke a secured service which has different policies for inbound and outbound flows</a></li>
+                         <li><a href="samples/sample433.html">Sample 433: Callout Mediator - Invoke a service using a defined Endpoint</a></li>
++                        <li><a href="samples/sample434.html">Sample 434: Callout Mediator - Invoke a service using an inline Endpoint</a></li>
+                     </ul>
+                 </p>
+                 <h4>URL Rewrite Mediator</h4>
+Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample433.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples/sample433.xml	(revision 1517068)
++++ java/modules/documentation/src/site/xdoc/userguide/samples/sample433.xml	(revision 1517069)
+@@ -27,7 +27,8 @@
+             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+ 
+     &lt;sequence name="main"&gt;
+-        &lt;callout endpointKey="StockQuoteServiceEndpoint"&gt;
++        &lt;callout&gt;
++            &lt;endpoint key="StockQuoteServiceEndpoint"/&gt;
+             &lt;source xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
+                     xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
+                     xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/&gt;
+Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample434.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples/sample434.xml	(nonexistent)
++++ java/modules/documentation/src/site/xdoc/userguide/samples/sample434.xml	(revision 1517069)
+@@ -0,0 +1,84 @@
++<?xml version="1.0" encoding="ISO-8859-1" ?>
++<!--
++  ~  Licensed to the Apache Software Foundation (ASF) under one
++  ~  or more contributor license agreements.  See the NOTICE file
++  ~  distributed with this work for additional information
++  ~  regarding copyright ownership.  The ASF licenses this file
++  ~  to you under the Apache License, Version 2.0 (the
++  ~  "License"); you may not use this file except in compliance
++  ~  with the License.  You may obtain a copy of the License at
++  ~
++  ~   http://www.apache.org/licenses/LICENSE-2.0
++  ~
++  ~  Unless required by applicable law or agreed to in writing,
++  ~  software distributed under the License is distributed on an
++  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++  ~  KIND, either express or implied.  See the License for the
++  ~  specific language governing permissions and limitations
++  ~  under the License.
++  -->
++
++<document>
++    <properties>
++        <title>Apache Synapse - Sample 434</title>
++    </properties>
++    <body>
++        <section name="Sample 434: Callout Mediator - Invoke a service using an inline Endpoint">
++            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
++
++    &lt;sequence name="main"&gt;
++        &lt;callout&gt;
++            &lt;endpoint&gt;
++                   &lt;address uri="http://localhost:9000/services/SimpleStockQuoteService"/&gt;
++            &lt;/endpoint&gt;
++            &lt;source xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
++                    xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
++                    xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/&gt;
++            &lt;target xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
++                    xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
++                    xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/&gt;
++        &lt;/callout&gt;
++        &lt;property name="RESPONSE" value="true"/&gt;
++        &lt;header name="To" action="remove"/&gt;
++        &lt;send/&gt;
++        &lt;drop/&gt;
++    &lt;/sequence&gt;
++
++&lt;/definitions&gt;</div>
++            <subsection name="Objective">
++                <p>
++                    Demonstrate how to invoke a service from Callout mediator using an inline endpoint.
++                </p>
++            </subsection>
++            <subsection name="Pre-requisites">
++                <p>
++                    <ul>
++                        <li>
++                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
++                        </li>
++                        <li>
++                            Start Synapse using the configuration numbered 434 (repository/conf/sample/synapse_sample_434.xml)
++                            <div class="command">
++                                Unix/Linux: sh synapse.sh -sample 434<br/>
++                                Windows: synapse.bat -sample 434
++                            </div>
++                        </li>
++                    </ul>
++                </p>
++            </subsection>
++            <subsection name="Executing the Client">
++                <p>
++                    In this sample, the Callout mediator does the direct service invocation to the
++                    StockQuoteService using the client request, gets the response, and sets it as the
++                    first child of the SOAP message body. Callout Mediator uses the inline endpoint
++                    to send the message to the StockQuoteService.
++                </p>
++                <p>
++                    Invoke the client as follows.
++                </p>
++                <div class="command">ant stockquote -Daddurl=http://localhost:8280/</div>
++            </subsection>
++        </section>
++        <p><a href="../samples.html">Back to Catalog</a></p>        
++    </body>
++</document>
+\ No newline at end of file
+Index: java/modules/integration/src/test/resources/extras/synapse_sample_433_altered.xml
+===================================================================
+--- java/modules/integration/src/test/resources/extras/synapse_sample_433_altered.xml	(revision 1517068)
++++ java/modules/integration/src/test/resources/extras/synapse_sample_433_altered.xml	(revision 1517069)
+@@ -22,7 +22,8 @@
+ <definitions xmlns="http://ws.apache.org/ns/synapse">
+ 
+     <sequence name="main">
+-        <callout endpointKey="StockQuoteServiceEndpoint">
++        <callout>
++            <endpoint key="StockQuoteServiceEndpoint"/>
+             <configuration axis2xml="modules/integration/target/test_repos/axis2Client/conf/axis2_def.xml" repository="modules/integration/target/test_repos/axis2Client"/>
+             <source xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
+                     xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
+Index: java/modules/integration/src/test/resources/extras/synapse_sample_434_altered.xml
+===================================================================
+--- java/modules/integration/src/test/resources/extras/synapse_sample_434_altered.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/extras/synapse_sample_434_altered.xml	(revision 1517069)
+@@ -0,0 +1,43 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!--
++  ~  Licensed to the Apache Software Foundation (ASF) under one
++  ~  or more contributor license agreements.  See the NOTICE file
++  ~  distributed with this work for additional information
++  ~  regarding copyright ownership.  The ASF licenses this file
++  ~  to you under the Apache License, Version 2.0 (the
++  ~  "License"); you may not use this file except in compliance
++  ~  with the License.  You may obtain a copy of the License at
++  ~
++  ~   http://www.apache.org/licenses/LICENSE-2.0
++  ~
++  ~  Unless required by applicable law or agreed to in writing,
++  ~  software distributed under the License is distributed on an
++  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++  ~  KIND, either express or implied.  See the License for the
++  ~  specific language governing permissions and limitations
++  ~  under the License.
++  -->
++
++<!-- Callout  mediator Inline Endpoint Sample-->
++<definitions xmlns="http://ws.apache.org/ns/synapse">
++
++    <sequence name="main">
++        <callout>
++            <endpoint>
++                <address uri="http://localhost:9000/services/SimpleStockQuoteService"/>
++            </endpoint>
++            <configuration axis2xml="modules/integration/target/test_repos/axis2Client/conf/axis2_def.xml" repository="modules/integration/target/test_repos/axis2Client"/>
++            <source xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
++                    xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
++                    xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
++            <target xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
++                    xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
++                    xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
++        </callout>
++        <property name="RESPONSE" value="true"/>
++        <header name="To" action="remove"/>
++        <send/>
++        <drop/>
++    </sequence>
++
++</definitions>
+Index: java/modules/integration/src/test/resources/sample434.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample434.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample434.xml	(revision 1517069)
+@@ -0,0 +1,18 @@
++<synapseSample>
++    <sampleID>434</sampleID>
++    <sampleName>Callout mediator - Invoke a service using an inline Endpoint</sampleName>
++    <synapseConfig>
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>modules/integration/src/test/resources/extras/synapse_sample_434_altered.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1517068)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1517069)
+@@ -235,6 +235,7 @@
+         sampleClassRepo.put("431", Sample431.class);
+         sampleClassRepo.put("432", Sample432.class);
+         sampleClassRepo.put("433", Sample433.class);
++        sampleClassRepo.put("434", Sample434.class);
+         sampleClassRepo.put("450", Sample450.class);
+         sampleClassRepo.put("451", Sample451.class);
+         sampleClassRepo.put("452", Sample452.class);
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample434.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample434.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample434.java	(revision 1517069)
+@@ -0,0 +1,42 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.samples.framework.tests.advanced;
++
++import org.apache.synapse.samples.framework.SampleClientResult;
++import org.apache.synapse.samples.framework.SynapseTestCase;
++import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
++
++public class Sample434 extends SynapseTestCase {
++
++    SampleClientResult result;
++
++    public Sample434() {
++        super(434);
++    }
++
++    public void testCallOutInlineEndpoint() {
++        log.info("Running test: Callout mediator - Invoke a service using an inline Endpoint");
++        String trpUrl = "http://localhost:8280/";
++        StockQuoteSampleClient client = getStockQuoteClient();
++        result = client.requestStandardQuote(null, trpUrl, null, "IBM" ,null);
++        assertTrue("Client did not run successfully", result.responseReceived());
++    }
++
++}
+-*-*-*-
+Message: Improving the callout mediator to support inline endpoints. Applying patches from SYNAPSE-969 and SYNAPSE-970
+-*-*-*-
+When: 2013-08-23 17:55:52 -0400 
+-*-*-*-
+Who: hiranya

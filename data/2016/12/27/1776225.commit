@@ -1,0 +1,143 @@
+Index: java/repository/conf/axis2.xml
+===================================================================
+--- java/repository/conf/axis2.xml	(revision 1776224)
++++ java/repository/conf/axis2.xml	(revision 1776225)
+@@ -148,8 +148,8 @@
+                          class="org.apache.synapse.format.hessian.HessianMessageFormatter"/>-->
+         <!--<messageFormatter contentType=""
+                          class="org.apache.synapse.format.hessian.HessianMessageFormatter"/>-->
+-        <!--<messageFormatter contentType="application/json"
+-                         class="org.apache.axis2.json.JSONMessageFormatter"/>-->
++        <messageFormatter contentType="application/json"
++                         class="org.apache.axis2.json.JSONMessageFormatter"/>
+ 
+     </messageFormatters>
+ 
+@@ -178,8 +178,8 @@
+                          class="org.apache.synapse.format.hessian.HessianMessageBuilder"/>-->
+         <!--<messageBuilder contentType=""
+                          class="org.apache.synapse.format.hessian.HessianMessageBuilder"/>-->
+-        <!--<messageBuilder contentType="application/json"
+-                         class="org.apache.axis2.json.JSONOMBuilder"/>-->
++        <messageBuilder contentType="application/json"
++                         class="org.apache.axis2.json.JSONOMBuilder"/>
+     </messageBuilders>
+ 
+     <!-- ================================================= -->
+Index: java/modules/documentation/src/site/xdoc/userguide/samples/setup/script.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples/setup/script.xml	(revision 1776224)
++++ java/modules/documentation/src/site/xdoc/userguide/samples/setup/script.xml	(revision 1776225)
+@@ -39,8 +39,11 @@
+ 					<a href="#python">Python Support</a>
+ 				</li>
+ 				<li>
+-					<a href="#json">JSON Support</a>
++					<a href="#json-syn3">JSON Support on Synapse 3.0.0</a>
+ 				</li>
++				<li>
++					<a href="#json">JSON Support Prior to Synapse 3.0.0</a>
++				</li>
+ 			</ul>
+ 		</section>
+ 		<section name="Configuring Synapse for Script Mediator Support"
+@@ -84,12 +87,20 @@
+ 				</p>
+ 			</subsection>
+ 
+-			<subsection name="JSON Support" id="json">
++			<subsection name="JSON Support on Synapse 3.0.0" id="json-syn3">
+ 				<p>
+ 					<a class="externalLink" href="http://json.org">JSON</a>
+ 					is a lightweight data-interchange format.
+-					It can be used as an alternative to XML or SOAP. To enable the JSON
+-					support in Synapse, following two jar files should be deployed into the 'lib'
++					It can be used as an alternative to XML or SOAP. From Synapse 3.0.0 onward, there are no additional
++					steps required to enable JSON.
++
++				</p>
++			</subsection>
++
++			<subsection name="JSON Support Prior to Synapse 3.0.0" id="json">
++				<p>
++					To enable JSON
++					support on Synpase versions prior to 3.0.0, the following two jar files should be deployed into the 'lib'
+ 					directory of Synapse.
+ 				</p>
+ 				<ul>
+@@ -97,7 +108,7 @@
+ 						<a class="externalLink" href="http://repo1.maven.org/maven2/org/apache/axis2/axis2-json">axis2-json.jar</a>
+ 					</li>
+ 					<li>
+-						<a class="externalLink" href="http://jettison.codehaus.org/Download">jettison.jar</a>
++						<a class="externalLink" href="http://central.maven.org/maven2/org/codehaus/jettison/jettison/">jettison.jar</a>
+ 					</li>
+ 				</ul>
+                 <p>
+Index: java/modules/documentation/src/site/xdoc/userguide/samples/setup/index.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples/setup/index.xml	(revision 1776224)
++++ java/modules/documentation/src/site/xdoc/userguide/samples/setup/index.xml	(revision 1776225)
+@@ -383,6 +383,7 @@
+                 <li><a href="tcp_udp.html">TCP/UDP Setup Guide</a></li>
+                 <li><a href="db.html">Database Setup Guide</a></li>
+                 <li><a href="script.html">Script Setup Guide</a></li>
++                <li><a href="script.html#json-syn3">JSON Setup Guide</a></li>
+                 <li><a href="mail.html">E-Mail Setup Guide</a></li>
+             </ul>
+         </section>
+Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample158.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples/sample158.xml	(revision 1776224)
++++ java/modules/documentation/src/site/xdoc/userguide/samples/sample158.xml	(revision 1776225)
+@@ -78,9 +78,6 @@
+                 <p>
+                     <ul>
+                         <li>
+-                            Setup Synapse and the sample Axis2 client for JSON  (Refer  Synapse <a href="setup/script.html#json">Samples Setup Guide</a> for details)
+-                        </li>
+-                        <li>
+                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                         </li>
+                         <li>
+Index: java/modules/distribution/pom.xml
+===================================================================
+--- java/modules/distribution/pom.xml	(revision 1776224)
++++ java/modules/distribution/pom.xml	(revision 1776225)
+@@ -110,6 +110,12 @@
+             <artifactId>axis2-codegen</artifactId>
+         </dependency>
+ 
++	<!-- JSON Support --> 
++	<dependency>
++		<groupId>org.apache.axis2</groupId>
++		<artifactId>axis2-json</artifactId>
++	</dependency>
++
+         <!-- Additional transports -->
+         <dependency>
+             <groupId>org.apache.axis2</groupId>
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1776224)
++++ java/pom.xml	(revision 1776225)
+@@ -427,7 +427,12 @@
+                 <groupId>org.apache.axis2</groupId>
+                 <artifactId>axis2-transport-mail</artifactId>
+                 <version>${axis2.version}</version>
+-            </dependency>
++	    </dependency>
++	    <dependency>
++                <groupId>org.apache.axis2</groupId>
++                <artifactId>axis2-json</artifactId>
++                <version>${axis2.version}</version>
++	    </dependency>
+             <dependency>
+                 <groupId>org.apache.axis2</groupId>
+                 <artifactId>axis2-adb</artifactId>
+-*-*-*-
+Message: Bundling axis2-json and jettison as part of distribution package and enabling json content type by default in axsi2.xml. Samples and setup guide also updated to reflect these changes.
+-*-*-*-
+When: 2016-12-27 23:08:49 -0500 
+-*-*-*-
+Who: ravi

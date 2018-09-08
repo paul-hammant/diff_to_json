@@ -1,20 +1,3 @@
-Index: java/modules/core/src/main/java/org/apache/synapse/SynapseConstants.java
-===================================================================
---- java/modules/core/src/main/java/org/apache/synapse/SynapseConstants.java	(revision 1505193)
-+++ java/modules/core/src/main/java/org/apache/synapse/SynapseConstants.java	(revision 1505194)
-@@ -419,5 +419,11 @@
-     public static final String FAIL_SAFE_MODE_SEQUENCES = "sequences";
-     public static final String FAIL_SAFE_MODE_EVENT_SOURCE = "eventsources";
-     public static final String FAIL_SAFE_MODE_EXECUTORS = "executors";
--    public static final String FAIL_SAFE_MODE_TEMPLATES = "executors";
-+    public static final String FAIL_SAFE_MODE_TEMPLATES = "templates";
-+    public static final String FAIL_SAFE_MODE_TASKS = "tasks";
-+    public static final String FAIL_SAFE_MODE_MESSAGE_STORES = "messagestores";
-+    public static final String FAIL_SAFE_MODE_MESSAGE_PROCESSORS = "messageprocessors";
-+    public static final String FAIL_SAFE_MODE_APIS = "apis";
-+    public static final String FAIL_SAFE_MODE_IMPORTS = "imports";
-+
- }
 Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MultiXMLConfigurationBuilder.java
 ===================================================================
 --- java/modules/core/src/main/java/org/apache/synapse/config/xml/MultiXMLConfigurationBuilder.java	(revision 1505193)
@@ -502,6 +485,23 @@ Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MultiXMLCon
 +    }
  }
 \ No newline at end of file
+Index: java/modules/core/src/main/java/org/apache/synapse/SynapseConstants.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/SynapseConstants.java	(revision 1505193)
++++ java/modules/core/src/main/java/org/apache/synapse/SynapseConstants.java	(revision 1505194)
+@@ -419,5 +419,11 @@
+     public static final String FAIL_SAFE_MODE_SEQUENCES = "sequences";
+     public static final String FAIL_SAFE_MODE_EVENT_SOURCE = "eventsources";
+     public static final String FAIL_SAFE_MODE_EXECUTORS = "executors";
+-    public static final String FAIL_SAFE_MODE_TEMPLATES = "executors";
++    public static final String FAIL_SAFE_MODE_TEMPLATES = "templates";
++    public static final String FAIL_SAFE_MODE_TASKS = "tasks";
++    public static final String FAIL_SAFE_MODE_MESSAGE_STORES = "messagestores";
++    public static final String FAIL_SAFE_MODE_MESSAGE_PROCESSORS = "messageprocessors";
++    public static final String FAIL_SAFE_MODE_APIS = "apis";
++    public static final String FAIL_SAFE_MODE_IMPORTS = "imports";
++
+ }
 -*-*-*-
 Message: Applying the patch for SYNAPSE-939 with some changes. Engaging the fail-safe mode when an invalid XML is encountered in the synapse configuration.
 -*-*-*-
