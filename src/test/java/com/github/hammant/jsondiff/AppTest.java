@@ -2,7 +2,6 @@ package com.github.hammant.jsondiff;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.net.URL;
 import java.nio.charset.Charset;
 
 import org.junit.Before;
@@ -35,9 +34,7 @@ public class AppTest {
 	@Test
 	public void testWholeDirectory() throws Exception {
 
-		URL dataDirUrl = getClass().getClassLoader().getResource("data");
-		File dataDir = new File(dataDirUrl.toURI());
-		//File dataDir = new File("/home/pratapi.patel/Desktop/01");
+		File dataDir = new File("data");
 		LOG.info("Starting test on the directory {}", dataDir.getAbsolutePath());
 		startTest(dataDir);
 		LOG.info("total {} passed {}", count, success);
@@ -112,10 +109,9 @@ public class AppTest {
 	@Test
 	public void testsingleFile() throws Exception {
 
-		URL dataDirUrl = getClass().getClassLoader().getResource("data/2011/12/19/1221091.commit");
-		File dataDir = new File(dataDirUrl.toURI());
+		File dataDir = new File("data/2011/12/19/1221091.commit");
 
-		LOG.info("Starting test on the directory {}", dataDir.getAbsolutePath());
+		LOG.info("Starting test on file {}", dataDir.getAbsolutePath());
 		runTest(dataDir);
 	}
 
