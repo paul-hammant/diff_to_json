@@ -1,0 +1,175 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     public static Access getAccess() {\n",
+            "         return access;\n",
+            "     }\n",
+            "+\n",
+            "+    public static Log getAccessLog() {\n",
+            "+        return accessLog;\n",
+            "+    }\n",
+            " }\n"
+          ],
+          "locn": "-37,4 +37,8"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessHandler.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/AccessHandler.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.http.nio.reactor.SessionInputBuffer;\n",
+            " import org.apache.http.nio.reactor.SessionOutputBuffer;\n",
+            " import org.apache.http.nio.util.HeapByteBufferAllocator;\n",
+            "+import org.apache.synapse.transport.nhttp.AccessHandler;\n",
+            " \n",
+            " import java.io.IOException;\n",
+            " \n"
+          ],
+          "locn": "-37,6 +37,7"
+        },
+        {
+          "lines": [
+            " \n",
+            "         public HttpRequest parse() throws IOException, HttpException {\n",
+            "             HttpRequest request = super.parse();\n",
+            "-            if (request != null && sourceHeaderLog.isDebugEnabled()) {\n",
+            "-                sourceHeaderLog.debug(\">> \" + request.getRequestLine().toString());\n",
+            "-                Header[] headers = request.getAllHeaders();\n",
+            "-                for (Header header : headers) {\n",
+            "-                    sourceHeaderLog.debug(\">> \" + header.toString());\n",
+            "+            if (request != null) {\n",
+            "+                if (sourceHeaderLog.isDebugEnabled()) {\n",
+            "+                    sourceHeaderLog.debug(\">> \" + request.getRequestLine().toString());\n",
+            "+                    Header[] headers = request.getAllHeaders();\n",
+            "+                    for (Header header : headers) {\n",
+            "+                        sourceHeaderLog.debug(\">> \" + header.toString());\n",
+            "+                    }\n",
+            "                 }\n",
+            "+\n",
+            "+                if (AccessHandler.getAccessLog().isInfoEnabled()) {\n",
+            "+                    AccessHandler.getAccess().addAccessToQueue(request);\n",
+            "+                }\n",
+            "             }\n",
+            "             return request;\n",
+            "         }\n"
+          ],
+          "locn": "-126,12 +127,18"
+        },
+        {
+          "lines": [
+            "         }\n",
+            " \n",
+            "         public void write(final HttpResponse response) throws IOException, HttpException {\n",
+            "-            if (response != null && sourceHeaderLog.isDebugEnabled()) {\n",
+            "-                sourceHeaderLog.debug(\"<< \" + response.getStatusLine().toString());\n",
+            "-                Header[] headers = response.getAllHeaders();\n",
+            "-                for (Header header : headers) {\n",
+            "-                    sourceHeaderLog.debug(\"<< \" + header.toString());\n",
+            "+            if (response != null) {\n",
+            "+                if (response != null && sourceHeaderLog.isDebugEnabled()) {\n",
+            "+                    sourceHeaderLog.debug(\"<< \" + response.getStatusLine().toString());\n",
+            "+                    Header[] headers = response.getAllHeaders();\n",
+            "+                    for (Header header : headers) {\n",
+            "+                        sourceHeaderLog.debug(\"<< \" + header.toString());\n",
+            "+                    }\n",
+            "                 }\n",
+            "+\n",
+            "+                if (AccessHandler.getAccessLog().isInfoEnabled()) {\n",
+            "+                    AccessHandler.getAccess().addAccessToQueue(response);\n",
+            "+                }\n",
+            "             }\n",
+            "             super.write(response);\n",
+            "         }\n"
+          ],
+          "locn": "-144,12 +151,18"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingNHttpServerConnectionFactory.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingNHttpServerConnectionFactory.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.http.nio.reactor.SessionInputBuffer;\n",
+            " import org.apache.http.nio.reactor.SessionOutputBuffer;\n",
+            " import org.apache.http.nio.util.HeapByteBufferAllocator;\n",
+            "+import org.apache.synapse.transport.nhttp.AccessHandler;\n",
+            " \n",
+            " import java.io.IOException;\n",
+            " \n"
+          ],
+          "locn": "-37,6 +37,7"
+        },
+        {
+          "lines": [
+            "         }\n",
+            " \n",
+            "         public void write(final HttpRequest request) throws IOException, HttpException {\n",
+            "-            if (request != null && targetHeaderLog.isDebugEnabled()) {\n",
+            "-                targetHeaderLog.debug(\">> \" + request.getRequestLine().toString());\n",
+            "-                Header[] headers = request.getAllHeaders();\n",
+            "-                for (Header header : headers) {\n",
+            "-                    targetHeaderLog.debug(\">> \" + header.toString());\n",
+            "+            if (request != null) {\n",
+            "+                if (targetHeaderLog.isDebugEnabled()) {\n",
+            "+                    targetHeaderLog.debug(\">> \" + request.getRequestLine().toString());\n",
+            "+                    Header[] headers = request.getAllHeaders();\n",
+            "+                    for (Header header : headers) {\n",
+            "+                        targetHeaderLog.debug(\">> \" + header.toString());\n",
+            "+                    }\n",
+            "                 }\n",
+            "+\n",
+            "+                if (AccessHandler.getAccessLog().isInfoEnabled()) {\n",
+            "+                    AccessHandler.getAccess().addAccessToQueue(request);\n",
+            "+                }\n",
+            "             }\n",
+            "             super.write(request);\n",
+            "         }\n"
+          ],
+          "locn": "-125,12 +126,18"
+        },
+        {
+          "lines": [
+            " \n",
+            "         public HttpResponse parse() throws IOException, HttpException {\n",
+            "             HttpResponse response = super.parse();\n",
+            "-            if (response != null && targetHeaderLog.isDebugEnabled()) {\n",
+            "-                targetHeaderLog.debug(\"<< \" + response.getStatusLine().toString());\n",
+            "-                Header[] headers = response.getAllHeaders();\n",
+            "-                for (Header header : headers) {\n",
+            "-                    targetHeaderLog.debug(\"<< \" + header.toString());\n",
+            "+            if (response != null) {\n",
+            "+                if (targetHeaderLog.isDebugEnabled()) {\n",
+            "+                    targetHeaderLog.debug(\"<< \" + response.getStatusLine().toString());\n",
+            "+                    Header[] headers = response.getAllHeaders();\n",
+            "+                    for (Header header : headers) {\n",
+            "+                        targetHeaderLog.debug(\"<< \" + header.toString());\n",
+            "+                    }\n",
+            "                 }\n",
+            "+\n",
+            "+                if (AccessHandler.getAccessLog().isInfoEnabled()) {\n",
+            "+                    AccessHandler.getAccess().addAccessToQueue(response);\n",
+            "+                }\n",
+            "             }\n",
+            "             return response;\n",
+            "         }\n"
+          ],
+          "locn": "-145,12 +152,18"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingNHttpClientConnectionFactory.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/logging/LoggingNHttpClientConnectionFactory.java"
+    }
+  ],
+  "id": "1758142",
+  "message": "Fixing SYNAPSE-1026",
+  "when": "2016-08-28T15:35:04-04:00",
+  "who": "ravi"
+}

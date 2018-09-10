@@ -1,0 +1,26 @@
+Index: java/modules/distribution/pom.xml
+===================================================================
+--- java/modules/distribution/pom.xml	(revision 1381163)
++++ java/modules/distribution/pom.xml	(revision 1381164)
+@@ -71,11 +71,11 @@
+             <groupId>org.apache.synapse</groupId>
+             <artifactId>synapse-fix-transport</artifactId>
+         </dependency>
+-	<dependency>
++        <dependency>
+             <groupId>org.apache.synapse</groupId>
+             <artifactId>synapse-documentation</artifactId>
+-	    <type>zip</type>
+-	    <classifier>docs</classifier>
++            <type>zip</type>
++            <classifier>docs</classifier>
+         </dependency>
+ 
+         <!-- Wrapper jars -->
+-*-*-*-
+Message: Replaced tabs with spaces.
+
+-*-*-*-
+When: 2012-09-05 09:16:52 -0400 
+-*-*-*-
+Who: veithen

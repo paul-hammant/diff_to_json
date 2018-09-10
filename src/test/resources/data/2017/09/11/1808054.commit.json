@@ -1,0 +1,46 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     <skin>\n",
+            "         <groupId>org.apache.maven.skins</groupId>\n",
+            "         <artifactId>maven-fluido-skin</artifactId>\n",
+            "-        <version>1.4</version>\n",
+            "+        <version>1.6</version>\n",
+            "     </skin>\n",
+            "     <body>\n",
+            "         <menu name=\"Main Menu\">\n"
+          ],
+          "locn": "-22,7 +22,7"
+        }
+      ],
+      "from": "java/modules/documentation/src/site/site.xml",
+      "to": "java/modules/documentation/src/site/site.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                 <plugin>\n",
+            "                     <groupId>org.apache.maven.plugins</groupId>\n",
+            "                     <artifactId>maven-site-plugin</artifactId>\n",
+            "-                    <version>3.3</version>\n",
+            "+                    <version>3.6</version>\n",
+            "                 </plugin>\n",
+            "                 <plugin>\n",
+            "                     <groupId>org.apache.maven.plugins</groupId>\n"
+          ],
+          "locn": "-188,7 +188,7"
+        }
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    }
+  ],
+  "id": "1808054",
+  "message": "SYNAPSE-1095, Mobile friendly site support",
+  "when": "2017-09-11T15:20:42-04:00",
+  "who": "vanji"
+}

@@ -1,0 +1,26 @@
+Index: java/modules/documentation/src/site/xdoc/userguide/samples/sample158.xml
+===================================================================
+--- java/modules/documentation/src/site/xdoc/userguide/samples/sample158.xml	(revision 1370861)
++++ java/modules/documentation/src/site/xdoc/userguide/samples/sample158.xml	(revision 1370862)
+@@ -23,7 +23,7 @@
+         <title>Apache Synapse - Sample 158</title>
+     </properties>
+     <body>
+-        <section name="Sample 156: Exposing a SOAP service over JSON">
++        <section name="Sample 158: Exposing a SOAP service over JSON">
+             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+ 
+     &lt;proxy name="JSONProxy" transports="http https"&gt;
+@@ -112,4 +112,4 @@
+         </section>
+         <p><a href="../samples.html">Back to Catalog</a></p>        
+     </body>
+-</document>
+\ No newline at end of file
++</document>
+-*-*-*-
+Message: Fixed incorrect sample number.
+-*-*-*-
+When: 2012-08-08 13:59:01 -0400 
+-*-*-*-
+Who: veithen

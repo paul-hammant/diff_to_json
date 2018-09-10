@@ -1,0 +1,1917 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "  * It is used as a holder for information required during the life-cycle of this connection.\n",
+            "  */\n",
+            " public class TargetContext {\n",
+            "+\n",
+            "     private TargetConfiguration targetConfiguration = null;\n",
+            " \n",
+            "     public static final String CONNECTION_INFORMATION = \"CONNECTION_INFORMATION\";\n",
+            "+\n",
+            "     /** The request for this connection */\n",
+            "     private TargetRequest request;\n",
+            "+\n",
+            "     /** The response for this connection */\n",
+            "     private TargetResponse response;\n",
+            "+\n",
+            "     /** State of the connection */\n",
+            "     private ProtocolState state;\n",
+            "+\n",
+            "     /** The request message context */\n",
+            "     private MessageContext requestMsgCtx;\n",
+            "+\n",
+            "     /** The current reader */\n",
+            "     private Pipe reader;\n",
+            "+\n",
+            "     /** The current writer */\n",
+            "     private Pipe writer;\n",
+            " \n"
+          ],
+          "locn": "-30,19 +30,26"
+        },
+        {
+          "lines": [
+            "         }\n",
+            "     }\n",
+            " \n",
+            "-    public static boolean assertState(NHttpConnection conn, ProtocolState state) {\n",
+            "-        TargetContext info = (TargetContext)\n",
+            "-                conn.getContext().getAttribute(CONNECTION_INFORMATION);\n",
+            "-\n",
+            "-        return info != null && info.getState() == state;\n",
+            "-\n",
+            "-    }\n",
+            "-\n",
+            "     public static ProtocolState getState(NHttpConnection conn) {\n",
+            "         TargetContext info = (TargetContext)\n",
+            "                 conn.getContext().getAttribute(CONNECTION_INFORMATION);\n"
+          ],
+          "locn": "-133,14 +140,6"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetContext.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetContext.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " package org.apache.synapse.transport.passthru;\n",
+            " \n",
+            " import org.apache.axiom.om.OMOutputFormat;\n",
+            "-import org.apache.axis2.AxisFault;\n",
+            " import org.apache.axis2.context.MessageContext;\n",
+            " import org.apache.axis2.transport.MessageFormatter;\n",
+            " import org.apache.axis2.transport.http.HTTPConstants;\n"
+          ],
+          "locn": "-21,7 +21,6"
+        },
+        {
+          "lines": [
+            "  * This is a class for representing a request to be sent to a target.\n",
+            "  */\n",
+            " public class TargetRequest {\n",
+            "+\n",
+            "     /** Configuration of the sender */\n",
+            "     private TargetConfiguration targetConfiguration;\n",
+            " \n",
+            "     private Pipe pipe = null;\n",
+            "+\n",
+            "     /** Headers map */\n",
+            "     private Map<String, String> headers = new HashMap<String, String>();\n",
+            "+\n",
+            "     /** URL */\n",
+            "     private URL url;\n",
+            "+\n",
+            "     /** HTTP Method */\n",
+            "     private String method;\n",
+            "+\n",
+            "     /** HTTP request created for sending the message */\n",
+            "     private HttpRequest request = null;\n",
+            "-    /** Weather chunk encoding should be used */\n",
+            "+\n",
+            "+    /** Whether chunk encoding should be used */\n",
+            "     private boolean chunk = true;\n",
+            "+\n",
+            "     /** HTTP version that should be used */\n",
+            "     private ProtocolVersion version = null;\n",
+            "+\n",
+            "     /** Weather full url is used for the request */\n",
+            "     private boolean fullUrl = false;\n",
+            "+\n",
+            "     /** Port to be used for the request */\n",
+            "     private int port = 80;\n",
+            "+\n",
+            "     /** Weather this request has a body */\n",
+            "     private boolean hasEntityBody = true;\n",
+            "+\n",
+            "     /** Keep alive request */\n",
+            "     private boolean keepAlive = true;\n",
+            "     \n"
+          ],
+          "locn": "-56,28 +55,39"
+        },
+        {
+          "lines": [
+            "         }\n",
+            "         \n",
+            "         MessageContext requestMsgCtx = TargetContext.get(conn).getRequestMsgCtx();\n",
+            "-        \n",
+            "-        if(requestMsgCtx.getProperty(PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH) != null){\n",
+            "-        \tcontentLength = (Long)requestMsgCtx.getProperty(PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH);\n",
+            "+        Long lengthValue = (Long) requestMsgCtx.getProperty(\n",
+            "+                PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH);\n",
+            "+        if (lengthValue != null){\n",
+            "+        \tcontentLength = lengthValue;\n",
+            "         }\n",
+            "-        \n",
+            "-       \n",
+            "+\n",
+            "         //fix for  POST_TO_URI\n",
+            "         if (requestMsgCtx.isPropertyTrue(NhttpConstants.POST_TO_URI)){\n",
+            "         \tpath = url.toString();\n"
+          ],
+          "locn": "-123,12 +133,12"
+        },
+        {
+          "lines": [
+            "     }\n",
+            " \n",
+            " \t/**\n",
+            "-\t * Handles the chuking messages in Passthough context, create a temporary buffer and calculate the message\n",
+            "-\t * size before writing to the external buffer, which is required the context of handling DISABLED chunking \n",
+            "-\t * messages\n",
+            "+\t * Handles the chunking messages in PassThough context, create a temporary buffer and\n",
+            "+     * calculate the message size before writing to the external buffer, which is required the\n",
+            "+     * context of handling DISABLED chunking messages.\n",
+            " \t * \n",
+            "-\t * @param conn\n",
+            "-\t * @param requestMsgCtx\n",
+            "+\t * @param conn Client HTTP connection\n",
+            "+\t * @param requestMsgCtx Current request message context\n",
+            " \n",
+            " \t * @throws IOException\n",
+            "-\t * @throws AxisFault\n",
+            " \t */\n",
+            "-\tprivate void processChunking(NHttpClientConnection conn, MessageContext requestMsgCtx) throws IOException,\n",
+            "-\t                                                                                                        AxisFault {\n",
+            "-\t\tString disableChunking = (String) requestMsgCtx.getProperty(PassThroughConstants.DISABLE_CHUNKING);\n",
+            "+\tprivate void processChunking(NHttpClientConnection conn,\n",
+            "+                                 MessageContext requestMsgCtx) throws IOException {\n",
+            "+\n",
+            "+\t\tString disableChunking = (String) requestMsgCtx.getProperty(\n",
+            "+                PassThroughConstants.DISABLE_CHUNKING);\n",
+            " \t\tString forceHttp10 = (String) requestMsgCtx.getProperty(PassThroughConstants.FORCE_HTTP_1_0);\n",
+            " \t    if (\"true\".equals(disableChunking) || \"true\".equals(forceHttp10)) {\n",
+            " \t    \tif (requestMsgCtx.getEnvelope().getBody().getFirstElement() == null) {\n"
+          ],
+          "locn": "-233,19 +243,20"
+        },
+        {
+          "lines": [
+            " \t\t\t\t\t\t\tOutputStream _out = pipe.getOutputStream();\n",
+            " \t\t\t\t\t\t\tIOUtils.write(out.toByteArray(), _out);\n",
+            " \t\t\t\t\t\t\n",
+            "-\t\t\t\t\t\t\tentity.setContentLength(new Long(out.toByteArray().length));\n",
+            "+\t\t\t\t\t\t\tentity.setContentLength(out.toByteArray().length);\n",
+            " \t\t\t\t\t\t\tentity.setChunked(false);\n",
+            " \t\t\t\t\t\t}\n",
+            " \t\t\t\t\t}\n"
+          ],
+          "locn": "-265,7 +276,7"
+        },
+        {
+          "lines": [
+            "     public boolean hasEntityBody() {\n",
+            "         return hasEntityBody;\n",
+            "     }\n",
+            "-    \n",
+            "-    \n",
+            "-    public void setHasEntityBody(boolean hasEntityBody) {\n",
+            "-\t\tthis.hasEntityBody = hasEntityBody;\n",
+            "-\t}\n",
+            " \n",
+            " \tpublic void addHeader(String name, String value) {\n",
+            "         headers.put(name, value);\n"
+          ],
+          "locn": "-307,11 +318,6"
+        },
+        {
+          "lines": [
+            " \tpublic HttpRequest getRequest() {\n",
+            " \t\treturn request;\n",
+            " \t}\n",
+            "-    \n",
+            "-    \n",
+            "+\n",
+            " }\n"
+          ],
+          "locn": "-344,6 +350,5"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetRequest.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetRequest.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     /** Configuration of the sender */\n",
+            "     private TargetConfiguration targetConfiguration;\n",
+            " \n",
+            "-    /** The maximum number of messages that can wait for a connection */\n",
+            "-    private int maxWaitingMessages = Integer.MAX_VALUE;\n",
+            "-\n",
+            "     private TargetErrorHandler targetErrorHandler;\n",
+            " \n",
+            "     /** Lock for synchronizing access */\n"
+          ],
+          "locn": "-63,9 +63,6"
+        },
+        {
+          "lines": [
+            "                     queue = new ConcurrentLinkedQueue<MessageContext>();\n",
+            "                     waitingMessages.put(key, queue);\n",
+            "                 }\n",
+            "-                if (queue.size() == maxWaitingMessages) {\n",
+            "+                if (queue.size() == Integer.MAX_VALUE) {\n",
+            "                     MessageContext msgCtx = queue.poll();\n",
+            "-\n",
+            "                     targetErrorHandler.handleError(msgCtx,\n",
+            "                             ErrorCodes.CONNECTION_TIMEOUT,\n",
+            "                             \"Error connecting to the back end\",\n"
+          ],
+          "locn": "-121,9 +118,8"
+        },
+        {
+          "lines": [
+            "             MessageContext msgCtx = queue.poll();\n",
+            " \n",
+            "             if (msgCtx != null) {\n",
+            "-                targetErrorHandler.handleError(msgCtx,\n",
+            "-                        errorCode,\n",
+            "-                        \"Error connecting to the back end\",\n",
+            "-                        null,\n",
+            "-                        ProtocolState.REQUEST_READY);\n",
+            "+                String errorMessage = \"Error while connecting to the endpoint\";\n",
+            "+                if (message != null) {\n",
+            "+                    errorMessage += \" (\" + message + \")\";\n",
+            "+                }\n",
+            "+                targetErrorHandler.handleError(msgCtx, errorCode, errorMessage,\n",
+            "+                        null, ProtocolState.REQUEST_READY);\n",
+            "             }\n",
+            "         } else {\n",
+            "             throw new IllegalStateException(\"Queue cannot be null for: \" + key);\n"
+          ],
+          "locn": "-160,11 +156,12"
+        },
+        {
+          "lines": [
+            "         if (pipe != null) {\n",
+            "             pipe.attachConsumer(conn);\n",
+            "             request.connect(pipe);\n",
+            "-            if (Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {\n",
+            "+            if (Boolean.TRUE.equals(msgContext.getProperty(\n",
+            "+                    PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {\n",
+            "                 synchronized (msgContext) {\n",
+            "                     OutputStream out = pipe.getOutputStream();\n",
+            "                     msgContext.setProperty(\"GET_ME_OUT\", out);\n"
+          ],
+          "locn": "-225,7 +222,8"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/DeliveryAgent.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/DeliveryAgent.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "  * In a Single TCP Connection there can be multiple HTTP Requests.\n",
+            "  */\n",
+            " public class SourceContext {\n",
+            "+\n",
+            "     public static final String CONNECTION_INFORMATION = \"CONNECTION_INFORMATION\";\n",
+            " \n",
+            "     private SourceConfiguration sourceConfiguration;\n"
+          ],
+          "locn": "-31,6 +31,7"
+        },
+        {
+          "lines": [
+            "     public static SourceContext get(NHttpConnection conn) {\n",
+            "         return (SourceContext) conn.getContext().getAttribute(CONNECTION_INFORMATION);\n",
+            "     }\n",
+            "-\n",
+            "-    public static Lock getLock(NHttpConnection conn) {\n",
+            "-        SourceContext info = (SourceContext)\n",
+            "-                conn.getContext().getAttribute(CONNECTION_INFORMATION);\n",
+            "-\n",
+            "-        return info != null ? info.getLock() : null;\n",
+            "-    }\n",
+            " }\n"
+          ],
+          "locn": "-195,11 +196,4"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceContext.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceContext.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "  * This class represents a response coming from the target server.\n",
+            "  */\n",
+            " public class TargetResponse {\n",
+            "-    // private Log log = LogFactory.getLog(TargetResponse.class);\n",
+            "+\n",
+            "     /** To pipe the incoming data through */\n",
+            "     private Pipe pipe = null;\n",
+            "+\n",
+            "     /** Headers of the response */\n",
+            "     private Map<String, String> headers = new HashMap<String, String>();\n",
+            "+\n",
+            "     /** The status of the response */\n",
+            "     private int status = HttpStatus.SC_OK;\n",
+            "+\n",
+            "     /** Http status line */\n",
+            "     private String statusLine = \"OK\";\n",
+            "+\n",
+            "     /** The Http response */\n",
+            "     private HttpResponse response = null;\n",
+            "+\n",
+            "     /** Configuration of the sender */\n",
+            "     private TargetConfiguration targetConfiguration;\n",
+            "+\n",
+            "     /** Protocol version */\n",
+            "     private ProtocolVersion version = HttpVersion.HTTP_1_1;\n",
+            "+\n",
+            "     /** This utility class is used for determining weather we need to close the connection\n",
+            "      * after submitting the response */\n",
+            "     private ConnectionReuseStrategy connStrategy = new DefaultConnectionReuseStrategy();\n",
+            "+\n",
+            "     /** The connection */\n",
+            "     private NHttpClientConnection connection;\n",
+            "-    /** Weather this response has a body */\n",
+            "+\n",
+            "+    /** Whether this response has a body */\n",
+            "     private boolean expectResponseBody = true;\n",
+            " \n",
+            "     public TargetResponse(TargetConfiguration targetConfiguration,\n"
+          ],
+          "locn": "-34,27 +34,36"
+        },
+        {
+          "lines": [
+            "                           HttpResponse response,\n",
+            "                           NHttpClientConnection conn,\n",
+            "                           boolean expectResponseBody) {\n",
+            "+\n",
+            "         this.targetConfiguration = targetConfiguration;\n",
+            "         this.response = response;\n",
+            "         this.connection = conn;\n",
+            "-\n",
+            "         this.version = response.getProtocolVersion();\n",
+            "-\n",
+            "         this.status = response.getStatusLine().getStatusCode();\n",
+            "         this.statusLine = response.getStatusLine().getReasonPhrase();\n",
+            " \n"
+          ],
+          "locn": "-61,12 +70,11"
+        },
+        {
+          "lines": [
+            "         TargetContext.updateState(conn, ProtocolState.RESPONSE_HEAD);\n",
+            "         \n",
+            "         if (expectResponseBody) {\n",
+            "-            pipe\n",
+            "-                = new Pipe(conn, targetConfiguration.getBufferFactory().getBuffer(), \"target\", targetConfiguration);\n",
+            "-\n",
+            "+            pipe = new Pipe(conn, targetConfiguration.getBufferFactory().getBuffer(),\n",
+            "+                    \"target\", targetConfiguration);\n",
+            "             TargetContext.get(conn).setReader(pipe);\n",
+            "-\n",
+            "             BasicHttpEntity entity = new BasicHttpEntity();\n",
+            "             if (response.getStatusLine().getProtocolVersion().greaterEquals(HttpVersion.HTTP_1_1)) {\n",
+            "                 entity.setChunked(true);\n"
+          ],
+          "locn": "-88,11 +96,9"
+        },
+        {
+          "lines": [
+            "     public int read(NHttpClientConnection conn, ContentDecoder decoder) throws IOException {\n",
+            "     \t\n",
+            "     \tint bytes=0;\n",
+            "-    \t\n",
+            "-    \tif(pipe != null){\n",
+            "+    \tif (pipe != null) {\n",
+            "     \t\tbytes = pipe.produce(decoder);\n",
+            "     \t}\n",
+            " \n"
+          ],
+          "locn": "-125,8 +131,7"
+        },
+        {
+          "lines": [
+            "         // Update connection state\n",
+            "         if (decoder.isCompleted()) {\n",
+            "             TargetContext.updateState(conn, ProtocolState.RESPONSE_DONE);\n",
+            "-\n",
+            "             targetConfiguration.getMetrics().notifyReceivedMessageSize(\n",
+            "                     conn.getMetrics().getReceivedBytesCount());\n",
+            " \n",
+            "             if (!this.connStrategy.keepAlive(response, conn.getContext())) {\n",
+            "                 TargetContext.updateState(conn, ProtocolState.CLOSED);\n",
+            "-\n",
+            "                 targetConfiguration.getConnections().shutdownConnection(conn);\n",
+            "             } else {\n",
+            "                 targetConfiguration.getConnections().releaseConnection(conn);\n"
+          ],
+          "locn": "-133,13 +138,11"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetResponse.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetResponse.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     /** The agent used for delivering requests */\n",
+            "     private DeliveryAgent deliveryAgent;\n",
+            " \n",
+            "-    /**\n",
+            "-     * Create the callback for the handling events on a given connection     \n",
+            "-     */\n",
+            "-    public ConnectCallback() {\n",
+            "-\n",
+            "-    }\n",
+            "-\n",
+            "     public void completed(SessionRequest request) {\n",
+            "         HostConnections pool = (HostConnections) request.getAttachment();\n",
+            "         pool.pendingConnectionSucceeded();\n"
+          ],
+          "locn": "-32,13 +32,6"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ConnectCallback.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ConnectCallback.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.axis2.description.Parameter;\n",
+            " import org.apache.axis2.engine.AxisEngine;\n",
+            " import org.apache.axiom.soap.*;\n",
+            "-import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;\n",
+            " import org.apache.axiom.om.OMAbstractFactory;\n",
+            " import org.apache.commons.logging.Log;\n",
+            " import org.apache.commons.logging.LogFactory;\n"
+          ],
+          "locn": "-32,7 +32,6"
+        },
+        {
+          "lines": [
+            " import java.util.Comparator;\n",
+            " \n",
+            " public class ClientWorker implements Runnable {\n",
+            "-    private Log log = LogFactory.getLog(ClientWorker.class);\n",
+            "+\n",
+            "+    private static final Log log = LogFactory.getLog(ClientWorker.class);\n",
+            "+\n",
+            "     /** the Axis2 configuration context */\n",
+            "     private ConfigurationContext cfgCtx = null;\n",
+            "+\n",
+            "     /** the response message context that would be created */\n",
+            "     private org.apache.axis2.context.MessageContext responseMsgCtx = null;\n",
+            "+\n",
+            "     /** the HttpResponse received */\n",
+            "     private TargetResponse response = null;\n",
+            "+\n",
+            "     /** weather a body is expected or not */\n",
+            "     private boolean expectEntityBody = true;\n",
+            " \n"
+          ],
+          "locn": "-47,13 +46,18"
+        },
+        {
+          "lines": [
+            " \t\t// Special casing 302 scenario in following section. Not sure whether it's the correct fix,\n",
+            " \t\t// but this fix makes it possible to do http --> https redirection.\n",
+            " \t\tif (oriURL != null && response.getStatus() != HttpStatus.SC_MOVED_TEMPORARILY) {\n",
+            "-\t\t\tURL url = null;\n",
+            "+\t\t\tURL url;\n",
+            " \t\t\ttry {\n",
+            " \t\t\t\turl = new URL(oriURL);\n",
+            " \t\t\t} catch (MalformedURLException e) {\n"
+          ],
+          "locn": "-71,7 +75,7"
+        },
+        {
+          "lines": [
+            " \t\t\t}\n",
+            " \n",
+            " \t\t\theaders.remove(PassThroughConstants.LOCATION);\n",
+            "-\t\t\tString prfix =  (String) outMsgCtx.getProperty(PassThroughConstants.SERVICE_PREFIX);\n",
+            "-\t\t\tif (prfix != null) {\n",
+            "-\t\t\t\theaders.put(PassThroughConstants.LOCATION, prfix + url.getFile());\n",
+            "+\t\t\tString prefix =  (String) outMsgCtx.getProperty(\n",
+            "+                    PassThroughConstants.SERVICE_PREFIX);\n",
+            "+\t\t\tif (prefix != null) {\n",
+            "+\t\t\t\theaders.put(PassThroughConstants.LOCATION, prefix + url.getFile());\n",
+            " \t\t\t}\n",
+            "-\n",
+            " \t\t}\n",
+            "         \n",
+            "         try {\n"
+          ],
+          "locn": "-80,11 +84,11"
+        },
+        {
+          "lines": [
+            "                 try {\n",
+            "                     responseMsgCtx.setEnvelope(envelope);\n",
+            "                 } catch (AxisFault axisFault) {\n",
+            "-                    log.error(\"Error setting SOAP envelope\", axisFault);\n",
+            "+                    log.error(\"Error setting the SOAP envelope\", axisFault);\n",
+            "                 }\n",
+            " \n",
+            "                 responseMsgCtx.setServerSide(true);\n"
+          ],
+          "locn": "-192,7 +196,7"
+        },
+        {
+          "lines": [
+            "             } else {\n",
+            "                 // there is no response entity-body\n",
+            "                 responseMsgCtx.setProperty(PassThroughConstants.NO_ENTITY_BODY, Boolean.TRUE);\n",
+            "-                responseMsgCtx.setEnvelope(new SOAP11Factory().getDefaultEnvelope());\n",
+            "+                responseMsgCtx.setEnvelope(OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope());\n",
+            "             }\n",
+            " \n",
+            "             // copy the HTTP status code as a message context property with the key HTTP_SC to be\n"
+          ],
+          "locn": "-199,7 +203,7"
+        },
+        {
+          "lines": [
+            "             if (statusCode >= 400) {\n",
+            "                 responseMsgCtx.setProperty(PassThroughConstants.FAULT_MESSAGE,\n",
+            "                         PassThroughConstants.TRUE);\n",
+            "-            } /*else if (statusCode == 202 && responseMsgCtx.getOperationContext().isComplete()) {\n",
+            "-                // Handle out-only invocation scenario\n",
+            "-                responseMsgCtx.setProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED, Boolean.TRUE);\n",
+            "-            }*/\n",
+            "+            }\n",
+            "             responseMsgCtx.setProperty(PassThroughConstants.NON_BLOCKING_TRANSPORT, true);\n",
+            " \n",
+            "             // process response received\n"
+          ],
+          "locn": "-209,10 +213,7"
+        },
+        {
+          "lines": [
+            "             } catch (AxisFault af) {\n",
+            "                 log.error(\"Fault processing response message through Axis2\", af);\n",
+            "             }\n",
+            "-\n",
+            "         } catch (AxisFault af) {\n",
+            "             log.error(\"Fault creating response SOAP envelope\", af);            \n",
+            "         } catch (IOException e) {\n"
+          ],
+          "locn": "-221,7 +222,6"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ClientWorker.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ClientWorker.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "  * Represents a Http Request.\n",
+            "  */\n",
+            " public class SourceRequest {\n",
+            "-    // private Log log = LogFactory.getLog(SourceRequest.class);\n",
+            " \n",
+            "     private Pipe pipe = null;\n",
+            "+\n",
+            "     /** HTTP Headers */\n",
+            "     private Map<String, String> headers =  new TreeMap<String, String>(new Comparator<String>() {\n",
+            "         public int compare(String o1, String o2) {\n"
+          ],
+          "locn": "-35,9 +35,9"
+        },
+        {
+          "lines": [
+            "             return o1.compareToIgnoreCase(o2);\n",
+            "         }\n",
+            "     });\n",
+            "+\n",
+            "     /** HTTP URL */\n",
+            "     private String url;\n",
+            "+\n",
+            "     /** HTTP Method */\n",
+            "     private String method;\n",
+            "-    /** Weather reqyest has a body */\n",
+            "+\n",
+            "+    /** Whether the request has a body */\n",
+            "     private boolean entityEnclosing;\n",
+            "+\n",
+            "     /** The http request */\n",
+            "     private HttpRequest request = null;\n",
+            "+\n",
+            "     /** Configuration of the receiver */\n",
+            "     private SourceConfiguration sourceConfiguration;\n",
+            "+\n",
+            "     /** HTTP Version */\n",
+            "     private ProtocolVersion version = null;\n",
+            "+\n",
+            "     /** The connection from the client */\n",
+            "     private NHttpServerConnection connection = null;\n",
+            " \n"
+          ],
+          "locn": "-44,18 +44,25"
+        },
+        {
+          "lines": [
+            "      */\n",
+            "     public void start(NHttpServerConnection conn) throws IOException, HttpException {\n",
+            "         if (entityEnclosing) {\n",
+            "-            pipe = new Pipe(conn, sourceConfiguration.getBufferFactory().getBuffer(), \"source\", sourceConfiguration);\n",
+            "+            pipe = new Pipe(conn, sourceConfiguration.getBufferFactory().getBuffer(),\n",
+            "+                    \"source\", sourceConfiguration);\n",
+            " \n",
+            "             SourceContext.get(conn).setReader(pipe);\n",
+            " \n"
+          ],
+          "locn": "-93,7 +100,8"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceRequest.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceRequest.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "  *  specific language governing permissions and limitations\n",
+            "  *  under the License.\n",
+            "  */\n",
+            "+\n",
+            " package org.apache.synapse.transport.passthru;\n",
+            " \n",
+            " import org.apache.axiom.om.OMElement;\n"
+          ],
+          "locn": "-16,6 +16,7"
+        },
+        {
+          "lines": [
+            "         namePrefix = (sslContext == null) ? \"HTTP\" : \"HTTPS\";\n",
+            " \n",
+            "         sourceConfiguration = new SourceConfiguration(cfgCtx, transportInDescription, workerPool);\n",
+            "-        sourceConfiguration.setSsl((sslContext == null) ? false :true);\n",
+            "+        sourceConfiguration.setSsl(sslContext != null);\n",
+            "         sourceConfiguration.build();\n",
+            " \n",
+            "         // register to receive updates on services for lifetime management\n"
+          ],
+          "locn": "-112,7 +113,7"
+        },
+        {
+          "lines": [
+            "     }\n",
+            " \n",
+            "     public void start() throws AxisFault {\n",
+            "-\n",
+            "         log.info(\"Starting Pass-through \" + namePrefix + \" Listener...\");\n",
+            " \n",
+            "         try {\n",
+            "             String prefix = namePrefix + \"-Listener I/O dispatcher\";\n",
+            "-\n",
+            "             ioReactor = new DefaultListeningIOReactor(\n",
+            "                             sourceConfiguration.getIOThreadsPerReactor(),\n",
+            "                             new NativeThreadFactory(new ThreadGroup(prefix + \" thread group\"), prefix),\n"
+          ],
+          "locn": "-132,12 +133,10"
+        },
+        {
+          "lines": [
+            "         }\n",
+            " \n",
+            "         state = BaseConstants.STARTED;\n",
+            "-\n",
+            "         log.info(\"Pass-through \" + namePrefix + \" Listener \" + \"started on port : \" +\n",
+            "                 sourceConfiguration.getPort());\n",
+            "     }\n"
+          ],
+          "locn": "-196,7 +195,6"
+        },
+        {
+          "lines": [
+            "         throw new AxisFault(s, e);\n",
+            "     }\n",
+            " \n",
+            "-    public EndpointReference getEPRForService(String serviceName, String ip) throws AxisFault {\n",
+            "-        String trailer = \"\";\n",
+            "-        //Strip out the operation name\n",
+            "-        if (serviceName.indexOf('/') != -1) {\n",
+            "-            trailer += serviceName.substring(serviceName.indexOf(\"/\"));\n",
+            "-            serviceName = serviceName.substring(0, serviceName.indexOf('/'));\n",
+            "-        }\n",
+            "-        // strip out the endpoint name if present\n",
+            "-        if (serviceName.indexOf('.') != -1) {\n",
+            "-            trailer += serviceName.substring(serviceName.indexOf(\".\"));\n",
+            "-            serviceName = serviceName.substring(0, serviceName.indexOf('.'));\n",
+            "-        }\n",
+            "-\n",
+            "-        if (serviceNameToEPRMap.containsKey(serviceName)) {\n",
+            "-            return new EndpointReference(\n",
+            "-                    sourceConfiguration.getCustomEPRPrefix() +\n",
+            "-                            serviceNameToEPRMap.get(serviceName) + trailer);\n",
+            "-        } else {\n",
+            "-            return new EndpointReference(sourceConfiguration.getServiceEPRPrefix() +\n",
+            "-                    serviceName + trailer);\n",
+            "-        }\n",
+            "-    }\n",
+            "-\n",
+            "     /**\n",
+            "      * Return the EPRs for the given service over this transport\n",
+            "      * @param serviceName name of the service\n"
+          ],
+          "locn": "-206,29 +204,6"
+        },
+        {
+          "lines": [
+            "                         addToServiceURIMap(service);\n",
+            "                         break;\n",
+            "                     case AxisEvent.SERVICE_REMOVE :\n",
+            "-                        removeServiceFfromURIMap(service);\n",
+            "+                        removeServiceFromURIMap(service);\n",
+            "                         break;\n",
+            "                     case AxisEvent.SERVICE_START  :\n",
+            "                         addToServiceURIMap(service);\n",
+            "                         break;\n",
+            "                     case AxisEvent.SERVICE_STOP   :\n",
+            "-                        removeServiceFfromURIMap(service);\n",
+            "+                        removeServiceFromURIMap(service);\n",
+            "                         break;\n",
+            "                 }\n",
+            "             }\n"
+          ],
+          "locn": "-354,13 +329,13"
+        },
+        {
+          "lines": [
+            "         }\n",
+            "     }\n",
+            " \n",
+            "-    private void removeServiceFfromURIMap(AxisService service) {\n",
+            "+    private void removeServiceFromURIMap(AxisService service) {\n",
+            "         eprToServiceNameMap.remove(serviceNameToEPRMap.get(service.getName()));\n",
+            "         serviceNameToEPRMap.remove(service.getName());\n",
+            "     }\n"
+          ],
+          "locn": "-394,7 +369,7"
+        },
+        {
+          "lines": [
+            " \n",
+            "     /**\n",
+            "      * Create the SSL IO Session handler to be used by this listener\n",
+            "-     * @param transportIn transport in descritption\n",
+            "+     * @param transportIn transport in description\n",
+            "      * @return always null\n",
+            "      * @throws AxisFault never thrown\n",
+            "      */\n"
+          ],
+          "locn": "-418,7 +393,7"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpListener.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpListener.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import java.util.Set;\n",
+            " \n",
+            " public class SourceResponse {\n",
+            "+\n",
+            "     private Pipe pipe = null;\n",
+            "+\n",
+            "     /** Transport headers */\n",
+            "     private Map<String, String> headers = new HashMap<String, String>();\n",
+            "+\n",
+            "     /** Status of the response */\n",
+            "     private int status = HttpStatus.SC_OK;\n",
+            "+\n",
+            "     /** Status line */\n",
+            "     private String statusLine = null;\n",
+            "+\n",
+            "     /** Actual response submitted */\n",
+            "     private HttpResponse response = null;\n",
+            "+\n",
+            "     /** Configuration of the receiver */\n",
+            "     private SourceConfiguration sourceConfiguration;\n",
+            "+\n",
+            "     /** Version of the response */\n",
+            "     private ProtocolVersion version = HttpVersion.HTTP_1_1;\n",
+            "+\n",
+            "     /** Connection strategy */\n",
+            "     private ConnectionReuseStrategy connStrategy = new DefaultConnectionReuseStrategy();\n",
+            "-    /** Chunk response or not */\n",
+            "-    // private boolean chunk = true;\n",
+            " \n",
+            "     private SourceRequest request = null;\n",
+            " \n"
+          ],
+          "locn": "-35,23 +35,29"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceResponse.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceResponse.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "  *  under the License.\n",
+            "  */\n",
+            " \n",
+            "-\n",
+            " package org.apache.synapse.transport.passthru;\n",
+            " \n",
+            " import java.io.IOException;\n"
+          ],
+          "locn": "-17,7 +17,6"
+        },
+        {
+          "lines": [
+            " import org.apache.synapse.transport.passthru.connections.HostConnections;\n",
+            " import org.apache.synapse.transport.passthru.jmx.PassThroughTransportMetricsCollector;\n",
+            " \n",
+            "-\n",
+            " /**\n",
+            "  * This class is handling events from the transport -- > client.\n",
+            "  */\n",
+            " public class TargetHandler implements NHttpClientHandler {\n",
+            "-    private static Log log = LogFactory.getLog(TargetHandler.class);\n",
+            " \n",
+            "+    private static final Log log = LogFactory.getLog(TargetHandler.class);\n",
+            "+\n",
+            "     /** Delivery agent */\n",
+            "     private final DeliveryAgent deliveryAgent;\n",
+            " \n"
+          ],
+          "locn": "-43,13 +42,13"
+        },
+        {
+          "lines": [
+            "         HostConnections pool = (HostConnections) o;\n",
+            "         conn.getContext().setAttribute(PassThroughConstants.CONNECTION_POOL, pool);\n",
+            " \n",
+            "-          \n",
+            "         // create the connection information and set it to request ready\n",
+            "         TargetContext.create(conn, ProtocolState.REQUEST_READY, targetConfiguration);\n",
+            " \n"
+          ],
+          "locn": "-75,7 +74,6"
+        },
+        {
+          "lines": [
+            "         // notify about the new connection\n",
+            "         deliveryAgent.connected(pool.getHost(), pool.getPort());\n",
+            "         \n",
+            "-        conn.getContext().setAttribute(PassThroughConstants.REQ_DEPARTURE_TIME, System.currentTimeMillis());\n",
+            "+        conn.getContext().setAttribute(PassThroughConstants.REQ_DEPARTURE_TIME,\n",
+            "+                System.currentTimeMillis());\n",
+            " \n",
+            "         metrics.connected();\n",
+            "     }\n"
+          ],
+          "locn": "-85,7 +83,8"
+        },
+        {
+          "lines": [
+            "                 request.start(conn);\n",
+            "                 targetConfiguration.getMetrics().incrementMessagesSent();\n",
+            "             }\n",
+            "-            conn.getContext().setAttribute(PassThroughConstants.REQ_DEPARTURE_TIME, System.currentTimeMillis());\n",
+            "+            conn.getContext().setAttribute(PassThroughConstants.REQ_DEPARTURE_TIME,\n",
+            "+                    System.currentTimeMillis());\n",
+            "         } catch (IOException e) {\n",
+            "             logIOException(conn, e);\n",
+            "             TargetContext.updateState(conn, ProtocolState.CLOSED);\n"
+          ],
+          "locn": "-109,7 +108,8"
+        },
+        {
+          "lines": [
+            "             }\n",
+            "         } else if (e.getMessage() != null) {\n",
+            "             String msg = e.getMessage().toLowerCase();\n",
+            "-            if (msg.indexOf(\"broken\") != -1) {\n",
+            "+            if (msg.contains(\"broken\")) {\n",
+            "                 log.warn(\"I/O error (Probably the connection \" +\n",
+            "                         \"was closed by the remote party):\" + e.getMessage());\n",
+            "             } else {\n"
+          ],
+          "locn": "-381,7 +381,7"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetHandler.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetHandler.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import java.io.OutputStream;\n",
+            " \n",
+            " /**\n",
+            "- * This Passthrough transport level interface is used for plugging in different implementations for special processing of some\n",
+            "- * HTTP GET requests.\n",
+            "+ * This PassThrough transport level interface is used for plugging in different implementations\n",
+            "+ * for special processing of some HTTP GET requests.\n",
+            "  * <p/>\n",
+            "  * e.g. ?wsdl, ?wsdl2 etc.\n",
+            "  * <p/>\n"
+          ],
+          "locn": "-28,8 +28,8"
+        },
+        {
+          "lines": [
+            " public interface HttpGetRequestProcessor {\n",
+            "     /**\n",
+            "      * Initialize the HttpGetProcessor\n",
+            "+     *\n",
+            "      * @param cfgCtx servers configuration context\n",
+            "-     * @param serverHandler dispatching handler\n",
+            "+     * @param handler dispatching handler\n",
+            "+     *\n",
+            "      * @throws AxisFault if an error occurs\n",
+            "      */\n",
+            "     void init(ConfigurationContext cfgCtx, SourceHandler handler) throws AxisFault;\n"
+          ],
+          "locn": "-39,8 +39,10"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/HttpGetRequestProcessor.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/HttpGetRequestProcessor.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            "     private boolean producerCompleted = false;\n",
+            " \n",
+            "-    public boolean isProducerCompleted() {\n",
+            "-\t\treturn producerCompleted;\n",
+            "-\t}\n",
+            "-\n",
+            " \t/** Lock to synchronize the producers and consumers */\n",
+            "     private Lock lock = new ReentrantLock();\n",
+            " \n"
+          ],
+          "locn": "-49,10 +49,6"
+        },
+        {
+          "lines": [
+            "         }\n",
+            "         return outputStream;\n",
+            "     }\n",
+            "-    \n",
+            "-    \n",
+            "-    /**\n",
+            "-     * Creates a separate ByteBuffer for the output data and returns an OutputStream\n",
+            "-     * on top of it.\n",
+            "-     *\n",
+            "-     * @return An OutputStream object\n",
+            "-     */\n",
+            "-    public synchronized OutputStream resetOutputStream() {\n",
+            "-    \toutputBuffer = baseConfig.getBufferFactory().getBuffer();\n",
+            "-        outBufferInputMode = new AtomicBoolean(true);\n",
+            "-        outputStream = new ByteBufferOutputStream();\n",
+            "-        return outputStream;\n",
+            "-    }\n",
+            "-    \n",
+            "-    \n",
+            "-    public synchronized void resetBufferPossition() {\n",
+            "-    \tif(buffer != null){\n",
+            "-    \t\tbuffer.rewind();\n",
+            "-    \t}\n",
+            "-    \t\n",
+            "-    \tif(outputBuffer != null){\n",
+            "-    \t\toutputBuffer.rewind();\n",
+            "-    \t}\n",
+            "-    }\n",
+            " \n",
+            "     public synchronized void setSerializationComplete(boolean serializationComplete) {\n",
+            "         if (!this.serializationComplete) {\n"
+          ],
+          "locn": "-267,31 +263,6"
+        },
+        {
+          "lines": [
+            "     public void setRawSerializationComplete(boolean rawSerializationComplete) {\n",
+            "     \tthis.rawSerializationComplete = rawSerializationComplete;\n",
+            "     }\n",
+            "-    \n",
+            "-    public void forceSetSerializationRest(){\n",
+            "-    \tif(this.serializationComplete){\n",
+            "-    \t\tthis.serializationComplete = false;\n",
+            "-    \t}\n",
+            "-    }\n",
+            " \n",
+            "-    \n",
+            "-    \n",
+            "-\n",
+            "-    public boolean isSerializationComplete() {\n",
+            "-\t\treturn serializationComplete;\n",
+            "-\t}\n",
+            "-\n",
+            " \tpublic ByteBuffer getBuffer() {\n",
+            "         return buffer;\n",
+            "     }\n",
+            " \n",
+            "-    public boolean hasHttpProducer() {\n",
+            "-        return hasHttpProducer;\n",
+            "-    }\n",
+            "-\n",
+            "     private void setInputMode(ByteBuffer buffer, AtomicBoolean inputMode) {\n",
+            "         if (inputMode.compareAndSet(false, true)) {\n",
+            "             if (buffer.hasRemaining()) {\n"
+          ],
+          "locn": "-312,28 +283,11"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/Pipe.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/Pipe.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.synapse.transport.passthru.config.TargetConfiguration;\n",
+            " \n",
+            " public class TargetErrorHandler {\n",
+            "-    private Log log = LogFactory.getLog(TargetErrorHandler.class);\n",
+            " \n",
+            "+    private static final Log log = LogFactory.getLog(TargetErrorHandler.class);\n",
+            "+\n",
+            "     private TargetConfiguration targetConfiguration = null;\n",
+            " \n",
+            "     public TargetErrorHandler(TargetConfiguration targetConfiguration) {\n"
+          ],
+          "locn": "-30,8 +30,9"
+        },
+        {
+          "lines": [
+            "             return;\n",
+            "         }\n",
+            " \n",
+            "-//        if (mc.getOperationContext().isComplete()) {\n",
+            "-//            return;\n",
+            "-//        } ? why we ignoring this..\n",
+            "-\n",
+            "         targetConfiguration.getWorkerPool().execute(new Runnable() {\n",
+            "             public void run() {\n",
+            "                 MessageReceiver mr = mc.getAxisOperation().getMessageReceiver();\n"
+          ],
+          "locn": "-62,10 +63,6"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetErrorHandler.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetErrorHandler.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.http.nio.entity.ContentOutputStream;\n",
+            " import org.apache.http.nio.util.ContentOutputBuffer;\n",
+            " import org.apache.http.nio.util.HeapByteBufferAllocator;\n",
+            "-import org.apache.http.nio.util.SharedOutputBuffer;\n",
+            " import org.apache.http.nio.util.SimpleOutputBuffer;\n",
+            " import org.apache.http.*;\n",
+            " import org.apache.http.protocol.*;\n",
+            " import org.apache.http.params.DefaultedHttpParams;\n",
+            "-import org.apache.http.impl.DefaultHttpResponseFactory;\n",
+            " import org.apache.http.message.BasicHttpResponse;\n",
+            " import org.apache.axis2.AxisFault;\n",
+            " import org.apache.commons.logging.Log;\n"
+          ],
+          "locn": "-23,12 +23,10"
+        },
+        {
+          "lines": [
+            "  * about the message and its various states.\n",
+            "  */\n",
+            " public class SourceHandler implements NHttpServiceHandler {\n",
+            "-    private static Log log = LogFactory.getLog(SourceHandler.class);\n",
+            " \n",
+            "+    private static final Log log = LogFactory.getLog(SourceHandler.class);\n",
+            "+\n",
+            "     private final SourceConfiguration sourceConfiguration;\n",
+            " \n",
+            "     private PassThroughTransportMetricsCollector metrics = null;\n"
+          ],
+          "locn": "-46,8 +44,9"
+        },
+        {
+          "lines": [
+            " \t\t\t\tthis.s2sLatencyView = new LatencyView(sourceConfiguration.isSsl());\n",
+            " \t\t\t}\n",
+            " \t\t} catch (AxisFault e) {\n",
+            "-\t\t\tlog.error(e.getMessage(), e);\n",
+            "+\t\t\tlog.error(\"Error while initializing latency view calculators\", e);\n",
+            " \t\t}\n",
+            "     }\n",
+            " \n"
+          ],
+          "locn": "-67,7 +66,7"
+        },
+        {
+          "lines": [
+            "         // we have to have these two operations in order\n",
+            "         sourceConfiguration.getSourceConnections().addConnection(conn);\n",
+            "         SourceContext.create(conn, ProtocolState.REQUEST_READY, sourceConfiguration);\n",
+            "-\n",
+            "         metrics.connected();\n",
+            "     }\n",
+            " \n",
+            "     public void requestReceived(NHttpServerConnection conn) {\n",
+            "         try {\n",
+            "-        \t\n",
+            "-        \tHttpContext _context = conn.getContext();\n",
+            "-        \t_context.setAttribute(PassThroughConstants.REQ_ARRIVAL_TIME, System.currentTimeMillis());\n",
+            "+            conn.getContext().setAttribute(PassThroughConstants.REQ_ARRIVAL_TIME,\n",
+            "+                    System.currentTimeMillis());\n",
+            "         \t \n",
+            "-            if (!SourceContext.assertState(conn, ProtocolState.REQUEST_READY) && !SourceContext.assertState(conn, ProtocolState.WSDL_RESPONSE_DONE)) {\n",
+            "+            if (!SourceContext.assertState(conn, ProtocolState.REQUEST_READY) &&\n",
+            "+                    !SourceContext.assertState(conn, ProtocolState.WSDL_RESPONSE_DONE)) {\n",
+            "                 handleInvalidState(conn, \"Request received\");\n",
+            "                 return;\n",
+            "             }\n"
+          ],
+          "locn": "-75,17 +74,16"
+        },
+        {
+          "lines": [
+            " \n",
+            "             // at this point we have read the HTTP Headers\n",
+            "             SourceContext.updateState(conn, ProtocolState.REQUEST_HEAD);\n",
+            "-\n",
+            "             SourceRequest request = new SourceRequest(\n",
+            "                     sourceConfiguration, conn.getHttpRequest(), conn);\n",
+            "-\n",
+            "             SourceContext.setRequest(conn, request);\n",
+            "-\n",
+            "             request.start(conn);\n",
+            "+            metrics.incrementMessagesReceived();\n",
+            " \n",
+            "-            metrics.incrementMessagesReceived();\n",
+            "-            \n",
+            "-            /******/\n",
+            "-            String method = request.getRequest() != null ? request.getRequest().getRequestLine().getMethod().toUpperCase():\"\";\n",
+            "+            String method = request.getRequest() != null ?\n",
+            "+                    request.getRequest().getRequestLine().getMethod().toUpperCase() : \"\";\n",
+            "             OutputStream os = null;\n",
+            " \t\t\tif (\"GET\".equals(method)) {\n",
+            " \t\t\t\tHttpContext context = request.getConnection().getContext();\n",
+            "-\t\t\t\tContentOutputBuffer outputBuffer = new SimpleOutputBuffer(8192,\tnew HeapByteBufferAllocator());\n",
+            "-\t\t\t\t// ContentOutputBuffer outputBuffer\n",
+            "-\t\t\t\t// = new SharedOutputBuffer(8192, conn, new\n",
+            "-\t\t\t\t// HeapByteBufferAllocator());\n",
+            "+\t\t\t\tContentOutputBuffer outputBuffer = new SimpleOutputBuffer(8192,\n",
+            "+                        new HeapByteBufferAllocator());\n",
+            " \t\t\t\tcontext.setAttribute(\"synapse.response-source-buffer\",outputBuffer);\n",
+            " \t\t\t\tos = new ContentOutputStream(outputBuffer);\n",
+            " \t\t\t} \n"
+          ],
+          "locn": "-94,25 +92,19"
+        },
+        {
+          "lines": [
+            " \n",
+            "             sourceConfiguration.getWorkerPool().execute(\n",
+            "                     new ServerWorker(request, sourceConfiguration,os));\n",
+            "+\n",
+            "         } catch (HttpException e) {\n",
+            "-            log.error(e.getMessage(), e);\n",
+            "-\n",
+            "+            log.error(\"HTTP exception while processing request\", e);\n",
+            "             informReaderError(conn);\n",
+            "-\n",
+            "             SourceContext.updateState(conn, ProtocolState.CLOSED);\n",
+            "             sourceConfiguration.getSourceConnections().shutDownConnection(conn);\n",
+            "         } catch (IOException e) {\n",
+            "             logIOException(e);\n",
+            "-\n",
+            "             informReaderError(conn);\n",
+            "-\n",
+            "             SourceContext.updateState(conn, ProtocolState.CLOSED);\n",
+            "             sourceConfiguration.getSourceConnections().shutDownConnection(conn);\n",
+            "         }\n",
+            "     }\n",
+            " \n",
+            "-    public void inputReady(NHttpServerConnection conn,\n",
+            "-                           ContentDecoder decoder) {\n",
+            "+    public void inputReady(NHttpServerConnection conn, ContentDecoder decoder) {\n",
+            "         try {\n",
+            "             ProtocolState protocolState = SourceContext.getState(conn);\n",
+            " \n"
+          ],
+          "locn": "-119,25 +111,21"
+        },
+        {
+          "lines": [
+            "             }\n",
+            " \n",
+            "             SourceContext.updateState(conn, ProtocolState.REQUEST_BODY);\n",
+            "-\n",
+            "             SourceRequest request = SourceContext.getRequest(conn);\n",
+            "-\n",
+            "             int readBytes = request.read(conn, decoder);\n",
+            "             if (readBytes > 0) {\n",
+            "                 metrics.incrementBytesReceived(readBytes);\n",
+            "             }\n",
+            "+\n",
+            "         } catch (IOException e) {\n",
+            "             logIOException(e);\n",
+            "-\n",
+            "             informReaderError(conn);\n",
+            "-\n",
+            "             SourceContext.updateState(conn, ProtocolState.CLOSED);\n",
+            "             sourceConfiguration.getSourceConnections().shutDownConnection(conn);\n",
+            "         }\n"
+          ],
+          "locn": "-148,18 +136,15"
+        },
+        {
+          "lines": [
+            "             SourceResponse response = SourceContext.getResponse(conn);\n",
+            "             if (response != null) {\n",
+            "                 response.start(conn);\n",
+            "-\n",
+            "                 metrics.incrementMessagesSent();\n",
+            "             }\n",
+            "+\n",
+            "         } catch (IOException e) {\n",
+            "             logIOException(e);\n",
+            "-\n",
+            "             informWriterError(conn);\n",
+            "-\n",
+            "             SourceContext.updateState(conn, ProtocolState.CLOSING);\n",
+            "             sourceConfiguration.getSourceConnections().shutDownConnection(conn);\n",
+            "         } catch (HttpException e) {\n",
+            "             log.error(e.getMessage(), e);\n",
+            "-\n",
+            "             informWriterError(conn);\n",
+            "-\n",
+            "             SourceContext.updateState(conn, ProtocolState.CLOSING);\n",
+            "             sourceConfiguration.getSourceConnections().shutDownConnection(conn);\n",
+            "         }\n"
+          ],
+          "locn": "-185,21 +170,17"
+        },
+        {
+          "lines": [
+            "                 e.getMessage().toLowerCase().contains(\"connection reset by peer\") ||\n",
+            "                 e.getMessage().toLowerCase().contains(\"forcibly closed\")))) {\n",
+            "             if (log.isDebugEnabled()) {\n",
+            "-                log.debug(\"I/O error (Probably the keepalive connection \" +\n",
+            "-                        \"was closed):\" + e.getMessage());\n",
+            "+                log.debug(\"I/O error (Probably a keepalive connection was closed):\" + e.getMessage());\n",
+            "             }\n",
+            "         } else if (e.getMessage() != null) {\n",
+            "             String msg = e.getMessage().toLowerCase();\n",
+            "-            if (msg.indexOf(\"broken\") != -1) {\n",
+            "+            if (msg.contains(\"broken\")) {\n",
+            "                 log.warn(\"I/O error (Probably the connection \" +\n",
+            "                         \"was closed by the remote party):\" + e.getMessage());\n",
+            "             } else {\n"
+          ],
+          "locn": "-312,12 +293,11"
+        },
+        {
+          "lines": [
+            "         }\n",
+            "     }\n",
+            "     \n",
+            "-    \n",
+            "-    /**\n",
+            "-     * Commit the response to the connection. Processes the response through the configured\n",
+            "-     * HttpProcessor and submits it to be sent out. This method hides any exceptions and is targetted\n",
+            "-     * for non critical (i.e. browser requests etc) requests, which are not core messages\n",
+            "-     * @param conn the connection being processed\n",
+            "-     * @param response the response to commit over the connection\n",
+            "-     */\n",
+            "-    public void commitResponseHideExceptions(\n",
+            "-            final NHttpServerConnection conn, final HttpResponse response) {\n",
+            "-        try {\n",
+            "-            conn.suspendInput();\n",
+            "-            sourceConfiguration.getHttpProcessor().process(response, conn.getContext());\n",
+            "-            conn.submitResponse(response);\n",
+            "-        } catch (HttpException e) {\n",
+            "-            handleException(\"Unexpected HTTP protocol error : \" + e.getMessage(), e, conn);\n",
+            "-        } catch (IOException e) {\n",
+            "-            handleException(\"IO error submiting response : \" + e.getMessage(), e, conn);\n",
+            "-        }\n",
+            "-    }\n",
+            "-    \n",
+            "-    \n",
+            "     // ----------- utility methods -----------\n",
+            " \n",
+            "     private void handleException(String msg, Exception e, NHttpServerConnection conn) {\n",
+            "-        log.error(msg, e);\n",
+            "+        String errorMessage;\n",
+            "         if (conn != null) {\n",
+            "-            //shutdownConnection(conn);\n",
+            "+            errorMessage = \"[\" + conn + \"] \" + msg;\n",
+            "+        } else {\n",
+            "+            errorMessage = \"[\" + conn + \"] \" + msg;\n",
+            "         }\n",
+            "+        log.error(errorMessage, e);\n",
+            "     }\n",
+            "-    \n",
+            "-    \n",
+            "-    \n",
+            "+\n",
+            " }\n"
+          ],
+          "locn": "-442,37 +422,16"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            " package org.apache.synapse.transport.passthru;\n",
+            " \n",
+            "-import java.io.IOException;\n",
+            " import java.io.OutputStream;\n",
+            " import java.net.InetAddress;\n",
+            " import java.util.Comparator;\n"
+          ],
+          "locn": "-19,7 +19,6"
+        },
+        {
+          "lines": [
+            " import java.util.TreeMap;\n",
+            " \n",
+            " import javax.xml.parsers.FactoryConfigurationError;\n",
+            "-import javax.xml.stream.XMLStreamException;\n",
+            " \n",
+            " import org.apache.axiom.om.OMAbstractFactory;\n",
+            " import org.apache.axiom.soap.SOAP11Constants;\n"
+          ],
+          "locn": "-28,7 +27,6"
+        },
+        {
+          "lines": [
+            " import org.apache.axiom.soap.SOAP12Constants;\n",
+            " import org.apache.axiom.soap.SOAPEnvelope;\n",
+            " import org.apache.axiom.soap.SOAPFactory;\n",
+            "-import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;\n",
+            " import org.apache.axiom.util.UIDGenerator;\n",
+            " import org.apache.axis2.AxisFault;\n",
+            " import org.apache.axis2.Constants;\n"
+          ],
+          "locn": "-35,7 +33,6"
+        },
+        {
+          "lines": [
+            " import org.apache.synapse.transport.nhttp.util.NhttpUtil;\n",
+            " import org.apache.synapse.transport.nhttp.util.RESTUtil;\n",
+            " import org.apache.synapse.transport.passthru.config.SourceConfiguration;\n",
+            "-import org.apache.synapse.transport.passthru.util.RelayUtils;\n",
+            " import org.apache.synapse.transport.passthru.util.SourceResponseFactory;\n",
+            " \n",
+            " /**\n"
+          ],
+          "locn": "-68,7 +65,6"
+        },
+        {
+          "lines": [
+            " public class ServerWorker implements Runnable {\n",
+            " \n",
+            "   \tprivate static final Log log = LogFactory.getLog(ServerWorker.class);\n",
+            "+\n",
+            "     /** the incoming message to be processed */\n",
+            "     private org.apache.axis2.context.MessageContext msgContext = null;\n",
+            "+\n",
+            "     /** the http request */\n",
+            "     private SourceRequest request = null;\n",
+            "+\n",
+            "     /** The configuration of the receiver */\n",
+            "     private SourceConfiguration sourceConfiguration = null;\n",
+            " \n"
+          ],
+          "locn": "-77,10 +73,13"
+        },
+        {
+          "lines": [
+            "     /** WSDL processor for Get requests */\n",
+            "     private HttpGetRequestProcessor httpGetRequestProcessor = null;\n",
+            "     \n",
+            "-    /** Weather we should do rest dispatching or not */\n",
+            "-    private boolean isRestDispatching = true;\n",
+            "-    \n",
+            "     private boolean isHttps = false;\n",
+            "     \n",
+            "     \n"
+          ],
+          "locn": "-89,9 +88,6"
+        },
+        {
+          "lines": [
+            "     private OutputStream os; //only used for WSDL  requests..\n",
+            "   \n",
+            "     public ServerWorker(final SourceRequest request,\n",
+            "-                        final SourceConfiguration sourceConfiguration,final OutputStream os) {\n",
+            "+                        final SourceConfiguration sourceConfiguration, final OutputStream os) {\n",
+            "         this.request = request;\n",
+            "         this.sourceConfiguration = sourceConfiguration;\n",
+            "-\n",
+            "         this.isHttps = sourceConfiguration.isSsl();\n",
+            "-        \n",
+            "         this.msgContext = createMessageContext(request);\n",
+            "-        \n",
+            "         this.httpGetRequestProcessor = sourceConfiguration.getHttpGetRequestProcessor();\n",
+            "-        \n",
+            "         this.os = os;\n",
+            "-        \n",
+            "-      \n",
+            "-        \n",
+            "+\n",
+            "         // set these properties to be accessed by the engine\n",
+            "         msgContext.setProperty(\n",
+            "                 PassThroughConstants.PASS_THROUGH_SOURCE_REQUEST, request);\n"
+          ],
+          "locn": "-98,20 +94,14"
+        },
+        {
+          "lines": [
+            "                 PassThroughConstants.PASS_THROUGH_SOURCE_CONFIGURATION, sourceConfiguration);\n",
+            "         msgContext.setProperty(PassThroughConstants.PASS_THROUGH_SOURCE_CONNECTION,\n",
+            "                 request.getConnection());\n",
+            "-        \n",
+            "     }\n",
+            " \n",
+            "     public void run() {\n"
+          ],
+          "locn": "-119,7 +109,6"
+        },
+        {
+          "lines": [
+            "         ConfigurationContext cfgCtx = sourceConfiguration.getConfigurationContext();        \n",
+            "         msgContext.setProperty(Constants.Configuration.HTTP_METHOD, request.getMethod());\n",
+            " \n",
+            "-        String method = request.getRequest() != null ? request.getRequest().getRequestLine().getMethod().toUpperCase():\"\";\n",
+            "+        String method = request.getRequest() != null ?\n",
+            "+                request.getRequest().getRequestLine().getMethod().toUpperCase() : \"\";\n",
+            "         \n",
+            "         String uri = request.getUri();\n",
+            "         String oriUri = uri;\n"
+          ],
+          "locn": "-129,7 +118,8"
+        },
+        {
+          "lines": [
+            "                 }\n",
+            "             }\n",
+            "         }\n",
+            "-        \n",
+            "-        \n",
+            "+\n",
+            "         String servicePrefix = oriUri.substring(0, oriUri.indexOf(uri));\n",
+            "-        if (servicePrefix.indexOf(\"://\") == -1) {\n",
+            "-            HttpInetConnection inetConn = (HttpInetConnection) request.getConnection();\n",
+            "-            InetAddress localAddr = inetConn.getLocalAddress();\n",
+            "-            if (localAddr != null) {\n",
+            "+        if (!servicePrefix.contains(\"://\")) {\n",
+            "+            HttpInetConnection conn = (HttpInetConnection) request.getConnection();\n",
+            "+            InetAddress localAddress = conn.getLocalAddress();\n",
+            "+            if (localAddress != null) {\n",
+            "                 servicePrefix = (sourceConfiguration.isSsl() ? \"https://\" : \"http://\") +\n",
+            "-                        localAddr.getHostAddress() + \":\" + inetConn.getLocalPort() + servicePrefix;\n",
+            "+                        localAddress.getHostAddress() + \":\" + conn.getLocalPort() + servicePrefix;\n",
+            "             }\n",
+            "         }\n",
+            "        \n"
+          ],
+          "locn": "-161,15 +151,14"
+        },
+        {
+          "lines": [
+            "         msgContext.setProperty(PassThroughConstants.REST_URL_POSTFIX, uri);\n",
+            " \n",
+            " \t\tif (\"GET\".equals(method) || \"DELETE\".equals(method)) {\n",
+            "-\t\t\t\n",
+            " \t\t\tHttpResponse response = sourceConfiguration.getResponseFactory().newHttpResponse(\n",
+            " \t\t                request.getVersion(), HttpStatus.SC_OK,\n",
+            " \t\t                request.getConnection().getContext());\n"
+          ],
+          "locn": "-179,7 +168,6"
+        },
+        {
+          "lines": [
+            "             response.setEntity(entity);\n",
+            "             \n",
+            " \t\t\thttpGetRequestProcessor.process(request.getRequest(), response,msgContext,\n",
+            "-\t\t\t\t\trequest.getConnection(), os, isRestDispatching);\n",
+            "+\t\t\t\t\trequest.getConnection(), os, true);\n",
+            " \t\t} \n",
+            " \t\t\n",
+            " \t\t//need special case to handle REST\n",
+            " \t\tboolean restHandle =false;\n",
+            "-\t\tif(msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE) != null && (Boolean)msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE)){\n",
+            "+\t\tif (msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE) != null &&\n",
+            "+                (Boolean)msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE)){\n",
+            " \t\t\tmsgContext.setProperty(HTTPConstants.HTTP_METHOD, method);\n",
+            " \t        msgContext.setServerSide(true);\n",
+            " \t        msgContext.setDoingREST(true);\n",
+            " \t        String contentTypeHeader = request.getHeaders().get(HTTP.CONTENT_TYPE);\n",
+            "-\t        //String contentType = contentTypeHeader != null ?TransportUtils.getContentType(contentTypeHeader, msgContext):null;\n",
+            " \t        SOAPEnvelope soapEnvelope = this.handleRESTUrlPost(contentTypeHeader);\n",
+            " \t        processNonEntityEnclosingRESTHandler(soapEnvelope);\n",
+            "-\t\t\trestHandle =true;\n",
+            "+\t\t\trestHandle = true;\n",
+            " \t\t}\n",
+            " \t\t\n",
+            " \t\t//if WSDL done then moved out rather than hand over to entity handle methods.\n",
+            "-\t\tSourceContext info = (SourceContext) request.getConnection().getContext().getAttribute(SourceContext.CONNECTION_INFORMATION);\n",
+            "+\t\tSourceContext info = (SourceContext) request.getConnection().getContext().\n",
+            "+                getAttribute(SourceContext.CONNECTION_INFORMATION);\n",
+            " \t\tif (info != null &&\n",
+            " \t\t    info.getState().equals(ProtocolState.WSDL_RESPONSE_DONE) ||\n",
+            "-\t\t    (msgContext.getProperty(PassThroughConstants.WSDL_GEN_HANDLED) != null && Boolean.TRUE.equals((msgContext.getProperty(PassThroughConstants.WSDL_GEN_HANDLED))))) {\n",
+            "+\t\t    (msgContext.getProperty(PassThroughConstants.WSDL_GEN_HANDLED) != null &&\n",
+            "+                    Boolean.TRUE.equals((msgContext.getProperty(PassThroughConstants.WSDL_GEN_HANDLED))))) {\n",
+            " \t\t\treturn;\n",
+            " \t\t}\n",
+            " \t\t\n"
+          ],
+          "locn": "-192,27 +180,29"
+        },
+        {
+          "lines": [
+            " \t\t\t\tprocessNonEntityEnclosingRESTHandler(null);\n",
+            " \t\t\t}\n",
+            " \t\t}\n",
+            "-\t\n",
+            "-\t\t\n",
+            "-\t\t\n",
+            " \n",
+            "         sendAck();\n",
+            "     }\n"
+          ],
+          "locn": "-224,9 +214,6"
+        },
+        {
+          "lines": [
+            " \t/**\n",
+            " \t * Method will setup the necessary parameters for the rest url post action\n",
+            " \t * \n",
+            "-\t * @param contentType\n",
+            "-\t * @return\n",
+            "+\t * @param contentTypeHdr Content-type header value\n",
+            "+\t * @return a SOAPEnvelope\n",
+            " \t * @throws FactoryConfigurationError\n",
+            " \t */\n",
+            " \tprivate SOAPEnvelope handleRESTUrlPost(String contentTypeHdr) throws FactoryConfigurationError {\n",
+            " \t    SOAPEnvelope soapEnvelope = null;\n",
+            "-\t    String contentType = contentTypeHdr!=null?TransportUtils.getContentType(contentTypeHdr, msgContext):null;\n",
+            "-\t    if (contentType == null || \"\".equals(contentType) || HTTPConstants.MEDIA_TYPE_X_WWW_FORM.equals(contentType)) {\n",
+            "-\t        contentType = contentTypeHdr != null ? contentTypeHdr:HTTPConstants.MEDIA_TYPE_X_WWW_FORM;\n",
+            "+\t    String contentType = contentTypeHdr!=null ?\n",
+            "+                TransportUtils.getContentType(contentTypeHdr, msgContext) : null;\n",
+            "+\n",
+            "+\t    if (contentType == null || \"\".equals(contentType) ||\n",
+            "+                HTTPConstants.MEDIA_TYPE_X_WWW_FORM.equals(contentType)) {\n",
+            "+\n",
+            "+\t        contentType = contentTypeHdr != null ?\n",
+            "+                    contentTypeHdr : HTTPConstants.MEDIA_TYPE_X_WWW_FORM;\n",
+            " \t        msgContext.setTo(new EndpointReference(request.getRequest().getRequestLine().getUri()));\n",
+            " \t        msgContext.setProperty(Constants.Configuration.CONTENT_TYPE,contentType);\n",
+            " \t        String charSetEncoding = BuilderUtil.getCharSetEncoding(contentType);\n",
+            " \t\t    msgContext.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING, charSetEncoding);\n",
+            "-\t        try {\n",
+            "+\n",
+            "+            try {\n",
+            " \t            RESTUtil.dispatchAndVerify(msgContext);\n",
+            " \t        } catch (AxisFault e1) {\n",
+            " \t        \tlog.error(\"Error while building message for REST_URL request\",e1);\n"
+          ],
+          "locn": "-234,20 +221,26"
+        },
+        {
+          "lines": [
+            " \t        }\n",
+            " \t        \n",
+            " \t        RequestURIBasedDispatcher requestDispatcher = new RequestURIBasedDispatcher();\n",
+            "-\t       \n",
+            " \t\t\ttry {\n",
+            "-\t\t\t\tString requestURI = request.getRequest().getRequestLine().getUri();\n",
+            " \t\t\t\tAxisService axisService = requestDispatcher.findService(msgContext);\n",
+            " \n",
+            "-\t\t\t\tboolean isCustomRESTDispatcher = false;\n",
+            "-\t\t\t\tif (requestURI.startsWith(\"/t/\") || requestURI.startsWith(\"/services/t/\")) {\n",
+            "-\t\t\t\t\tisCustomRESTDispatcher = true;\n",
+            "-\t\t\t\t}\n",
+            "-\n",
+            " \t\t\t\t// the logic determines which service dispatcher to get invoke,\n",
+            " \t\t\t\t// this will be determine\n",
+            " \t\t\t\t// based on parameter defines at disableRestServiceDispatching,\n"
+          ],
+          "locn": "-254,16 +247,9"
+        },
+        {
+          "lines": [
+            " \t\t\t\t// Dispatcher Service.\n",
+            " \n",
+            " \t\t\t\tif (axisService == null) {\n",
+            "-\t\t\t\t\tString defaultSvcName = NHttpConfiguration.getInstance().getStringValue(\"nhttp.default.service\",\n",
+            "-\t\t\t\t\t                                                                        \"__SynapseService\");\n",
+            "-\n",
+            "+\t\t\t\t\tString defaultSvcName = NHttpConfiguration.getInstance().getStringValue(\n",
+            "+                            \"nhttp.default.service\", \"__SynapseService\");\n",
+            " \t\t\t\t\taxisService =  msgContext.getConfigurationContext().getAxisConfiguration()\n",
+            " \t\t\t\t\t                        .getService(defaultSvcName);\n",
+            " \t\t\t\t\tmsgContext.setAxisService(axisService);\n",
+            "-\n",
+            " \t\t\t\t}\n",
+            " \t\t\t} catch (AxisFault e) {\n",
+            "-\t\t\t\thandleException(\"Error processing \" + request.getMethod() + \" request for : \" + request.getUri(), e);\n",
+            "+\t\t\t\thandleException(\"Error processing \" + request.getMethod() + \" request for : \" +\n",
+            "+                        request.getUri(), e);\n",
+            " \t\t\t}\n",
+            "-\t\t\t\n",
+            "-\t\t\t\n",
+            "+\n",
+            " \t        try {\n",
+            " \t        \t soapEnvelope = TransportUtils.createSOAPMessage(msgContext, null, contentType);\n",
+            " \t           } catch (Exception e) {\n",
+            " \t        \tlog.error(\"Error while building message for REST_URL request\");\n",
+            " \t        }\n",
+            "-\t       //msgContext.setProperty(Constants.Configuration.CONTENT_TYPE,\"application/xml\");  \n",
+            "-\t       msgContext.setProperty(Constants.Configuration.MESSAGE_TYPE,HTTPConstants.MEDIA_TYPE_APPLICATION_XML);   \n",
+            "+\t        msgContext.setProperty(Constants.Configuration.MESSAGE_TYPE,\n",
+            "+                    HTTPConstants.MEDIA_TYPE_APPLICATION_XML);\n",
+            " \t    }\n",
+            " \t    return soapEnvelope;\n",
+            "     }\n"
+          ],
+          "locn": "-272,26 +258,24"
+        },
+        {
+          "lines": [
+            "                     Constants.RESPONSE_WRITTEN);\n",
+            "         }\n",
+            "         \n",
+            "-        if(msgContext.getProperty(PassThroughConstants.FORCE_SOAP_FAULT) != null){\n",
+            "+        if (msgContext.getProperty(PassThroughConstants.FORCE_SOAP_FAULT) != null) {\n",
+            "         \trespWritten =\"SKIP\";\n",
+            "         }\n",
+            "         \n"
+          ],
+          "locn": "-303,7 +287,7"
+        },
+        {
+          "lines": [
+            "         msgContext.setTo(new EndpointReference(request.getUri()));\n",
+            "         msgContext.setServerSide(true);\n",
+            "         msgContext.setDoingREST(true);\n",
+            "-        if(!request.isEntityEnclosing()){\n",
+            "+        if (!request.isEntityEnclosing()) {\n",
+            "         \tmsgContext.setProperty(PassThroughConstants.NO_ENTITY_BODY, Boolean.TRUE);\n",
+            "         }\n",
+            "         \n",
+            "         try {\n",
+            "-        \tif(soapEnvelope == null){\n",
+            "-        \t\t msgContext.setEnvelope(new SOAP11Factory().getDefaultEnvelope());\n",
+            "-        \t}else{\n",
+            "+        \tif (soapEnvelope == null) {\n",
+            "+        \t\t msgContext.setEnvelope(OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope());\n",
+            "+        \t} else {\n",
+            "         \t\t msgContext.setEnvelope(soapEnvelope);\n",
+            "         \t}\n",
+            "-         \n",
+            " \n",
+            "             AxisEngine.receive(msgContext);\n",
+            "         } catch (AxisFault axisFault) {\n"
+          ],
+          "locn": "-355,17 +339,16"
+        },
+        {
+          "lines": [
+            "                 \" request for : \" + request.getUri(), axisFault);\n",
+            "         } \n",
+            "     }\n",
+            "-    \n",
+            "-    \n",
+            "+\n",
+            "     private boolean isRest(String contentType) {\n",
+            "         return contentType != null &&\n",
+            "-                contentType.indexOf(SOAP11Constants.SOAP_11_CONTENT_TYPE) == -1 &&\n",
+            "-                contentType.indexOf(SOAP12Constants.SOAP_12_CONTENT_TYPE) == -1;\n",
+            "+                !contentType.contains(SOAP11Constants.SOAP_11_CONTENT_TYPE) &&\n",
+            "+                !contentType.contains(SOAP12Constants.SOAP_12_CONTENT_TYPE);\n",
+            "     }\n",
+            " \n",
+            "-\n",
+            "-\n",
+            "     /**\n",
+            "      * Create an Axis2 message context for the given http request. The request may be in the\n",
+            "      * process of being streamed\n"
+          ],
+          "locn": "-440,16 +423,13"
+        },
+        {
+          "lines": [
+            "                 new MessageContext();\n",
+            "         msgContext.setMessageID(UIDGenerator.generateURNString());\n",
+            " \n",
+            "-        // Axis2 spawns a new threads to send a message if this is TRUE - and it has to\n",
+            "+        // Axis2 spawns a new thread to send a message if this is TRUE - and it has to\n",
+            "         // be the other way\n",
+            "         msgContext.setProperty(MessageContext.CLIENT_API_NON_BLOCKING,\n",
+            "                 Boolean.FALSE);\n",
+            "         msgContext.setConfigurationContext(cfgCtx);\n",
+            "-\n",
+            "-//        msgContext.setTransportOut(cfgCtx.getAxisConfiguration()\n",
+            "-//                .getTransportOut(Constants.TRANSPORT_HTTP));\n",
+            "-//        msgContext.setTransportIn(cfgCtx.getAxisConfiguration()\n",
+            "-//                .getTransportIn(Constants.TRANSPORT_HTTP));\n",
+            "-//        msgContext.setIncomingTransportName(Constants.TRANSPORT_HTTP);\n",
+            "-//        msgContext.setProperty(Constants.OUT_TRANSPORT_INFO, this);\n",
+            "-        \n",
+            "         NHttpServerConnection conn = request.getConnection();\n",
+            "         \n",
+            "         if (isHttps) {\n"
+          ],
+          "locn": "-463,19 +443,11"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ServerWorker.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ServerWorker.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     CLOSING,\n",
+            "     /** The connection is closed */\n",
+            "     CLOSED,\n",
+            "-    \n",
+            "+    /** WSDL response has been sent */\n",
+            "     WSDL_RESPONSE_DONE\n",
+            " }\n"
+          ],
+          "locn": "-43,6 +43,6"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ProtocolState.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ProtocolState.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "  * Error codes exposed by this transport. \n",
+            "  */\n",
+            " public class ErrorCodes {\n",
+            "+\n",
+            "     public static final int SND_IO_ERROR       = 101500;\n",
+            " \n",
+            "     public static final int SND_HTTP_ERROR     = 102510;\n"
+          ],
+          "locn": "-22,6 +22,7"
+        },
+        {
+          "lines": [
+            " \n",
+            "     public static final int CONNECT_CANCEL     = 101507;\n",
+            " \n",
+            "-    public static final int CONNECT_TIMEOUT    = 101508;    \n",
+            "+    public static final int CONNECT_TIMEOUT    = 101508;\n",
+            "+\n",
+            " }\n",
+            "\\ No newline at end of file\n"
+          ],
+          "locn": "-38,5 +39,6"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ErrorCodes.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ErrorCodes.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         }\n",
+            "     }\n",
+            " \n",
+            "-\n",
+            " \tprivate void sendRequestContent(final MessageContext msgContext) throws AxisFault {\n",
+            " \t\tif (Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {\n",
+            " \t\t\tsynchronized (msgContext) {\n"
+          ],
+          "locn": "-277,7 +277,6"
+        },
+        {
+          "lines": [
+            " \t\t\t\t\tformatter.writeTo(msgContext, format, _out, false);\n",
+            " \t\t\t\t\ttry {\n",
+            " \t                    IOUtils.write(_out.toByteArray(),out);\n",
+            "-\t                    msgContext.setProperty(PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH,new Long(_out.toByteArray().length));\n",
+            "+\t                    msgContext.setProperty(PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH,\n",
+            "+                                _out.toByteArray().length);\n",
+            "                     } catch (IOException e) {\n",
+            "-\t                    // TODO Auto-generated catch block\n",
+            "-                    \t handleException(\"IO while building message\", e);\n",
+            "+                    \t handleException(\"IO error while building message\", e);\n",
+            "                     }\n",
+            "                 \tpipe.setSerializationComplete(true);\n",
+            " \t\t\t\t}else {\n"
+          ],
+          "locn": "-308,10 +307,10"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     public void testCreateFaultAndChangeDirection() {\n",
+            "         String addUrl = \"http://localhost:9000/services/SimpleStockQuoteService\";\n",
+            "         String trpUrl = \"http://localhost:8280\";\n",
+            "-        String expectedError_MSFT = \"Error connecting to the back end\";\n",
+            "-        String expectedError_SUN = \"Error connecting to the back end\";\n",
+            "+        String expectedError_MSFT = \"Error while connecting to the endpoint (Connection Failed)\";\n",
+            "+        String expectedError_SUN = \"Error while connecting to the endpoint (Connection Failed)\";\n",
+            " \n",
+            "         log.info(\"Running test: Creating SOAP fault messages and changing the direction of a message\");\n",
+            "         SampleClientResult result = client.requestStandardQuote(addUrl, trpUrl, null, \"MSFT\" ,null);\n"
+          ],
+          "locn": "-41,8 +41,8"
+        }
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample5.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample5.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     </transportReceiver>\n",
+            " \n",
+            "     <!-- the non blocking https transport based on HttpCore + SSL-NIO extensions -->\n",
+            "-    <transportReceiver name=\"https\" class=\"org.apache.synapse.transport.nhttp.HttpCoreNIOSSLListener\">\n",
+            "+    <transportReceiver name=\"https\" class=\"org.apache.synapse.transport.passthru.PassThroughHttpSSLListener\">\n",
+            "         <parameter name=\"port\" locked=\"false\">8243</parameter>\n",
+            "         <!--parameter name=\"bind-address\" locked=\"false\">hostname or IP address</parameter-->\n",
+            "         <!--parameter name=\"WSDLEPRPrefix\" locked=\"false\">http://apachehost:port/somepath</parameter-->\n"
+          ],
+          "locn": "-195,7 +195,7"
+        },
+        {
+          "lines": [
+            "         <parameter name=\"http.proxyPort\" locked=\"false\">3128</parameter>\n",
+            "         <parameter name=\"http.nonProxyHosts\" locked=\"false\">localhost|moon|sun</parameter-->\n",
+            "     </transportSender>\n",
+            "-    <transportSender name=\"https\" class=\"org.apache.synapse.transport.nhttp.HttpCoreNIOSSLSender\">\n",
+            "+    <transportSender name=\"https\" class=\"org.apache.synapse.transport.passthru.PassThroughHttpSSLSender\">\n",
+            "         <parameter name=\"non-blocking\" locked=\"false\">true</parameter>\n",
+            "         <parameter name=\"warnOnHTTP500\" locked=\"false\">*</parameter>\n",
+            "         <parameter name=\"keystore\" locked=\"false\">\n"
+          ],
+          "locn": "-274,7 +274,7"
+        }
+      ],
+      "from": "java/repository/conf/axis2.xml",
+      "to": "java/repository/conf/axis2.xml"
+    }
+  ],
+  "id": "1502737",
+  "message": "Code cleanup and refactoring",
+  "when": "2013-07-12T22:55:02-04:00",
+  "who": "hiranya"
+}

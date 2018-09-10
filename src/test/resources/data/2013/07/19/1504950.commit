@@ -1,0 +1,22 @@
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java	(revision 1504949)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java	(revision 1504950)
+@@ -554,11 +554,6 @@
+                 lstMetrics.incrementFaultsSending();
+             }
+             log.warn("Connection closed by client : " + worker.getRemoteAddress());
+-        } catch (IllegalStateException e) {
+-            if (lstMetrics != null) {
+-                lstMetrics.incrementFaultsSending();
+-            }
+-            log.warn("Connection closed by client : " + worker.getRemoteAddress());
+         } catch (IOException e) {
+             if (lstMetrics != null) {
+                 lstMetrics.incrementFaultsSending();
+-*-*-*-
+Message: Fixing SYNAPSE-866; Logging a more general error message with the full stack trace in case of IllegalStateExceptions
+-*-*-*-
+When: 2013-07-19 14:01:47 -0400 
+-*-*-*-
+Who: hiranya

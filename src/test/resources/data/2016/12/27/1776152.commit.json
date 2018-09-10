@@ -1,0 +1,44 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             <directory>../../modules/distribution/src/main/conf</directory>\r\n",
+            "             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>\r\n",
+            "             <includes>\r\n",
+            "-                <include>log4j.properties</include>\r\n",
+            "                 <include>providers.xml</include>\r\n",
+            "                 <include>identity.jks</include>\r\n",
+            "                 <include>trust.jks</include>\r\n"
+          ],
+          "locn": "-86,7 +86,6"
+        },
+        {
+          "lines": [
+            "             </includes>\r\n",
+            "         </fileSet>\r\n",
+            "         <fileSet>\r\n",
+            "+            <directory>../../modules/distribution/src/main/conf</directory>\r\n",
+            "+            <outputDirectory>synapse-${synapse.version}/repository/conf</outputDirectory>\r\n",
+            "+            <includes>\r\n",
+            "+                <include>log4j.properties</include>\r\n",
+            "+            </includes>\r\n",
+            "+        </fileSet>\r\n",
+            "+        <fileSet>\r\n",
+            "             <directory>../../modules/migrator/src/main/resources</directory>\r\n",
+            "             <outputDirectory>synapse-${synapse.version}/resources</outputDirectory>\r\n",
+            "             <includes>\r\n"
+          ],
+          "locn": "-93,6 +92,13"
+        }
+      ],
+      "from": "java/modules/distribution/src/main/assembly/bin.xml",
+      "to": "java/modules/distribution/src/main/assembly/bin.xml"
+    }
+  ],
+  "id": "1776152",
+  "message": "Apply patch by Chanaka Fernando to fix SYNAPSE-1069",
+  "when": "2016-12-27T10:37:47-05:00",
+  "who": "isudana"
+}

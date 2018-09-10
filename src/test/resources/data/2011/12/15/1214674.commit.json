@@ -1,0 +1,27 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                     if (log.isDebugEnabled()) {\r\n",
+            "                         log.debug(\"ShuttingDown Task Scheduler : \" + scheduler.getMetaData());\r\n",
+            "                     }\r\n",
+            "-                    scheduler.shutdown();\r\n",
+            "+                    scheduler.shutdown(true);\r\n",
+            "                 }\r\n",
+            "                 initialized = false;\r\n",
+            "             } catch (SchedulerException e) {\r\n"
+          ],
+          "locn": "-281,7 +281,7"
+        }
+      ],
+      "from": "java/modules/tasks/src/main/java/org/apache/synapse/task/TaskScheduler.java",
+      "to": "java/modules/tasks/src/main/java/org/apache/synapse/task/TaskScheduler.java"
+    }
+  ],
+  "id": "1214674",
+  "message": "Making synapse wait will all the running jobs are finished before shutdown",
+  "when": "2011-12-15T04:35:18-05:00",
+  "who": "charith"
+}

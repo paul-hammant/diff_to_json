@@ -1,0 +1,27 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            "                     AMQPTransportHABrokerEntry brokerEntry = haHandler.getConnectionMap().get(key);\n",
+            "                     if (brokerEntry == null) {\n",
+            "-                        log.error(\"No new connection factory were found for key '\" + key + \"'\");\n",
+            "+                        log.error(\"No new connection factory was found for key '\" + key + \"'\");\n",
+            "                     } else {\n",
+            "                         setChannel(brokerEntry.getChannel());\n",
+            "                         stop();\n"
+          ],
+          "locn": "-538,7 +538,7"
+        }
+      ],
+      "from": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTask.java",
+      "to": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTask.java"
+    }
+  ],
+  "id": "1509546",
+  "message": "fixed wording.",
+  "when": "2013-08-02T01:07:47-04:00",
+  "who": "rajikak"
+}

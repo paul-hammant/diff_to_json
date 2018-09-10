@@ -1,0 +1,27 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             <activation>\n",
+            "                 <property>\n",
+            "                     <name>synapse.version</name>\n",
+            "-                    <value>3.0.0-SNAPSHOT</value>\n",
+            "+                    <value>3.0.1-SNAPSHOT</value>\n",
+            "                 </property>\n",
+            "             </activation>\n",
+            "             <repositories>\n"
+          ],
+          "locn": "-34,7 +34,7"
+        }
+      ],
+      "from": "java/modules/packaging/package-archetype/src/main/resources/archetype-resources/pom.xml",
+      "to": "java/modules/packaging/package-archetype/src/main/resources/archetype-resources/pom.xml"
+    }
+  ],
+  "id": "1817013",
+  "message": "Update archetype-resource pom to use 3.0.1 version in SNAPSHOT repository",
+  "when": "2017-12-03T01:01:53-05:00",
+  "who": "isudana"
+}

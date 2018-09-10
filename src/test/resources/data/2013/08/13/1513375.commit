@@ -1,0 +1,67 @@
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/TargetRequestFactory.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/TargetRequestFactory.java	(revision 1513374)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/TargetRequestFactory.java	(revision 1513375)
+@@ -82,7 +82,7 @@
+                         if (!HTTPConstants.HEADER_HOST.equalsIgnoreCase((String) entry.getKey())) {
+                             request.addHeader((String) entry.getKey(), (String) entry.getValue());
+                         } else {
+-                            if( msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER) != null) {
++                            if (msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER) != null) {
+                             	request.addHeader((String) entry.getKey(),
+                                         (String) msgContext.getProperty(
+                                                 NhttpConstants.REQUEST_HOST_HEADER));
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetRequest.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetRequest.java	(revision 1513374)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetRequest.java	(revision 1513375)
+@@ -192,10 +192,8 @@
+             	requestMsgCtx.getAxisOperation().getInputAction();
+             }
+ 
+-            if (requestMsgCtx.isSOAP11() && soapAction != null &&
+-                    soapAction.length() > 0) {
+-                Header existingHeader =
+-                	request.getFirstHeader(HTTPConstants.HEADER_SOAP_ACTION);
++            if (requestMsgCtx.isSOAP11() && soapAction != null && soapAction.length() > 0) {
++                Header existingHeader = request.getFirstHeader(HTTPConstants.HEADER_SOAP_ACTION);
+                 if (existingHeader != null) {
+                 	request.removeHeader(existingHeader);
+                 }
+@@ -203,7 +201,6 @@
+                     MessageFormatterDecoratorFactory.createMessageFormatterDecorator(requestMsgCtx);
+                 request.setHeader(HTTPConstants.HEADER_SOAP_ACTION,
+                         messageFormatter.formatSOAPAction(requestMsgCtx, null, soapAction));
+-                request.setHeader(HttpHeaders.USER_AGENT, "Synapse-PT-HttpComponents-NIO");
+             }
+     	}
+ 
+@@ -216,8 +213,7 @@
+         // Pre-process HTTP request
+         HttpContext context = conn.getContext();
+         context.setAttribute(HttpCoreContext.HTTP_CONNECTION, conn);
+-        context.setAttribute(HttpCoreContext.HTTP_TARGET_HOST,
+-                new HttpHost(url.getHost(), port));
++        context.setAttribute(HttpCoreContext.HTTP_TARGET_HOST, new HttpHost(url.getHost(), port));
+         context.setAttribute(HttpCoreContext.HTTP_REQUEST, request);
+ 
+         // start the request
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/TargetConfiguration.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/TargetConfiguration.java	(revision 1513374)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/TargetConfiguration.java	(revision 1513375)
+@@ -59,7 +59,7 @@
+                 new RequestContent(),
+                 new RequestTargetHost(),
+                 new RequestConnControl(),
+-                new RequestUserAgent(),
++                new RequestUserAgent("Synapse-PT-HttpComponents-NIO"),
+                 new RequestExpectContinue(false));
+     }
+ 
+-*-*-*-
+Message: Using the RequestUserAgent API to set the User-Agent header on outgoing messages.
+-*-*-*-
+When: 2013-08-13 03:12:47 -0400 
+-*-*-*-
+Who: hiranya

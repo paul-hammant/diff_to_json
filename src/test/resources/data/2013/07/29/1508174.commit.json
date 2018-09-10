@@ -1,0 +1,195 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "  */\n",
+            " public class AMQPProducerClient {\n",
+            " \n",
+            "-    //    private static final String QUEUE_NAME = \"ConsumerTxProxy\";\n",
+            "-//    private static final String QUEUE_NAME = \"worker-queue\";\n",
+            "     private static final String QUEUE_NAME = \"ProducerProxy\";\n",
+            " \n",
+            "     private static final String MESSAGE =\n"
+          ],
+          "locn": "-11,8 +11,6"
+        },
+        {
+          "lines": [
+            " \n",
+            "     public static void main(String[] args) throws IOException {\n",
+            " \n",
+            "+        if (args.length < 2) {\n",
+            "+            System.out.println(\"Usage: java AMQPProducerClient <queue?> \" +\n",
+            "+                    \"<queue|exchange-name> <routing-key>\");\n",
+            "+            System.out.println(\"Default arguments will be used\");\n",
+            "+        }\n",
+            "+\n",
+            "         ConnectionFactory factory = new ConnectionFactory();\n",
+            "         factory.setHost(\"localhost\");\n",
+            "         Connection connection = factory.newConnection();\n"
+          ],
+          "locn": "-42,6 +40,12"
+        },
+        {
+          "lines": [
+            " \n",
+            "         Channel channel = connection.createChannel();\n",
+            " \n",
+            "-        //channel.queueDeclare(QUEUE_NAME, false, false, false, null);\n",
+            "-        AMQPProducerClient.produce(MESSAGE2, channel, QUEUE_NAME);\n",
+            "-//        AMQPProducerClient.publish(MESSAGE2, channel, \"subscriber-exchange\");\n",
+            "-//        AMQPProducerClient.route(MESSAGE2, channel, \"route-exchange\", \"fatal\");\n",
+            "-//        AMQPProducerClient.route(MESSAGE2, channel, \"topic-exchange\", \"kern.critical\");\n",
+            "+        String queueName = null, exchangeName = null, routingKey = null;\n",
+            " \n",
+            "+        if (\"y\".equals(args[0])) {\n",
+            "+            if (args[1] != null) {\n",
+            "+                queueName = args[1];\n",
+            "+            } else {\n",
+            "+                queueName = QUEUE_NAME;\n",
+            "+            }\n",
+            "+        } else {\n",
+            "+            if (args[2] != null) {\n",
+            "+                exchangeName = args[2];\n",
+            "+                if (args[3] != null) {\n",
+            "+                    routingKey = args[3];\n",
+            "+                } else {\n",
+            "+                    routingKey = \"kern.critical\";\n",
+            "+                }\n",
+            "+            } else {\n",
+            "+                exchangeName = \"subscriber-exchange\";\n",
+            "+            }\n",
+            "+        }\n",
+            "+\n",
+            "+        if (queueName != null) {\n",
+            "+            AMQPProducerClient.produce(MESSAGE2, channel, QUEUE_NAME);\n",
+            "+        } else {\n",
+            "+            if (routingKey != null) {\n",
+            "+                AMQPProducerClient.route(MESSAGE2, channel, exchangeName, routingKey);\n",
+            "+            } else {\n",
+            "+                AMQPProducerClient.publish(MESSAGE2, channel, exchangeName);\n",
+            "+            }\n",
+            "+        }\n",
+            "+\n",
+            "         channel.close();\n",
+            "         connection.close();\n",
+            "-\n",
+            "     }\n",
+            " \n",
+            " \n",
+            "-    private static void produce(String message, Channel channel, String queueName) throws IOException {\n",
+            "+    private static void produce(String message, Channel channel, String queueName)\n",
+            "+            throws IOException {\n",
+            "         channel.basicPublish(\"\", queueName, null, message.getBytes());\n",
+            "     }\n",
+            " \n",
+            "-    private static void publish(String message, Channel channel, String exchangeName) throws IOException {\n",
+            "+    private static void publish(String message, Channel channel, String exchangeName)\n",
+            "+            throws IOException {\n",
+            "         channel.basicPublish(exchangeName, \"\", null, message.getBytes());\n",
+            "     }\n",
+            " \n",
+            "-    private static void route(String message, Channel channel, String exchangeName, String routeKey) throws IOException {\n",
+            "+    private static void route(String message, Channel channel, String exchangeName,\n",
+            "+                              String routeKey)\n",
+            "+            throws IOException {\n",
+            "         channel.basicPublish(exchangeName, routeKey, null, message.getBytes());\n",
+            "     }\n",
+            " \n"
+          ],
+          "locn": "-48,27 +52,55"
+        }
+      ],
+      "from": "java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPProducerClient.java",
+      "to": "java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPProducerClient.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "  */\n",
+            " public class AMQPConsumerClient {\n",
+            " \n",
+            "-    public static final String QUEUE_NAME = \"ProducerProxy\";\n",
+            "+    private static final String QUEUE_NAME = \"ProducerProxy\";\n",
+            " \n",
+            "     public static void main(String[] args) throws IOException, InterruptedException {\n",
+            " \n",
+            "+        String queueName;\n",
+            "+\n",
+            "+        if (args.length < 1) {\n",
+            "+            System.out.println(\"Usage: java AMQPConsumerClient <queue-name>\");\n",
+            "+            System.out.println(\"Default arguments will be used\");\n",
+            "+            queueName = QUEUE_NAME;\n",
+            "+        }\n",
+            "+        queueName = args[1];\n",
+            "+\n",
+            "         ConnectionFactory factory = new ConnectionFactory();\n",
+            "         factory.setHost(\"localhost\");\n",
+            "         Connection connection = factory.newConnection();\n",
+            " \n",
+            "         Channel channel = connection.createChannel();\n",
+            "-        channel.queueDeclare(QUEUE_NAME, false, false, false, null);\n",
+            "+        channel.queueDeclare(queueName, false, false, false, null);\n",
+            " \n",
+            "         QueueingConsumer consumer = new QueueingConsumer(channel);\n",
+            "-        channel.basicConsume(QUEUE_NAME, true, consumer);\n",
+            "-        System.out.println(\"Waiting for message on queue '\" + QUEUE_NAME + \"'\");\n",
+            "+        channel.basicConsume(queueName, true, consumer);\n",
+            "+        System.out.println(\"Waiting for message on queue '\" + queueName + \"'\");\n",
+            " \n",
+            "         while (true) {\n",
+            "             QueueingConsumer.Delivery delivery = consumer.nextDelivery();\n"
+          ],
+          "locn": "-12,20 +12,29"
+        }
+      ],
+      "from": "java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPConsumerClient.java",
+      "to": "java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPConsumerClient.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "  */\n",
+            " package org.apache.synapse.transport.amqp.pollingtask;\n",
+            " \n",
+            "-import com.rabbitmq.client.AMQP;\n",
+            "-import com.rabbitmq.client.Channel;\n",
+            "-import com.rabbitmq.client.QueueingConsumer;\n",
+            "+import com.rabbitmq.client.*;\n",
+            " import org.apache.axiom.om.OMAbstractFactory;\n",
+            " import org.apache.axiom.om.OMDocument;\n",
+            " import org.apache.axiom.om.OMElement;\n"
+          ],
+          "locn": "-13,9 +13,7"
+        },
+        {
+          "lines": [
+            "             } catch (IOException e) {\n",
+            "                 log.error(\"I/O error occurs for the polling tasks for service '\" + serviceName +\n",
+            "                         \"'\", e);\n",
+            "+            } catch (ShutdownSignalException e) {\n",
+            "+                log.error(\"Polling task for service '\" + serviceName + \"' received a \" +\n",
+            "+                        \"shutdown signal\", e);\n",
+            "+            } catch (ConsumerCancelledException e) {\n",
+            "+                log.error(\"Polling task for service '\" + serviceName + \"' received a cancellation \" +\n",
+            "+                        \"signal\");\n",
+            "             }\n",
+            "         }\n",
+            "     }\n"
+          ],
+          "locn": "-545,6 +543,12"
+        }
+      ],
+      "from": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTask.java",
+      "to": "java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTask.java"
+    }
+  ],
+  "id": "1508174",
+  "message": "handled the shutdown signal + fixed the clients.",
+  "when": "2013-07-29T14:48:33-04:00",
+  "who": "rajikak"
+}

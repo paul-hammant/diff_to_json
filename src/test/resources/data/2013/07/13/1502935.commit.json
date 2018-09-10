@@ -1,0 +1,302 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "+<definitions xmlns=\"http://ws.apache.org/ns/synapse\">\n",
+            "+    <api name=\"StockQuoteAPI\" context=\"/stockquote\">\n",
+            "+        <resource uri-template=\"/view/{symbol}\" methods=\"GET\">\n",
+            "+            <inSequence>\n",
+            "+                <payloadFactory>\n",
+            "+                    <format>\n",
+            "+                        <m0:getQuote xmlns:m0=\"http://services.samples\">\n",
+            "+                            <m0:request>\n",
+            "+                                <m0:symbol>$1</m0:symbol>\n",
+            "+                            </m0:request>\n",
+            "+                        </m0:getQuote>\n",
+            "+                    </format>\n",
+            "+                    <args>\n",
+            "+                        <arg expression=\"get-property('uri.var.symbol')\"/>\n",
+            "+                    </args>\n",
+            "+                </payloadFactory>\n",
+            "+                <send>\n",
+            "+                    <endpoint>\n",
+            "+                        <address uri=\"http://localhost:9000/services/SimpleStockQuoteService\" format=\"soap11\"/>\n",
+            "+                    </endpoint>\n",
+            "+                </send>\n",
+            "+            </inSequence>\n",
+            "+            <outSequence>\n",
+            "+                <send/>\n",
+            "+            </outSequence>\n",
+            "+        </resource>\n",
+            "+        <resource url-pattern=\"/order/*\" methods=\"POST\">\n",
+            "+            <inSequence>\n",
+            "+                <property name=\"FORCE_SC_ACCEPTED\" value=\"true\" scope=\"axis2\"/>\n",
+            "+                <property name=\"OUT_ONLY\" value=\"true\"/>\n",
+            "+                <send>\n",
+            "+                    <endpoint>\n",
+            "+                        <address uri=\"http://localhost:9000/services/SimpleStockQuoteService\" format=\"soap11\"/>\n",
+            "+                    </endpoint>\n",
+            "+                </send>\n",
+            "+            </inSequence>\n",
+            "+        </resource>\n",
+            "+    </api>\n",
+            "+</definitions>\n",
+            "\\ No newline at end of file\n"
+          ],
+          "locn": "-0,0 +1,39"
+        }
+      ],
+      "from": "java/repository/conf/sample/synapse_sample_800.xml",
+      "to": "java/repository/conf/sample/synapse_sample_800.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         if (marker == -1) {\n",
+            "             return allocator.allocate(bufferSize);\n",
+            "         } else {\n",
+            "-            lock.lock();\n",
+            "             try {\n",
+            "+                lock.lock();\n",
+            "                 if (marker >= 0) {\n",
+            "                     ByteBuffer b = buffers[marker];\n",
+            "+                    b.clear();\n",
+            "                     buffers[marker] = null;\n",
+            "                     marker--;\n",
+            "                     return b;\n"
+          ],
+          "locn": "-52,10 +52,11"
+        },
+        {
+          "lines": [
+            "                 lock.unlock();\n",
+            "             }\n",
+            "         }\n",
+            "-\n",
+            "         return allocator.allocate(bufferSize);\n",
+            "     }\n",
+            " \n",
+            "     public void release(ByteBuffer buffer) {\n",
+            "-        lock.lock();\n",
+            "         try {\n",
+            "+            lock.lock();\n",
+            "             if (marker < buffers.length - 1) {\n",
+            "+                buffer.clear();\n",
+            "                 buffers[++marker] = buffer;\n",
+            "             }\n",
+            "         } finally {\n"
+          ],
+          "locn": "-64,14 +65,14"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/BufferFactory.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/BufferFactory.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \t\n",
+            " \tpublic static final String WSDL_GEN_HANDLED = \"WSDL_GEN_HANDLED\";\n",
+            " \n",
+            "-\t\n",
+            " }\n"
+          ],
+          "locn": "-126,5 +126,4"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughConstants.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughConstants.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import javax.net.ssl.SSLContext;\n",
+            " \n",
+            " import org.apache.axiom.om.OMOutputFormat;\n",
+            "+import org.apache.axiom.util.blob.OverflowBlob;\n",
+            " import org.apache.axis2.AxisFault;\n",
+            " import org.apache.axis2.Constants;\n",
+            " import org.apache.axis2.addressing.AddressingConstants;\n"
+          ],
+          "locn": "-26,6 +26,7"
+        },
+        {
+          "lines": [
+            " import org.apache.axis2.transport.base.threads.NativeThreadFactory;\n",
+            " import org.apache.axis2.transport.base.threads.WorkerPool;\n",
+            " import org.apache.axis2.util.MessageProcessorSelector;\n",
+            "-import org.apache.commons.io.IOUtils;\n",
+            " import org.apache.commons.logging.Log;\n",
+            " import org.apache.commons.logging.LogFactory;\n",
+            " import org.apache.http.HttpException;\n"
+          ],
+          "locn": "-42,7 +43,6"
+        },
+        {
+          "lines": [
+            " \t\t\t\t\tOMOutputFormat format = PassThroughTransportUtils.getOMOutputFormat(msgContext);\n",
+            " \t\t\t\t\tformatter.writeTo(msgContext, format, _out, false);\n",
+            " \t\t\t\t\ttry {\n",
+            "-\t                    IOUtils.write(_out.toByteArray(),out);\n",
+            "-\t                    msgContext.setProperty(PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH,\n",
+            "-                                _out.toByteArray().length);\n",
+            "+                        long messageSize = setStreamAsTempData(formatter,msgContext,format);\n",
+            "+                        msgContext.setProperty(PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH,messageSize);\n",
+            "+                        formatter.writeTo(msgContext, format, out, false);\n",
+            "                     } catch (IOException e) {\n",
+            "                     \t handleException(\"IO error while building message\", e);\n",
+            "                     }\n"
+          ],
+          "locn": "-306,9 +306,9"
+        },
+        {
+          "lines": [
+            "         }\n",
+            "     }\n",
+            " \n",
+            "+    /**\n",
+            "+     * Write the stream to a temporary storage and calculate the content length\n",
+            "+     *\n",
+            "+     * @param messageFormatter Formatter used to serialize the message\n",
+            "+     * @param msgContext Message to be serialized\n",
+            "+     * @param format Output format\n",
+            "+     *\n",
+            "+     * @throws IOException if an exception occurred while writing data\n",
+            "+     */\n",
+            "+    private long setStreamAsTempData(MessageFormatter messageFormatter,\n",
+            "+                                     MessageContext msgContext,\n",
+            "+                                     OMOutputFormat format) throws IOException {\n",
+            "+\n",
+            "+        OverflowBlob serialized = new OverflowBlob(256, 4096, \"http-nio_\", \".dat\");\n",
+            "+        OutputStream out = serialized.getOutputStream();\n",
+            "+        try {\n",
+            "+            messageFormatter.writeTo(msgContext, format, out, true);\n",
+            "+        } finally {\n",
+            "+            out.close();\n",
+            "+        }\n",
+            "+        return serialized.getLength();\n",
+            "+    }\n",
+            "+\n",
+            "     private void handleException(String s, Exception e) throws AxisFault {\n",
+            "         log.error(s, e);\n",
+            "         throw new AxisFault(s, e);\n"
+          ],
+          "locn": "-493,6 +493,29"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "  * @see org.apache.synapse.util.xpath.SynapseXPathVariableContext\n",
+            "  */\n",
+            " public class SynapseXPath extends AXIOMXPath {\n",
+            "+\n",
+            "     private static final long serialVersionUID = 7639226137534334222L;\n",
+            " \n",
+            "     private static final Log log = LogFactory.getLog(SynapseXPath.class);\n"
+          ],
+          "locn": "-76,6 +76,7"
+        },
+        {
+          "lines": [
+            "         // TODO: Improve this\n",
+            "         if (xpathString.contains(\"/\")) {\n",
+            "             contentAware = true;\n",
+            "-        } else if (xpathString.contains(\"get-property('To')\") ||\n",
+            "-                xpathString.contains(\"get-property('From'\") ||\n",
+            "+        } else if (xpathString.contains(\"get-property('From'\") ||\n",
+            "                 xpathString.contains(\"get-property('FAULT')\")) {\n",
+            "             contentAware = true;\n",
+            "         } else {\n",
+            "             contentAware = false;\n",
+            "         }\n",
+            "+\n",
+            "+        if (xpathString.contains(\"$trp\") || xpathString.contains(\"$ctx\") ||\n",
+            "+                xpathString.contains(\"$axis2\")) {\n",
+            "+            contentAware = false;\n",
+            "+        }\n",
+            "     }\n",
+            " \n",
+            "     /**\n"
+          ],
+          "locn": "-95,13 +96,17"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/util/xpath/SynapseXPath.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/util/xpath/SynapseXPath.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            " package org.apache.synapse.mediators.builtin;\n",
+            " \n",
+            "+import org.apache.http.protocol.HTTP;\n",
+            " import org.apache.synapse.MessageContext;\n",
+            " import org.apache.synapse.SynapseLog;\n",
+            " import org.apache.synapse.SynapseException;\n"
+          ],
+          "locn": "-19,6 +19,7"
+        },
+        {
+          "lines": [
+            "     /** Set the property (ACTION_SET) or remove it (ACTION_REMOVE). Defaults to ACTION_SET */\n",
+            "     private int action = ACTION_SET;\n",
+            " \n",
+            "-    /** Regualar expresion pattern to be evaluated over the property value.\n",
+            "+    /** Regular expression pattern to be evaluated over the property value.\n",
+            "      * Resulting match string will be applied to the property */\n",
+            "     private Pattern pattern;\n",
+            " \n"
+          ],
+          "locn": "-64,7 +65,7"
+        },
+        {
+          "lines": [
+            " \n",
+            "     @Override\n",
+            "     public boolean isContentAware() {\n",
+            "-        return expression != null;\n",
+            "+        if (expression != null) {\n",
+            "+            return expression.isContentAware();\n",
+            "+        }\n",
+            "+\n",
+            "+        boolean contentAware = false;\n",
+            "+        if (XMLConfigConstants.SCOPE_AXIS2.equals(scope)) {\n",
+            "+            //the logic will determine the content-aware true\n",
+            "+            if (org.apache.axis2.Constants.Configuration.MESSAGE_TYPE.equals(name)) {\n",
+            "+                contentAware = true;\n",
+            "+            }\n",
+            "+\n",
+            "+        } else if (XMLConfigConstants.SCOPE_TRANSPORT.equals(scope)) {\n",
+            "+            //the logic will determine the content-aware true\n",
+            "+            if (HTTP.CONTENT_ENCODING.equals(name)) {\n",
+            "+                contentAware = true;\n",
+            "+            }\n",
+            "+        }\n",
+            "+        return contentAware;\n",
+            "     }\n",
+            " }\n"
+          ],
+          "locn": "-359,6 +360,23"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/PropertyMediator.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/PropertyMediator.java"
+    }
+  ],
+  "id": "1502935",
+  "message": "Committing a part of the patch to SYNAPSE-935",
+  "when": "2013-07-13T23:58:07-04:00",
+  "who": "hiranya"
+}

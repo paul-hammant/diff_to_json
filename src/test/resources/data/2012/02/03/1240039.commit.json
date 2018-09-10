@@ -1,0 +1,61 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "+#\n",
+            "+# Licensed to the Apache Software Foundation (ASF) under one\n",
+            "+# or more contributor license agreements. See the NOTICE file\n",
+            "+# distributed with this work for additional information\n",
+            "+# regarding copyright ownership. The ASF licenses this file\n",
+            "+# to you under the Apache License, Version 2.0 (the\n",
+            "+# \"License\"); you may not use this file except in compliance\n",
+            "+# with the License. You may obtain a copy of the License at\n",
+            "+#\n",
+            "+# http://www.apache.org/licenses/LICENSE-2.0\n",
+            "+#\n",
+            "+# Unless required by applicable law or agreed to in writing,\n",
+            "+# software distributed under the License is distributed on an\n",
+            "+# \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n",
+            "+# KIND, either express or implied. See the License for the\n",
+            "+# specific language governing permissions and limitations\n",
+            "+# under the License.\n",
+            "+#\n",
+            "+\n",
+            "+# This file contains the configuration parameters used by the Non-blocking HTTP transport.\n",
+            "+\n",
+            "+#http.socket.timeout=60000\n",
+            "+#http.socket.buffer-size=8192\n",
+            "+#http.tcp.nodelay=1\n",
+            "+#http.connection.stalecheck=0\n",
+            "+\n",
+            "+# Uncomment the following property for an AIX based deployment\n",
+            "+#http.nio.interest-ops-queueing=true\n",
+            "+\n",
+            "+# HTTP Listener thread pool parameters\n",
+            "+#snd_t_core=20\n",
+            "+#snd_t_max=100\n",
+            "+#snd_alive_sec=5\n",
+            "+#snd_qlen=-1\n",
+            "+#snd_io_threads=2\n",
+            "+\n",
+            "+# HTTP Sender thread pool parameters\n",
+            "+#lst_t_core=20\n",
+            "+#lst_t_max=100\n",
+            "+#lst_alive_sec=5\n",
+            "+#lst_qlen=-1\n",
+            "+#lst_io_threads=2\n"
+          ],
+          "locn": "-0,0 +1,42"
+        }
+      ],
+      "from": "java/repository/conf/nhttp.properties",
+      "to": "java/repository/conf/nhttp.properties"
+    }
+  ],
+  "id": "1240039",
+  "message": "committing patch for SYNAPSE-839",
+  "when": "2012-02-03T04:31:19-05:00",
+  "who": "uswick"
+}

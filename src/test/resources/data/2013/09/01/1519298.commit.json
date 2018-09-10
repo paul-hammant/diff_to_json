@@ -1,0 +1,157 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             </subsection>\n",
+            "             <subsection name=\"Callout Mediator\" id=\"Callout\">\n",
+            "                 <p>\n",
+            "-                    Callout mediator performs a blocking external service invocation during\n",
+            "-                    mediation. 'serviceURL' and optional 'action' attributes specify the parameters\n",
+            "-                    for the external service call. The source element specifies the payload for the\n",
+            "-                    request message using an XPath expression; or a registry key. The target element\n",
+            "-                    specifies a node, at which the response payload will be attached into the\n",
+            "-                    current message, or the name of a key/property using which the response would be\n",
+            "-                    attached to the current message context as a property.\n",
+            "+                    Callout mediator performs a blocking external service invocation during mediation.\n",
+            "+                    The target external service can be configured either using a child endpoint element\n",
+            "+                    or using the 'serviceURL' attribute. When serviceURL is specified, it is used as\n",
+            "+                    the EPR of the external service. We can specify the endpoint element if we want to\n",
+            "+                    leverage endpoint functionality like format conversions, security, etc.\n",
+            "+                    The target endpoint can be defined inline or we can refer to an existing named\n",
+            "+                    endpoint in the configuration.\n",
+            "+                    Only Leaf endpoint types (Address/WSDL/Default) are supported.\n",
+            "+                    When both serviceURL and endpoint is not present, 'To' header on the request is\n",
+            "+                    used as the target endpoint.\n",
+            "                 </p>\n",
+            "-                <div class=\"xmlConf\">&lt;callout [serviceURL=\"string\"] [action=\"string\"]&gt;\n",
+            "+                <div class=\"xmlConf\">&lt;callout [serviceURL=\"string\"] [action=\"string\"][passHeaders=\"true|false\"] [initAxis2ClientOptions=\"true|false\"] &gt;\n",
+            "     &lt;configuration [axis2xml=\"string\"] [repository=\"string\"]/&gt;?\n",
+            "-    &lt;source xpath=\"expression\" | key=\"string\"&gt;\n",
+            "-    &lt;target xpath=\"expression\" | key=\"string\"/&gt;\n",
+            "+    &lt;endpoint/&gt;?\n",
+            "+    &lt;source xpath=\"expression\" | key=\"string\"&gt;?\n",
+            "+    &lt;target xpath=\"expression\" | key=\"string\"/&gt;?\n",
+            "     &lt;enableSec policy=\"string\" | outboundPolicy=\"String\" | inboundPolicy=\"String\" /&gt;?\n",
+            " &lt;/callout&gt;</div>\n",
+            "                 <p>\n",
+            "+                    'action' attribute can be used to specify the SOAP Action of the external service\n",
+            "+                    call. When 'initAxis2ClientOptions' is set to false, axis2 client options available\n",
+            "+                    in the incoming message context is reused for the service invocation.\n",
+            "+                    When 'passHeaders' is set to true, SOAP Headers of the received message is parsed\n",
+            "+                    to the external service.\n",
+            "+                </p>\n",
+            "+                <p>\n",
+            "+                    The source element specifies the payload for the request message using an XPath\n",
+            "+                    expression or a registry key.\n",
+            "+                    When source element is not defined, entire SOAP Envelope arrived at the Callout\n",
+            "+                    mediator is treated as the source.\n",
+            "+                    The target element specifies a node, at which the response payload will be\n",
+            "+                    attached into the current message, or the name of a key/property using which the\n",
+            "+                    response would be attached to the current message context as a property.\n",
+            "+                    When target element is not specified, entire SOAP Envelope arrived to the\n",
+            "+                    Callout mediator is replaced from the response received from the external service\n",
+            "+                    invocation.\n",
+            "+\n",
+            "+                </p>\n",
+            "+                <p>\n",
+            "                     Since the callout mediator performs a blocking call, it cannot use the default\n",
+            "-                    non-blocking http/s transports based on Java NIO, and thus defaults to using the\n",
+            "-                    samples/axis2Client/client_repo/conf/axis2.xml as the Axis2 configuration, and\n",
+            "-                    samples/axis2Client/client_repo as the client repository unless these are\n",
+            "-                    specified otherwise inside the 'configuration' sub-element.\n",
+            "+                    non-blocking http/s transports based on Java NIO, and thus defaults to\n",
+            "+                    using the repository/conf/axis2_blocking_client.xml as the\n",
+            "+                    Axis2 configuration, and repository/ as the client repository\n",
+            "+                    unless these are specified inside the 'configuration' sub-element.\n",
+            "                 </p>\n",
+            "                 <p>\n",
+            "                     To invoke secured services, Callout mediator can be configured to enable WS-Security\n",
+            "-                    using the enableSec element. Security policy should be specified using the 'policy'\n",
+            "+                    using the 'enableSec' element. Security policy should be specified using the 'policy'\n",
+            "                     attribute which may point to a registry key or a local entry. You can also specify\n",
+            "                     two different policies for inbound and outbound messages (flows). This is done by\n",
+            "-                    using the 'inboundPolicy' and 'outboundPolicy' attributes.\n",
+            "+                    using the 'inboundPolicy' and 'outboundPolicy' attributes. These security\n",
+            "+                    configurations will not get activated if we configure the external service using\n",
+            "+                    the endpoint element. When endpoint is defined, security settings can be\n",
+            "+                    configured at the endpoint.\n",
+            "                 </p>\n",
+            "-                <p>\n",
+            "-                    When the 'serviceURL' attribute is not present, the 'To' header on the request\n",
+            "-                    is used as the target endpoint.\n",
+            "-                </p>\n",
+            "             </subsection>\n",
+            "             <subsection name=\"Clone Mediator\" id=\"Clone\">\n",
+            "                 <p>\n"
+          ],
+          "locn": "-826,38 +826,61"
+        }
+      ],
+      "from": "java/modules/documentation/src/site/xdoc/userguide/mediators.xml",
+      "to": "java/modules/documentation/src/site/xdoc/userguide/mediators.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import java.util.List;\n",
+            " \n",
+            " /**\n",
+            "- * <callout [serviceURL=\"string\"] [action=\"string\"][passHeaders=\"true|false\"]>\n",
+            "+ * <callout [serviceURL=\"string\"] [action=\"string\"][passHeaders=\"true|false\"] [initAxis2ClientOptions=\"true|false\"]>\n",
+            "  * <configuration [axis2xml=\"string\"] [repository=\"string\"]/>?\n",
+            "  * <endpoint/>?\n",
+            "  * <source xpath=\"expression\" | key=\"string\">? <!-- key can be a MC property or entry key -->\n"
+          ],
+          "locn": "-46,7 +46,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/CalloutMediator.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/CalloutMediator.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "  * Factory for {@link CalloutMediator} instances.\n",
+            "  * \n",
+            "  * <pre>\n",
+            "- * &lt;callout [serviceURL=\"string\"] [action=\"string\"][passHeaders=\"true|false\"]&gt;\n",
+            "+ * &lt;callout [serviceURL=\"string\"] [action=\"string\"][passHeaders=\"true|false\"] [initAxis2ClientOptions=\"true|false\"]&gt;\n",
+            "  *      &lt;configuration [axis2xml=\"string\"] [repository=\"string\"]/&gt;?\n",
+            "  *      &lt;endpoint/&gt;?\n",
+            "  *      &lt;source xpath=\"expression\" | key=\"string\"&gt;?\n"
+          ],
+          "locn": "-37,7 +37,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorFactory.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorFactory.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            " /**\n",
+            "  * <pre>\n",
+            "- * &lt;callout [serviceURL=\"string\"] [action=\"string\"][passHeaders=\"true|false\"]&gt;\n",
+            "+ * &lt;callout [serviceURL=\"string\"] [action=\"string\"][passHeaders=\"true|false\"] [initAxis2ClientOptions=\"true|false\"]&gt;\n",
+            "  *      &lt;configuration [axis2xml=\"string\"] [repository=\"string\"]/&gt;?\n",
+            "  *      &lt;endpoint/&gt;?\n",
+            "  *      &lt;source xpath=\"expression\" | key=\"string\"&gt;?\n"
+          ],
+          "locn": "-27,7 +27,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorSerializer.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorSerializer.java"
+    }
+  ],
+  "id": "1519298",
+  "message": "Documentation update. Applying patch from SYNAPSE-973",
+  "when": "2013-09-01T14:06:02-04:00",
+  "who": "hiranya"
+}

@@ -1,0 +1,345 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            " <document>\n",
+            " \t<properties>\n",
+            "-\t\t<title>Apache Synapse - Extending the Service Bus</title>\n",
+            "+\t\t<title>Apache Synapse - Extending Synapse</title>\n",
+            " \t</properties>\n",
+            " \t<body>\n",
+            " \t\t\t<div id=\"contentBox\">\n",
+            "-\t\t\t\t   <section name=\"Apache Synapse ESB - Extending the Service Bus\">\n",
+            "+\t\t\t\t   <section name=\"Apache Synapse ESB - Extending Synapse\">\n",
+            " \t\t\t\t\t<p>\n",
+            " \t\t\t\t\t\tApache Synapse provides a number of extension points so that\n",
+            " \t\t\t\t\t\tusers can plug-in custom developed code to extend the\n"
+          ],
+          "locn": "-21,11 +21,11"
+        },
+        {
+          "lines": [
+            " \t\t\t\t\t\t\tInterface\n",
+            " \t\t\t\t\t\t</a>\n",
+            " \t\t\t\t\t</h4>\n",
+            "-\t\t\t\t\t<p></p>\n",
+            " \t\t\t\t\t<div class=\"xmlConf\">package org.apache.synapse;\n",
+            " \n",
+            " import ...\n"
+          ],
+          "locn": "-69,7 +69,6"
+        },
+        {
+          "lines": [
+            "      */\n",
+            "     public QName getTagQName();\n",
+            " }</div>\n",
+            "-\t\t\t\t\t<p></p>\n",
+            " \t\t\t\t\t<h4>\n",
+            " \t\t\t\t\t\t<a class=\"externalLink\"\n",
+            " \t\t\t\t\t\t\thref=\"http://svn.apache.org/viewvc/synapse/trunk/java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializer.java?view=markup\">The\n"
+          ],
+          "locn": "-365,7 +364,6"
+        }
+      ],
+      "from": "scratch/hiranya/website/src/site/xdoc/userguide/extending.xml",
+      "to": "scratch/hiranya/website/src/site/xdoc/userguide/extending.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "   -->\n",
+            " \n",
+            " <document>\n",
+            "+    <properties>\n",
+            "+        <title>Apache Synapse - Transports Catalog</title>\n",
+            "+    </properties>\n",
+            " \t<body>\n",
+            " \t\t<section name=\"Introduction\" id=\"Introduction\">\n",
+            " \t\t\t<p>\n"
+          ],
+          "locn": "-20,6 +20,9"
+        }
+      ],
+      "from": "scratch/hiranya/website/src/site/xdoc/userguide/transports.xml",
+      "to": "scratch/hiranya/website/src/site/xdoc/userguide/transports.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "   -->\n",
+            " \n",
+            " <document>\n",
+            "+    <properties>\n",
+            "+        <title>Apache Synapse - Deployment Guide</title>\n",
+            "+    </properties>\n",
+            "     <body>\n",
+            "         <section name=\"Contents\">\n",
+            "             <ul>\n"
+          ],
+          "locn": "-19,6 +19,9"
+        }
+      ],
+      "from": "scratch/hiranya/website/src/site/xdoc/userguide/deployment.xml",
+      "to": "scratch/hiranya/website/src/site/xdoc/userguide/deployment.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "   -->\n",
+            " \n",
+            " <document>\n",
+            "+    <properties>\n",
+            "+        <title>Apache Synapse - Upgrading to the Latest Version</title>\n",
+            "+    </properties>\n",
+            " \t<body>\n",
+            " \t\t<section name=\"Content\">\n",
+            " \t\t\t\t<ul>\n"
+          ],
+          "locn": "-20,6 +20,9"
+        },
+        {
+          "lines": [
+            " \t\t\t\t\t\t<a href=\"#General_comments\">General comments</a>\n",
+            " \t\t\t\t\t</li>\n",
+            " \t\t\t\t\t<li>\n",
+            "-\t\t\t\t\t\t<a href=\"#Upgrading_from_1.2_to_2.0.0\">Upgrading from 1.2 to 2.0.0</a>\n",
+            "+\t\t\t\t\t\t<a href=\"#Upgrading_from_1.2_to_2.1\">Upgrading from 1.2 to 2.1</a>\n",
+            " \t\t\t\t\t\t<ul>\n",
+            " \t\t\t\t\t\t\t<li>\n",
+            " \t\t\t\t\t\t\t\t<a href=\"#Configuration_file_vs_multi_XML_configuration\">Configuration file vs multi XML configuration</a>\n"
+          ],
+          "locn": "-27,7 +30,7"
+        },
+        {
+          "lines": [
+            " \t\t\t</p>\n",
+            " \t\t</section>\n",
+            " \t\t\n",
+            "-\t\t<section name=\"Upgrading from 1.2 to 2.0.0\" id=\"Upgrading_from_1.2_to_2.0.0\">\n",
+            "+\t\t<section name=\"Upgrading from 1.2 to 2.1\" id=\"Upgrading_from_1.2_to_2.1\">\n",
+            " \t\t\t<subsection name=\"Configuration file vs multi XML configuration\" id=\"Configuration_file_vs_multi_XML_configuration\">\n",
+            " \t\t\t\t<p>\n",
+            "                     In 1.2 you have been using a single synapse.xml file which resides on the\n",
+            "-                    repository/conf directory of the distribution, where as on 2.0.0 we have structured\n",
+            "+                    repository/conf directory of the distribution, where as on 2.1 we have structured\n",
+            "                     this into a configuration repository with multiple directories to have different\n",
+            "                     artifact types and each and every artifact configuration to reside on a different\n",
+            "-                    files inside the desired repository directory. This repository directory on the 2.0.0\n",
+            "+                    files inside the desired repository directory. This repository directory on the 2.1\n",
+            " \t\t\t\t\trelease resides in the repository/conf directory too, and named as synapse-config.\n",
+            " \t\t\t\t\tThe repository directory structure inside the synapse-config directory\n",
+            " \t\t\t\t\tlooks like follows;\n"
+          ],
+          "locn": "-89,14 +92,14"
+        },
+        {
+          "lines": [
+            " \t\t\t</subsection>\n",
+            " \t\t\t<subsection name=\"Endpoint URLs for proxy services\" id=\"Endpoint_URLs_for_proxy_services\">\n",
+            " \t\t\t\t<p>\n",
+            "-\t\t\t\t\tIn release 2.0.0 the endpoint URLs for proxy services have changed from\n",
+            "+\t\t\t\t\tIn release 2.1 the endpoint URLs for proxy services have changed from\n",
+            " \t\t\t\t\t<tt>/soap</tt> to <tt>/services</tt>. E.g. <tt>http://localhost:8280/services/StockQuote</tt>\n",
+            " \t\t\t\t\tshould be used instead of <tt>http://localhost:8280/soap/StockQuote</tt>.\n",
+            " \t\t\t\t</p>\n"
+          ],
+          "locn": "-132,7 +135,7"
+        },
+        {
+          "lines": [
+            " \t\t\t\t\tconfiguration file. In 1.2 the deployer was configured as follows:\n",
+            " \t\t\t\t</p>\n",
+            " \t\t\t\t<div class=\"xmlConf\">&lt;deployer extension=&quot;jar&quot; directory=&quot;mediators&quot;\n",
+            "-    class=&quot;org.apache.synapse.core.axis2.MediatorDeployer&quot;/&gt;</div>\n",
+            "+        class=&quot;org.apache.synapse.core.axis2.MediatorDeployer&quot;/&gt;</div>\n",
+            " \t\t\t\t<p>\n",
+            "-                    In 2.0.0 the suggested configuration is:\n",
+            "+                    In 2.1 the suggested configuration is:\n",
+            "                 </p>\n",
+            " \t\t\t\t<div class=\"xmlConf\">&lt;deployer extension=&quot;xar&quot; directory=&quot;extensions&quot;\n",
+            "-    class=&quot;org.apache.synapse.deployers.ExtensionDeployer&quot;/&gt; </div>\n",
+            "+        class=&quot;org.apache.synapse.deployers.ExtensionDeployer&quot;/&gt; </div>\n",
+            " \t\t\t\t<p>\n",
+            "                     It is possible to have multiple configuration entries for the extension deployer\n",
+            "                     with different settings. For example, if you used the deployer in 1.2 you might\n"
+          ],
+          "locn": "-148,12 +151,12"
+        },
+        {
+          "lines": [
+            "                     want to have the following configuration:\n",
+            " \t\t\t\t</p>\n",
+            " \t\t\t\t<div class=\"xmlConf\">&lt;deployer extension=&quot;jar&quot; directory=&quot;mediators&quot;\n",
+            "-    class=&quot;org.apache.synapse.deployers.ExtensionDeployer&quot;/&gt;\n",
+            "-&lt;deployer extension=&quot;xar&quot;\n",
+            "-    directory=&quot;extensions&quot;\n",
+            "-\tclass=&quot;org.apache.synapse.deployers.ExtensionDeployer&quot;/&gt;</div>\n",
+            "+        class=&quot;org.apache.synapse.deployers.ExtensionDeployer&quot;/&gt;\n",
+            "+&lt;deployer extension=&quot;xar&quot; directory=&quot;extensions&quot;\n",
+            "+\t    class=&quot;org.apache.synapse.deployers.ExtensionDeployer&quot;/&gt;</div>\n",
+            " \t\t\t</subsection>\n",
+            " \t\t\t<subsection name=\"JMS transport\" id=\"JMS_transport\">\n",
+            " \t\t\t\t<p>\n"
+          ],
+          "locn": "-160,10 +163,9"
+        },
+        {
+          "lines": [
+            "                     top level mediators and a main sequence leading the synapse to fail to start on\n",
+            "                     2.x Synapse configuration builder simply ignores the top level mediators. So you\n",
+            "                     need to wrap the top level mediators, if there are any, with the sequence named\n",
+            "-\t\t\t\t\t<strong>main</strong> on the new 2.0.0 version.\n",
+            "+\t\t\t\t\t<strong>main</strong> on the new 2.1 version.\n",
+            " \t\t\t\t</p>\n",
+            " \t\t\t\t<p>\n",
+            " \t\t\t\t\tTo further explain this lets have a look at the following valid configuration bit\n"
+          ],
+          "locn": "-182,7 +184,7"
+        },
+        {
+          "lines": [
+            "     &lt;!-- Send the message to implicit destination --&gt;\n",
+            "     &lt;send/&gt;\n",
+            " &lt;/definitions&gt;</div>\n",
+            "-\t\t\t\t\twhich needs to be changed to the following configuration on 2.0.0\n",
+            "+\t\t\t\t\twhich needs to be changed to the following configuration on 2.1\n",
+            " \t\t\t\t\t<div class=\"xmlConf\">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;\n",
+            " \n",
+            "     &lt;sequence name=&quot;main&quot;&gt;\n"
+          ],
+          "locn": "-194,7 +196,7"
+        },
+        {
+          "lines": [
+            " \t\t\t</subsection>\n",
+            " \t\t\t<subsection name=\"Filter Mediator\" id=\"Filter_Mediator\">\n",
+            " \t\t\t\t<p>\n",
+            "-                    From 2.0.0 onwards Synapse filter mediator supports the else close as well, and hence\n",
+            "+                    From 2.1 onwards Synapse filter mediator supports the else close as well, and hence\n",
+            " \t\t\t\t\tthe filter matching set of mediators has to be enclosed within a &lt;then&gt; element.\n",
+            "                 </p>\n",
+            " \t\t\t\t<p>\n"
+          ],
+          "locn": "-210,7 +212,7"
+        },
+        {
+          "lines": [
+            "     &lt;/send&gt;\n",
+            "     &lt;drop/&gt;\n",
+            " &lt;/filter&gt;</div>\n",
+            "-\t\t\t\t\tthe equivalent configuration for the 2.0.0 release is going to be;\n",
+            "+\t\t\t\t\tthe equivalent configuration for the 2.1 release is going to be;\n",
+            " \t\t\t\t\t<div class=\"xmlConf\">&lt;filter source=&quot;get-property('To')&quot; regex=&quot;.*/StockQuote.*&quot;&gt;\n",
+            "     &lt;then&gt;\n",
+            "         &lt;send&gt;\n"
+          ],
+          "locn": "-223,7 +225,7"
+        },
+        {
+          "lines": [
+            " \t\t\t\t<p>\n",
+            "                     In general it is recommended to run the configuration through the migration tool\n",
+            " \t\t\t\t\tprovided with the Synapse 2.x release, on your synapse 1.2 configuration before\n",
+            "-                    using it with the 2.0.0.\n",
+            "+                    using it with the 2.1.\n",
+            " \t\t\t\t</p>\n",
+            " \t\t\t\t<p>\n",
+            " \t\t\t\t\tTo run the migration tool execute the synapse-config-migrator.sh by passing the\n",
+            " \t\t\t\t\tsynapse.xml file location of the\n",
+            "-\t\t\t\t\t1.2 configuration. Which will create the 2.0.0\n",
+            "+\t\t\t\t\t1.2 configuration. Which will create the 2.1\n",
+            " \t\t\t\t\tcompatible configuration with the .new suffix. For example;\n",
+            " \t\t\t\t\t<pre>sh bin/synapse-config-migrator.sh synapse-i1.2/repository/conf/synapse.xml</pre>\n",
+            " \t\t\t\t</p>\n"
+          ],
+          "locn": "-255,12 +257,12"
+        },
+        {
+          "lines": [
+            " \t\t\t\t\t\t<td>\n",
+            " \t\t\t\t\t\t\tThis was the method that you have been overwriting on the 1.2 version to\n",
+            " \t\t\t\t\t\t\timplement a new custom mediator factory to build the mediator by looking at\n",
+            "-\t\t\t\t\t\t\tthe XML configuration. On the 2.0.0 version you should be extending the\n",
+            "+\t\t\t\t\t\t\tthe XML configuration. On the 2.1 version you should be extending the\n",
+            " \t\t\t\t\t\t\t<a href=\"apidocs/org/apache/synapse/config/xml/AbstractMediatorFactory.html#createSpecificMediator(org.apache.axiom.om.OMElement,%20java.util.Properties)\">createSpecificMediator(OMElement, Properties)</a>\n",
+            " \t\t\t\t\t\t\t. Note that in the process of changing the method to be extended, the method\n",
+            " \t\t\t\t\t\t\t<a href=\"apidocs/org/apache/synapse/config/xml/AbstractMediatorFactory.html#createMediator(org.apache.axiom.om.OMElement,%20java.util.Properties)\">createMediator</a>\n"
+          ],
+          "locn": "-288,7 +290,7"
+        },
+        {
+          "lines": [
+            " \t\t\t\t\t\t<td>\n",
+            " \t\t\t\t\t\t\tThis was the method that you have been overwriting on the 1.2 version to\n",
+            " \t\t\t\t\t\t\timplement a new custom mediator serializer to serialize to the XML\n",
+            "-                            Configuration by walking through the mediator properties. On the 2.0.0\n",
+            "+                            Configuration by walking through the mediator properties. On the 2.1\n",
+            "                             version you should be extending the\n",
+            " \t\t\t\t\t\t\t<a href=\"apidocs/org/apache/synapse/config/xml/AbstractMediatorSerializer.html#serializeSpecificMediator(org.apache.synapse.Mediator)\">serializeSpecificMediator(Mediator)</a>\n",
+            " \t\t\t\t\t\t\t. Note that in the process of changing the method to be extended, the method\n"
+          ],
+          "locn": "-305,7 +307,7"
+        }
+      ],
+      "from": "scratch/hiranya/website/src/site/xdoc/userguide/upgrading.xml",
+      "to": "scratch/hiranya/website/src/site/xdoc/userguide/upgrading.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "   -->\n",
+            " \n",
+            " <document>\n",
+            "+    <properties>\n",
+            "+        <title>Apache Synapse - Down the Memory Lane</title>\n",
+            "+    </properties>\n",
+            "     <body>\n",
+            "         <section name=\"History of Synapse\">\n",
+            "             <p>\n"
+          ],
+          "locn": "-19,6 +19,9"
+        }
+      ],
+      "from": "scratch/hiranya/website/src/site/xdoc/userguide/history.xml",
+      "to": "scratch/hiranya/website/src/site/xdoc/userguide/history.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             <item name=\"Installation Guide\" href=\"userguide/installation.html\"/>\n",
+            "             <item name=\"Quick Start Guide\" href=\"userguide/quick_start.html\"/>\n",
+            "             <item name=\"Samples Setup Guide\" href=\"userguide/samples/setup/index.html\"/>\n",
+            "-            <item name=\"Extending the Service Bus\" href=\"userguide/extending.html\"/>\n",
+            "+            <item name=\"Extending Synapse\" href=\"userguide/extending.html\"/>\n",
+            "             <item name=\"Samples Catalog\" href=\"userguide/samples.html\"/>\n",
+            "             <item name=\"Configuration Language\" href=\"userguide/config.html\"/>\n",
+            "             <item name=\"Upgrading\" href=\"userguide/upgrading.html\"/>\n",
+            "             <item name=\"Deployment\" href=\"userguide/deployment.html\"/>\n",
+            "             <item name=\"Transport\" href=\"userguide/transports.html\"/>\n",
+            "+            <item name=\"Javadocs\" href=\"apidocs/\"/>\n",
+            "+            <item name=\"FAQ\" href=\"apidocs/\"/>\n",
+            "         </menu>\n",
+            "         <menu name=\"Developer Resources\">\n",
+            "             <item name=\"Checkout the Source\"/>\n"
+          ],
+          "locn": "-36,12 +36,14"
+        }
+      ],
+      "from": "scratch/hiranya/website/src/site/site.xml",
+      "to": "scratch/hiranya/website/src/site/site.xml"
+    }
+  ],
+  "id": "1222213",
+  "message": "Site updates",
+  "when": "2011-12-22T08:14:20-05:00",
+  "who": "hiranya"
+}

@@ -1,0 +1,68 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/util/jaxp/SchemaResourceLSInput.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/util/jaxp/SchemaResourceLSInput.java	(revision 1745701)
++++ java/modules/core/src/main/java/org/apache/synapse/util/jaxp/SchemaResourceLSInput.java	(revision 1745702)
+@@ -17,6 +17,9 @@
+ public class SchemaResourceLSInput implements LSInput {
+ 
+     InputStream byteStream = null;
++    String systemId = null;
++    String publicId = null;
++    String baseURI = null;
+ 
+     public Reader getCharacterStream() {
+         return null;
+@@ -43,27 +46,27 @@
+     }
+ 
+     public String getSystemId() {
+-        return null;
++        return systemId;
+     }
+ 
+     public void setSystemId(String systemId) {
+-
++        this.systemId = systemId;
+     }
+ 
+     public String getPublicId() {
+-        return null;
++        return publicId;
+     }
+ 
+     public void setPublicId(String publicId) {
+-
++        this.publicId = publicId;
+     }
+ 
+     public String getBaseURI() {
+-        return null;
++        return baseURI;
+     }
+ 
+     public void setBaseURI(String baseURI) {
+-
++        this.baseURI = baseURI;
+     }
+ 
+     public String getEncoding() {
+Index: java/modules/core/src/main/java/org/apache/synapse/util/jaxp/SchemaResourceResolver.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/util/jaxp/SchemaResourceResolver.java	(revision 1745701)
++++ java/modules/core/src/main/java/org/apache/synapse/util/jaxp/SchemaResourceResolver.java	(revision 1745702)
+@@ -51,6 +51,9 @@
+         }
+         SchemaResourceLSInput schemaResourceLSInput = new SchemaResourceLSInput();
+         schemaResourceLSInput.setByteStream(inputSource.getByteStream());
++        schemaResourceLSInput.setSystemId(systemId);
++        schemaResourceLSInput.setPublicId(publicId);
++        schemaResourceLSInput.setBaseURI(baseURI);
+         return schemaResourceLSInput;
+     }
+ }
+-*-*-*-
+Message: Adding systemId, publicId and baseURL to the SchemaResourceLSInput. Applied patch from Senduran at SYNAPSE-1005
+-*-*-*-
+When: 2016-05-26 20:44:03 -0400 
+-*-*-*-
+Who: hiranya

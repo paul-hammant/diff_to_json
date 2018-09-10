@@ -1,0 +1,28 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             if (request instanceof HttpEntityEnclosingRequest) {\n",
+            "                 HttpEntity entity = ((HttpEntityEnclosingRequest) request).getEntity();\n",
+            "                 byte[] entityContent = EntityUtils.toByteArray(entity);\n",
+            "+                if (log.isDebugEnabled()) {\n",
+            "+                \tlog.debug(\"Request entity read; size=\" + entityContent.length);\n",
+            "+                }\n",
+            "                 response.setStatusCode(HttpStatus.SC_OK);\n",
+            "                 response.setEntity(new ByteArrayEntity(entityContent,\n",
+            "                         ContentType.create(entity.getContentType().getValue())));\n"
+          ],
+          "locn": "-78,6 +78,9"
+        }
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/EchoHttpServerController.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/EchoHttpServerController.java"
+    }
+  ],
+  "id": "1544894",
+  "message": "Added some debug logging.",
+  "when": "2013-11-23T18:52:19-05:00",
+  "who": "veithen"
+}

@@ -1,0 +1,149 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             <outputDirectory>synapse-${synapse.version}/bin/native</outputDirectory>\r\n",
+            "             <fileMode>755</fileMode>\r\n",
+            "         </fileSet>      \r\n",
+            "-        <fileSet>\r\n",
+            "+        <!--fileSet>\r\n",
+            "             <directory>../../src/site/resources/images</directory>\r\n",
+            "             <outputDirectory>synapse-${synapse.version}/docs/images</outputDirectory>\r\n",
+            "         </fileSet>\r\n"
+          ],
+          "locn": "-131,7 +131,7"
+        },
+        {
+          "lines": [
+            "         <fileSet>\r\n",
+            "             <directory>../../src/site/resources/logos</directory>\r\n",
+            "             <outputDirectory>synapse-${synapse.version}/docs/logos</outputDirectory>\r\n",
+            "-        </fileSet>\r\n",
+            "+        </fileSet-->\r\n",
+            "         <fileSet>\r\n",
+            "             <directory>../../modules/samples/services</directory>\r\n",
+            "             <outputDirectory>synapse-${synapse.version}/samples/axis2Server/src</outputDirectory>\r\n"
+          ],
+          "locn": "-138,7 +138,7"
+        },
+        {
+          "lines": [
+            "         <!--</fileSet>-->\r\n",
+            "     </fileSets>\r\n",
+            "     <files>\r\n",
+            "-        <file>\r\n",
+            "+        <!--file>\r\n",
+            "             <source>../../src/site/xdoc/Synapse_Configuration_Language.xml</source>\r\n",
+            "             <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>\r\n",
+            "             <destName>Synapse_Configuration_Language.html</destName>\r\n"
+          ],
+          "locn": "-190,7 +190,7"
+        },
+        {
+          "lines": [
+            "             <source>../../src/site/xdoc/Synapse_Extending.xml</source>\r\n",
+            "             <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>\r\n",
+            "             <destName>Synapse_Extending.html</destName>\r\n",
+            "-        </file>\r\n",
+            "+        </file-->\r\n",
+            "         <file>\r\n",
+            "             <source>.empty</source>\r\n",
+            "             <outputDirectory>synapse-${synapse.version}/work/temp/sampleClient</outputDirectory>\r\n"
+          ],
+          "locn": "-214,7 +214,7"
+        },
+        {
+          "lines": [
+            "             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>\r\n",
+            "             <excludes>\r\n",
+            "                 <exclude>org.apache.synapse:synapse-patches:zip:jars</exclude>\r\n",
+            "+\t\t<exclude>org.apache.synapse:synapse-documentation:zip</exclude>\r\n",
+            "                 <exclude>org.apache.axis2:addressing:mar</exclude>\r\n",
+            "                 <exclude>org.apache.rampart:rampart:mar</exclude>\r\n",
+            "                 <exclude>org.apache.sandesha2:sandesha2:mar</exclude>\r\n"
+          ],
+          "locn": "-234,6 +234,7"
+        },
+        {
+          "lines": [
+            "                 <exclude>xerces:xercesImpl:jar</exclude>\r\n",
+            "                 <exclude>org.apache.xerces:xercesImpl</exclude> <!-- Find the source of this -->\r\n",
+            "                 <exclude>org.apache.xerces:xml-apis</exclude>\r\n",
+            "-\t\t        <exclude>xalan:xalan:jar</exclude>\r\n",
+            "+\t        <exclude>xalan:xalan:jar</exclude>\r\n",
+            "                 <exclude>quickfixj:quickfixj-all:jar</exclude>\r\n",
+            "             </excludes>\r\n",
+            "         </dependencySet>\r\n",
+            "+\t<dependencySet>\r\n",
+            "+\t    <useProjectArtifact>false</useProjectArtifact>\r\n",
+            "+\t    <outputDirectory>synapse-${synapse.version}</outputDirectory>\r\n",
+            "+            <unpack>true</unpack>\r\n",
+            "+            <includes>\r\n",
+            "+                <include>org.apache.synapse:synapse-documentation:zip:docs</include>\r\n",
+            "+            </includes>\r\n",
+            "+\t</dependencySet>\r\n",
+            "         <dependencySet>\r\n",
+            "             <useProjectArtifact>false</useProjectArtifact>\r\n",
+            "             <outputDirectory>synapse-${synapse.version}/lib/patches</outputDirectory>\r\n"
+          ],
+          "locn": "-242,10 +243,18"
+        }
+      ],
+      "from": "java/modules/distribution/src/main/assembly/bin.xml",
+      "to": "java/modules/distribution/src/main/assembly/bin.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             <groupId>org.apache.synapse</groupId>\n",
+            "             <artifactId>synapse-fix-transport</artifactId>\n",
+            "         </dependency>\n",
+            "+\t<dependency>\n",
+            "+            <groupId>org.apache.synapse</groupId>\n",
+            "+            <artifactId>synapse-documentation</artifactId>\n",
+            "+\t    <type>zip</type>\n",
+            "+\t    <classifier>docs</classifier>\n",
+            "+        </dependency>\n",
+            " \n",
+            "         <!-- Wrapper jars -->\n",
+            "         <dependency>\n"
+          ],
+          "locn": "-71,6 +71,12"
+        }
+      ],
+      "from": "java/modules/distribution/pom.xml",
+      "to": "java/modules/distribution/pom.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                 <artifactId>synapse-core</artifactId>\n",
+            "                 <version>${project.version}</version>\n",
+            "             </dependency>\n",
+            "+\t    <dependency>\n",
+            "+                <groupId>org.apache.synapse</groupId>\n",
+            "+                <artifactId>synapse-documentation</artifactId>\n",
+            "+                <version>${project.version}</version>\n",
+            "+\t\t<type>zip</type>\n",
+            "+\t\t<classifier>docs</classifier>\n",
+            "+            </dependency>\n",
+            "             <dependency>\n",
+            "                 <groupId>org.apache.synapse</groupId>\n",
+            "                 <artifactId>synapse-core</artifactId>\n"
+          ],
+          "locn": "-350,6 +350,13"
+        }
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    }
+  ],
+  "id": "1302403",
+  "message": "Adding docs distro as a dependency",
+  "when": "2012-03-19T08:53:58-04:00",
+  "who": "hiranya"
+}

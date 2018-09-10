@@ -1,0 +1,245 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             <scope>test</scope>\n",
+            "         </dependency>\n",
+            "         <dependency>\n",
+            "-            <groupId>rhino</groupId>\n",
+            "-            <artifactId>js</artifactId>\n",
+            "+            <groupId>org.mozilla</groupId>\n",
+            "+            <artifactId>rhino</artifactId>\n",
+            "             <scope>test</scope>\n",
+            "         </dependency>\n",
+            "         <dependency>\n"
+          ],
+          "locn": "-394,8 +394,8"
+        }
+      ],
+      "from": "java/modules/integration/pom.xml",
+      "to": "java/modules/integration/pom.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     private static final String MC_VAR_NAME = \"mc\";\n",
+            " \n",
+            "     /**\n",
+            "+     * Name of the JavaScript language\n",
+            "+     */\n",
+            "+    private static final String JAVA_SCRIPT = \"js\";\n",
+            "+\n",
+            "+    /**\n",
+            "      * The registry entry key for a script loaded from the registry\n",
+            "      * Handle both static and dynamic(Xpath) Keys\n",
+            "      */\n"
+          ],
+          "locn": "-66,6 +66,11"
+        },
+        {
+          "lines": [
+            "         if (scriptEngine == null) {\n",
+            "             handleException(\"No script engine found for language: \" + language);\n",
+            "         }\n",
+            "-        xmlHelper = XMLHelper.getArgHelper(scriptEngine);\n",
+            "+        //Invoking a custom Helper class since there is an api change in rhino17 for js\n",
+            "+        if (language.equalsIgnoreCase(JAVA_SCRIPT)) {\n",
+            "+            xmlHelper = new JavaScriptXmlHelper();\n",
+            "+        } else {\n",
+            "+            xmlHelper = XMLHelper.getArgHelper(scriptEngine);\n",
+            "+        }\n",
+            " \n",
+            "         this.multiThreadedEngine = scriptEngine.getFactory().getParameter(\"THREADING\") != null;\n",
+            "         log.debug(\"Script mediator for language : \" + language +\n"
+          ],
+          "locn": "-428,7 +433,12"
+        }
+      ],
+      "from": "java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMediator.java",
+      "to": "java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMediator.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "+/*\n",
+            "+ *  Licensed to the Apache Software Foundation (ASF) under one\n",
+            "+ *  or more contributor license agreements.  See the NOTICE file\n",
+            "+ *  distributed with this work for additional information\n",
+            "+ *  regarding copyright ownership.  The ASF licenses this file\n",
+            "+ *  to you under the Apache License, Version 2.0 (the\n",
+            "+ *  \"License\"); you may not use this file except in compliance\n",
+            "+ *  with the License.  You may obtain a copy of the License at\n",
+            "+ *\n",
+            "+ *   http://www.apache.org/licenses/LICENSE-2.0\n",
+            "+ *\n",
+            "+ *  Unless required by applicable law or agreed to in writing,\n",
+            "+ *  software distributed under the License is distributed on an\n",
+            "+ *   * \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n",
+            "+ *  KIND, either express or implied.  See the License for the\n",
+            "+ *  specific language governing permissions and limitations\n",
+            "+ *  under the License.\n",
+            "+ */\n",
+            "+\n",
+            "+package org.apache.synapse.mediators.bsf;\n",
+            "+\n",
+            "+import org.apache.axiom.om.OMElement;\n",
+            "+import org.apache.axiom.om.util.AXIOMUtil;\n",
+            "+import org.apache.bsf.xml.DefaultXMLHelper;\n",
+            "+import org.apache.xmlbeans.XmlException;\n",
+            "+import org.apache.xmlbeans.XmlObject;\n",
+            "+import org.mozilla.javascript.Context;\n",
+            "+import org.mozilla.javascript.Scriptable;\n",
+            "+import org.mozilla.javascript.ScriptableObject;\n",
+            "+import org.mozilla.javascript.xml.XMLObject;\n",
+            "+\n",
+            "+import javax.script.ScriptException;\n",
+            "+import javax.xml.stream.XMLStreamException;\n",
+            "+\n",
+            "+/**\n",
+            "+ * This class will provide the operation to getPayloadXML and setPayload of\n",
+            "+ * ScriptMessageContext to convert between XML and ScriptXML object\n",
+            "+ * since there is an api change in rhino17,This class is provided instead of\n",
+            "+ * getting Helper class by XMLHelper.getArgHelper(engine) in bsf\n",
+            "+ */\n",
+            "+\n",
+            "+public class JavaScriptXmlHelper extends DefaultXMLHelper {\n",
+            "+\n",
+            "+    private final Scriptable scope;\n",
+            "+\n",
+            "+    JavaScriptXmlHelper() {\n",
+            "+        Context cx = Context.enter();\n",
+            "+        try {\n",
+            "+            this.scope = cx.initStandardObjects();\n",
+            "+        } finally {\n",
+            "+            Context.exit();\n",
+            "+        }\n",
+            "+    }\n",
+            "+\n",
+            "+    /**\n",
+            "+     * This method will convert the message payload in to xml\n",
+            "+     *\n",
+            "+     * @param scriptXML from java script Scriptable\n",
+            "+     * @return XML content as OMElement wrapped in Scriptable object\n",
+            "+     * @throws javax.script.ScriptException when error\n",
+            "+     */\n",
+            "+    public OMElement toOMElement(Object scriptXML) throws ScriptException {\n",
+            "+        if (scriptXML == null) {\n",
+            "+            return null;\n",
+            "+        }\n",
+            "+        if (!(scriptXML instanceof XMLObject)) {\n",
+            "+            return null;\n",
+            "+        }\n",
+            "+        // TODO: E4X Bug? Shouldn't need this copy, but without it the outer element gets lost???\n",
+            "+        Scriptable jsXML = (Scriptable) ScriptableObject.callMethod(\n",
+            "+                (Scriptable) scriptXML, \"copy\", new Object[0]);\n",
+            "+\n",
+            "+        OMElement omElement;\n",
+            "+        try {\n",
+            "+            omElement = AXIOMUtil.stringToOM((String) ScriptableObject.callMethod(\n",
+            "+                    jsXML, \"toXMLString\", new Object[0]));\n",
+            "+        } catch (XMLStreamException e) {\n",
+            "+            throw new ScriptException(e);\n",
+            "+        }\n",
+            "+        return omElement;\n",
+            "+    }\n",
+            "+\n",
+            "+    /**\n",
+            "+     * This method will convert the message payload in to ScriptXML Object\n",
+            "+     *\n",
+            "+     * @param omElement\n",
+            "+     * @return Scriptable object by adding the xml content\n",
+            "+     * @throws javax.script.ScriptException when error\n",
+            "+     */\n",
+            "+    public Object toScriptXML(OMElement omElement)\n",
+            "+            throws ScriptException {\n",
+            "+        if (omElement == null) {\n",
+            "+            return null;\n",
+            "+        }\n",
+            "+        Context cx = Context.enter();\n",
+            "+        try {\n",
+            "+            XmlObject xml;\n",
+            "+            try {\n",
+            "+                xml = XmlObject.Factory.parse(omElement.getXMLStreamReader());\n",
+            "+            } catch (XmlException e) {\n",
+            "+                throw new ScriptException(e);\n",
+            "+            }\n",
+            "+            Object wrappedXML = cx.getWrapFactory().wrap(cx, this.scope, xml, XmlObject.class);\n",
+            "+            Object obj = cx.newObject(this.scope, \"XML\", new Object[]{wrappedXML});\n",
+            "+            return obj;\n",
+            "+        } finally {\n",
+            "+            Context.exit();\n",
+            "+        }\n",
+            "+    }\n",
+            "+}\n"
+          ],
+          "locn": "-0,0 +1,110"
+        }
+      ],
+      "from": "java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/JavaScriptXmlHelper.java",
+      "to": "java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/JavaScriptXmlHelper.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             <artifactId>wso2throttle-core</artifactId>\n",
+            "         </dependency>\n",
+            "         <dependency>\n",
+            "-            <groupId>rhino</groupId>\n",
+            "-            <artifactId>js</artifactId>\n",
+            "+            <groupId>org.mozilla</groupId>\n",
+            "+            <artifactId>rhino</artifactId>\n",
+            "         </dependency>\n",
+            "         <dependency>\n",
+            "             <groupId>xerces</groupId>\n"
+          ],
+          "locn": "-136,8 +136,8"
+        }
+      ],
+      "from": "java/modules/extensions/pom.xml",
+      "to": "java/modules/extensions/pom.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                 <version>${bsf.version}</version>\n",
+            "             </dependency>\n",
+            "             <dependency>\n",
+            "-                <groupId>rhino</groupId>\n",
+            "-                <artifactId>js</artifactId>\n",
+            "+                <groupId>org.mozilla</groupId>\n",
+            "+                <artifactId>rhino</artifactId>\n",
+            "                 <version>${rhino.version}</version>\n",
+            "             </dependency>\n",
+            " \n"
+          ],
+          "locn": "-834,8 +834,8"
+        },
+        {
+          "lines": [
+            "         <bsf.version>3.0</bsf.version>\n",
+            "         <groovy.version>1.1-rc-1</groovy.version>\n",
+            "         <spring.version>1.2.8</spring.version>\n",
+            "-        <rhino.version>1.6R5</rhino.version>\n",
+            "+        <rhino.version>1.7R5</rhino.version>\n",
+            "         <activation.version>1.1</activation.version>\n",
+            " \n",
+            "         <!-- Maven Tools -->\n"
+          ],
+          "locn": "-1114,7 +1114,7"
+        }
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    }
+  ],
+  "id": "1745672",
+  "message": "Upgrading Rhino version to 1.7R5; Applying patch from Nuwan submitted at SYNAPSE-1013",
+  "when": "2016-05-26T19:00:20-04:00",
+  "who": "hiranya"
+}

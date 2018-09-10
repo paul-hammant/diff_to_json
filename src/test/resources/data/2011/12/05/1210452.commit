@@ -1,0 +1,357 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/deployers/PriorityExecutorDeployer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/deployers/PriorityExecutorDeployer.java	(revision 1210451)
++++ java/modules/core/src/main/java/org/apache/synapse/deployers/PriorityExecutorDeployer.java	(revision 1210452)
+@@ -35,8 +35,9 @@
+ import java.util.Properties;
+ 
+ public class PriorityExecutorDeployer extends AbstractSynapseArtifactDeployer {
+-    private static Log log = LogFactory.getLog(LocalEntryDeployer.class);
+ 
++    private static Log log = LogFactory.getLog(PriorityExecutorDeployer.class);
++
+     @Override
+     public String deploySynapseArtifact(OMElement artifactConfig,
+                                         String fileName, Properties properties) {
+Index: java/modules/core/src/main/java/org/apache/synapse/deployers/ProxyServiceDeployer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/deployers/ProxyServiceDeployer.java	(revision 1210451)
++++ java/modules/core/src/main/java/org/apache/synapse/deployers/ProxyServiceDeployer.java	(revision 1210452)
+@@ -115,7 +115,8 @@
+                 if (log.isDebugEnabled()) {
+                     log.debug("Initialized the ProxyService : " + proxy.getName());
+                 }
+-                proxy.stop(getSynapseConfiguration());
++                ProxyService currentProxy = getSynapseConfiguration().getProxyService(existingArtifactName);
++                currentProxy.stop(getSynapseConfiguration());
+                 getSynapseConfiguration().removeProxyService(existingArtifactName);
+                 if (!existingArtifactName.equals(proxy.getName())) {
+                     log.info("ProxyService named " + existingArtifactName + " has been Undeployed");
+Index: java/modules/core/src/main/java/org/apache/synapse/deployers/TaskDeployer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/deployers/TaskDeployer.java	(revision 1210451)
++++ java/modules/core/src/main/java/org/apache/synapse/deployers/TaskDeployer.java	(revision 1210452)
+@@ -48,22 +48,22 @@
+ 
+         try {
+             Startup st = StartupFinder.getInstance().getStartup(artifactConfig, properties);
+-                st.setFileName((new File(fileName)).getName());
+-                if (log.isDebugEnabled()) {
+-                    log.debug("StartupTask named '" + st.getName()
+-                            + "' has been built from the file " + fileName);
+-                }
+-                st.init(getSynapseEnvironment());
+-                if (log.isDebugEnabled()) {
+-                    log.debug("Initialized the StartupTask : " + st.getName());
+-                }
+-                getSynapseConfiguration().addStartup(st);
+-                if (log.isDebugEnabled()) {
+-                    log.debug("StartupTask Deployment from file : " + fileName + " : Completed");
+-                }
+-                log.info("StartupTask named '" + st.getName()
+-                        + "' has been deployed from file : " + fileName);
+-                return st.getName();
++            st.setFileName((new File(fileName)).getName());
++            if (log.isDebugEnabled()) {
++                log.debug("StartupTask named '" + st.getName()
++                        + "' has been built from the file " + fileName);
++            }
++            st.init(getSynapseEnvironment());
++            if (log.isDebugEnabled()) {
++                log.debug("Initialized the StartupTask : " + st.getName());
++            }
++            getSynapseConfiguration().addStartup(st);
++            if (log.isDebugEnabled()) {
++                log.debug("StartupTask Deployment from file : " + fileName + " : Completed");
++            }
++            log.info("StartupTask named '" + st.getName()
++                    + "' has been deployed from file : " + fileName);
++            return st.getName();
+         } catch (Exception e) {
+             handleSynapseArtifactDeploymentError(
+                     "StartupTask Deployment from the file : " + fileName + " : Failed.", e);
+@@ -87,9 +87,11 @@
+             if (log.isDebugEnabled()) {
+                 log.debug("StartupTask: " + st.getName() + " has been built from the file: " + fileName);
+             }
+-            st.init(getSynapseEnvironment());
+ 
+             Startup existingSt = getSynapseConfiguration().getStartup(existingArtifactName);
++            existingSt.destroy();
++
++            st.init(getSynapseEnvironment());
+             if (existingArtifactName.equals(st.getName())) {
+                 getSynapseConfiguration().updateStartup(st);
+             } else {
+@@ -98,7 +100,6 @@
+                 log.info("StartupTask: " + existingArtifactName + " has been undeployed");
+             }
+ 
+-            existingSt.destroy();
+             log.info("StartupTask: " + st.getName() + " has been updated from the file: " + fileName);
+             return st.getName();
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/deployers/AbstractSynapseArtifactDeployer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/deployers/AbstractSynapseArtifactDeployer.java	(revision 1210451)
++++ java/modules/core/src/main/java/org/apache/synapse/deployers/AbstractSynapseArtifactDeployer.java	(revision 1210452)
+@@ -29,7 +29,6 @@
+ import org.apache.axis2.description.Parameter;
+ import org.apache.axis2.util.XMLPrettyPrinter;
+ import org.apache.commons.io.FileUtils;
+-import org.apache.commons.io.FilenameUtils;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.ServerConfigurationInformation;
+@@ -71,6 +70,15 @@
+         this.cfgCtx = configCtx;
+     }
+ 
++    private boolean isHotDeploymentEnabled() {
++        try {
++            return getSynapseConfiguration().isAllowHotUpdate();
++        } catch (DeploymentException e) {
++            log.warn("Error while retrieving the SynapseConfiguration", e);
++            return false;
++        }
++    }
++
+     /**
+      * This method is called by the axis2 deployment framework and it performs a synapse artifact
+      * specific yet common across all the artifacts, set of tasks and delegate the actual deployment
+@@ -84,7 +92,15 @@
+      */
+     public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {
+ 
+-        String filename = FilenameUtils.normalize(deploymentFileData.getAbsolutePath());
++        if (!isHotDeploymentEnabled()) {
++            if (log.isDebugEnabled()) {
++                log.debug("Hot deployment has been suspended - Ignoring");
++            }
++            return;
++        }
++
++        String filename = SynapseArtifactDeploymentStore.getNormalizedAbsolutePath(
++                deploymentFileData.getAbsolutePath());
+         if (log.isDebugEnabled()) {
+             log.debug("Deployment of the synapse artifact from file : " + filename + " : STARTED");
+         }
+@@ -116,7 +132,7 @@
+         }
+         
+         try {
+-            InputStream in = new FileInputStream(filename);
++            InputStream in = FileUtils.openInputStream(new File(filename));
+             try {
+                 // construct the xml element from the file, it has to be XML,
+                 // since all synapse artifacts are XML based
+@@ -125,7 +141,7 @@
+                 properties.put(SynapseConstants.RESOLVE_ROOT, getSynapseEnvironment()
+                         .getServerContextInformation()
+                         .getServerConfigurationInformation().getResolveRoot());
+-                String artifatcName = null;
++                String artifactName = null;
+                 if (deploymentStore.isUpdatingArtifact(filename)) {
+ 
+                     if (log.isDebugEnabled()) {
+@@ -136,7 +152,7 @@
+                             = deploymentStore.getUpdatingArtifactWithFileName(filename);
+                     deploymentStore.removeUpdatingArtifact(filename);
+                     try {
+-                        artifatcName = updateSynapseArtifact(
++                        artifactName = updateSynapseArtifact(
+                                 element, filename, existingArtifactName, properties);
+                     } catch (SynapseArtifactDeploymentException sade) {
+                         log.error("Update of the Synapse Artifact from file : "
+@@ -145,12 +161,12 @@
+                                 + backupFile(deploymentFileData.getFile()));
+                         log.info("Restoring the existing artifact into the file : " + filename);
+                         restoreSynapseArtifact(existingArtifactName);
+-                        artifatcName = existingArtifactName;
++                        artifactName = existingArtifactName;
+                     }
+                 } else {
+                     // new artifact hot-deployment case
+                     try {
+-                        artifatcName = deploySynapseArtifact(element, filename, properties);
++                        artifactName = deploySynapseArtifact(element, filename, properties);
+                     } catch (SynapseArtifactDeploymentException sade) {
+                         log.error("Deployment of the Synapse Artifact from file : "
+                                 + filename + " : Failed!", sade);
+@@ -158,8 +174,8 @@
+                                 + backupFile(deploymentFileData.getFile()));
+                     }
+                 }
+-                if (artifatcName != null) {
+-                    deploymentStore.addArtifact(filename, artifatcName);
++                if (artifactName != null) {
++                    deploymentStore.addArtifact(filename, artifactName);
+                 }
+             } finally {
+                 in.close();
+@@ -191,9 +207,16 @@
+      */
+     public void undeploy(String fileName) throws DeploymentException {
+ 
+-        fileName = FilenameUtils.normalize(fileName);
++        if (!isHotDeploymentEnabled()) {
++            if (log.isDebugEnabled()) {
++                log.debug("Hot deployment has been suspended - Ignoring");
++            }
++            return;
++        }
++
++        fileName = SynapseArtifactDeploymentStore.getNormalizedAbsolutePath(fileName);
+         if (log.isDebugEnabled()) {
+-            log.debug("UnDeployment of the synapse artifact from file : "
++            log.debug("Undeployment of the synapse artifact from file : "
+                     + fileName + " : STARTED");
+         }
+ 
+@@ -207,7 +230,7 @@
+                 log.debug("BackedUp artifact detected with filename : " + fileName);
+             }
+             // only one undeployment trigger can happen after a backup and hence remove it from
+-            // backedUpFiles at the first hit, allowing the further undeploymentsto take place
++            // backedUpFiles at the first hit, allowing the further undeployment to take place
+             // as usual
+             deploymentStore.removeBackedUpArtifact(fileName);
+             return;
+@@ -357,7 +380,7 @@
+         SynapseArtifactDeploymentStore deploymentStore =
+                 getSynapseConfiguration().getArtifactDeploymentStore();
+         deploymentStore.addRestoredArtifact(fileName);
+-        OutputStream out = new FileOutputStream(new File(fileName));
++        OutputStream out = FileUtils.openOutputStream(new File(fileName));
+         XMLPrettyPrinter.prettify(content, out);
+         out.flush();
+         out.close();
+@@ -389,7 +412,7 @@
+ 
+     private void handleDeploymentError(String msg, Exception e, String fileName)
+             throws DeploymentException {
+-        fileName = FilenameUtils.normalize(fileName);
++        fileName = SynapseArtifactDeploymentStore.getNormalizedAbsolutePath(fileName);
+         log.error(msg, e);
+         SynapseArtifactDeploymentStore deploymentStore =
+                 getSynapseConfiguration().getArtifactDeploymentStore();
+@@ -404,8 +427,8 @@
+     }
+ 
+     private String backupFile(File file) throws DeploymentException {
+-        String filePath = FilenameUtils.normalize(file.getAbsolutePath());
+-
++        String filePath = SynapseArtifactDeploymentStore.getNormalizedAbsolutePath(
++                file.getAbsolutePath());
+         SynapseArtifactDeploymentStore deploymentStore =
+                 getSynapseConfiguration().getArtifactDeploymentStore();
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/deployers/SynapseArtifactDeploymentStore.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/deployers/SynapseArtifactDeploymentStore.java	(revision 1210451)
++++ java/modules/core/src/main/java/org/apache/synapse/deployers/SynapseArtifactDeploymentStore.java	(revision 1210452)
+@@ -24,10 +24,8 @@
+ import org.apache.commons.logging.LogFactory;
+ 
+ import java.io.File;
+-import java.util.ArrayList;
+-import java.util.HashMap;
+-import java.util.List;
+-import java.util.Map;
++import java.io.IOException;
++import java.util.*;
+ 
+ /**
+  * Keeps track of the artifacts deployed with files inside the synapse repository</p>
+@@ -41,6 +39,7 @@
+  * @see org.apache.synapse.config.xml.MultiXMLConfigurationBuilder
+  */
+ public final class SynapseArtifactDeploymentStore {
++
+     /** Keeps track of the deployed artifacts in the synapse environment */
+     private Map<String, String> fileName2ArtifactName = new HashMap<String, String>();
+ 
+@@ -48,10 +47,10 @@
+     private Map<String, String> updatingArtifacts = new HashMap<String, String>();
+ 
+     /** Keeps track of the restored artifacts in the synapse environment in a particular instance */
+-    private List<String> restoredFiles = new ArrayList<String>();
++    private Set<String> restoredFiles = new HashSet<String>();
+ 
+     /** Keeps track of the backed up artifacts in the synapse environment in a particular instance */
+-    private List<String> backedUpFiles = new ArrayList<String>();
++    private Set<String> backedUpFiles = new HashSet<String>();
+    
+     private static final Log log = LogFactory.getLog(SynapseArtifactDeploymentStore.class);
+ 
+@@ -228,6 +227,14 @@
+     }
+ 
+     public static String getNormalizedAbsolutePath(String fileName) {
+-        return FilenameUtils.normalize(new File(fileName).getAbsolutePath());
++        String path;
++        File file = new File(fileName);
++        try {
++            path = file.getCanonicalPath();
++        } catch (IOException e) {
++            log.warn("Error while computing the canonical path of file: " + fileName);
++            path = file.getAbsolutePath();
++        }
++        return FilenameUtils.normalize(path);
+     }
+ }
+Index: java/modules/core/src/main/java/org/apache/synapse/deployers/TemplateDeployer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/deployers/TemplateDeployer.java	(revision 1210451)
++++ java/modules/core/src/main/java/org/apache/synapse/deployers/TemplateDeployer.java	(revision 1210452)
+@@ -138,7 +138,7 @@
+                         getEndpointTemplate(existingArtifactName);
+ 
+                 if (existingArtifactName.equals(tm.getName())) {
+-                    getSynapseConfiguration().updateEndpointTemplate(tm.getName(), existingSt);
++                    getSynapseConfiguration().updateEndpointTemplate(tm.getName(), tm);
+                 } else {
+                     getSynapseConfiguration().addEndpointTemplate(tm.getName(), tm);
+                     getSynapseConfiguration().removeEndpointTemplate(existingSt.getName());
+@@ -171,7 +171,7 @@
+                                 getSequenceTemplate(existingArtifactName);
+ 
+                         if (existingArtifactName.equals(tm.getName())) {
+-                            getSynapseConfiguration().updateSequenceTemplate(tm.getName(), existingSt);
++                            getSynapseConfiguration().updateSequenceTemplate(tm.getName(), tm);
+                         } else {
+                             getSynapseConfiguration().addSequenceTemplate(tm.getName(), tm);
+                             getSynapseConfiguration().removeSequenceTemplate(existingSt.getName());
+@@ -206,10 +206,10 @@
+             try {
+                 st = getSynapseConfiguration().getEndpointTemplate(artifactName);
+             } catch (SynapseException e) {
+-                //could not locate an endpoint template for this particular un-delpoyment. This name refers
+-                //probably to a sequence tempalte. Thus if  throws a Synapse exception with following message
++                //could not locate an endpoint template for this particular un-deployment. This name refers
++                //probably to a sequence template. Thus if  throws a Synapse exception with following message
+                 //catch n log that and continue this process for undeployment of a sequence template
+-                if (e.getMessage().indexOf("Cannot locate an either local or remote enrty for key") != -1) {
++                if (e.getMessage().indexOf("Cannot locate an either local or remote entry for key") != -1) {
+                     if (log.isDebugEnabled()) {
+                         log.debug("Undeploying template is not of endpoint type. Undeployer will now check " +
+                                   "for sequence template for the key: " + artifactName);
+Index: java/modules/core/src/main/java/org/apache/synapse/deployers/ExtensionDeployer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/deployers/ExtensionDeployer.java	(revision 1210451)
++++ java/modules/core/src/main/java/org/apache/synapse/deployers/ExtensionDeployer.java	(revision 1210452)
+@@ -151,7 +151,7 @@
+                 = new BufferedReader(new InputStreamReader(servicesURL.openStream()));
+             try {
+                 String className;
+-                while ((className = in.readLine()) != null) {
++                while ((className = in.readLine()) != null && (!className.trim().equals(""))) {
+                     log.info("Loading the " + providerClassName + " implementation: " + className);
+                     try {
+                         Class<? extends T> clazz
+-*-*-*-
+Message: Fixing a few typos and minor issues with the deployers
+-*-*-*-
+When: 2011-12-05 08:16:19 -0500 
+-*-*-*-
+Who: hiranya

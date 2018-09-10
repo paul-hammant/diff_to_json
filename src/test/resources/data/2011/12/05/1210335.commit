@@ -1,0 +1,55 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/ResolvingEndpoint.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/endpoints/ResolvingEndpoint.java	(revision 1210334)
++++ java/modules/core/src/main/java/org/apache/synapse/endpoints/ResolvingEndpoint.java	(revision 1210335)
+@@ -53,7 +53,7 @@
+         }
+     }
+ 
+-    private Endpoint loadAndInitEndpoint(ConfigurationContext cc, String key) {
++    private synchronized Endpoint loadAndInitEndpoint(ConfigurationContext cc, String key) {
+         Parameter parameter = cc.getAxisConfiguration().getParameter(
+                 SynapseConstants.SYNAPSE_CONFIG);
+         Parameter synEnvParameter = cc.getAxisConfiguration().getParameter(
+Index: java/modules/core/src/main/java/org/apache/synapse/config/Entry.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/Entry.java	(revision 1210334)
++++ java/modules/core/src/main/java/org/apache/synapse/config/Entry.java	(revision 1210335)
+@@ -117,11 +117,11 @@
+      * OMElement otherwise.
+      * @return Either an OMElement or a String
+      */
+-    public Object getValue() {
++    public synchronized Object getValue() {
+         return value;
+     }
+ 
+-    public void setValue(Object value) {
++    public synchronized void setValue(Object value) {
+         this.value = value;
+     }
+ 
+@@ -129,7 +129,7 @@
+      *
+      * @return mapper
+      */
+-    public XMLToObjectMapper getMapper() {
++    public synchronized XMLToObjectMapper getMapper() {
+         return mapper;
+     }
+ 
+@@ -138,7 +138,7 @@
+      *
+      * @param mapper XMLToObjectMapper instance
+      */
+-    public void setMapper(XMLToObjectMapper mapper) {
++    public synchronized void setMapper(XMLToObjectMapper mapper) {
+         this.mapper = mapper;
+     }
+ 
+-*-*-*-
+Message: Fixed SYNAPSE-819.
+-*-*-*-
+When: 2011-12-05 00:30:40 -0500 
+-*-*-*-
+Who: rajikak

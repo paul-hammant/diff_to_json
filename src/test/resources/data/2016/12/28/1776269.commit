@@ -1,0 +1,38 @@
+Index: java/modules/distribution/pom.xml
+===================================================================
+--- java/modules/distribution/pom.xml	(revision 1776268)
++++ java/modules/distribution/pom.xml	(revision 1776269)
+@@ -115,10 +115,6 @@
+             <groupId>org.apache.axis2</groupId>
+             <artifactId>axis2-json</artifactId>
+         </dependency>
+-        <dependency>
+-            <groupId>org.codehaus.jettison</groupId>
+-            <artifactId>jettison</artifactId>
+-        </dependency>
+ 
+         <!-- Additional transports -->
+         <dependency>
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1776268)
++++ java/pom.xml	(revision 1776269)
+@@ -445,12 +445,6 @@
+                 <groupId>org.apache.axis2</groupId>
+                 <artifactId>axis2-json</artifactId>
+                 <version>${axis2.version}</version>
+-                <exclusions>
+-                    <exclusion>
+-                        <groupId>org.codehaus.jettison</groupId>
+-                        <artifactId>jettison</artifactId>
+-                    </exclusion>
+-                </exclusions>
+             </dependency>
+             <dependency>
+                 <groupId>org.codehaus.jettison</groupId>
+-*-*-*-
+Message: SYNAPSE-1077: To change the version of a transitive dependency, a dependencyManagement entry is enough; there is no need to exclude the transitive dependency and add it as a direct dependency. In this particular case, this also avoids an unwanted transitive dependency on stax:stax-api (which is excluded in Axis2 and reappears if Jettison is added as a direct dependency).
+-*-*-*-
+When: 2016-12-28 06:21:37 -0500 
+-*-*-*-
+Who: veithen

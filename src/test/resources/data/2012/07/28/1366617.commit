@@ -1,0 +1,23 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/eip/splitter/IterateMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/eip/splitter/IterateMediator.java	(revision 1366616)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/eip/splitter/IterateMediator.java	(revision 1366617)
+@@ -108,10 +108,7 @@
+ 
+             // if not preservePayload remove all the child elements
+             if (!preservePayload && envelope.getBody() != null) {
+-                for (Iterator itr = envelope.getBody().getChildren(); itr.hasNext();) {
+-                    itr.next();
+-                    itr.remove();
+-                }
++                envelope.getBody().removeChildren();
+             }
+ 
+             int msgCount = splitElements.size();
+-*-*-*-
+Message: Some code simplifications using the new OMContainer#removeChildren() method.
+
+-*-*-*-
+When: 2012-07-28 05:04:06 -0400 
+-*-*-*-
+Who: veithen

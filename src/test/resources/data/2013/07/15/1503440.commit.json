@@ -1,0 +1,138 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            " package org.apache.synapse.core.axis2;\n",
+            " \n",
+            " import org.apache.axiom.om.OMAbstractFactory;\n",
+            "+import org.apache.axiom.util.UIDGenerator;\n",
+            " import org.apache.axiom.util.blob.OverflowBlob;\n",
+            "-import org.apache.axiom.util.UIDGenerator;\n",
+            " import org.apache.axis2.context.ConfigurationContext;\n",
+            " import org.apache.axis2.context.OperationContext;\n",
+            " import org.apache.axis2.context.ServiceContext;\n",
+            " import org.apache.axis2.description.InOutAxisOperation;\n",
+            "-import org.apache.axis2.description.TransportInDescription;\n",
+            " import org.apache.commons.logging.Log;\n",
+            " import org.apache.commons.logging.LogFactory;\n",
+            "-import org.apache.synapse.*;\n",
+            "-import org.apache.synapse.rest.RESTRequestHandler;\n",
+            "-import org.apache.synapse.task.SynapseTaskManager;\n",
+            "-import org.apache.synapse.transport.passthru.util.RelayUtils;\n",
+            "+import org.apache.synapse.Mediator;\n",
+            "+import org.apache.synapse.MessageContext;\n",
+            "+import org.apache.synapse.ServerContextInformation;\n",
+            "+import org.apache.synapse.SynapseConstants;\n",
+            "+import org.apache.synapse.SynapseException;\n",
+            " import org.apache.synapse.aspects.statistics.StatisticsCollector;\n",
+            " import org.apache.synapse.config.SynapseConfiguration;\n",
+            " import org.apache.synapse.core.SynapseEnvironment;\n"
+          ],
+          "locn": "-20,19 +20,19"
+        },
+        {
+          "lines": [
+            " import org.apache.synapse.mediators.MediatorFaultHandler;\n",
+            " import org.apache.synapse.mediators.MediatorWorker;\n",
+            " import org.apache.synapse.mediators.base.SequenceMediator;\n",
+            "+import org.apache.synapse.rest.RESTRequestHandler;\n",
+            "+import org.apache.synapse.task.SynapseTaskManager;\n",
+            "+import org.apache.synapse.transport.passthru.util.RelayUtils;\n",
+            " import org.apache.synapse.util.concurrent.SynapseThreadPool;\n",
+            " import org.apache.synapse.util.xpath.ext.SynapseXpathFunctionContextProvider;\n",
+            " import org.apache.synapse.util.xpath.ext.SynapseXpathVariableResolver;\n"
+          ],
+          "locn": "-41,6 +41,9"
+        },
+        {
+          "lines": [
+            "      */\n",
+            "     public void send(EndpointDefinition endpoint, MessageContext synCtx) {\n",
+            "         if (synCtx.isResponse()) {\n",
+            "-\n",
+            "             if (endpoint != null) {\n",
+            "+                if (isTransportSwitching(synCtx, endpoint)) {\n",
+            "+                    buildMessage(synCtx);\n",
+            "+                }\n",
+            "                 Axis2Sender.sendOn(endpoint, synCtx);\n",
+            "             } else {\n",
+            "                 String proxyName = (String) synCtx.getProperty(SynapseConstants.PROXY_SERVICE);\n"
+          ],
+          "locn": "-256,8 +259,10"
+        },
+        {
+          "lines": [
+            "                 if (proxyName != null) {\n",
+            "                     ProxyService proxyService = synapseConfig.getProxyService(proxyName);\n",
+            "                     if (proxyService.isModuleEngaged()) {\n",
+            "-                        try {\n",
+            "-                        \t RelayUtils.buildMessage(((Axis2MessageContext) synCtx).getAxis2MessageContext(),false);\n",
+            "-                        } catch (Exception e) {\n",
+            "-                            handleException(\"Error building message\", e);\n",
+            "-                        }\n",
+            "+                        buildMessage(synCtx);\n",
+            "                     }\n",
+            "                 }\n",
+            "                 Axis2Sender.sendBack(synCtx);\n"
+          ],
+          "locn": "-264,11 +269,7"
+        },
+        {
+          "lines": [
+            " \n",
+            "             // This is only for stats collection\n",
+            "             synCtx.setProperty(SynapseConstants.SENDING_REQUEST, true);\n",
+            "-            if (endpoint == null) {\n",
+            "-                try {\n",
+            "-                \tRelayUtils.buildMessage(((Axis2MessageContext) synCtx).getAxis2MessageContext(),false);\n",
+            "-                } catch (Exception e) {\n",
+            "-                    handleException(\"Error while building message\", e);\n",
+            "-                }\n",
+            "+\n",
+            "+            if (endpoint == null || isTransportSwitching(synCtx, endpoint)) {\n",
+            "+                buildMessage(synCtx);\n",
+            "             }\n",
+            "             Axis2Sender.sendOn(endpoint, synCtx);\n",
+            "         }\n",
+            "     }\n",
+            " \n",
+            "+    private boolean isTransportSwitching(MessageContext synCtx, EndpointDefinition endpoint) {\n",
+            "+        if (endpoint.getAddress() != null) {\n",
+            "+            // If the message is sent to an explicit non-HTTP endpoint, build the message\n",
+            "+            return !endpoint.getAddress().startsWith(\"http\");\n",
+            "+        } else {\n",
+            "+            String address = synCtx.getTo().getAddress();\n",
+            "+            if (address != null) {\n",
+            "+                // If the message is sent to an implicit non-HTTP endpoint, build the message\n",
+            "+                return !address.startsWith(\"http\");\n",
+            "+            }\n",
+            "+        }\n",
+            "+        return false;\n",
+            "+    }\n",
+            "+\n",
+            "+    private void buildMessage(MessageContext synCtx) {\n",
+            "+        try {\n",
+            "+            RelayUtils.buildMessage(((Axis2MessageContext) synCtx).getAxis2MessageContext(), false);\n",
+            "+        } catch (Exception e) {\n",
+            "+            handleException(\"Error while building message\", e);\n",
+            "+        }\n",
+            "+    }\n",
+            "+\n",
+            "     /**\n",
+            "      * This method will be used to create a new MessageContext in the Axis2 environment for\n",
+            "      * Synapse. This will set all the relevant parts to the MessageContext, but for this message\n"
+          ],
+          "locn": "-286,17 +287,36"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2SynapseEnvironment.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2SynapseEnvironment.java"
+    }
+  ],
+  "id": "1503440",
+  "message": "Building the message when switching from HTTP/S to a different transport. Applying the patch for SYNAPSE-937 with some improvements.",
+  "when": "2013-07-15T16:00:52-04:00",
+  "who": "hiranya"
+}

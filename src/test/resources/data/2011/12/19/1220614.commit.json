@@ -1,0 +1,27 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         </dependency>\n",
+            " \n",
+            "         <dependency>\n",
+            "-            <groupId>org.apache.xalan</groupId>\n",
+            "+            <groupId>xalan</groupId>\n",
+            "             <artifactId>xalan</artifactId>\n",
+            "             <version>${xalan.version}</version>\n",
+            "         </dependency>\n"
+          ],
+          "locn": "-584,7 +584,7"
+        }
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    }
+  ],
+  "id": "1220614",
+  "message": "Fixing test failure",
+  "when": "2011-12-19T00:27:32-05:00",
+  "who": "kasun"
+}

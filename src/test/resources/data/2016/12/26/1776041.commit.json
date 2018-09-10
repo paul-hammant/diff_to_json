@@ -1,0 +1,642 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.synapse.transport.passthru.ProtocolState;\n",
+            " import org.apache.synapse.transport.passthru.SourceContext;\n",
+            " import org.apache.synapse.transport.passthru.TargetContext;\n",
+            "+import org.apache.synapse.transport.passthru.config.TargetConfiguration;\n",
+            " import org.apache.synapse.transport.passthru.connections.SourceConnections;\n",
+            " import org.apache.synapse.transport.passthru.connections.TargetConnections;\n",
+            " \n"
+          ],
+          "locn": "-38,6 +38,7"
+        },
+        {
+          "lines": [
+            "      * copied from the request messages\n",
+            "      * \n",
+            "      * @param msgContext the Axis2 Message context from which these headers should be removed\n",
+            "-     * @param preserveServerHeader if true preserve the original server header\n",
+            "-     * @param preserveUserAgentHeader if true preserve the original user-agent header\n",
+            "+     * @param targetConfiguration configuration for the passThrough handler\n",
+            "      */\n",
+            "-    public static void removeUnwantedHeaders(MessageContext msgContext,\n",
+            "-                                             boolean preserveServerHeader,\n",
+            "-                                             boolean preserveUserAgentHeader) {\n",
+            "+    public static void removeUnwantedHeaders(MessageContext msgContext, TargetConfiguration targetConfiguration) {\n",
+            "         Map headers = (Map) msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);\n",
+            " \t\tMap excessHeaders = (Map) msgContext.getProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS);\n",
+            " \n"
+          ],
+          "locn": "-111,12 +112,9"
+        },
+        {
+          "lines": [
+            "         while (iter.hasNext()) {\n",
+            "             String headerName = (String) iter.next();\n",
+            "             if (HTTP.CONN_DIRECTIVE.equalsIgnoreCase(headerName) ||\n",
+            "-                HTTP.TRANSFER_ENCODING.equalsIgnoreCase(headerName) ||\n",
+            "-                HTTP.DATE_HEADER.equalsIgnoreCase(headerName) ||\n",
+            "-                HTTP.CONTENT_LEN.equalsIgnoreCase(headerName) ||\n",
+            "-                HTTP.CONN_KEEP_ALIVE.equalsIgnoreCase(headerName)) {\n",
+            "+                HTTP.TRANSFER_ENCODING.equalsIgnoreCase(headerName)) {\n",
+            "                 iter.remove();\n",
+            "             }\n",
+            " \n",
+            "-            if (!preserveServerHeader && HTTP.SERVER_HEADER.equalsIgnoreCase(headerName)) {\n",
+            "+            if (HTTP.DATE_HEADER.equalsIgnoreCase(headerName)\n",
+            "+                && !targetConfiguration.isPreserveHttpHeader(HTTP.DATE_HEADER)) {\n",
+            "                 iter.remove();\n",
+            "             }\n",
+            " \n",
+            "-            if (!preserveUserAgentHeader && HTTP.USER_AGENT.equalsIgnoreCase(headerName)) {\n",
+            "+            if (HTTP.CONTENT_LEN.equalsIgnoreCase(headerName)\n",
+            "+                && !targetConfiguration.isPreserveHttpHeader(HTTP.CONTENT_LEN)) {\n",
+            "                 iter.remove();\n",
+            "             }\n",
+            "+\n",
+            "+            if (HTTP.CONN_KEEP_ALIVE.equalsIgnoreCase(headerName)\n",
+            "+                && !targetConfiguration.isPreserveHttpHeader(HTTP.CONN_KEEP_ALIVE)) {\n",
+            "+                iter.remove();\n",
+            "+            }\n",
+            "+\n",
+            "+            if (HTTP.SERVER_HEADER.equalsIgnoreCase(headerName)\n",
+            "+                && !targetConfiguration.isPreserveHttpHeader(HTTP.SERVER_HEADER)) {\n",
+            "+                iter.remove();\n",
+            "+            }\n",
+            "+\n",
+            "+            if (HTTP.USER_AGENT.equalsIgnoreCase(headerName)\n",
+            "+                && !targetConfiguration.isPreserveHttpHeader(HTTP.USER_AGENT)) {\n",
+            "+                iter.remove();\n",
+            "+            }\n",
+            "         }\n",
+            " \n",
+            "     }\n"
+          ],
+          "locn": "-128,20 +126,34"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/PassThroughTransportUtils.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/PassThroughTransportUtils.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                     noEntityBody == null || !noEntityBody);\n",
+            " \n",
+            "             // headers\n",
+            "-            PassThroughTransportUtils.removeUnwantedHeaders(msgContext,\n",
+            "-                    configuration.isPreserveServerHeader(),\n",
+            "-                    configuration.isPreserveUserAgentHeader());\n",
+            "+            PassThroughTransportUtils.removeUnwantedHeaders(msgContext, configuration);\n",
+            " \n",
+            "             Object o = msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);\n",
+            "             if (o != null && o instanceof Map) {\n"
+          ],
+          "locn": "-69,9 +69,7"
+        },
+        {
+          "lines": [
+            "                     Map.Entry entry = (Map.Entry) entryObj;\n",
+            "                     if (entry.getValue() != null && entry.getKey() instanceof String &&\n",
+            "                             entry.getValue() instanceof String) {\n",
+            "-                        if (!HTTPConstants.HEADER_HOST.equalsIgnoreCase((String) entry.getKey())) {\n",
+            "-                            request.addHeader((String) entry.getKey(), (String) entry.getValue());\n",
+            "-                        } else {\n",
+            "+                        if (HTTPConstants.HEADER_HOST.equalsIgnoreCase((String) entry.getKey())\n",
+            "+                            && !configuration.isPreserveHttpHeader(HTTPConstants.HEADER_HOST)) {\n",
+            "                             if (msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER) != null) {\n",
+            "-                            \trequest.addHeader((String) entry.getKey(),\n",
+            "-                                        (String) msgContext.getProperty(\n",
+            "-                                                NhttpConstants.REQUEST_HOST_HEADER));\n",
+            "+                                request.addHeader((String) entry.getKey(),\n",
+            "+                                                  (String) msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER));\n",
+            "                             }\n",
+            "+                        } else {\n",
+            "+                            request.addHeader((String) entry.getKey(), (String) entry.getValue());\n",
+            "                         }\n",
+            "                     }\n",
+            "                 }\n"
+          ],
+          "locn": "-81,14 +79,14"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/TargetRequestFactory.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/TargetRequestFactory.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            "     public InvocationResponse invoke(MessageContext msgContext) throws AxisFault {\n",
+            "         // remove unwanted HTTP headers (if any from the current message)\n",
+            "-        PassThroughTransportUtils.removeUnwantedHeaders(msgContext,\n",
+            "-                targetConfiguration.isPreserveServerHeader(),\n",
+            "-                targetConfiguration.isPreserveUserAgentHeader());\n",
+            "+        PassThroughTransportUtils.removeUnwantedHeaders(msgContext, targetConfiguration);\n",
+            " \n",
+            "         if (AddressingHelper.isReplyRedirected(msgContext)\n",
+            "                 && !msgContext.getReplyTo().hasNoneAddress()) {\n"
+          ],
+          "locn": "-248,9 +248,7"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.commons.logging.Log;\n",
+            " import org.apache.commons.logging.LogFactory;\n",
+            " import org.apache.synapse.transport.nhttp.NhttpConstants;\n",
+            "+import org.apache.synapse.transport.passthru.config.TargetConfiguration;\n",
+            " \n",
+            " import java.io.IOException;\n",
+            " import java.net.MalformedURLException;\n"
+          ],
+          "locn": "-36,6 +36,7"
+        },
+        {
+          "lines": [
+            " \n",
+            "     private static final Log log = LogFactory.getLog(ClientWorker.class);\n",
+            " \n",
+            "-    /** the Axis2 configuration context */\n",
+            "-    private ConfigurationContext cfgCtx = null;\n",
+            "+    /** the Http connectors configuration context */\n",
+            "+    private TargetConfiguration targetConfiguration = null;\n",
+            " \n",
+            "     /** the response message context that would be created */\n",
+            "     private MessageContext responseMsgCtx = null;\n"
+          ],
+          "locn": "-49,8 +50,8"
+        },
+        {
+          "lines": [
+            "     /** weather a body is expected or not */\n",
+            "     private boolean expectEntityBody = true;\n",
+            " \n",
+            "-    public ClientWorker(ConfigurationContext cfgCtx,\n",
+            "+    public ClientWorker(TargetConfiguration targetConfiguration,\n",
+            "                         MessageContext outMsgCtx,\n",
+            "                         TargetResponse response) {\n",
+            "-        this.cfgCtx = cfgCtx;\n",
+            "+        this.targetConfiguration = targetConfiguration;\n",
+            "         this.response = response;\n",
+            "         this.expectEntityBody = response.isExpectResponseBody();\n",
+            " \n"
+          ],
+          "locn": "-61,10 +62,10"
+        },
+        {
+          "lines": [
+            " \t\t\n",
+            " \t\t// Special casing 302 scenario in following section. Not sure whether it's the correct fix,\n",
+            " \t\t// but this fix makes it possible to do http --> https redirection.\n",
+            "-\t\tif (oriURL != null && response.getStatus() != HttpStatus.SC_MOVED_TEMPORARILY) {\n",
+            "+\t\tif (oriURL != null && response.getStatus() != HttpStatus.SC_MOVED_TEMPORARILY && !targetConfiguration\n",
+            "+                .isPreserveHttpHeader(PassThroughConstants.LOCATION)) {\n",
+            " \t\t\tURL url;\n",
+            " \t\t\ttry {\n",
+            " \t\t\t\turl = new URL(oriURL);\n"
+          ],
+          "locn": "-75,7 +76,8"
+        },
+        {
+          "lines": [
+            "             return cTypeProperty.toString();\n",
+            "         }\n",
+            "         // Try to get the content type from the axis configuration\n",
+            "-        Parameter cTypeParam = cfgCtx.getAxisConfiguration().getParameter(\n",
+            "+        Parameter cTypeParam = targetConfiguration.getConfigurationContext().getAxisConfiguration().getParameter(\n",
+            "                 PassThroughConstants.CONTENT_TYPE);\n",
+            "         if (cTypeParam != null) {\n",
+            "             return cTypeParam.getValue().toString();\n"
+          ],
+          "locn": "-242,7 +244,7"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ClientWorker.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ClientWorker.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             }\n",
+            "                        \n",
+            "             targetConfiguration.getWorkerPool().execute(\n",
+            "-                    new ClientWorker(targetConfiguration.getConfigurationContext(),\n",
+            "-                            requestMsgContext, targetResponse));\n",
+            "+                    new ClientWorker(targetConfiguration, requestMsgContext, targetResponse));\n",
+            " \n",
+            "             metrics.incrementMessagesReceived();\n",
+            "             \n"
+          ],
+          "locn": "-224,8 +224,7"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetHandler.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetHandler.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.http.protocol.*;\n",
+            " import org.apache.synapse.transport.passthru.connections.TargetConnections;\n",
+            " \n",
+            "+import java.util.ArrayList;\n",
+            "+import java.util.Arrays;\n",
+            "+import java.util.List;\n",
+            "+\n",
+            " /**\n",
+            "  * This class stores configuration specific to HTTP Connectors (Senders)\n",
+            "  */\n"
+          ],
+          "locn": "-25,6 +25,10"
+        },
+        {
+          "lines": [
+            "     /** Whether Server header coming from server should be preserved */\n",
+            "     private boolean preserveServerHeader = true;\n",
+            " \n",
+            "+    /** Http headers which should be preserved */\n",
+            "+    private List<String> preserveHttpHeaders;\n",
+            "+\n",
+            "     private TargetConnections connections = null;\n",
+            " \n",
+            "     public TargetConfiguration(ConfigurationContext configurationContext,\n"
+          ],
+          "locn": "-38,6 +42,9"
+        },
+        {
+          "lines": [
+            "                 PassThroughConfigPNames.USER_AGENT_HEADER_PRESERVE, false);\n",
+            "         preserveServerHeader = conf.getBooleanProperty(\n",
+            "                 PassThroughConfigPNames.SERVER_HEADER_PRESERVE, true);\n",
+            "+        populatePreserveHttpHeaders(conf.getPreserveHttpHeaders());\n",
+            "     }\n",
+            " \n",
+            "     @Override\n"
+          ],
+          "locn": "-51,6 +58,7"
+        },
+        {
+          "lines": [
+            "         return maxConnections;\n",
+            "     }\n",
+            " \n",
+            "-    public boolean isPreserveUserAgentHeader() {\n",
+            "-        return preserveUserAgentHeader;\n",
+            "-    }\n",
+            "+    /**\n",
+            "+     * Check preserving status of the given http header name\n",
+            "+     *\n",
+            "+     * @param headerName http header name which need to check preserving status\n",
+            "+     * @return preserving status of the given http header\n",
+            "+     */\n",
+            "+    public boolean isPreserveHttpHeader(String headerName) {\n",
+            " \n",
+            "-    public boolean isPreserveServerHeader() {\n",
+            "-        return preserveServerHeader;\n",
+            "+        if (preserveHttpHeaders == null || preserveHttpHeaders.isEmpty() || headerName == null) {\n",
+            "+            return false;\n",
+            "+        }\n",
+            "+        return preserveHttpHeaders.contains(headerName.toUpperCase());\n",
+            "     }\n",
+            " \n",
+            "     public TargetConnections getConnections() {\n"
+          ],
+          "locn": "-70,12 +78,18"
+        },
+        {
+          "lines": [
+            "     public void setConnections(TargetConnections connections) {\n",
+            "         this.connections = connections;\n",
+            "     }\n",
+            "+\n",
+            "+    /**\n",
+            "+     * Populate preserve http headers from comma separate string\n",
+            "+     *\n",
+            "+     * @param preserveHeaders Comma separated preserve enable http headers\n",
+            "+     */\n",
+            "+    private void populatePreserveHttpHeaders(String preserveHeaders) {\n",
+            "+\n",
+            "+        preserveHttpHeaders = new ArrayList<String>();\n",
+            "+        if (preserveHeaders != null && !preserveHeaders.isEmpty()) {\n",
+            "+            String[] presHeaders = preserveHeaders.trim().toUpperCase().split(\",\");\n",
+            "+            if (presHeaders != null && presHeaders.length > 0) {\n",
+            "+                preserveHttpHeaders.addAll(Arrays.asList(presHeaders));\n",
+            "+            }\n",
+            "+        }\n",
+            "+\n",
+            "+        if (preserveServerHeader && !preserveHttpHeaders.contains(HTTP.SERVER_HEADER.toUpperCase())) {\n",
+            "+            preserveHttpHeaders.add(HTTP.SERVER_HEADER.toUpperCase());\n",
+            "+        }\n",
+            "+\n",
+            "+        if (preserveUserAgentHeader && !preserveHttpHeaders.contains(HTTP.USER_AGENT.toUpperCase())) {\n",
+            "+            preserveHttpHeaders.add(HTTP.USER_AGENT.toUpperCase());\n",
+            "+        }\n",
+            "+    }\n",
+            "+\n",
+            " }\n"
+          ],
+          "locn": "-85,4 +99,29"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/TargetConfiguration.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/TargetConfiguration.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                 DEFAULT_IO_THREADS_PER_REACTOR);\n",
+            "     }\n",
+            " \n",
+            "+    public String getPreserveHttpHeaders() {\n",
+            "+        return getStringProperty(PassThroughConfigPNames.HTTP_HEADERS_PRESERVE, \"\");\n",
+            "+    }\n",
+            "+\n",
+            " }\n"
+          ],
+          "locn": "-71,4 +71,8"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/PassThroughConfiguration.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/PassThroughConfiguration.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     public String SERVER_HEADER_PRESERVE = \"http.server.preserve\";\n",
+            " \n",
+            "     /**\n",
+            "+     * Defines whether ESB needs to preserve the original Http header.\n",
+            "+     */\n",
+            "+    public String HTTP_HEADERS_PRESERVE = \"http.headers.preserve\";\n",
+            "+\n",
+            "+    /**\n",
+            "      * Defines whether HTTP keep-alive is disabled\n",
+            "      */\n",
+            "     public String DISABLE_KEEPALIVE = \"http.connection.disable.keepalive\";\n"
+          ],
+          "locn": "-66,6 +66,11"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/PassThroughConfigPNames.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/PassThroughConfigPNames.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            " package org.apache.synapse.transport.nhttp;\n",
+            " \n",
+            "+import org.apache.http.protocol.HTTP;\n",
+            " import org.apache.synapse.transport.utils.config.HttpTransportConfiguration;\n",
+            " \n",
+            " import java.util.ArrayList;\n",
+            "+import java.util.Arrays;\n",
+            " import java.util.List;\n",
+            " \n",
+            " /**\n"
+          ],
+          "locn": "-19,9 +19,11"
+        },
+        {
+          "lines": [
+            " \n",
+            "     private static NHttpConfiguration _instance = new NHttpConfiguration();\n",
+            "     private List<String> methods;\n",
+            "-\n",
+            "+    //Preserve HTTP headers\n",
+            "+    private List<String> preserveHeaders;\n",
+            "     /** Comma separated list of blocked uris*/\n",
+            "     public static final String BLOCK_SERVICE_LIST = \"http.block_service_list\";\n",
+            "     /** Default value for BLOCK_SERVICE_LIST*/\n"
+          ],
+          "locn": "-57,7 +59,8"
+        },
+        {
+          "lines": [
+            "     \n",
+            "     private NHttpConfiguration() {\n",
+            "         super(\"nhttp\");\n",
+            "+        populatePreserveHttpHeaders();\n",
+            "     }\n",
+            " \n",
+            "     @Override\n"
+          ],
+          "locn": "-65,6 +68,7"
+        },
+        {
+          "lines": [
+            "         return getIntProperty(NhttpConstants.DISABLE_KEEPALIVE, 0) == 1;\n",
+            "     }\n",
+            " \n",
+            "-    public boolean isPreserveUserAgentHeader() {\n",
+            "-        return getBooleanProperty(NhttpConstants.USER_AGENT_HEADER_PRESERVE, false);\n",
+            "-    }\n",
+            "-\n",
+            "-    public boolean isPreserveServerHeader() {\n",
+            "-        return getBooleanProperty(NhttpConstants.SERVER_HEADER_PRESERVE, true);\n",
+            "-    }\n",
+            "-\n",
+            "     public boolean isCountConnections() {\n",
+            "         return getBooleanProperty(NhttpConstants.COUNT_CONNECTIONS, false);\n",
+            "     }\n"
+          ],
+          "locn": "-116,14 +120,6"
+        },
+        {
+          "lines": [
+            "         return methods.contains(method);\n",
+            "     }\n",
+            " \n",
+            "+    /**\n",
+            "+     * Check preserving status of the http header field\n",
+            "+     *\n",
+            "+     * @param httpHeader http header name\n",
+            "+     * @return return true if preserve else false\n",
+            "+     */\n",
+            "+    public boolean isPreserveHttpHeader(String httpHeader) {\n",
+            "+        if (preserveHeaders == null || preserveHeaders.isEmpty() || httpHeader == null) {\n",
+            "+            return false;\n",
+            "+        } else {\n",
+            "+            return preserveHeaders.contains(httpHeader.toUpperCase());\n",
+            "+        }\n",
+            "+    }\n",
+            "+\n",
+            "+    private void populatePreserveHttpHeaders() {\n",
+            "+        if (preserveHeaders == null) {\n",
+            "+            preserveHeaders = new ArrayList<String>();\n",
+            "+            String presHeaders = getStringProperty(NhttpConstants.HTTP_HEADERS_PRESERVE, \"\");\n",
+            "+\n",
+            "+            if (presHeaders != null && !presHeaders.isEmpty()) {\n",
+            "+                String[] splitHeaders = presHeaders.toUpperCase().trim().split(\",\");\n",
+            "+\n",
+            "+                if (splitHeaders != null && splitHeaders.length > 0) {\n",
+            "+                    preserveHeaders.addAll(Arrays.asList(splitHeaders));\n",
+            "+                }\n",
+            "+            }\n",
+            "+\n",
+            "+            if (getBooleanProperty(NhttpConstants.SERVER_HEADER_PRESERVE, true)\n",
+            "+                && !preserveHeaders.contains(HTTP.SERVER_HEADER.toUpperCase())) {\n",
+            "+                preserveHeaders.add(HTTP.SERVER_HEADER.toUpperCase());\n",
+            "+            }\n",
+            "+\n",
+            "+            if (getBooleanProperty(NhttpConstants.USER_AGENT_HEADER_PRESERVE, false)\n",
+            "+                && !preserveHeaders.contains(HTTP.USER_AGENT.toUpperCase())) {\n",
+            "+                preserveHeaders.add(HTTP.USER_AGENT.toUpperCase());\n",
+            "+            }\n",
+            "+        }\n",
+            "+    }\n",
+            " }\n"
+          ],
+          "locn": "-143,4 +139,42"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/NHttpConfiguration.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/NHttpConfiguration.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "      * */\n",
+            "     public static final String SERVER_HEADER_PRESERVE = \"http.server.preserve\";\n",
+            " \n",
+            "+    /**\n",
+            "+     * Defines weather synapse needs to preserve the original Http headers. Configures\n",
+            "+     * through nhttp.properties file\n",
+            "+     */\n",
+            "+    public static final String HTTP_HEADERS_PRESERVE = \"http.headers.preserve\";\n",
+            "+\n",
+            "     /** Denotes a connection close is forced if set at the NhttpContext */\n",
+            "     public static final String FORCE_CLOSING = \"forceClosing\";\n",
+            "     /** Denotes a message is being processed by the current connection if this is set at the context */\n"
+          ],
+          "locn": "-81,6 +81,12"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/NhttpConstants.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/NhttpConstants.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     private List<String> knownDirectHosts = new ArrayList<String>();\n",
+            "     /** The list of known hosts to go via proxy */\n",
+            "     private List<String> knownProxyHosts = new ArrayList<String>();\n",
+            "-    /** Weather User-Agent header coming from client should be preserved */\n",
+            "-    private boolean preserveUserAgentHeader = false;\n",
+            "-    /** Weather Server header coming from server should be preserved */\n",
+            "-    private boolean preserveServerHeader = true;\n",
+            "+    /** NHttp transporter base configurations */\n",
+            "+    private NHttpConfiguration cfg;\n",
+            "+\n",
+            "     /**\n",
+            "      * Initialize the transport sender, and execute reactor in new separate thread\n",
+            "      * @param cfgCtx the Axis2 configuration context\n"
+          ],
+          "locn": "-102,10 +102,9"
+        },
+        {
+          "lines": [
+            "         // is this an SSL Sender?\n",
+            "         sslContext = getSSLContext(transportOut);\n",
+            "         SSLSetupHandler sslSetupHandler = getSSLSetupHandler(transportOut);\n",
+            "+        cfg = NHttpConfiguration.getInstance();\n",
+            " \n",
+            "         // configure proxy settings - only supports HTTP right now (See SYNAPSE-418)\n",
+            "         if (sslContext == null) {\n"
+          ],
+          "locn": "-116,6 +115,7"
+        },
+        {
+          "lines": [
+            "             cfgCtx.setNonReplicableProperty(\"warnOnHTTP500\", warnOnHttp500);\n",
+            "         }\n",
+            " \n",
+            "-        preserveUserAgentHeader = NHttpConfiguration.getInstance().isPreserveUserAgentHeader();\n",
+            "-        preserveServerHeader = NHttpConfiguration.getInstance().isPreserveServerHeader();\n",
+            "-\n",
+            "         try {\n",
+            "             String prefix = (sslContext == null ? \"http\" : \"https\") + \"-Sender I/O dispatcher\";\n",
+            "             ioReactor = new DefaultConnectingIOReactor(\n"
+          ],
+          "locn": "-152,9 +152,6"
+        },
+        {
+          "lines": [
+            "             String headerName = (String) iter.next();\n",
+            "             if (HTTP.CONN_DIRECTIVE.equalsIgnoreCase(headerName) ||\n",
+            "                 HTTP.TRANSFER_ENCODING.equalsIgnoreCase(headerName) ||\n",
+            "-                HTTP.DATE_HEADER.equalsIgnoreCase(headerName) ||\n",
+            "                 HTTP.CONTENT_TYPE.equalsIgnoreCase(headerName) ||\n",
+            "                 HTTP.CONTENT_LEN.equalsIgnoreCase(headerName)) {\n",
+            "                 iter.remove();\n",
+            "             }\n",
+            " \n",
+            "-            if (!preserveServerHeader && HTTP.SERVER_HEADER.equalsIgnoreCase(headerName)) {\n",
+            "+            if (HTTP.SERVER_HEADER.equalsIgnoreCase(headerName)\n",
+            "+                && !cfg.isPreserveHttpHeader(HTTP.SERVER_HEADER)) {\n",
+            "                 iter.remove();\n",
+            "             }\n",
+            " \n",
+            "-            if (!preserveUserAgentHeader && HTTP.USER_AGENT.equalsIgnoreCase(headerName)) {\n",
+            "+            if (HTTP.USER_AGENT.equalsIgnoreCase(headerName)\n",
+            "+                && !cfg.isPreserveHttpHeader(HTTP.USER_AGENT)) {\n",
+            "                 iter.remove();\n",
+            "             }\n",
+            "+\n",
+            "+            if (HTTP.DATE_HEADER.equalsIgnoreCase(headerName)\n",
+            "+                && !cfg.isPreserveHttpHeader(HTTP.DATE_HEADER)) {\n",
+            "+                iter.remove();\n",
+            "+            }\n",
+            "         }\n",
+            "     }\n",
+            " \n"
+          ],
+          "locn": "-321,19 +318,25"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " #worker_pool_queue_length=-1\n",
+            " #io_threads_per_reactor=2\n",
+            " io_buffer_size=16384\n",
+            "-http.socket.reuseaddr=true\n",
+            "\\ No newline at end of file\n",
+            "+http.socket.reuseaddr=true\n",
+            "+#http.headers.preserve=Location,Serer,User-Agent,Host,Date\n"
+          ],
+          "locn": "-26,4 +26,5"
+        }
+      ],
+      "from": "java/repository/conf/passthru-http.properties",
+      "to": "java/repository/conf/passthru-http.properties"
+    }
+  ],
+  "id": "1776041",
+  "message": "SYNAPSE-1016 HTTP Header Preservation through configuration, patch by Prabath Ariyarathna",
+  "when": "2016-12-26T00:14:41-05:00",
+  "who": "ravi"
+}

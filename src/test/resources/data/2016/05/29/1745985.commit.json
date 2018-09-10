@@ -1,0 +1,59 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            "     <dependencies>\n",
+            "         <dependency>\n",
+            "-            <groupId>quickfixj</groupId>\n",
+            "+            <groupId>org.quickfixj</groupId>\n",
+            "             <artifactId>quickfixj-all</artifactId>\n",
+            "         </dependency>\n",
+            "         <dependency>\n"
+          ],
+          "locn": "-110,7 +110,7"
+        }
+      ],
+      "from": "java/modules/transports/optional/fix/pom.xml",
+      "to": "java/modules/transports/optional/fix/pom.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            "             <!-- Quickfix/J (FIX Transport) -->\n",
+            "             <dependency>\n",
+            "-                <groupId>quickfixj</groupId>\n",
+            "+                <groupId>org.quickfixj</groupId>\n",
+            "                 <artifactId>quickfixj-all</artifactId>\n",
+            "                 <version>${qfj.version}</version>\n",
+            "             </dependency>\n"
+          ],
+          "locn": "-846,7 +846,7"
+        },
+        {
+          "lines": [
+            "         <httpcore.nio.version>4.3.3</httpcore.nio.version>\n",
+            "         <http.client.version>4.3.6</http.client.version>\n",
+            "         <aspectj.version>1.8.2</aspectj.version>\n",
+            "-        <qfj.version>1.4.0</qfj.version>\n",
+            "+        <qfj.version>1.6.2</qfj.version>\n",
+            "         <wso2uri-template.version>1.0.0</wso2uri-template.version>\n",
+            "         <activemq.version>5.2.0</activemq.version>\n",
+            "         <snmp4j.version>2.0.3</snmp4j.version>\n"
+          ],
+          "locn": "-1068,7 +1068,7"
+        }
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    }
+  ],
+  "id": "1745985",
+  "message": "Upgrade quickfixj to a version available from Maven central.",
+  "when": "2016-05-29T07:28:06-04:00",
+  "who": "veithen"
+}

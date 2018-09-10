@@ -1,0 +1,275 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         buildMessage(msgCtx, false);\n",
+            "     }\n",
+            " \n",
+            "-    public static void buildMessage(MessageContext messageContext, boolean earlyBuild) throws IOException,\n",
+            "-            XMLStreamException {\n",
+            "+    public static void buildMessage(MessageContext messageContext,\n",
+            "+                                    boolean earlyBuild) throws IOException, XMLStreamException {\n",
+            " \n",
+            "         final Pipe pipe = (Pipe) messageContext.getProperty(PassThroughConstants.PASS_THROUGH_PIPE);\n",
+            "-\t\tif (pipe != null && forcePTBuild &&\n",
+            "-                !PassThroughTransportUtils.builderInvoked(messageContext)) {\n",
+            "+\t\tif (pipe != null && forcePTBuild && !PassThroughTransportUtils.builderInvoked(messageContext)) {\n",
+            " \t\t\tInputStream in = pipe.getInputStream();\n",
+            "         \tbuildMessage(messageContext, earlyBuild, in);\n",
+            "             return;\n"
+          ],
+          "locn": "-76,12 +76,11"
+        },
+        {
+          "lines": [
+            "         }\n",
+            "     }\n",
+            " \n",
+            "-\tpublic static void buildMessage(MessageContext messageContext,\n",
+            "+\tprivate static void buildMessage(MessageContext messageContext,\n",
+            "                                     boolean earlyBuild, InputStream in) throws IOException {\n",
+            " \n",
+            " \t    BufferedInputStream bufferedInputStream = (BufferedInputStream) messageContext.getProperty(\n"
+          ],
+          "locn": "-121,7 +120,7"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/RelayUtils.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/RelayUtils.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "+/*\n",
+            "+ *  Licensed to the Apache Software Foundation (ASF) under one\n",
+            "+ *  or more contributor license agreements.  See the NOTICE file\n",
+            "+ *  distributed with this work for additional information\n",
+            "+ *  regarding copyright ownership.  The ASF licenses this file\n",
+            "+ *  to you under the Apache License, Version 2.0 (the\n",
+            "+ *  \"License\"); you may not use this file except in compliance\n",
+            "+ *  with the License.  You may obtain a copy of the License at\n",
+            "+ *\n",
+            "+ *   http://www.apache.org/licenses/LICENSE-2.0\n",
+            "+ *\n",
+            "+ *  Unless required by applicable law or agreed to in writing,\n",
+            "+ *  software distributed under the License is distributed on an\n",
+            "+ *   * \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n",
+            "+ *  KIND, either express or implied.  See the License for the\n",
+            "+ *  specific language governing permissions and limitations\n",
+            "+ *  under the License.\n",
+            "+ */\n",
+            "+\n",
+            " package org.apache.synapse.samples.framework.clients;\n",
+            " \n",
+            " import org.apache.axiom.om.OMElement;\n"
+          ],
+          "locn": "-1,3 +1,22"
+        }
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/HttpResponse.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/HttpResponse.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "+/*\n",
+            "+ *  Licensed to the Apache Software Foundation (ASF) under one\n",
+            "+ *  or more contributor license agreements.  See the NOTICE file\n",
+            "+ *  distributed with this work for additional information\n",
+            "+ *  regarding copyright ownership.  The ASF licenses this file\n",
+            "+ *  to you under the Apache License, Version 2.0 (the\n",
+            "+ *  \"License\"); you may not use this file except in compliance\n",
+            "+ *  with the License.  You may obtain a copy of the License at\n",
+            "+ *\n",
+            "+ *   http://www.apache.org/licenses/LICENSE-2.0\n",
+            "+ *\n",
+            "+ *  Unless required by applicable law or agreed to in writing,\n",
+            "+ *  software distributed under the License is distributed on an\n",
+            "+ *  \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n",
+            "+ *  KIND, either express or implied.  See the License for the\n",
+            "+ *  specific language governing permissions and limitations\n",
+            "+ *  under the License.\n",
+            "+ */\n",
+            "+\n",
+            " package org.apache.synapse.samples.framework.clients;\n",
+            " \n",
+            "-import org.apache.http.HttpEntity;\n",
+            " import org.apache.http.client.HttpClient;\n",
+            " import org.apache.http.client.methods.HttpGet;\n",
+            " import org.apache.http.client.methods.HttpPost;\n"
+          ],
+          "locn": "-1,6 +1,24"
+        },
+        {
+          "lines": [
+            " \n",
+            " import java.io.ByteArrayInputStream;\n",
+            " \n",
+            "+/**\n",
+            "+ * A simple HTTP client that enables making HTTP requests. Useful for testing\n",
+            "+ * RESTful invocations on Synapse.\n",
+            "+ */\n",
+            " public class BasicHttpClient {\n",
+            " \n",
+            "+    /**\n",
+            "+     * Make a HTTP GET request on the specified URL.\n",
+            "+     *\n",
+            "+     * @param url A valid HTTP URL\n",
+            "+     * @return A HttpResponse object\n",
+            "+     * @throws Exception If an error occurs while making the HTTP call\n",
+            "+     */\n",
+            "     public HttpResponse doGet(String url) throws Exception {\n",
+            "         HttpClient client = new DefaultHttpClient();\n",
+            "         try {\n"
+          ],
+          "locn": "-9,8 +27,19"
+        },
+        {
+          "lines": [
+            "         }\n",
+            "     }\n",
+            " \n",
+            "+    /**\n",
+            "+     * Make a HTTP POST request on the specified URL.\n",
+            "+     *\n",
+            "+     * @param url A valid HTTP URL\n",
+            "+     * @param payload An array of bytes to be posted to the URL (message body)\n",
+            "+     * @param contentType Content type of the message body\n",
+            "+     * @return A HttpResponse object\n",
+            "+     * @throws Exception If an error occurs while making the HTTP call\n",
+            "+     */\n",
+            "     public HttpResponse doPost(String url, byte[] payload, String contentType) throws Exception {\n",
+            "         HttpClient client = new DefaultHttpClient();\n",
+            "         try {\n"
+          ],
+          "locn": "-21,6 +50,15"
+        }
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/BasicHttpClient.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/BasicHttpClient.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "+/*\n",
+            "+ *  Licensed to the Apache Software Foundation (ASF) under one\n",
+            "+ *  or more contributor license agreements.  See the NOTICE file\n",
+            "+ *  distributed with this work for additional information\n",
+            "+ *  regarding copyright ownership.  The ASF licenses this file\n",
+            "+ *  to you under the Apache License, Version 2.0 (the\n",
+            "+ *  \"License\"); you may not use this file except in compliance\n",
+            "+ *  with the License.  You may obtain a copy of the License at\n",
+            "+ *\n",
+            "+ *   http://www.apache.org/licenses/LICENSE-2.0\n",
+            "+ *\n",
+            "+ *  Unless required by applicable law or agreed to in writing,\n",
+            "+ *  software distributed under the License is distributed on an\n",
+            "+ *  \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n",
+            "+ *  KIND, either express or implied.  See the License for the\n",
+            "+ *  specific language governing permissions and limitations\n",
+            "+ *  under the License.\n",
+            "+ */\n",
+            "+\n",
+            " package org.apache.synapse.samples.framework.tests.rest;\n",
+            " \n",
+            " import org.apache.axiom.om.OMElement;\n"
+          ],
+          "locn": "-1,3 +1,22"
+        }
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/rest/Sample800.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/rest/Sample800.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         ConfigurationContext axisCfgCtx = axisOutMsgCtx.getConfigurationContext();\n",
+            "         AxisConfiguration axisCfg       = axisCfgCtx.getAxisConfiguration();\n",
+            " \n",
+            "-        AxisService anoymousService =\n",
+            "+        AxisService anonymousService =\n",
+            "             AnonymousServiceFactory.getAnonymousService(synapseOutMessageContext.getConfiguration(),\n",
+            "                     axisCfg, wsAddressingEnabled, wsRMEnabled, wsSecurityEnabled);\n",
+            "         // mark the anon services created to be used in the client side of synapse as hidden\n",
+            "         // from the server side of synapse point of view\n",
+            "-        anoymousService.getParent().addParameter(SynapseConstants.HIDDEN_SERVICE_PARAM, \"true\");\n",
+            "+        anonymousService.getParent().addParameter(SynapseConstants.HIDDEN_SERVICE_PARAM, \"true\");\n",
+            "         ServiceGroupContext sgc = new ServiceGroupContext(\n",
+            "-                        axisCfgCtx, (AxisServiceGroup) anoymousService.getParent());\n",
+            "-        ServiceContext serviceCtx = sgc.getServiceContext(anoymousService);\n",
+            "+                        axisCfgCtx, (AxisServiceGroup) anonymousService.getParent());\n",
+            "+        ServiceContext serviceCtx = sgc.getServiceContext(anonymousService);\n",
+            " \n",
+            "         boolean outOnlyMessage = \"true\".equals(synapseOutMessageContext.getProperty(\n",
+            "                 SynapseConstants.OUT_ONLY));\n",
+            " \n",
+            "         // get a reference to the DYNAMIC operation of the Anonymous Axis2 service\n",
+            "-        AxisOperation axisAnonymousOperation = anoymousService.getOperation(\n",
+            "+        AxisOperation axisAnonymousOperation = anonymousService.getOperation(\n",
+            "                 outOnlyMessage ?\n",
+            "                         new QName(AnonymousServiceFactory.OUT_ONLY_OPERATION) :\n",
+            "                         new QName(AnonymousServiceFactory.OUT_IN_OPERATION));\n"
+          ],
+          "locn": "-326,21 +326,21"
+        },
+        {
+          "lines": [
+            "                     RMAssertionBuilder builder = new RMAssertionBuilder();\n",
+            "                     SandeshaPolicyBean sandeshaPolicyBean = (SandeshaPolicyBean) builder.build(policyOMElement, null);\n",
+            "                     Parameter policyParam = new Parameter(Sandesha2Constants.SANDESHA_PROPERTY_BEAN, sandeshaPolicyBean);\n",
+            "-                    anoymousService.addParameter(policyParam);\n",
+            "+                    anonymousService.addParameter(policyParam);\n",
+            "                 }\n",
+            "             }\n",
+            "         }\n"
+          ],
+          "locn": "-358,7 +358,7"
+        },
+        {
+          "lines": [
+            "         return newMC;\n",
+            "     }\n",
+            " \n",
+            "-    public static void clearSecurtityProperties(Options options) {\n",
+            "+    public static void clearSecurityProperties(Options options) {\n",
+            " \n",
+            "         Options current = options;\n",
+            "         while (current != null && current.getProperty(SynapseConstants.RAMPART_POLICY) != null) {\n"
+          ],
+          "locn": "-468,7 +468,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                 messageContext.getEnvelope().getOrCreateHeader();\n",
+            "             }\n",
+            " \n",
+            "-            Axis2FlexibleMEPClient.clearSecurtityProperties(messageContext.getOptions());\n",
+            "+            Axis2FlexibleMEPClient.clearSecurityProperties(messageContext.getOptions());\n",
+            " \n",
+            "            // report stats for any component at response sending check point\n",
+            "             StatisticsReporter.reportForAllOnResponseSent(smc);\n"
+          ],
+          "locn": "-146,7 +146,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2Sender.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2Sender.java"
+    }
+  ],
+  "id": "1503085",
+  "message": "Some refactoring and cleanup",
+  "when": "2013-07-14T20:00:49-04:00",
+  "who": "hiranya"
+}

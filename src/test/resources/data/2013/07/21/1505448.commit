@@ -1,0 +1,387 @@
+Index: java/modules/integration/src/test/resources/extras/synapse_sample_431_altered.xml
+===================================================================
+--- java/modules/integration/src/test/resources/extras/synapse_sample_431_altered.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/extras/synapse_sample_431_altered.xml	(revision 1505448)
+@@ -0,0 +1,44 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!--
++  ~  Licensed to the Apache Software Foundation (ASF) under one
++  ~  or more contributor license agreements.  See the NOTICE file
++  ~  distributed with this work for additional information
++  ~  regarding copyright ownership.  The ASF licenses this file
++  ~  to you under the Apache License, Version 2.0 (the
++  ~  "License"); you may not use this file except in compliance
++  ~  with the License.  You may obtain a copy of the License at
++  ~
++  ~   http://www.apache.org/licenses/LICENSE-2.0
++  ~
++  ~  Unless required by applicable law or agreed to in writing,
++  ~  software distributed under the License is distributed on an
++  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++  ~  KIND, either express or implied.  See the License for the
++  ~  specific language governing permissions and limitations
++  ~  under the License.
++  -->
++
++<!-- Callout  mediator Security Sample-->
++<definitions xmlns="http://ws.apache.org/ns/synapse">
++
++    <localEntry key="sec_policy" src="file:repository/conf/sample/resources/policy/policy_3.xml"/>
++
++    <sequence name="main">
++        <callout serviceURL="http://localhost:9000/services/SecureStockQuoteService"
++                 action="urn:getQuote">
++            <configuration axis2xml="modules/integration/target/test_repos/axis2Client/conf/axis2_def.xml" repository="modules/integration/target/test_repos/axis2Client"/>
++            <source xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
++                    xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
++                    xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
++            <target xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
++                    xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
++                    xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
++            <enableSec policy="sec_policy"/>
++        </callout>
++        <property name="RESPONSE" value="true"/>
++        <header name="To" action="remove"/>
++        <send/>
++        <drop/>
++    </sequence>
++
++</definitions>
+Index: java/modules/integration/src/test/resources/sample431.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample431.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample431.xml	(revision 1505448)
+@@ -0,0 +1,18 @@
++<synapseSample>
++    <sampleID>431</sampleID>
++    <sampleName>Callout Mediator with security</sampleName>
++    <synapseConfig>
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>modules/integration/src/test/resources/extras/synapse_sample_431_altered.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1505447)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1505448)
+@@ -220,6 +220,7 @@
+         sampleClassRepo.put("391", Sample391.class);
+         sampleClassRepo.put("420", Sample420.class);
+         //sampleClassRepo.put("430", Sample430.class);  // Problem with repo path
++        sampleClassRepo.put("431", Sample431.class);
+         sampleClassRepo.put("450", Sample450.class);
+         sampleClassRepo.put("451", Sample451.class);
+         sampleClassRepo.put("452", Sample452.class);
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample431.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample431.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/advanced/Sample431.java	(revision 1505448)
+@@ -0,0 +1,45 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++package org.apache.synapse.samples.framework.tests.advanced;
++
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.samples.framework.SampleClientResult;
++import org.apache.synapse.samples.framework.SynapseTestCase;
++import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
++
++public class Sample431 extends SynapseTestCase {
++
++    private static final Log log = LogFactory.getLog(Sample431.class);
++    SampleClientResult result;
++    StockQuoteSampleClient client;
++
++    public Sample431() {
++        super(431);
++        client = getStockQuoteClient();
++    }
++
++    public void testCallOutSecurity() {
++        log.info("Running test: Callout Mediator with security");
++        String trpUrl = "http://localhost:8280/";
++        result = client.requestStandardQuote(null, trpUrl, null, "IBM" ,null);
++        assertTrue("Client did not run successfully ", result.responseReceived());
++    }
++
++}
+Index: java/modules/core/src/test/java/org/apache/synapse/config/xml/CalloutMediatorSerializationTest.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/config/xml/CalloutMediatorSerializationTest.java	(revision 1505447)
++++ java/modules/core/src/test/java/org/apache/synapse/config/xml/CalloutMediatorSerializationTest.java	(revision 1505448)
+@@ -61,5 +61,19 @@
+         assertTrue(serialization(inputXml, calloutMediatorFactory, calloutMediatorSerializer));
+         assertTrue(serialization(inputXml, calloutMediatorSerializer));
+     }
++
++    public void testCalloutMediatorSerializationScenarioThree() {
++        String inputXml = "<callout xmlns=\"http://ws.apache.org/ns/synapse\" " +
++                "serviceURL=\"http://localhost:9000/soap/SimpleStockQuoteService\" " +
++                "action=\"urn:getQuote\"><source xmlns:s11=\"http://schemas.xmlsoap.org/" +
++                "soap/envelope/\" xmlns:s12=\"http://www.w3.org/2003/05/soap-envelope\" " +
++                "xpath=\"s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]\"/>" +
++                "<target xmlns:s11=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
++                "xmlns:s12=\"http://www.w3.org/2003/05/soap-envelope\" xpath=\"s11:Body/" +
++                "child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]\"/>" +
++                "<enableSec policy=\"sec_policy\"/></callout>";
++        assertTrue(serialization(inputXml, calloutMediatorFactory, calloutMediatorSerializer));
++        assertTrue(serialization(inputXml, calloutMediatorSerializer));
++    }
+ }
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/CalloutMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/CalloutMediator.java	(revision 1505447)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/CalloutMediator.java	(revision 1505448)
+@@ -48,6 +48,7 @@
+  *      <configuration [axis2xml="string"] [repository="string"]/>?
+  *      <source xpath="expression" | key="string"> <!-- key can be a MC property or entry key -->
+  *      <target xpath="expression" | key="string"/>
++ *      <enableSec policy="string"/>?
+  * </callout>
+  */
+ public class CalloutMediator extends AbstractMediator implements ManagedLifecycle {
+@@ -64,6 +65,8 @@
+     private boolean passHeaders = false;
+     public final static String DEFAULT_CLIENT_REPO = "./samples/axis2Client/client_repo";
+     public final static String DEFAULT_AXIS2_XML = "./samples/axis2Client/client_repo/conf/axis2.xml";
++    private boolean securityOn = false;  //Should messages be sent using WS-Security?
++    private String wsSecPolicyKey = null;
+ 
+     public boolean mediate(MessageContext synCtx) {
+ 
+@@ -80,6 +83,22 @@
+         try {
+             ServiceClient sc = new ServiceClient(configCtx, null);
+             Options options = new Options();
++
++            if (isSecurityOn()) {
++                if (synLog.isTraceOrDebugEnabled()) {
++                    synLog.traceOrDebug("Callout mediator: using security");
++                }
++                if (wsSecPolicyKey != null) {
++                    options.setProperty(
++                            SynapseConstants.RAMPART_POLICY,
++                            MessageHelper.getPolicy(synCtx, wsSecPolicyKey));
++                    sc.engageModule(SynapseConstants.SECURITY_MODULE_NAME);
++                } else {
++                    handleException("Security policy not found", synCtx);
++                }
++
++            }
++
+             options.setTo(new EndpointReference(serviceURL));
+ 
+             if (action != null) {
+@@ -146,7 +165,7 @@
+                         tgtNode.detach();
+                     } else {
+                         handleException("Evaluation of target XPath expression : " +
+-                            targetXPath.toString() + " did not yeild an OMNode", synCtx);
++                            targetXPath.toString() + " did not yield an OMNode", synCtx);
+                     }
+                 } if (targetKey != null) {
+                     synCtx.setProperty(targetKey, result);
+@@ -320,4 +339,40 @@
+     public void setPassHeaders(boolean passHeaders) {
+         this.passHeaders = passHeaders;
+     }
++
++    /**
++     * Is WS-Security turned on?
++     *
++     * @return true if on
++     */
++    public boolean isSecurityOn() {
++        return securityOn;
++    }
++
++    /**
++     * Request that WS-Sec be turned on/off
++     *
++     * @param securityOn a boolean flag indicating security is on or not
++     */
++    public void setSecurityOn(boolean securityOn) {
++        this.securityOn = securityOn;
++    }
++
++    /**
++     * Return the Rampart Security configuration policy's 'key' to be used
++     *
++     * @return the Rampart Security configuration policy's 'key' to be used
++     */
++    public String getWsSecPolicyKey() {
++        return wsSecPolicyKey;
++    }
++
++    /**
++     * Set the Rampart Security configuration policy's 'key' to be used
++     *
++     * @param wsSecPolicyKey the Rampart Security configuration policy's 'key' to be used
++     */
++    public void setWsSecPolicyKey(String wsSecPolicyKey) {
++        this.wsSecPolicyKey = wsSecPolicyKey;
++    }
+ }
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorFactory.java	(revision 1505447)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorFactory.java	(revision 1505448)
+@@ -38,6 +38,7 @@
+  *      &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
+  *      &lt;source xpath="expression" | key="string"&gt;
+  *      &lt;target xpath="expression" | key="string"/&gt;
++ *      &lt;enableSec policy="string" /&gt;?
+  * &lt;/callout&gt;
+  * </pre>
+  */
+@@ -56,6 +57,10 @@
+             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "source");
+     private static final QName Q_TARGET
+             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "target");
++    private static final QName Q_SEC
++                = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "enableSec");
++    private static final QName ATT_POLICY
++                = new QName(XMLConfigConstants.NULL_NAMESPACE, "policy");
+ 
+     public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+ 
+@@ -67,6 +72,7 @@
+         OMElement   configElt     = elem.getFirstChildWithName(Q_CONFIG);
+         OMElement   sourceElt     = elem.getFirstChildWithName(Q_SOURCE);
+         OMElement   targetElt     = elem.getFirstChildWithName(Q_TARGET);
++        OMElement wsSec = elem.getFirstChildWithName(Q_SEC);
+ 
+         if (attServiceURL != null) {
+             callout.setServiceURL(attServiceURL.getAttributeValue());
+@@ -145,6 +151,16 @@
+             handleException("The message 'target' must be specified for a Callout mediator");
+         }
+ 
++        if (wsSec != null) {
++            OMAttribute policyKey = wsSec.getAttribute(ATT_POLICY);
++            if (policyKey != null) {
++                callout.setSecurityOn(true);
++                callout.setWsSecPolicyKey(policyKey.getAttributeValue());
++            } else {
++                handleException("A policy key is required to enable security");
++            }
++        }
++
+         return callout;
+     }
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorSerializer.java	(revision 1505447)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/CalloutMediatorSerializer.java	(revision 1505448)
+@@ -29,6 +29,7 @@
+  *      &lt;configuration [axis2xml="string"] [repository="string"]/&gt;?
+  *      &lt;source xpath="expression" | key="string"&gt;
+  *      &lt;target xpath="expression" | key="string"/&gt;
++ *      &lt;enableSec policy="string"/&gt;?
+  * &lt;/callout&gt;
+  * </pre>
+  */
+@@ -38,6 +39,7 @@
+ 
+         if (!(m instanceof CalloutMediator)) {
+             handleException("Unsupported mediator passed in for serialization : " + m.getType());
++            return null;
+         }
+ 
+         CalloutMediator mediator = (CalloutMediator) m;
+@@ -82,6 +84,12 @@
+                 "key", nullNS, mediator.getTargetKey()));
+         }
+ 
++        if (mediator.isSecurityOn() && mediator.getWsSecPolicyKey() != null) {
++            OMElement security = fac.createOMElement("enableSec", synNS, callout);
++            security.addAttribute(fac.createOMAttribute(
++                    "policy", nullNS, mediator.getWsSecPolicyKey()));
++        }
++
+         return callout;
+     }
+ 
+Index: java/repository/conf/sample/synapse_sample_431.xml
+===================================================================
+--- java/repository/conf/sample/synapse_sample_431.xml	(nonexistent)
++++ java/repository/conf/sample/synapse_sample_431.xml	(revision 1505448)
+@@ -0,0 +1,43 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!--
++  ~  Licensed to the Apache Software Foundation (ASF) under one
++  ~  or more contributor license agreements.  See the NOTICE file
++  ~  distributed with this work for additional information
++  ~  regarding copyright ownership.  The ASF licenses this file
++  ~  to you under the Apache License, Version 2.0 (the
++  ~  "License"); you may not use this file except in compliance
++  ~  with the License.  You may obtain a copy of the License at
++  ~
++  ~   http://www.apache.org/licenses/LICENSE-2.0
++  ~
++  ~  Unless required by applicable law or agreed to in writing,
++  ~  software distributed under the License is distributed on an
++  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++  ~  KIND, either express or implied.  See the License for the
++  ~  specific language governing permissions and limitations
++  ~  under the License.
++  -->
++
++<!-- Callout  mediator Security Sample-->
++<definitions xmlns="http://ws.apache.org/ns/synapse">
++
++    <localEntry key="sec_policy" src="file:repository/conf/sample/resources/policy/policy_3.xml"/>
++
++    <sequence name="main">
++        <callout serviceURL="http://localhost:9000/services/SecureStockQuoteService"
++                 action="urn:getQuote">
++            <source xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
++                    xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
++                    xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
++            <target xmlns:s11="http://schemas.xmlsoap.org/soap/envelope/"
++                    xmlns:s12="http://www.w3.org/2003/05/soap-envelope"
++                    xpath="s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]"/>
++            <enableSec policy="sec_policy"/>
++        </callout>
++        <property name="RESPONSE" value="true"/>
++        <header name="To" action="remove"/>
++        <send/>
++        <drop/>
++    </sequence>
++
++</definitions>
+-*-*-*-
+Message: Applying patches for SYNAPSE-947 and SYNAPSE-948. WS-Security support for the callout mediator. Added an extra test case for the CalloutMediatorSerializationTest.
+-*-*-*-
+When: 2013-07-21 15:13:11 -0400 
+-*-*-*-
+Who: hiranya

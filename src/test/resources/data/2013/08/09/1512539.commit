@@ -1,0 +1,21 @@
+Index: java/repository/conf/sample/synapse_sample_270.xml
+===================================================================
+Cannot display: file marked as a binary type.
+svn:mime-type = application/xml
+Index: java/repository/conf/sample/synapse_sample_270.xml
+===================================================================
+--- java/repository/conf/sample/synapse_sample_270.xml	(nonexistent)
++++ java/repository/conf/sample/synapse_sample_270.xml	(revision 1512539)
+
+Property changes on: java/repository/conf/sample/synapse_sample_270.xml
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++application/xml
+\ No newline at end of property
+-*-*-*-
+Message: added a sftp example.
+-*-*-*-
+When: 2013-08-09 20:18:16 -0400 
+-*-*-*-
+Who: rajikak

@@ -1,0 +1,43 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         </java>\n",
+            "     </target>\n",
+            " \n",
+            "-    <target name=\"rabbitmqclient\" depends=\"compile\">\n",
+            "+    <target name=\"rabbitmqclient\" depends=\"init\">\n",
+            "+        <javac srcdir=\"src\" destdir=\"${class.dir}\" includes=\"**/RabbitMQAMQPClient.java\">\n",
+            "+            <classpath refid=\"javac.classpath\"/>\n",
+            "+        </javac>\n",
+            "         <java classname=\"samples.userguide.RabbitMQAMQPClient\"\n",
+            "               classpathref=\"javac.classpath\" fork=\"true\">\n",
+            "             <sysproperty key=\"amqpmode\"    value=\"${amqpmode}\"/>\n"
+          ],
+          "locn": "-256,7 +256,10"
+        },
+        {
+          "lines": [
+            "     </target>\n",
+            " \n",
+            "     <target name=\"compile\" depends=\"init\" description=\"Compile all Java\">\n",
+            "-        <javac srcdir=\"src\" destdir=\"${class.dir}\">\n",
+            "+        <javac srcdir=\"src\" destdir=\"${class.dir}\" excludes=\"**/RabbitMQAMQPClient.java\">\n",
+            "             <classpath refid=\"javac.classpath\"/>\n",
+            "         </javac>\n",
+            "     </target>\n"
+          ],
+          "locn": "-389,7 +392,7"
+        }
+      ],
+      "from": "java/modules/samples/src/main/scripts/axis2Client/build.xml",
+      "to": "java/modules/samples/src/main/scripts/axis2Client/build.xml"
+    }
+  ],
+  "id": "1512995",
+  "message": "fixed the rabbitmq client target.",
+  "when": "2013-08-11T15:43:13-04:00",
+  "who": "rajikak"
+}

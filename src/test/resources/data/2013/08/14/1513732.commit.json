@@ -1,0 +1,105 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            " import org.apache.axiom.om.*;\n",
+            " import org.apache.axiom.om.xpath.AXIOMXPath;\n",
+            "+import org.apache.commons.io.FileUtils;\n",
+            " import org.apache.commons.io.output.NullOutputStream;\n",
+            " import org.apache.synapse.config.Entry;\n",
+            " import org.apache.synapse.registry.Registry;\n"
+          ],
+          "locn": "-23,6 +23,7"
+        },
+        {
+          "lines": [
+            "         Registry reg = new SimpleURLRegistry();\n",
+            "         Properties props = new Properties();\n",
+            "         props.put(\"root\", \"file:./\");\n",
+            "-        props.put(\"cachableDuration\", \"1500\");\n",
+            "+        props.put(\"cachableDuration\", \"3000\");\n",
+            "         reg.init(props);\n",
+            "         Entry prop = new Entry();\n",
+            "         prop.setType(Entry.REMOTE_ENTRY);\n"
+          ],
+          "locn": "-60,7 +61,7"
+        },
+        {
+          "lines": [
+            "         Thread.sleep(1000);\n",
+            "         XMLAssert.assertXMLEqual(TEXT_1, reg.getResource(prop, new Properties()).toString());\n",
+            " \n",
+            "-        // sleep another 1 sec, has expired in cache, but content hasnt changed\n",
+            "-        Thread.sleep(1000);\n",
+            "+        // sleep another 5 seconds, has expired in cache, but content hasn't changed\n",
+            "+        Thread.sleep(5000);\n",
+            "         XMLAssert.assertXMLEqual(TEXT_1, reg.getResource(prop, new Properties()).toString());\n",
+            " \n",
+            "-        // the renewed cache should be valid for another 1.5 secs\n",
+            "+        // the renewed cache should be valid for another 5 secs\n",
+            "         // change the file now and change next cache duration\n",
+            "         writeToFile(TEXT_2);\n",
+            "         props.put(\"cachableDuration\", \"100\");\n"
+          ],
+          "locn": "-73,11 +74,11"
+        },
+        {
+          "lines": [
+            "         Thread.sleep(800);\n",
+            "         XMLAssert.assertXMLEqual(TEXT_1, reg.getResource(prop, new Properties()).toString());\n",
+            " \n",
+            "-        // sleep another 1 sec.. cache should expire and new content should be loaded\n",
+            "-        Thread.sleep(1000);\n",
+            "+        // sleep another 5 sec.. cache should expire and new content should be loaded\n",
+            "+        Thread.sleep(5000);\n",
+            "         XMLAssert.assertXMLEqual(TEXT_2, reg.getResource(prop, new Properties()).toString());\n",
+            " \n",
+            "         // change content back to original\n",
+            "         writeToFile(TEXT_1);\n",
+            " \n",
+            "-        // sleep for .5 sec, now the new content should be loaded as new expiry time\n",
+            "-        // is .1 sec\n",
+            "-        Thread.sleep(500);\n",
+            "+        // sleep for 2 seconds, now the new content should be loaded as new expiry time\n",
+            "+        // is 0.1 sec\n",
+            "+        Thread.sleep(2000);\n",
+            "         XMLAssert.assertXMLEqual(TEXT_1, reg.getResource(prop, new Properties()).toString());\n",
+            "     }\n",
+            "     \n"
+          ],
+          "locn": "-89,16 +90,16"
+        },
+        {
+          "lines": [
+            "     }\n",
+            " \n",
+            "     public void tearDown() throws Exception {\n",
+            "-        new File(FILE).delete();\n",
+            "-        new File(FILE2).delete();\n",
+            "+        FileUtils.deleteQuietly(new File(FILE));\n",
+            "+        FileUtils.deleteQuietly(new File(FILE2));\n",
+            "     }\n",
+            " \n",
+            "     private void writeToFile(String content) throws Exception {\n",
+            "         BufferedWriter out = new BufferedWriter(new FileWriter(new File(FILE)));\n",
+            "         out.write(content);\n",
+            "+        out.flush();\n",
+            "         out.close();\n",
+            "     }\n",
+            " }\n"
+          ],
+          "locn": "-130,13 +131,14"
+        }
+      ],
+      "from": "java/modules/core/src/test/java/org/apache/synapse/registry/url/SimpleURLRegistryTest.java",
+      "to": "java/modules/core/src/test/java/org/apache/synapse/registry/url/SimpleURLRegistryTest.java"
+    }
+  ],
+  "id": "1513732",
+  "message": "Slightly changed the timing of the SimpleURLRegistryTest to avoid failure due to clock issues. Improved the file write method in the test case to flush the stream before closing.",
+  "when": "2013-08-14T01:54:31-04:00",
+  "who": "hiranya"
+}

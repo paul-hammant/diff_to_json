@@ -1,0 +1,464 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         sampleClassRepo.put(\"155\", Sample155.class);\n",
+            "         sampleClassRepo.put(\"156\", Sample156.class);\n",
+            "         sampleClassRepo.put(\"157\", Sample157.class);\n",
+            "-\n",
+            "+        sampleClassRepo.put(\"161\", Sample161.class);\n",
+            "         //Transport switching\n",
+            "         sampleClassRepo.put(\"250\", Sample250.class);\n",
+            "         sampleClassRepo.put(\"251\", Sample251.class);\n"
+          ],
+          "locn": "-207,7 +207,7"
+        },
+        {
+          "lines": [
+            " \n",
+            "         sampleClassRepo.put(\"10101\", Sample10101.class);\n",
+            "     }\n",
+            "-}\n",
+            "\\ No newline at end of file\n",
+            "+}\n"
+          ],
+          "locn": "-250,4 +250,4"
+        }
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "+/*\n",
+            "+ *  Licensed to the Apache Software Foundation (ASF) under one\n",
+            "+ *  or more contributor license agreements.  See the NOTICE file\n",
+            "+ *  distributed with this work for additional information\n",
+            "+ *  regarding copyright ownership.  The ASF licenses this file\n",
+            "+ *  to you under the Apache License, Version 2.0 (the\n",
+            "+ *  \"License\"); you may not use this file except in compliance\n",
+            "+ *  with the License.  You may obtain a copy of the License at\n",
+            "+ *\n",
+            "+ *   http://www.apache.org/licenses/LICENSE-2.0\n",
+            "+ *\n",
+            "+ *  Unless required by applicable law or agreed to in writing,\n",
+            "+ *  software distributed under the License is distributed on an\n",
+            "+ *   * \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n",
+            "+ *  KIND, either express or implied.  See the License for the\n",
+            "+ *  specific language governing permissions and limitations\n",
+            "+ *  under the License.\n",
+            "+ */\n",
+            "+\n",
+            "+package org.apache.synapse.samples.framework.tests.proxy;\n",
+            "+\n",
+            "+import org.apache.http.HttpStatus;\n",
+            "+import org.apache.synapse.samples.framework.SynapseTestCase;\n",
+            "+import org.apache.synapse.samples.framework.clients.BasicHttpClient;\n",
+            "+import org.apache.synapse.samples.framework.clients.HttpResponse;\n",
+            "+\n",
+            "+public class Sample161 extends SynapseTestCase {\n",
+            "+    private String requestXml = \"<test>foo</test>\";\n",
+            "+\n",
+            "+    public Sample161() {\n",
+            "+        super(161);\n",
+            "+    }\n",
+            "+\n",
+            "+    public void testRespondMediator() throws Exception {\n",
+            "+\n",
+            "+        String url = \"http://localhost:8280/services/EchoService\";\n",
+            "+        BasicHttpClient client = new BasicHttpClient();\n",
+            "+        HttpResponse response = client.doPost(url, requestXml.getBytes(), \"application/xml\");\n",
+            "+        assertEquals(HttpStatus.SC_OK, response.getStatus());\n",
+            "+        assertEquals(\"Request and Echo Service Response is not equal\", requestXml, response.getBodyAsString());\n",
+            "+\n",
+            "+    }\n",
+            "+\n",
+            "+}\n"
+          ],
+          "locn": "-0,0 +1,44"
+        }
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample161.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample161.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "+<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+            "+<!--\n",
+            "+  ~  Licensed to the Apache Software Foundation (ASF) under one\n",
+            "+  ~  or more contributor license agreements.  See the NOTICE file\n",
+            "+  ~  distributed with this work for additional information\n",
+            "+  ~  regarding copyright ownership.  The ASF licenses this file\n",
+            "+  ~  to you under the Apache License, Version 2.0 (the\n",
+            "+  ~  \"License\"); you may not use this file except in compliance\n",
+            "+  ~  with the License.  You may obtain a copy of the License at\n",
+            "+  ~\n",
+            "+  ~   http://www.apache.org/licenses/LICENSE-2.0\n",
+            "+  ~\n",
+            "+  ~  Unless required by applicable law or agreed to in writing,\n",
+            "+  ~  software distributed under the License is distributed on an\n",
+            "+  ~   * \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n",
+            "+  ~  KIND, either express or implied.  See the License for the\n",
+            "+  ~  specific language governing permissions and limitations\n",
+            "+  ~  under the License.\n",
+            "+  -->\n",
+            "+\n",
+            "+<!-- Repond Mediator with proxy services -->\n",
+            "+<definitions xmlns=\"http://ws.apache.org/ns/synapse\">\n",
+            "+    <proxy name=\"EchoService\">\n",
+            "+        <target>\n",
+            "+            <inSequence>\n",
+            "+                <respond/>\n",
+            "+            </inSequence>\n",
+            "+        </target>\n",
+            "+    </proxy>\n",
+            "+</definitions>\n"
+          ],
+          "locn": "-0,0 +1,30"
+        }
+      ],
+      "from": "java/modules/integration/src/test/resources/extras/synapse_sample_161.xml",
+      "to": "java/modules/integration/src/test/resources/extras/synapse_sample_161.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "+<synapseSample>\n",
+            "+    <sampleID>161</sampleID>\n",
+            "+    <sampleName>Proxy with respond mediator</sampleName>\n",
+            "+    <synapseConfig>\n",
+            "+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>\n",
+            "+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>\n",
+            "+        <synapseXml>modules/integration/src/test/resources/extras/synapse_sample_161.xml</synapseXml>\n",
+            "+    </synapseConfig>\n",
+            "+    <backEndServerConfig>\n",
+            "+        <axis2Server id='0'>\n",
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n",
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n",
+            "+        </axis2Server>\n",
+            "+    </backEndServerConfig>\n",
+            "+    <clientConfig>\n",
+            "+\t<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>\n",
+            "+    </clientConfig>\n",
+            "+</synapseSample>\n"
+          ],
+          "locn": "-0,0 +1,18"
+        }
+      ],
+      "from": "java/modules/integration/src/test/resources/sample161.xml",
+      "to": "java/modules/integration/src/test/resources/sample161.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "+/*\n",
+            "+ *  Licensed to the Apache Software Foundation (ASF) under one\n",
+            "+ *  or more contributor license agreements.  See the NOTICE file\n",
+            "+ *  distributed with this work for additional information\n",
+            "+ *  regarding copyright ownership.  The ASF licenses this file\n",
+            "+ *  to you under the Apache License, Version 2.0 (the\n",
+            "+ *  \"License\"); you may not use this file except in compliance\n",
+            "+ *  with the License.  You may obtain a copy of the License at\n",
+            "+ *\n",
+            "+ *   http://www.apache.org/licenses/LICENSE-2.0\n",
+            "+ *\n",
+            "+ *  Unless required by applicable law or agreed to in writing,\n",
+            "+ *  software distributed under the License is distributed on an\n",
+            "+ *   * \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n",
+            "+ *  KIND, either express or implied.  See the License for the\n",
+            "+ *  specific language governing permissions and limitations\n",
+            "+ *  under the License.\n",
+            "+ */\n",
+            "+\n",
+            "+package org.apache.synapse.config.xml;\n",
+            "+\n",
+            "+public class RespondMediatorSerializationTest extends AbstractTestCase {\n",
+            "+\n",
+            "+    RespondMediatorFactory respondMediatorFactory;\n",
+            "+    RespondMediatorSerializer respondMediatorSerializer;\n",
+            "+\n",
+            "+    public RespondMediatorSerializationTest() {\n",
+            "+        super(RespondMediatorSerializationTest.class.getName());\n",
+            "+        respondMediatorFactory = new RespondMediatorFactory();\n",
+            "+        respondMediatorSerializer = new RespondMediatorSerializer();\n",
+            "+    }\n",
+            "+\n",
+            "+    public void testRespondMediatorSerializationSenarioOne() throws Exception {\n",
+            "+        String inputXml = \"<respond xmlns=\\\"http://ws.apache.org/ns/synapse\\\" />\";\n",
+            "+        assertTrue(serialization(inputXml, respondMediatorFactory, respondMediatorSerializer));\n",
+            "+        assertTrue(serialization(inputXml, respondMediatorSerializer));\n",
+            "+    }\n",
+            "+}\n"
+          ],
+          "locn": "-0,0 +1,38"
+        }
+      ],
+      "from": "java/modules/core/src/test/java/org/apache/synapse/config/xml/RespondMediatorSerializationTest.java",
+      "to": "java/modules/core/src/test/java/org/apache/synapse/config/xml/RespondMediatorSerializationTest.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         InvokeMediatorFactory.class,\n",
+            "         PayloadFactoryMediatorFactory.class,\n",
+            "         BeanMediatorFactory.class,\n",
+            "-        EJBMediatorFactory.class\n",
+            "+        EJBMediatorFactory.class,\n",
+            "+        RespondMediatorFactory.class\n",
+            "     };\n",
+            " \n",
+            "     private final static MediatorFactoryFinder instance  = new MediatorFactoryFinder();\n"
+          ],
+          "locn": "-84,7 +84,8"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "+/*\n",
+            "+ *  Licensed to the Apache Software Foundation (ASF) under one\n",
+            "+ *  or more contributor license agreements.  See the NOTICE file\n",
+            "+ *  distributed with this work for additional information\n",
+            "+ *  regarding copyright ownership.  The ASF licenses this file\n",
+            "+ *  to you under the Apache License, Version 2.0 (the\n",
+            "+ *  \"License\"); you may not use this file except in compliance\n",
+            "+ *  with the License.  You may obtain a copy of the License at\n",
+            "+ *\n",
+            "+ *   http://www.apache.org/licenses/LICENSE-2.0\n",
+            "+ *\n",
+            "+ *  Unless required by applicable law or agreed to in writing,\n",
+            "+ *  software distributed under the License is distributed on an\n",
+            "+ *   * \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n",
+            "+ *  KIND, either express or implied.  See the License for the\n",
+            "+ *  specific language governing permissions and limitations\n",
+            "+ *  under the License.\n",
+            "+ */\n",
+            "+\n",
+            "+package org.apache.synapse.config.xml;\n",
+            "+\n",
+            "+import org.apache.axiom.om.OMElement;\n",
+            "+import org.apache.synapse.Mediator;\n",
+            "+import org.apache.synapse.mediators.builtin.RespondMediator;\n",
+            "+\n",
+            "+/**\n",
+            "+ * Serializer for {@link RespondMediator} instances.\n",
+            "+ *\n",
+            "+ * @see RespondMediator\n",
+            "+ */\n",
+            "+public class RespondMediatorSerializer extends AbstractMediatorSerializer{\n",
+            "+\n",
+            "+    public OMElement serializeSpecificMediator(Mediator m) {\n",
+            "+        if (!(m instanceof RespondMediator)) {\n",
+            "+            handleException(\"Unsupported mediator passed in for serialization : \" + m.getType());\n",
+            "+        }\n",
+            "+        RespondMediator mediator = (RespondMediator) m;\n",
+            "+        OMElement respond = fac.createOMElement(\"respond\", synNS);\n",
+            "+        saveTracingState(respond, mediator);\n",
+            "+        return respond;\n",
+            "+    }\n",
+            "+\n",
+            "+    public String getMediatorClassName() {\n",
+            "+        return RespondMediator.class.getName();\n",
+            "+    }\n",
+            "+}\n",
+            "\\ No newline at end of file\n"
+          ],
+          "locn": "-0,0 +1,46"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/RespondMediatorSerializer.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/RespondMediatorSerializer.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.synapse.SynapseException;\n",
+            " import org.apache.synapse.Mediator;\n",
+            " import org.apache.synapse.config.xml.eventing.EventPublisherMediatorSerializer;\n",
+            "+import org.apache.synapse.mediators.builtin.RespondMediator;\n",
+            " import sun.misc.Service;\n",
+            " \n",
+            " import java.util.HashMap;\n"
+          ],
+          "locn": "-24,6 +24,7"
+        },
+        {
+          "lines": [
+            "         URLRewriteMediatorSerializer.class,\n",
+            "         PayloadFactoryMediatorSerializer.class,\n",
+            "         BeanMediatorSerializer.class,\n",
+            "-        EJBMediatorSerializer.class\n",
+            "+        EJBMediatorSerializer.class,\n",
+            "+        RespondMediatorSerializer.class\n",
+            "     };\n",
+            " \n",
+            "     private final static MediatorSerializerFinder instance = new MediatorSerializerFinder();\n"
+          ],
+          "locn": "-70,7 +71,8"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "+/*\n",
+            "+ *  Licensed to the Apache Software Foundation (ASF) under one\n",
+            "+ *  or more contributor license agreements.  See the NOTICE file\n",
+            "+ *  distributed with this work for additional information\n",
+            "+ *  regarding copyright ownership.  The ASF licenses this file\n",
+            "+ *  to you under the Apache License, Version 2.0 (the\n",
+            "+ *  \"License\"); you may not use this file except in compliance\n",
+            "+ *  with the License.  You may obtain a copy of the License at\n",
+            "+ *\n",
+            "+ *   http://www.apache.org/licenses/LICENSE-2.0\n",
+            "+ *\n",
+            "+ *  Unless required by applicable law or agreed to in writing,\n",
+            "+ *  software distributed under the License is distributed on an\n",
+            "+ *   * \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n",
+            "+ *  KIND, either express or implied.  See the License for the\n",
+            "+ *  specific language governing permissions and limitations\n",
+            "+ *  under the License.\n",
+            "+ */\n",
+            "+\n",
+            "+package org.apache.synapse.config.xml;\n",
+            "+\n",
+            "+import org.apache.axiom.om.OMElement;\n",
+            "+import org.apache.synapse.Mediator;\n",
+            "+import org.apache.synapse.mediators.builtin.RespondMediator;\n",
+            "+\n",
+            "+import javax.xml.namespace.QName;\n",
+            "+import java.util.Properties;\n",
+            "+\n",
+            "+/**\n",
+            "+ * Factory for {@link RespondMediator} instances.\n",
+            "+ * <p/>\n",
+            "+ * Configuration syntax:\n",
+            "+ * <pre>\n",
+            "+ * &lt;respond/&gt;\n",
+            "+ * </pre>\n",
+            "+ */\n",
+            "+public class RespondMediatorFactory extends AbstractMediatorFactory {\n",
+            "+    private static final QName Respond_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, \"respond\");\n",
+            "+\n",
+            "+    @Override\n",
+            "+    protected Mediator createSpecificMediator(OMElement omElement, Properties properties) {\n",
+            "+        Mediator responseMediator = new RespondMediator();\n",
+            "+        processAuditStatus(responseMediator, omElement);\n",
+            "+        return responseMediator;\n",
+            "+    }\n",
+            "+\n",
+            "+    public QName getTagQName() {\n",
+            "+        return Respond_Q;\n",
+            "+    }\n",
+            "+}\n"
+          ],
+          "locn": "-0,0 +1,50"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/RespondMediatorFactory.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/RespondMediatorFactory.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "+/*\n",
+            "+ *  Licensed to the Apache Software Foundation (ASF) under one\n",
+            "+ *  or more contributor license agreements.  See the NOTICE file\n",
+            "+ *  distributed with this work for additional information\n",
+            "+ *  regarding copyright ownership.  The ASF licenses this file\n",
+            "+ *  to you under the Apache License, Version 2.0 (the\n",
+            "+ *  \"License\"); you may not use this file except in compliance\n",
+            "+ *  with the License.  You may obtain a copy of the License at\n",
+            "+ *\n",
+            "+ *   http://www.apache.org/licenses/LICENSE-2.0\n",
+            "+ *\n",
+            "+ *  Unless required by applicable law or agreed to in writing,\n",
+            "+ *  software distributed under the License is distributed on an\n",
+            "+ *   * \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n",
+            "+ *  KIND, either express or implied.  See the License for the\n",
+            "+ *  specific language governing permissions and limitations\n",
+            "+ *  under the License.\n",
+            "+ */\n",
+            "+\n",
+            "+package org.apache.synapse.mediators.builtin;\n",
+            "+\n",
+            "+import org.apache.synapse.MessageContext;\n",
+            "+import org.apache.synapse.SynapseLog;\n",
+            "+import org.apache.synapse.core.axis2.Axis2Sender;\n",
+            "+import org.apache.synapse.mediators.AbstractMediator;\n",
+            "+\n",
+            "+/**\n",
+            "+ * Halts further processing/mediation of the current message and return the current message back to client\n",
+            "+ * This Mediator reduce the number of configuration element need to build an echo service from ESB.\n",
+            "+ */\n",
+            "+public class RespondMediator extends AbstractMediator {\n",
+            "+\n",
+            "+    /**\n",
+            "+     * Halts further processing/mediation of the current message and return the current message back to client.\n",
+            "+     *\n",
+            "+     * @param synCtx the current message for mediation\n",
+            "+     * @return false\n",
+            "+     */\n",
+            "+    public boolean mediate(MessageContext synCtx) {\n",
+            "+        SynapseLog synapseLog = getLog(synCtx);\n",
+            "+\n",
+            "+        boolean isTraceOrDebugEnabled = synapseLog.isTraceOrDebugEnabled();\n",
+            "+        if (isTraceOrDebugEnabled) {\n",
+            "+            synapseLog.traceOrDebug(\"Start : Respond mediator\");\n",
+            "+\n",
+            "+            if (synapseLog.isTraceTraceEnabled()) {\n",
+            "+                synapseLog.traceOrDebug(\"Message : \" + synCtx.getEnvelope());\n",
+            "+            }\n",
+            "+        }\n",
+            "+\n",
+            "+        synCtx.setTo(null);\n",
+            "+        synCtx.setResponse(true);\n",
+            "+        Axis2Sender.sendBack(synCtx);\n",
+            "+\n",
+            "+        if (isTraceOrDebugEnabled) {\n",
+            "+            synapseLog.traceOrDebug(\"End : Respond Mediator\");\n",
+            "+        }\n",
+            "+        return false;\n",
+            "+    }\n",
+            "+\n",
+            "+    /**\n",
+            "+     * Since this Mediator does not touch the content of the message Content Aware property is set into False.\n",
+            "+     *\n",
+            "+     * @return false\n",
+            "+     */\n",
+            "+    @Override\n",
+            "+    public boolean isContentAware() {\n",
+            "+        return false;\n",
+            "+    }\n",
+            "+}\n"
+          ],
+          "locn": "-0,0 +1,70"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/RespondMediator.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/RespondMediator.java"
+    }
+  ],
+  "id": "1746312",
+  "message": "applying patch to include Respond Mediator improvement SYNAPSE-997 together with integration test provided through SYNAPSE-1031",
+  "when": "2016-05-31T14:27:38-04:00",
+  "who": "isudana"
+}

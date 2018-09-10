@@ -1,0 +1,18 @@
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1302324)
++++ java/pom.xml	(revision 1302325)
+@@ -1056,6 +1056,7 @@
+         <module>modules/packaging/package-skeleton</module>
+         <module>modules/packaging/package-archetype</module>
+         <module>modules/integration</module>
++	<module>modules/documentation</module>
+     </modules>
+ 
+     <properties>
+-*-*-*-
+Message: Adding documentation module to the build
+-*-*-*-
+When: 2012-03-19 04:48:38 -0400 
+-*-*-*-
+Who: hiranya

@@ -1,0 +1,27 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "              maven-antrun-plugin. -->\n",
+            "         <java.version>1.6</java.version>\n",
+            " \n",
+            "-        <synapse.version>3.0.1-SNAPSHOT</synapse.version>\n",
+            "+\t<synapse.version>${project.version}</synapse.version>\n",
+            " \n",
+            "         <!-- Apache Commons -->\n",
+            "         <commons.dbcp.version>1.3</commons.dbcp.version> <!-- We need this version to support JDK 5 -->\n"
+          ],
+          "locn": "-1048,7 +1048,7"
+        }
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    }
+  ],
+  "id": "1776553",
+  "message": "Using project.version instead of manually entering synapse version, this causes release time headaches having to manually change things",
+  "when": "2016-12-30T08:04:19-05:00",
+  "who": "ravi"
+}

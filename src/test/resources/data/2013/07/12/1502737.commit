@@ -1,0 +1,1505 @@
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ErrorCodes.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ErrorCodes.java	(revision 1502736)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ErrorCodes.java	(revision 1502737)
+@@ -22,6 +22,7 @@
+  * Error codes exposed by this transport. 
+  */
+ public class ErrorCodes {
++
+     public static final int SND_IO_ERROR       = 101500;
+ 
+     public static final int SND_HTTP_ERROR     = 102510;
+@@ -38,5 +39,6 @@
+ 
+     public static final int CONNECT_CANCEL     = 101507;
+ 
+-    public static final int CONNECT_TIMEOUT    = 101508;    
++    public static final int CONNECT_TIMEOUT    = 101508;
++
+ }
+\ No newline at end of file
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java	(revision 1502736)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java	(revision 1502737)
+@@ -277,7 +277,6 @@
+         }
+     }
+ 
+-
+ 	private void sendRequestContent(final MessageContext msgContext) throws AxisFault {
+ 		if (Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {
+ 			synchronized (msgContext) {
+@@ -308,10 +307,10 @@
+ 					formatter.writeTo(msgContext, format, _out, false);
+ 					try {
+ 	                    IOUtils.write(_out.toByteArray(),out);
+-	                    msgContext.setProperty(PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH,new Long(_out.toByteArray().length));
++	                    msgContext.setProperty(PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH,
++                                _out.toByteArray().length);
+                     } catch (IOException e) {
+-	                    // TODO Auto-generated catch block
+-                    	 handleException("IO while building message", e);
++                    	 handleException("IO error while building message", e);
+                     }
+                 	pipe.setSerializationComplete(true);
+ 				}else {
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetContext.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetContext.java	(revision 1502736)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetContext.java	(revision 1502737)
+@@ -30,19 +30,26 @@
+  * It is used as a holder for information required during the life-cycle of this connection.
+  */
+ public class TargetContext {
++
+     private TargetConfiguration targetConfiguration = null;
+ 
+     public static final String CONNECTION_INFORMATION = "CONNECTION_INFORMATION";
++
+     /** The request for this connection */
+     private TargetRequest request;
++
+     /** The response for this connection */
+     private TargetResponse response;
++
+     /** State of the connection */
+     private ProtocolState state;
++
+     /** The request message context */
+     private MessageContext requestMsgCtx;
++
+     /** The current reader */
+     private Pipe reader;
++
+     /** The current writer */
+     private Pipe writer;
+ 
+@@ -133,14 +140,6 @@
+         }
+     }
+ 
+-    public static boolean assertState(NHttpConnection conn, ProtocolState state) {
+-        TargetContext info = (TargetContext)
+-                conn.getContext().getAttribute(CONNECTION_INFORMATION);
+-
+-        return info != null && info.getState() == state;
+-
+-    }
+-
+     public static ProtocolState getState(NHttpConnection conn) {
+         TargetContext info = (TargetContext)
+                 conn.getContext().getAttribute(CONNECTION_INFORMATION);
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetRequest.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetRequest.java	(revision 1502736)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetRequest.java	(revision 1502737)
+@@ -21,7 +21,6 @@
+ package org.apache.synapse.transport.passthru;
+ 
+ import org.apache.axiom.om.OMOutputFormat;
+-import org.apache.axis2.AxisFault;
+ import org.apache.axis2.context.MessageContext;
+ import org.apache.axis2.transport.MessageFormatter;
+ import org.apache.axis2.transport.http.HTTPConstants;
+@@ -56,28 +55,39 @@
+  * This is a class for representing a request to be sent to a target.
+  */
+ public class TargetRequest {
++
+     /** Configuration of the sender */
+     private TargetConfiguration targetConfiguration;
+ 
+     private Pipe pipe = null;
++
+     /** Headers map */
+     private Map<String, String> headers = new HashMap<String, String>();
++
+     /** URL */
+     private URL url;
++
+     /** HTTP Method */
+     private String method;
++
+     /** HTTP request created for sending the message */
+     private HttpRequest request = null;
+-    /** Weather chunk encoding should be used */
++
++    /** Whether chunk encoding should be used */
+     private boolean chunk = true;
++
+     /** HTTP version that should be used */
+     private ProtocolVersion version = null;
++
+     /** Weather full url is used for the request */
+     private boolean fullUrl = false;
++
+     /** Port to be used for the request */
+     private int port = 80;
++
+     /** Weather this request has a body */
+     private boolean hasEntityBody = true;
++
+     /** Keep alive request */
+     private boolean keepAlive = true;
+     
+@@ -123,12 +133,12 @@
+         }
+         
+         MessageContext requestMsgCtx = TargetContext.get(conn).getRequestMsgCtx();
+-        
+-        if(requestMsgCtx.getProperty(PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH) != null){
+-        	contentLength = (Long)requestMsgCtx.getProperty(PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH);
++        Long lengthValue = (Long) requestMsgCtx.getProperty(
++                PassThroughConstants.PASS_THROUGH_MESSAGE_LENGTH);
++        if (lengthValue != null){
++        	contentLength = lengthValue;
+         }
+-        
+-       
++
+         //fix for  POST_TO_URI
+         if (requestMsgCtx.isPropertyTrue(NhttpConstants.POST_TO_URI)){
+         	path = url.toString();
+@@ -233,19 +243,20 @@
+     }
+ 
+ 	/**
+-	 * Handles the chuking messages in Passthough context, create a temporary buffer and calculate the message
+-	 * size before writing to the external buffer, which is required the context of handling DISABLED chunking 
+-	 * messages
++	 * Handles the chunking messages in PassThough context, create a temporary buffer and
++     * calculate the message size before writing to the external buffer, which is required the
++     * context of handling DISABLED chunking messages.
+ 	 * 
+-	 * @param conn
+-	 * @param requestMsgCtx
++	 * @param conn Client HTTP connection
++	 * @param requestMsgCtx Current request message context
+ 
+ 	 * @throws IOException
+-	 * @throws AxisFault
+ 	 */
+-	private void processChunking(NHttpClientConnection conn, MessageContext requestMsgCtx) throws IOException,
+-	                                                                                                        AxisFault {
+-		String disableChunking = (String) requestMsgCtx.getProperty(PassThroughConstants.DISABLE_CHUNKING);
++	private void processChunking(NHttpClientConnection conn,
++                                 MessageContext requestMsgCtx) throws IOException {
++
++		String disableChunking = (String) requestMsgCtx.getProperty(
++                PassThroughConstants.DISABLE_CHUNKING);
+ 		String forceHttp10 = (String) requestMsgCtx.getProperty(PassThroughConstants.FORCE_HTTP_1_0);
+ 	    if ("true".equals(disableChunking) || "true".equals(forceHttp10)) {
+ 	    	if (requestMsgCtx.getEnvelope().getBody().getFirstElement() == null) {
+@@ -265,7 +276,7 @@
+ 							OutputStream _out = pipe.getOutputStream();
+ 							IOUtils.write(out.toByteArray(), _out);
+ 						
+-							entity.setContentLength(new Long(out.toByteArray().length));
++							entity.setContentLength(out.toByteArray().length);
+ 							entity.setChunked(false);
+ 						}
+ 					}
+@@ -307,11 +318,6 @@
+     public boolean hasEntityBody() {
+         return hasEntityBody;
+     }
+-    
+-    
+-    public void setHasEntityBody(boolean hasEntityBody) {
+-		this.hasEntityBody = hasEntityBody;
+-	}
+ 
+ 	public void addHeader(String name, String value) {
+         headers.put(name, value);
+@@ -344,6 +350,5 @@
+ 	public HttpRequest getRequest() {
+ 		return request;
+ 	}
+-    
+-    
++
+ }
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/DeliveryAgent.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/DeliveryAgent.java	(revision 1502736)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/DeliveryAgent.java	(revision 1502737)
+@@ -63,9 +63,6 @@
+     /** Configuration of the sender */
+     private TargetConfiguration targetConfiguration;
+ 
+-    /** The maximum number of messages that can wait for a connection */
+-    private int maxWaitingMessages = Integer.MAX_VALUE;
+-
+     private TargetErrorHandler targetErrorHandler;
+ 
+     /** Lock for synchronizing access */
+@@ -121,9 +118,8 @@
+                     queue = new ConcurrentLinkedQueue<MessageContext>();
+                     waitingMessages.put(key, queue);
+                 }
+-                if (queue.size() == maxWaitingMessages) {
++                if (queue.size() == Integer.MAX_VALUE) {
+                     MessageContext msgCtx = queue.poll();
+-
+                     targetErrorHandler.handleError(msgCtx,
+                             ErrorCodes.CONNECTION_TIMEOUT,
+                             "Error connecting to the back end",
+@@ -160,11 +156,12 @@
+             MessageContext msgCtx = queue.poll();
+ 
+             if (msgCtx != null) {
+-                targetErrorHandler.handleError(msgCtx,
+-                        errorCode,
+-                        "Error connecting to the back end",
+-                        null,
+-                        ProtocolState.REQUEST_READY);
++                String errorMessage = "Error while connecting to the endpoint";
++                if (message != null) {
++                    errorMessage += " (" + message + ")";
++                }
++                targetErrorHandler.handleError(msgCtx, errorCode, errorMessage,
++                        null, ProtocolState.REQUEST_READY);
+             }
+         } else {
+             throw new IllegalStateException("Queue cannot be null for: " + key);
+@@ -225,7 +222,8 @@
+         if (pipe != null) {
+             pipe.attachConsumer(conn);
+             request.connect(pipe);
+-            if (Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {
++            if (Boolean.TRUE.equals(msgContext.getProperty(
++                    PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {
+                 synchronized (msgContext) {
+                     OutputStream out = pipe.getOutputStream();
+                     msgContext.setProperty("GET_ME_OUT", out);
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetResponse.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetResponse.java	(revision 1502736)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetResponse.java	(revision 1502737)
+@@ -34,27 +34,36 @@
+  * This class represents a response coming from the target server.
+  */
+ public class TargetResponse {
+-    // private Log log = LogFactory.getLog(TargetResponse.class);
++
+     /** To pipe the incoming data through */
+     private Pipe pipe = null;
++
+     /** Headers of the response */
+     private Map<String, String> headers = new HashMap<String, String>();
++
+     /** The status of the response */
+     private int status = HttpStatus.SC_OK;
++
+     /** Http status line */
+     private String statusLine = "OK";
++
+     /** The Http response */
+     private HttpResponse response = null;
++
+     /** Configuration of the sender */
+     private TargetConfiguration targetConfiguration;
++
+     /** Protocol version */
+     private ProtocolVersion version = HttpVersion.HTTP_1_1;
++
+     /** This utility class is used for determining weather we need to close the connection
+      * after submitting the response */
+     private ConnectionReuseStrategy connStrategy = new DefaultConnectionReuseStrategy();
++
+     /** The connection */
+     private NHttpClientConnection connection;
+-    /** Weather this response has a body */
++
++    /** Whether this response has a body */
+     private boolean expectResponseBody = true;
+ 
+     public TargetResponse(TargetConfiguration targetConfiguration,
+@@ -61,12 +70,11 @@
+                           HttpResponse response,
+                           NHttpClientConnection conn,
+                           boolean expectResponseBody) {
++
+         this.targetConfiguration = targetConfiguration;
+         this.response = response;
+         this.connection = conn;
+-
+         this.version = response.getProtocolVersion();
+-
+         this.status = response.getStatusLine().getStatusCode();
+         this.statusLine = response.getStatusLine().getReasonPhrase();
+ 
+@@ -88,11 +96,9 @@
+         TargetContext.updateState(conn, ProtocolState.RESPONSE_HEAD);
+         
+         if (expectResponseBody) {
+-            pipe
+-                = new Pipe(conn, targetConfiguration.getBufferFactory().getBuffer(), "target", targetConfiguration);
+-
++            pipe = new Pipe(conn, targetConfiguration.getBufferFactory().getBuffer(),
++                    "target", targetConfiguration);
+             TargetContext.get(conn).setReader(pipe);
+-
+             BasicHttpEntity entity = new BasicHttpEntity();
+             if (response.getStatusLine().getProtocolVersion().greaterEquals(HttpVersion.HTTP_1_1)) {
+                 entity.setChunked(true);
+@@ -125,8 +131,7 @@
+     public int read(NHttpClientConnection conn, ContentDecoder decoder) throws IOException {
+     	
+     	int bytes=0;
+-    	
+-    	if(pipe != null){
++    	if (pipe != null) {
+     		bytes = pipe.produce(decoder);
+     	}
+ 
+@@ -133,13 +138,11 @@
+         // Update connection state
+         if (decoder.isCompleted()) {
+             TargetContext.updateState(conn, ProtocolState.RESPONSE_DONE);
+-
+             targetConfiguration.getMetrics().notifyReceivedMessageSize(
+                     conn.getMetrics().getReceivedBytesCount());
+ 
+             if (!this.connStrategy.keepAlive(response, conn.getContext())) {
+                 TargetContext.updateState(conn, ProtocolState.CLOSED);
+-
+                 targetConfiguration.getConnections().shutdownConnection(conn);
+             } else {
+                 targetConfiguration.getConnections().releaseConnection(conn);
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceContext.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceContext.java	(revision 1502736)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceContext.java	(revision 1502737)
+@@ -31,6 +31,7 @@
+  * In a Single TCP Connection there can be multiple HTTP Requests.
+  */
+ public class SourceContext {
++
+     public static final String CONNECTION_INFORMATION = "CONNECTION_INFORMATION";
+ 
+     private SourceConfiguration sourceConfiguration;
+@@ -195,11 +196,4 @@
+     public static SourceContext get(NHttpConnection conn) {
+         return (SourceContext) conn.getContext().getAttribute(CONNECTION_INFORMATION);
+     }
+-
+-    public static Lock getLock(NHttpConnection conn) {
+-        SourceContext info = (SourceContext)
+-                conn.getContext().getAttribute(CONNECTION_INFORMATION);
+-
+-        return info != null ? info.getLock() : null;
+-    }
+ }
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ConnectCallback.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ConnectCallback.java	(revision 1502736)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ConnectCallback.java	(revision 1502737)
+@@ -32,13 +32,6 @@
+     /** The agent used for delivering requests */
+     private DeliveryAgent deliveryAgent;
+ 
+-    /**
+-     * Create the callback for the handling events on a given connection     
+-     */
+-    public ConnectCallback() {
+-
+-    }
+-
+     public void completed(SessionRequest request) {
+         HostConnections pool = (HostConnections) request.getAttachment();
+         pool.pendingConnectionSucceeded();
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ClientWorker.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ClientWorker.java	(revision 1502736)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ClientWorker.java	(revision 1502737)
+@@ -32,7 +32,6 @@
+ import org.apache.axis2.description.Parameter;
+ import org.apache.axis2.engine.AxisEngine;
+ import org.apache.axiom.soap.*;
+-import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
+ import org.apache.axiom.om.OMAbstractFactory;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+@@ -47,13 +46,18 @@
+ import java.util.Comparator;
+ 
+ public class ClientWorker implements Runnable {
+-    private Log log = LogFactory.getLog(ClientWorker.class);
++
++    private static final Log log = LogFactory.getLog(ClientWorker.class);
++
+     /** the Axis2 configuration context */
+     private ConfigurationContext cfgCtx = null;
++
+     /** the response message context that would be created */
+     private org.apache.axis2.context.MessageContext responseMsgCtx = null;
++
+     /** the HttpResponse received */
+     private TargetResponse response = null;
++
+     /** weather a body is expected or not */
+     private boolean expectEntityBody = true;
+ 
+@@ -71,7 +75,7 @@
+ 		// Special casing 302 scenario in following section. Not sure whether it's the correct fix,
+ 		// but this fix makes it possible to do http --> https redirection.
+ 		if (oriURL != null && response.getStatus() != HttpStatus.SC_MOVED_TEMPORARILY) {
+-			URL url = null;
++			URL url;
+ 			try {
+ 				url = new URL(oriURL);
+ 			} catch (MalformedURLException e) {
+@@ -80,11 +84,11 @@
+ 			}
+ 
+ 			headers.remove(PassThroughConstants.LOCATION);
+-			String prfix =  (String) outMsgCtx.getProperty(PassThroughConstants.SERVICE_PREFIX);
+-			if (prfix != null) {
+-				headers.put(PassThroughConstants.LOCATION, prfix + url.getFile());
++			String prefix =  (String) outMsgCtx.getProperty(
++                    PassThroughConstants.SERVICE_PREFIX);
++			if (prefix != null) {
++				headers.put(PassThroughConstants.LOCATION, prefix + url.getFile());
+ 			}
+-
+ 		}
+         
+         try {
+@@ -192,7 +196,7 @@
+                 try {
+                     responseMsgCtx.setEnvelope(envelope);
+                 } catch (AxisFault axisFault) {
+-                    log.error("Error setting SOAP envelope", axisFault);
++                    log.error("Error setting the SOAP envelope", axisFault);
+                 }
+ 
+                 responseMsgCtx.setServerSide(true);
+@@ -199,7 +203,7 @@
+             } else {
+                 // there is no response entity-body
+                 responseMsgCtx.setProperty(PassThroughConstants.NO_ENTITY_BODY, Boolean.TRUE);
+-                responseMsgCtx.setEnvelope(new SOAP11Factory().getDefaultEnvelope());
++                responseMsgCtx.setEnvelope(OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope());
+             }
+ 
+             // copy the HTTP status code as a message context property with the key HTTP_SC to be
+@@ -209,10 +213,7 @@
+             if (statusCode >= 400) {
+                 responseMsgCtx.setProperty(PassThroughConstants.FAULT_MESSAGE,
+                         PassThroughConstants.TRUE);
+-            } /*else if (statusCode == 202 && responseMsgCtx.getOperationContext().isComplete()) {
+-                // Handle out-only invocation scenario
+-                responseMsgCtx.setProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED, Boolean.TRUE);
+-            }*/
++            }
+             responseMsgCtx.setProperty(PassThroughConstants.NON_BLOCKING_TRANSPORT, true);
+ 
+             // process response received
+@@ -221,7 +222,6 @@
+             } catch (AxisFault af) {
+                 log.error("Fault processing response message through Axis2", af);
+             }
+-
+         } catch (AxisFault af) {
+             log.error("Fault creating response SOAP envelope", af);            
+         } catch (IOException e) {
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceRequest.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceRequest.java	(revision 1502736)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceRequest.java	(revision 1502737)
+@@ -35,9 +35,9 @@
+  * Represents a Http Request.
+  */
+ public class SourceRequest {
+-    // private Log log = LogFactory.getLog(SourceRequest.class);
+ 
+     private Pipe pipe = null;
++
+     /** HTTP Headers */
+     private Map<String, String> headers =  new TreeMap<String, String>(new Comparator<String>() {
+         public int compare(String o1, String o2) {
+@@ -44,18 +44,25 @@
+             return o1.compareToIgnoreCase(o2);
+         }
+     });
++
+     /** HTTP URL */
+     private String url;
++
+     /** HTTP Method */
+     private String method;
+-    /** Weather reqyest has a body */
++
++    /** Whether the request has a body */
+     private boolean entityEnclosing;
++
+     /** The http request */
+     private HttpRequest request = null;
++
+     /** Configuration of the receiver */
+     private SourceConfiguration sourceConfiguration;
++
+     /** HTTP Version */
+     private ProtocolVersion version = null;
++
+     /** The connection from the client */
+     private NHttpServerConnection connection = null;
+ 
+@@ -93,7 +100,8 @@
+      */
+     public void start(NHttpServerConnection conn) throws IOException, HttpException {
+         if (entityEnclosing) {
+-            pipe = new Pipe(conn, sourceConfiguration.getBufferFactory().getBuffer(), "source", sourceConfiguration);
++            pipe = new Pipe(conn, sourceConfiguration.getBufferFactory().getBuffer(),
++                    "source", sourceConfiguration);
+ 
+             SourceContext.get(conn).setReader(pipe);
+ 
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpListener.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpListener.java	(revision 1502736)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpListener.java	(revision 1502737)
+@@ -16,6 +16,7 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.transport.passthru;
+ 
+ import org.apache.axiom.om.OMElement;
+@@ -112,7 +113,7 @@
+         namePrefix = (sslContext == null) ? "HTTP" : "HTTPS";
+ 
+         sourceConfiguration = new SourceConfiguration(cfgCtx, transportInDescription, workerPool);
+-        sourceConfiguration.setSsl((sslContext == null) ? false :true);
++        sourceConfiguration.setSsl(sslContext != null);
+         sourceConfiguration.build();
+ 
+         // register to receive updates on services for lifetime management
+@@ -132,12 +133,10 @@
+     }
+ 
+     public void start() throws AxisFault {
+-
+         log.info("Starting Pass-through " + namePrefix + " Listener...");
+ 
+         try {
+             String prefix = namePrefix + "-Listener I/O dispatcher";
+-
+             ioReactor = new DefaultListeningIOReactor(
+                             sourceConfiguration.getIOThreadsPerReactor(),
+                             new NativeThreadFactory(new ThreadGroup(prefix + " thread group"), prefix),
+@@ -196,7 +195,6 @@
+         }
+ 
+         state = BaseConstants.STARTED;
+-
+         log.info("Pass-through " + namePrefix + " Listener " + "started on port : " +
+                 sourceConfiguration.getPort());
+     }
+@@ -206,29 +204,6 @@
+         throw new AxisFault(s, e);
+     }
+ 
+-    public EndpointReference getEPRForService(String serviceName, String ip) throws AxisFault {
+-        String trailer = "";
+-        //Strip out the operation name
+-        if (serviceName.indexOf('/') != -1) {
+-            trailer += serviceName.substring(serviceName.indexOf("/"));
+-            serviceName = serviceName.substring(0, serviceName.indexOf('/'));
+-        }
+-        // strip out the endpoint name if present
+-        if (serviceName.indexOf('.') != -1) {
+-            trailer += serviceName.substring(serviceName.indexOf("."));
+-            serviceName = serviceName.substring(0, serviceName.indexOf('.'));
+-        }
+-
+-        if (serviceNameToEPRMap.containsKey(serviceName)) {
+-            return new EndpointReference(
+-                    sourceConfiguration.getCustomEPRPrefix() +
+-                            serviceNameToEPRMap.get(serviceName) + trailer);
+-        } else {
+-            return new EndpointReference(sourceConfiguration.getServiceEPRPrefix() +
+-                    serviceName + trailer);
+-        }
+-    }
+-
+     /**
+      * Return the EPRs for the given service over this transport
+      * @param serviceName name of the service
+@@ -354,13 +329,13 @@
+                         addToServiceURIMap(service);
+                         break;
+                     case AxisEvent.SERVICE_REMOVE :
+-                        removeServiceFfromURIMap(service);
++                        removeServiceFromURIMap(service);
+                         break;
+                     case AxisEvent.SERVICE_START  :
+                         addToServiceURIMap(service);
+                         break;
+                     case AxisEvent.SERVICE_STOP   :
+-                        removeServiceFfromURIMap(service);
++                        removeServiceFromURIMap(service);
+                         break;
+                 }
+             }
+@@ -394,7 +369,7 @@
+         }
+     }
+ 
+-    private void removeServiceFfromURIMap(AxisService service) {
++    private void removeServiceFromURIMap(AxisService service) {
+         eprToServiceNameMap.remove(serviceNameToEPRMap.get(service.getName()));
+         serviceNameToEPRMap.remove(service.getName());
+     }
+@@ -418,7 +393,7 @@
+ 
+     /**
+      * Create the SSL IO Session handler to be used by this listener
+-     * @param transportIn transport in descritption
++     * @param transportIn transport in description
+      * @return always null
+      * @throws AxisFault never thrown
+      */
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceResponse.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceResponse.java	(revision 1502736)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceResponse.java	(revision 1502737)
+@@ -35,23 +35,29 @@
+ import java.util.Set;
+ 
+ public class SourceResponse {
++
+     private Pipe pipe = null;
++
+     /** Transport headers */
+     private Map<String, String> headers = new HashMap<String, String>();
++
+     /** Status of the response */
+     private int status = HttpStatus.SC_OK;
++
+     /** Status line */
+     private String statusLine = null;
++
+     /** Actual response submitted */
+     private HttpResponse response = null;
++
+     /** Configuration of the receiver */
+     private SourceConfiguration sourceConfiguration;
++
+     /** Version of the response */
+     private ProtocolVersion version = HttpVersion.HTTP_1_1;
++
+     /** Connection strategy */
+     private ConnectionReuseStrategy connStrategy = new DefaultConnectionReuseStrategy();
+-    /** Chunk response or not */
+-    // private boolean chunk = true;
+ 
+     private SourceRequest request = null;
+ 
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetHandler.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetHandler.java	(revision 1502736)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetHandler.java	(revision 1502737)
+@@ -17,7 +17,6 @@
+  *  under the License.
+  */
+ 
+-
+ package org.apache.synapse.transport.passthru;
+ 
+ import java.io.IOException;
+@@ -43,13 +42,13 @@
+ import org.apache.synapse.transport.passthru.connections.HostConnections;
+ import org.apache.synapse.transport.passthru.jmx.PassThroughTransportMetricsCollector;
+ 
+-
+ /**
+  * This class is handling events from the transport -- > client.
+  */
+ public class TargetHandler implements NHttpClientHandler {
+-    private static Log log = LogFactory.getLog(TargetHandler.class);
+ 
++    private static final Log log = LogFactory.getLog(TargetHandler.class);
++
+     /** Delivery agent */
+     private final DeliveryAgent deliveryAgent;
+ 
+@@ -75,7 +74,6 @@
+         HostConnections pool = (HostConnections) o;
+         conn.getContext().setAttribute(PassThroughConstants.CONNECTION_POOL, pool);
+ 
+-          
+         // create the connection information and set it to request ready
+         TargetContext.create(conn, ProtocolState.REQUEST_READY, targetConfiguration);
+ 
+@@ -85,7 +83,8 @@
+         // notify about the new connection
+         deliveryAgent.connected(pool.getHost(), pool.getPort());
+         
+-        conn.getContext().setAttribute(PassThroughConstants.REQ_DEPARTURE_TIME, System.currentTimeMillis());
++        conn.getContext().setAttribute(PassThroughConstants.REQ_DEPARTURE_TIME,
++                System.currentTimeMillis());
+ 
+         metrics.connected();
+     }
+@@ -109,7 +108,8 @@
+                 request.start(conn);
+                 targetConfiguration.getMetrics().incrementMessagesSent();
+             }
+-            conn.getContext().setAttribute(PassThroughConstants.REQ_DEPARTURE_TIME, System.currentTimeMillis());
++            conn.getContext().setAttribute(PassThroughConstants.REQ_DEPARTURE_TIME,
++                    System.currentTimeMillis());
+         } catch (IOException e) {
+             logIOException(conn, e);
+             TargetContext.updateState(conn, ProtocolState.CLOSED);
+@@ -381,7 +381,7 @@
+             }
+         } else if (e.getMessage() != null) {
+             String msg = e.getMessage().toLowerCase();
+-            if (msg.indexOf("broken") != -1) {
++            if (msg.contains("broken")) {
+                 log.warn("I/O error (Probably the connection " +
+                         "was closed by the remote party):" + e.getMessage());
+             } else {
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/HttpGetRequestProcessor.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/HttpGetRequestProcessor.java	(revision 1502736)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/HttpGetRequestProcessor.java	(revision 1502737)
+@@ -28,8 +28,8 @@
+ import java.io.OutputStream;
+ 
+ /**
+- * This Passthrough transport level interface is used for plugging in different implementations for special processing of some
+- * HTTP GET requests.
++ * This PassThrough transport level interface is used for plugging in different implementations
++ * for special processing of some HTTP GET requests.
+  * <p/>
+  * e.g. ?wsdl, ?wsdl2 etc.
+  * <p/>
+@@ -39,8 +39,10 @@
+ public interface HttpGetRequestProcessor {
+     /**
+      * Initialize the HttpGetProcessor
++     *
+      * @param cfgCtx servers configuration context
+-     * @param serverHandler dispatching handler
++     * @param handler dispatching handler
++     *
+      * @throws AxisFault if an error occurs
+      */
+     void init(ConfigurationContext cfgCtx, SourceHandler handler) throws AxisFault;
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/Pipe.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/Pipe.java	(revision 1502736)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/Pipe.java	(revision 1502737)
+@@ -49,10 +49,6 @@
+ 
+     private boolean producerCompleted = false;
+ 
+-    public boolean isProducerCompleted() {
+-		return producerCompleted;
+-	}
+-
+ 	/** Lock to synchronize the producers and consumers */
+     private Lock lock = new ReentrantLock();
+ 
+@@ -267,31 +263,6 @@
+         }
+         return outputStream;
+     }
+-    
+-    
+-    /**
+-     * Creates a separate ByteBuffer for the output data and returns an OutputStream
+-     * on top of it.
+-     *
+-     * @return An OutputStream object
+-     */
+-    public synchronized OutputStream resetOutputStream() {
+-    	outputBuffer = baseConfig.getBufferFactory().getBuffer();
+-        outBufferInputMode = new AtomicBoolean(true);
+-        outputStream = new ByteBufferOutputStream();
+-        return outputStream;
+-    }
+-    
+-    
+-    public synchronized void resetBufferPossition() {
+-    	if(buffer != null){
+-    		buffer.rewind();
+-    	}
+-    	
+-    	if(outputBuffer != null){
+-    		outputBuffer.rewind();
+-    	}
+-    }
+ 
+     public synchronized void setSerializationComplete(boolean serializationComplete) {
+         if (!this.serializationComplete) {
+@@ -312,28 +283,11 @@
+     public void setRawSerializationComplete(boolean rawSerializationComplete) {
+     	this.rawSerializationComplete = rawSerializationComplete;
+     }
+-    
+-    public void forceSetSerializationRest(){
+-    	if(this.serializationComplete){
+-    		this.serializationComplete = false;
+-    	}
+-    }
+ 
+-    
+-    
+-
+-    public boolean isSerializationComplete() {
+-		return serializationComplete;
+-	}
+-
+ 	public ByteBuffer getBuffer() {
+         return buffer;
+     }
+ 
+-    public boolean hasHttpProducer() {
+-        return hasHttpProducer;
+-    }
+-
+     private void setInputMode(ByteBuffer buffer, AtomicBoolean inputMode) {
+         if (inputMode.compareAndSet(false, true)) {
+             if (buffer.hasRemaining()) {
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java	(revision 1502736)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java	(revision 1502737)
+@@ -23,12 +23,10 @@
+ import org.apache.http.nio.entity.ContentOutputStream;
+ import org.apache.http.nio.util.ContentOutputBuffer;
+ import org.apache.http.nio.util.HeapByteBufferAllocator;
+-import org.apache.http.nio.util.SharedOutputBuffer;
+ import org.apache.http.nio.util.SimpleOutputBuffer;
+ import org.apache.http.*;
+ import org.apache.http.protocol.*;
+ import org.apache.http.params.DefaultedHttpParams;
+-import org.apache.http.impl.DefaultHttpResponseFactory;
+ import org.apache.http.message.BasicHttpResponse;
+ import org.apache.axis2.AxisFault;
+ import org.apache.commons.logging.Log;
+@@ -46,8 +44,9 @@
+  * about the message and its various states.
+  */
+ public class SourceHandler implements NHttpServiceHandler {
+-    private static Log log = LogFactory.getLog(SourceHandler.class);
+ 
++    private static final Log log = LogFactory.getLog(SourceHandler.class);
++
+     private final SourceConfiguration sourceConfiguration;
+ 
+     private PassThroughTransportMetricsCollector metrics = null;
+@@ -67,7 +66,7 @@
+ 				this.s2sLatencyView = new LatencyView(sourceConfiguration.isSsl());
+ 			}
+ 		} catch (AxisFault e) {
+-			log.error(e.getMessage(), e);
++			log.error("Error while initializing latency view calculators", e);
+ 		}
+     }
+ 
+@@ -75,17 +74,16 @@
+         // we have to have these two operations in order
+         sourceConfiguration.getSourceConnections().addConnection(conn);
+         SourceContext.create(conn, ProtocolState.REQUEST_READY, sourceConfiguration);
+-
+         metrics.connected();
+     }
+ 
+     public void requestReceived(NHttpServerConnection conn) {
+         try {
+-        	
+-        	HttpContext _context = conn.getContext();
+-        	_context.setAttribute(PassThroughConstants.REQ_ARRIVAL_TIME, System.currentTimeMillis());
++            conn.getContext().setAttribute(PassThroughConstants.REQ_ARRIVAL_TIME,
++                    System.currentTimeMillis());
+         	 
+-            if (!SourceContext.assertState(conn, ProtocolState.REQUEST_READY) && !SourceContext.assertState(conn, ProtocolState.WSDL_RESPONSE_DONE)) {
++            if (!SourceContext.assertState(conn, ProtocolState.REQUEST_READY) &&
++                    !SourceContext.assertState(conn, ProtocolState.WSDL_RESPONSE_DONE)) {
+                 handleInvalidState(conn, "Request received");
+                 return;
+             }
+@@ -94,25 +92,19 @@
+ 
+             // at this point we have read the HTTP Headers
+             SourceContext.updateState(conn, ProtocolState.REQUEST_HEAD);
+-
+             SourceRequest request = new SourceRequest(
+                     sourceConfiguration, conn.getHttpRequest(), conn);
+-
+             SourceContext.setRequest(conn, request);
+-
+             request.start(conn);
++            metrics.incrementMessagesReceived();
+ 
+-            metrics.incrementMessagesReceived();
+-            
+-            /******/
+-            String method = request.getRequest() != null ? request.getRequest().getRequestLine().getMethod().toUpperCase():"";
++            String method = request.getRequest() != null ?
++                    request.getRequest().getRequestLine().getMethod().toUpperCase() : "";
+             OutputStream os = null;
+ 			if ("GET".equals(method)) {
+ 				HttpContext context = request.getConnection().getContext();
+-				ContentOutputBuffer outputBuffer = new SimpleOutputBuffer(8192,	new HeapByteBufferAllocator());
+-				// ContentOutputBuffer outputBuffer
+-				// = new SharedOutputBuffer(8192, conn, new
+-				// HeapByteBufferAllocator());
++				ContentOutputBuffer outputBuffer = new SimpleOutputBuffer(8192,
++                        new HeapByteBufferAllocator());
+ 				context.setAttribute("synapse.response-source-buffer",outputBuffer);
+ 				os = new ContentOutputStream(outputBuffer);
+ 			} 
+@@ -119,25 +111,21 @@
+ 
+             sourceConfiguration.getWorkerPool().execute(
+                     new ServerWorker(request, sourceConfiguration,os));
++
+         } catch (HttpException e) {
+-            log.error(e.getMessage(), e);
+-
++            log.error("HTTP exception while processing request", e);
+             informReaderError(conn);
+-
+             SourceContext.updateState(conn, ProtocolState.CLOSED);
+             sourceConfiguration.getSourceConnections().shutDownConnection(conn);
+         } catch (IOException e) {
+             logIOException(e);
+-
+             informReaderError(conn);
+-
+             SourceContext.updateState(conn, ProtocolState.CLOSED);
+             sourceConfiguration.getSourceConnections().shutDownConnection(conn);
+         }
+     }
+ 
+-    public void inputReady(NHttpServerConnection conn,
+-                           ContentDecoder decoder) {
++    public void inputReady(NHttpServerConnection conn, ContentDecoder decoder) {
+         try {
+             ProtocolState protocolState = SourceContext.getState(conn);
+ 
+@@ -148,18 +136,15 @@
+             }
+ 
+             SourceContext.updateState(conn, ProtocolState.REQUEST_BODY);
+-
+             SourceRequest request = SourceContext.getRequest(conn);
+-
+             int readBytes = request.read(conn, decoder);
+             if (readBytes > 0) {
+                 metrics.incrementBytesReceived(readBytes);
+             }
++
+         } catch (IOException e) {
+             logIOException(e);
+-
+             informReaderError(conn);
+-
+             SourceContext.updateState(conn, ProtocolState.CLOSED);
+             sourceConfiguration.getSourceConnections().shutDownConnection(conn);
+         }
+@@ -185,21 +170,17 @@
+             SourceResponse response = SourceContext.getResponse(conn);
+             if (response != null) {
+                 response.start(conn);
+-
+                 metrics.incrementMessagesSent();
+             }
++
+         } catch (IOException e) {
+             logIOException(e);
+-
+             informWriterError(conn);
+-
+             SourceContext.updateState(conn, ProtocolState.CLOSING);
+             sourceConfiguration.getSourceConnections().shutDownConnection(conn);
+         } catch (HttpException e) {
+             log.error(e.getMessage(), e);
+-
+             informWriterError(conn);
+-
+             SourceContext.updateState(conn, ProtocolState.CLOSING);
+             sourceConfiguration.getSourceConnections().shutDownConnection(conn);
+         }
+@@ -312,12 +293,11 @@
+                 e.getMessage().toLowerCase().contains("connection reset by peer") ||
+                 e.getMessage().toLowerCase().contains("forcibly closed")))) {
+             if (log.isDebugEnabled()) {
+-                log.debug("I/O error (Probably the keepalive connection " +
+-                        "was closed):" + e.getMessage());
++                log.debug("I/O error (Probably a keepalive connection was closed):" + e.getMessage());
+             }
+         } else if (e.getMessage() != null) {
+             String msg = e.getMessage().toLowerCase();
+-            if (msg.indexOf("broken") != -1) {
++            if (msg.contains("broken")) {
+                 log.warn("I/O error (Probably the connection " +
+                         "was closed by the remote party):" + e.getMessage());
+             } else {
+@@ -442,37 +422,16 @@
+         }
+     }
+     
+-    
+-    /**
+-     * Commit the response to the connection. Processes the response through the configured
+-     * HttpProcessor and submits it to be sent out. This method hides any exceptions and is targetted
+-     * for non critical (i.e. browser requests etc) requests, which are not core messages
+-     * @param conn the connection being processed
+-     * @param response the response to commit over the connection
+-     */
+-    public void commitResponseHideExceptions(
+-            final NHttpServerConnection conn, final HttpResponse response) {
+-        try {
+-            conn.suspendInput();
+-            sourceConfiguration.getHttpProcessor().process(response, conn.getContext());
+-            conn.submitResponse(response);
+-        } catch (HttpException e) {
+-            handleException("Unexpected HTTP protocol error : " + e.getMessage(), e, conn);
+-        } catch (IOException e) {
+-            handleException("IO error submiting response : " + e.getMessage(), e, conn);
+-        }
+-    }
+-    
+-    
+     // ----------- utility methods -----------
+ 
+     private void handleException(String msg, Exception e, NHttpServerConnection conn) {
+-        log.error(msg, e);
++        String errorMessage;
+         if (conn != null) {
+-            //shutdownConnection(conn);
++            errorMessage = "[" + conn + "] " + msg;
++        } else {
++            errorMessage = "[" + conn + "] " + msg;
+         }
++        log.error(errorMessage, e);
+     }
+-    
+-    
+-    
++
+ }
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetErrorHandler.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetErrorHandler.java	(revision 1502736)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetErrorHandler.java	(revision 1502737)
+@@ -30,8 +30,9 @@
+ import org.apache.synapse.transport.passthru.config.TargetConfiguration;
+ 
+ public class TargetErrorHandler {
+-    private Log log = LogFactory.getLog(TargetErrorHandler.class);
+ 
++    private static final Log log = LogFactory.getLog(TargetErrorHandler.class);
++
+     private TargetConfiguration targetConfiguration = null;
+ 
+     public TargetErrorHandler(TargetConfiguration targetConfiguration) {
+@@ -62,10 +63,6 @@
+             return;
+         }
+ 
+-//        if (mc.getOperationContext().isComplete()) {
+-//            return;
+-//        } ? why we ignoring this..
+-
+         targetConfiguration.getWorkerPool().execute(new Runnable() {
+             public void run() {
+                 MessageReceiver mr = mc.getAxisOperation().getMessageReceiver();
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ServerWorker.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ServerWorker.java	(revision 1502736)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ServerWorker.java	(revision 1502737)
+@@ -19,7 +19,6 @@
+ 
+ package org.apache.synapse.transport.passthru;
+ 
+-import java.io.IOException;
+ import java.io.OutputStream;
+ import java.net.InetAddress;
+ import java.util.Comparator;
+@@ -28,7 +27,6 @@
+ import java.util.TreeMap;
+ 
+ import javax.xml.parsers.FactoryConfigurationError;
+-import javax.xml.stream.XMLStreamException;
+ 
+ import org.apache.axiom.om.OMAbstractFactory;
+ import org.apache.axiom.soap.SOAP11Constants;
+@@ -35,7 +33,6 @@
+ import org.apache.axiom.soap.SOAP12Constants;
+ import org.apache.axiom.soap.SOAPEnvelope;
+ import org.apache.axiom.soap.SOAPFactory;
+-import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
+ import org.apache.axiom.util.UIDGenerator;
+ import org.apache.axis2.AxisFault;
+ import org.apache.axis2.Constants;
+@@ -68,7 +65,6 @@
+ import org.apache.synapse.transport.nhttp.util.NhttpUtil;
+ import org.apache.synapse.transport.nhttp.util.RESTUtil;
+ import org.apache.synapse.transport.passthru.config.SourceConfiguration;
+-import org.apache.synapse.transport.passthru.util.RelayUtils;
+ import org.apache.synapse.transport.passthru.util.SourceResponseFactory;
+ 
+ /**
+@@ -77,10 +73,13 @@
+ public class ServerWorker implements Runnable {
+ 
+   	private static final Log log = LogFactory.getLog(ServerWorker.class);
++
+     /** the incoming message to be processed */
+     private org.apache.axis2.context.MessageContext msgContext = null;
++
+     /** the http request */
+     private SourceRequest request = null;
++
+     /** The configuration of the receiver */
+     private SourceConfiguration sourceConfiguration = null;
+ 
+@@ -89,9 +88,6 @@
+     /** WSDL processor for Get requests */
+     private HttpGetRequestProcessor httpGetRequestProcessor = null;
+     
+-    /** Weather we should do rest dispatching or not */
+-    private boolean isRestDispatching = true;
+-    
+     private boolean isHttps = false;
+     
+     
+@@ -98,20 +94,14 @@
+     private OutputStream os; //only used for WSDL  requests..
+   
+     public ServerWorker(final SourceRequest request,
+-                        final SourceConfiguration sourceConfiguration,final OutputStream os) {
++                        final SourceConfiguration sourceConfiguration, final OutputStream os) {
+         this.request = request;
+         this.sourceConfiguration = sourceConfiguration;
+-
+         this.isHttps = sourceConfiguration.isSsl();
+-        
+         this.msgContext = createMessageContext(request);
+-        
+         this.httpGetRequestProcessor = sourceConfiguration.getHttpGetRequestProcessor();
+-        
+         this.os = os;
+-        
+-      
+-        
++
+         // set these properties to be accessed by the engine
+         msgContext.setProperty(
+                 PassThroughConstants.PASS_THROUGH_SOURCE_REQUEST, request);
+@@ -119,7 +109,6 @@
+                 PassThroughConstants.PASS_THROUGH_SOURCE_CONFIGURATION, sourceConfiguration);
+         msgContext.setProperty(PassThroughConstants.PASS_THROUGH_SOURCE_CONNECTION,
+                 request.getConnection());
+-        
+     }
+ 
+     public void run() {
+@@ -129,7 +118,8 @@
+         ConfigurationContext cfgCtx = sourceConfiguration.getConfigurationContext();        
+         msgContext.setProperty(Constants.Configuration.HTTP_METHOD, request.getMethod());
+ 
+-        String method = request.getRequest() != null ? request.getRequest().getRequestLine().getMethod().toUpperCase():"";
++        String method = request.getRequest() != null ?
++                request.getRequest().getRequestLine().getMethod().toUpperCase() : "";
+         
+         String uri = request.getUri();
+         String oriUri = uri;
+@@ -161,15 +151,14 @@
+                 }
+             }
+         }
+-        
+-        
++
+         String servicePrefix = oriUri.substring(0, oriUri.indexOf(uri));
+-        if (servicePrefix.indexOf("://") == -1) {
+-            HttpInetConnection inetConn = (HttpInetConnection) request.getConnection();
+-            InetAddress localAddr = inetConn.getLocalAddress();
+-            if (localAddr != null) {
++        if (!servicePrefix.contains("://")) {
++            HttpInetConnection conn = (HttpInetConnection) request.getConnection();
++            InetAddress localAddress = conn.getLocalAddress();
++            if (localAddress != null) {
+                 servicePrefix = (sourceConfiguration.isSsl() ? "https://" : "http://") +
+-                        localAddr.getHostAddress() + ":" + inetConn.getLocalPort() + servicePrefix;
++                        localAddress.getHostAddress() + ":" + conn.getLocalPort() + servicePrefix;
+             }
+         }
+        
+@@ -179,7 +168,6 @@
+         msgContext.setProperty(PassThroughConstants.REST_URL_POSTFIX, uri);
+ 
+ 		if ("GET".equals(method) || "DELETE".equals(method)) {
+-			
+ 			HttpResponse response = sourceConfiguration.getResponseFactory().newHttpResponse(
+ 		                request.getVersion(), HttpStatus.SC_OK,
+ 		                request.getConnection().getContext());
+@@ -192,27 +180,29 @@
+             response.setEntity(entity);
+             
+ 			httpGetRequestProcessor.process(request.getRequest(), response,msgContext,
+-					request.getConnection(), os, isRestDispatching);
++					request.getConnection(), os, true);
+ 		} 
+ 		
+ 		//need special case to handle REST
+ 		boolean restHandle =false;
+-		if(msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE) != null && (Boolean)msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE)){
++		if (msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE) != null &&
++                (Boolean)msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE)){
+ 			msgContext.setProperty(HTTPConstants.HTTP_METHOD, method);
+ 	        msgContext.setServerSide(true);
+ 	        msgContext.setDoingREST(true);
+ 	        String contentTypeHeader = request.getHeaders().get(HTTP.CONTENT_TYPE);
+-	        //String contentType = contentTypeHeader != null ?TransportUtils.getContentType(contentTypeHeader, msgContext):null;
+ 	        SOAPEnvelope soapEnvelope = this.handleRESTUrlPost(contentTypeHeader);
+ 	        processNonEntityEnclosingRESTHandler(soapEnvelope);
+-			restHandle =true;
++			restHandle = true;
+ 		}
+ 		
+ 		//if WSDL done then moved out rather than hand over to entity handle methods.
+-		SourceContext info = (SourceContext) request.getConnection().getContext().getAttribute(SourceContext.CONNECTION_INFORMATION);
++		SourceContext info = (SourceContext) request.getConnection().getContext().
++                getAttribute(SourceContext.CONNECTION_INFORMATION);
+ 		if (info != null &&
+ 		    info.getState().equals(ProtocolState.WSDL_RESPONSE_DONE) ||
+-		    (msgContext.getProperty(PassThroughConstants.WSDL_GEN_HANDLED) != null && Boolean.TRUE.equals((msgContext.getProperty(PassThroughConstants.WSDL_GEN_HANDLED))))) {
++		    (msgContext.getProperty(PassThroughConstants.WSDL_GEN_HANDLED) != null &&
++                    Boolean.TRUE.equals((msgContext.getProperty(PassThroughConstants.WSDL_GEN_HANDLED))))) {
+ 			return;
+ 		}
+ 		
+@@ -224,9 +214,6 @@
+ 				processNonEntityEnclosingRESTHandler(null);
+ 			}
+ 		}
+-	
+-		
+-		
+ 
+         sendAck();
+     }
+@@ -234,20 +221,26 @@
+ 	/**
+ 	 * Method will setup the necessary parameters for the rest url post action
+ 	 * 
+-	 * @param contentType
+-	 * @return
++	 * @param contentTypeHdr Content-type header value
++	 * @return a SOAPEnvelope
+ 	 * @throws FactoryConfigurationError
+ 	 */
+ 	private SOAPEnvelope handleRESTUrlPost(String contentTypeHdr) throws FactoryConfigurationError {
+ 	    SOAPEnvelope soapEnvelope = null;
+-	    String contentType = contentTypeHdr!=null?TransportUtils.getContentType(contentTypeHdr, msgContext):null;
+-	    if (contentType == null || "".equals(contentType) || HTTPConstants.MEDIA_TYPE_X_WWW_FORM.equals(contentType)) {
+-	        contentType = contentTypeHdr != null ? contentTypeHdr:HTTPConstants.MEDIA_TYPE_X_WWW_FORM;
++	    String contentType = contentTypeHdr!=null ?
++                TransportUtils.getContentType(contentTypeHdr, msgContext) : null;
++
++	    if (contentType == null || "".equals(contentType) ||
++                HTTPConstants.MEDIA_TYPE_X_WWW_FORM.equals(contentType)) {
++
++	        contentType = contentTypeHdr != null ?
++                    contentTypeHdr : HTTPConstants.MEDIA_TYPE_X_WWW_FORM;
+ 	        msgContext.setTo(new EndpointReference(request.getRequest().getRequestLine().getUri()));
+ 	        msgContext.setProperty(Constants.Configuration.CONTENT_TYPE,contentType);
+ 	        String charSetEncoding = BuilderUtil.getCharSetEncoding(contentType);
+ 		    msgContext.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING, charSetEncoding);
+-	        try {
++
++            try {
+ 	            RESTUtil.dispatchAndVerify(msgContext);
+ 	        } catch (AxisFault e1) {
+ 	        	log.error("Error while building message for REST_URL request",e1);
+@@ -254,16 +247,9 @@
+ 	        }
+ 	        
+ 	        RequestURIBasedDispatcher requestDispatcher = new RequestURIBasedDispatcher();
+-	       
+ 			try {
+-				String requestURI = request.getRequest().getRequestLine().getUri();
+ 				AxisService axisService = requestDispatcher.findService(msgContext);
+ 
+-				boolean isCustomRESTDispatcher = false;
+-				if (requestURI.startsWith("/t/") || requestURI.startsWith("/services/t/")) {
+-					isCustomRESTDispatcher = true;
+-				}
+-
+ 				// the logic determines which service dispatcher to get invoke,
+ 				// this will be determine
+ 				// based on parameter defines at disableRestServiceDispatching,
+@@ -272,26 +258,24 @@
+ 				// Dispatcher Service.
+ 
+ 				if (axisService == null) {
+-					String defaultSvcName = NHttpConfiguration.getInstance().getStringValue("nhttp.default.service",
+-					                                                                        "__SynapseService");
+-
++					String defaultSvcName = NHttpConfiguration.getInstance().getStringValue(
++                            "nhttp.default.service", "__SynapseService");
+ 					axisService =  msgContext.getConfigurationContext().getAxisConfiguration()
+ 					                        .getService(defaultSvcName);
+ 					msgContext.setAxisService(axisService);
+-
+ 				}
+ 			} catch (AxisFault e) {
+-				handleException("Error processing " + request.getMethod() + " request for : " + request.getUri(), e);
++				handleException("Error processing " + request.getMethod() + " request for : " +
++                        request.getUri(), e);
+ 			}
+-			
+-			
++
+ 	        try {
+ 	        	 soapEnvelope = TransportUtils.createSOAPMessage(msgContext, null, contentType);
+ 	           } catch (Exception e) {
+ 	        	log.error("Error while building message for REST_URL request");
+ 	        }
+-	       //msgContext.setProperty(Constants.Configuration.CONTENT_TYPE,"application/xml");  
+-	       msgContext.setProperty(Constants.Configuration.MESSAGE_TYPE,HTTPConstants.MEDIA_TYPE_APPLICATION_XML);   
++	        msgContext.setProperty(Constants.Configuration.MESSAGE_TYPE,
++                    HTTPConstants.MEDIA_TYPE_APPLICATION_XML);
+ 	    }
+ 	    return soapEnvelope;
+     }
+@@ -303,7 +287,7 @@
+                     Constants.RESPONSE_WRITTEN);
+         }
+         
+-        if(msgContext.getProperty(PassThroughConstants.FORCE_SOAP_FAULT) != null){
++        if (msgContext.getProperty(PassThroughConstants.FORCE_SOAP_FAULT) != null) {
+         	respWritten ="SKIP";
+         }
+         
+@@ -355,17 +339,16 @@
+         msgContext.setTo(new EndpointReference(request.getUri()));
+         msgContext.setServerSide(true);
+         msgContext.setDoingREST(true);
+-        if(!request.isEntityEnclosing()){
++        if (!request.isEntityEnclosing()) {
+         	msgContext.setProperty(PassThroughConstants.NO_ENTITY_BODY, Boolean.TRUE);
+         }
+         
+         try {
+-        	if(soapEnvelope == null){
+-        		 msgContext.setEnvelope(new SOAP11Factory().getDefaultEnvelope());
+-        	}else{
++        	if (soapEnvelope == null) {
++        		 msgContext.setEnvelope(OMAbstractFactory.getSOAP11Factory().getDefaultEnvelope());
++        	} else {
+         		 msgContext.setEnvelope(soapEnvelope);
+         	}
+-         
+ 
+             AxisEngine.receive(msgContext);
+         } catch (AxisFault axisFault) {
+@@ -440,16 +423,13 @@
+                 " request for : " + request.getUri(), axisFault);
+         } 
+     }
+-    
+-    
++
+     private boolean isRest(String contentType) {
+         return contentType != null &&
+-                contentType.indexOf(SOAP11Constants.SOAP_11_CONTENT_TYPE) == -1 &&
+-                contentType.indexOf(SOAP12Constants.SOAP_12_CONTENT_TYPE) == -1;
++                !contentType.contains(SOAP11Constants.SOAP_11_CONTENT_TYPE) &&
++                !contentType.contains(SOAP12Constants.SOAP_12_CONTENT_TYPE);
+     }
+ 
+-
+-
+     /**
+      * Create an Axis2 message context for the given http request. The request may be in the
+      * process of being streamed
+@@ -463,19 +443,11 @@
+                 new MessageContext();
+         msgContext.setMessageID(UIDGenerator.generateURNString());
+ 
+-        // Axis2 spawns a new threads to send a message if this is TRUE - and it has to
++        // Axis2 spawns a new thread to send a message if this is TRUE - and it has to
+         // be the other way
+         msgContext.setProperty(MessageContext.CLIENT_API_NON_BLOCKING,
+                 Boolean.FALSE);
+         msgContext.setConfigurationContext(cfgCtx);
+-
+-//        msgContext.setTransportOut(cfgCtx.getAxisConfiguration()
+-//                .getTransportOut(Constants.TRANSPORT_HTTP));
+-//        msgContext.setTransportIn(cfgCtx.getAxisConfiguration()
+-//                .getTransportIn(Constants.TRANSPORT_HTTP));
+-//        msgContext.setIncomingTransportName(Constants.TRANSPORT_HTTP);
+-//        msgContext.setProperty(Constants.OUT_TRANSPORT_INFO, this);
+-        
+         NHttpServerConnection conn = request.getConnection();
+         
+         if (isHttps) {
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ProtocolState.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ProtocolState.java	(revision 1502736)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ProtocolState.java	(revision 1502737)
+@@ -43,6 +43,6 @@
+     CLOSING,
+     /** The connection is closed */
+     CLOSED,
+-    
++    /** WSDL response has been sent */
+     WSDL_RESPONSE_DONE
+ }
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample5.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample5.java	(revision 1502736)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/message/Sample5.java	(revision 1502737)
+@@ -41,8 +41,8 @@
+     public void testCreateFaultAndChangeDirection() {
+         String addUrl = "http://localhost:9000/services/SimpleStockQuoteService";
+         String trpUrl = "http://localhost:8280";
+-        String expectedError_MSFT = "Error connecting to the back end";
+-        String expectedError_SUN = "Error connecting to the back end";
++        String expectedError_MSFT = "Error while connecting to the endpoint (Connection Failed)";
++        String expectedError_SUN = "Error while connecting to the endpoint (Connection Failed)";
+ 
+         log.info("Running test: Creating SOAP fault messages and changing the direction of a message");
+         SampleClientResult result = client.requestStandardQuote(addUrl, trpUrl, null, "MSFT" ,null);
+Index: java/repository/conf/axis2.xml
+===================================================================
+--- java/repository/conf/axis2.xml	(revision 1502736)
++++ java/repository/conf/axis2.xml	(revision 1502737)
+@@ -195,7 +195,7 @@
+     </transportReceiver>
+ 
+     <!-- the non blocking https transport based on HttpCore + SSL-NIO extensions -->
+-    <transportReceiver name="https" class="org.apache.synapse.transport.nhttp.HttpCoreNIOSSLListener">
++    <transportReceiver name="https" class="org.apache.synapse.transport.passthru.PassThroughHttpSSLListener">
+         <parameter name="port" locked="false">8243</parameter>
+         <!--parameter name="bind-address" locked="false">hostname or IP address</parameter-->
+         <!--parameter name="WSDLEPRPrefix" locked="false">http://apachehost:port/somepath</parameter-->
+@@ -274,7 +274,7 @@
+         <parameter name="http.proxyPort" locked="false">3128</parameter>
+         <parameter name="http.nonProxyHosts" locked="false">localhost|moon|sun</parameter-->
+     </transportSender>
+-    <transportSender name="https" class="org.apache.synapse.transport.nhttp.HttpCoreNIOSSLSender">
++    <transportSender name="https" class="org.apache.synapse.transport.passthru.PassThroughHttpSSLSender">
+         <parameter name="non-blocking" locked="false">true</parameter>
+         <parameter name="warnOnHTTP500" locked="false">*</parameter>
+         <parameter name="keystore" locked="false">
+-*-*-*-
+Message: Code cleanup and refactoring
+-*-*-*-
+When: 2013-07-12 22:55:02 -0400 
+-*-*-*-
+Who: hiranya

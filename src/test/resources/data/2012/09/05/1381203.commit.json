@@ -1,0 +1,153 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                     </exclusion>\n",
+            "                 </exclusions>\n",
+            "             </dependency>\n",
+            "+            <dependency>\n",
+            "+                <groupId>org.apache.axis2</groupId>\n",
+            "+                <artifactId>axis2-jaxws</artifactId>\n",
+            "+                <version>${axis2.version}</version>\n",
+            "+            </dependency>\n",
+            " \n",
+            "             <!-- Apache Rampart -->\n",
+            "             <dependency>\n"
+          ],
+          "locn": "-493,6 +493,11"
+        }
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         <serviceBuilderExtension name =\"jwsbuilderExt\" class=\"org.apache.axis2.jaxws.framework.JAXWSServiceBuilderExtension\"/>\n",
+            "         <serviceBuilderExtension name =\"wsdlbuilderExt\" class=\"org.apache.axis2.deployment.WSDLServiceBuilderExtension\"/>\n",
+            "     </deployer>\n",
+            "+    \n",
+            "+    <deployer extension=\".jar\" directory=\"servicejars\"\n",
+            "+              class=\"org.apache.axis2.jaxws.framework.JAXWSDeployer\"/>\n",
+            " \n",
+            "     <!-- Following parameter will set the host name for the epr-->\n",
+            "     <!--<parameter name=\"hostname\" locked=\"true\">myhost.com</parameter>-->\n"
+          ],
+          "locn": "-80,6 +80,9"
+        }
+      ],
+      "from": "java/repository/conf/sample/resources/misc/server/axis2.xml",
+      "to": "java/repository/conf/sample/resources/misc/server/axis2.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " wrapper.java.classpath.3=../../lib\n",
+            " wrapper.java.classpath.4=../../repository/conf\n",
+            " wrapper.java.classpath.5=../../lib/*.jar\n",
+            "+wrapper.java.classpath.6=lib/*.jar\n",
+            " \n",
+            " # Java Library Path (location of Wrapper.DLL or libwrapper.so)\n",
+            " wrapper.java.library.path.1=../../lib\n"
+          ],
+          "locn": "-20,6 +20,7"
+        }
+      ],
+      "from": "java/repository/conf/sample-server-wrapper.conf",
+      "to": "java/repository/conf/sample-server-wrapper.conf"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            " # update classpath\n",
+            " AXIS2_CLASSPATH=\"$AXIS2_HOME/../../lib\"\n",
+            "-for f in \"$AXIS2_HOME\"/../../lib/*.jar\n",
+            "+for f in \"$AXIS2_HOME\"/../../lib/*.jar \"$AXIS2_HOME\"/lib/*.jar\n",
+            " do\n",
+            "   AXIS2_CLASSPATH=\"$AXIS2_CLASSPATH\":$f\n",
+            " done\n"
+          ],
+          "locn": "-81,7 +81,7"
+        }
+      ],
+      "from": "java/modules/samples/src/main/scripts/axis2Server/axis2server.sh",
+      "to": "java/modules/samples/src/main/scripts/axis2Server/axis2server.sh"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             <groupId>xerces</groupId>\n",
+            "             <artifactId>xercesImpl</artifactId>\n",
+            "         </dependency-->\n",
+            "+        \n",
+            "+        <!-- Libraries packaged with the sample Axis2 server (but that are not useful for Synapse itself) -->\n",
+            "+        <dependency>\n",
+            "+            <groupId>org.apache.axis2</groupId>\n",
+            "+            <artifactId>axis2-jaxws</artifactId>\n",
+            "+        </dependency>\n",
+            "     </dependencies>\n",
+            " \n",
+            "     <repositories>\n"
+          ],
+          "locn": "-154,6 +154,12"
+        }
+      ],
+      "from": "java/modules/distribution/pom.xml",
+      "to": "java/modules/distribution/pom.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                 <exclude>quickfixj:quickfixj-all:jar</exclude>\r\n",
+            "                 <exclude>org.snmp4j:snmp4j</exclude>\r\n",
+            "                 <exclude>org.snmp4j:snmp4j-agent</exclude>\r\n",
+            "+                \r\n",
+            "+                <!-- Dependencies that are only used by the Axis2 sample server -->\r\n",
+            "+                <exclude>org.apache.axis2:axis2-jaxws:jar</exclude>\r\n",
+            "+                <exclude>org.apache.axis2:axis2-metadata:jar</exclude>\r\n",
+            "+                <exclude>org.apache.geronimo.specs:geronimo-annotation_1.0_spec:jar</exclude>\r\n",
+            "+                <exclude>org.apache.geronimo.specs:geronimo-jaxws_2.2_spec:jar</exclude>\r\n",
+            "+                <exclude>javax.xml.bind:jaxb-api:jar</exclude>\r\n",
+            "+                <exclude>com.sun.xml.bind:jaxb-impl:jar</exclude>\r\n",
+            "+                <exclude>com.sun.xml.bind:jaxb-xjc:jar</exclude>\r\n",
+            "             </excludes>\r\n",
+            "         </dependencySet>\r\n",
+            "         <dependencySet>\r\n",
+            "             <useProjectArtifact>false</useProjectArtifact>\r\n",
+            "+            <outputDirectory>synapse-${synapse.version}/samples/axis2Server/lib</outputDirectory>\r\n",
+            "+            <includes>\r\n",
+            "+                <include>org.apache.axis2:axis2-jaxws:jar</include>\r\n",
+            "+                <include>org.apache.axis2:axis2-metadata:jar</include>\r\n",
+            "+                <include>org.apache.geronimo.specs:geronimo-annotation_1.0_spec:jar</include>\r\n",
+            "+                <include>org.apache.geronimo.specs:geronimo-jaxws_2.2_spec:jar</include>\r\n",
+            "+                <include>javax.xml.bind:jaxb-api:jar</include>\r\n",
+            "+                <include>com.sun.xml.bind:jaxb-impl:jar</include>\r\n",
+            "+                <include>com.sun.xml.bind:jaxb-xjc:jar</include>\r\n",
+            "+            </includes>\r\n",
+            "+        </dependencySet>\r\n",
+            "+        <dependencySet>\r\n",
+            "+            <useProjectArtifact>false</useProjectArtifact>\r\n",
+            "             <outputDirectory>synapse-${synapse.version}</outputDirectory>\r\n",
+            "             <unpack>true</unpack>\r\n",
+            "             <includes>\r\n"
+          ],
+          "locn": "-192,10 +192,32"
+        }
+      ],
+      "from": "java/modules/distribution/src/main/assembly/bin.xml",
+      "to": "java/modules/distribution/src/main/assembly/bin.xml"
+    }
+  ],
+  "id": "1381203",
+  "message": "Changed the configuration of the Axis2 sample server packaged with the distribution such that one can readily deploy JAX-WS services on it.\n",
+  "when": "2012-09-05T10:42:53-04:00",
+  "who": "veithen"
+}

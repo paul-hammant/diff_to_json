@@ -1,0 +1,186 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            " package org.apache.synapse.core.axis2;\n",
+            " \n",
+            "-import org.apache.axiom.om.OMAbstractFactory;\n",
+            " import org.apache.axiom.om.OMElement;\n",
+            "-import org.apache.axiom.soap.SOAPFactory;\n",
+            " import org.apache.axis2.AxisFault;\n",
+            " import org.apache.axis2.Constants;\n",
+            " import org.apache.axis2.addressing.AddressingConstants;\n"
+          ],
+          "locn": "-19,9 +19,7"
+        },
+        {
+          "lines": [
+            "                 }\n",
+            "             }\n",
+            "             // temporary workaround for https://issues.apache.org/jira/browse/WSCOMMONS-197\n",
+            "-            if (axisOutMsgCtx.getEnvelope().getHeader() == null) {\n",
+            "-                SOAPFactory fac = axisOutMsgCtx.isSOAP11() ?\n",
+            "-                        OMAbstractFactory.getSOAP11Factory() : OMAbstractFactory.getSOAP12Factory();\n",
+            "-                fac.createSOAPHeader(axisOutMsgCtx.getEnvelope());\n",
+            "-            }\n",
+            "+            axisOutMsgCtx.getEnvelope().getOrCreateHeader();\n",
+            "         }\n",
+            " \n",
+            "         OperationClient mepClient = axisAnonymousOperation.createClient(serviceCtx, clientOptions);\n"
+          ],
+          "locn": "-383,11 +381,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            " package org.apache.synapse.core.axis2;\n",
+            " \n",
+            "-import org.apache.axiom.om.OMAbstractFactory;\n",
+            "-import org.apache.axiom.soap.SOAPFactory;\n",
+            " import org.apache.axiom.util.UIDGenerator;\n",
+            " import org.apache.axis2.AxisFault;\n",
+            " import org.apache.axis2.Constants;\n"
+          ],
+          "locn": "-19,8 +19,6"
+        },
+        {
+          "lines": [
+            "             }\n",
+            " \n",
+            "             // temporary workaround for https://issues.apache.org/jira/browse/WSCOMMONS-197\n",
+            "-            if (messageContext.isEngaged(SynapseConstants.SECURITY_MODULE_NAME) &&\n",
+            "-                messageContext.getEnvelope().getHeader() == null) {\n",
+            "-                SOAPFactory fac = messageContext.isSOAP11() ?\n",
+            "-                    OMAbstractFactory.getSOAP11Factory() : OMAbstractFactory.getSOAP12Factory();\n",
+            "-                fac.createSOAPHeader(messageContext.getEnvelope());\n",
+            "+            if (messageContext.isEngaged(SynapseConstants.SECURITY_MODULE_NAME)) {\n",
+            "+                messageContext.getEnvelope().getOrCreateHeader();\n",
+            "             }\n",
+            " \n",
+            "             Axis2FlexibleMEPClient.clearSecurtityProperties(messageContext.getOptions());\n"
+          ],
+          "locn": "-144,11 +142,8"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2Sender.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2Sender.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " package org.apache.synapse.mediators.elementary;\n",
+            " \n",
+            " import org.apache.axiom.om.*;\n",
+            "-import org.apache.axiom.soap.SOAP12Constants;\n",
+            " import org.apache.axiom.soap.SOAPEnvelope;\n",
+            "-import org.apache.axiom.soap.SOAPFactory;\n",
+            " import org.apache.synapse.MessageContext;\n",
+            " import org.apache.synapse.SynapseLog;\n",
+            " import org.apache.synapse.util.MessageHelper;\n"
+          ],
+          "locn": "-20,9 +20,7"
+        },
+        {
+          "lines": [
+            "                     if (node instanceof OMElement) {\n",
+            "                         if (node instanceof SOAPEnvelope) {\n",
+            "                             SOAPEnvelope soapEnvelope = (SOAPEnvelope) node;\n",
+            "-                            String soapNamespace = null;\n",
+            "-\n",
+            "-                            if (soapEnvelope.getNamespace() != null) {\n",
+            "-                                soapNamespace = soapEnvelope.getNamespace().getNamespaceURI();\n",
+            "-                            }\n",
+            "-                            if (soapEnvelope.getHeader() == null && soapNamespace != null) {\n",
+            "-                                SOAPFactory soapFactory;\n",
+            "-                                if (soapNamespace.equals(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI)) {\n",
+            "-                                    soapFactory = OMAbstractFactory.getSOAP12Factory();\n",
+            "-                                } else {\n",
+            "-                                    soapFactory = OMAbstractFactory.getSOAP11Factory();\n",
+            "-                                }\n",
+            "-                                soapFactory.createSOAPHeader(soapEnvelope);\n",
+            "-                            }\n",
+            "+                            soapEnvelope.getOrCreateHeader();\n",
+            "                             sourceNodeList.add(soapEnvelope);\n",
+            "                         } else {\n",
+            "                             OMElement ele = (OMElement) node;\n"
+          ],
+          "locn": "-123,20 +121,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/Source.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/Source.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             return;\n",
+            "         }\n",
+            "         SOAPFactory fac = (SOAPFactory) env.getOMFactory();\n",
+            "-        SOAPHeader header = env.getHeader();\n",
+            "-        if (header == null) {\n",
+            "-            header = fac.createSOAPHeader(env);\n",
+            "-        }\n",
+            "+        SOAPHeader header = env.getOrCreateHeader();\n",
+            "         SOAPHeaderBlock hb = header.addHeaderBlock(qName.getLocalPart(),\n",
+            "                 fac.createOMNamespace(qName.getNamespaceURI(), qName.getPrefix()));\n",
+            "         hb.setText(value);\n"
+          ],
+          "locn": "-159,10 +159,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/transform/HeaderMediator.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/transform/HeaderMediator.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.axiom.om.OMNode;\n",
+            " import org.apache.axiom.soap.SOAPBody;\n",
+            " import org.apache.axiom.soap.SOAPEnvelope;\n",
+            "-import org.apache.axiom.soap.SOAPFactory;\n",
+            " import org.apache.axiom.soap.SOAPHeader;\n",
+            " import org.apache.axiom.soap.SOAPHeaderBlock;\n",
+            " import org.apache.axis2.AxisFault;\n"
+          ],
+          "locn": "-32,7 +32,6"
+        },
+        {
+          "lines": [
+            "      * @throws ScriptException if an error occurs when converting the XML to OM\n",
+            "      */\n",
+            "     public void addHeader(boolean mustUnderstand, Object content) throws ScriptException {\n",
+            "-        SOAPEnvelope envelope = mc.getEnvelope();\n",
+            "-        SOAPFactory factory = (SOAPFactory)envelope.getOMFactory();\n",
+            "-        SOAPHeader header = envelope.getHeader();\n",
+            "-        if (header == null) {\n",
+            "-            header = factory.createSOAPHeader(envelope);\n",
+            "-        }\n",
+            "+        SOAPHeader header = mc.getEnvelope().getOrCreateHeader();\n",
+            "         OMElement element = xmlHelper.toOMElement(content);\n",
+            "         // We can't add the element directly to the SOAPHeader. Instead, we need to copy the\n",
+            "         // information over to a SOAPHeaderBlock.\n"
+          ],
+          "locn": "-106,12 +105,7"
+        }
+      ],
+      "from": "java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMessageContext.java",
+      "to": "java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMessageContext.java"
+    }
+  ],
+  "id": "1435845",
+  "message": "Use the new SOAPEnvelope#getOrCreateHeader() method where appropriate.",
+  "when": "2013-01-20T09:06:32-05:00",
+  "who": "veithen"
+}

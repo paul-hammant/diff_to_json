@@ -1,0 +1,44 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             if (url == null) {\n",
+            "                 return null;\n",
+            "             }\n",
+            "-            URLConnection connection = getURLConnection(url);\n",
+            "+\n",
+            "+            URLConnection connection = null;\n",
+            "+            // If wsdl url contains http basic authentication parameters.\n",
+            "+            if (url.getUserInfo() != null) {\n",
+            "+                String protocol = url.getProtocol();\n",
+            "+                if (\"http\".equalsIgnoreCase(protocol) || \"https\".equalsIgnoreCase(protocol)) {\n",
+            "+                    // Create new url excluding user info\n",
+            "+                    URL newUrl = new URL(protocol, url.getHost(), url.getPort(), url.getFile());\n",
+            "+                    connection = getURLConnection(newUrl);\n",
+            "+                    String encoding = new String(new Base64().encode(url.getUserInfo().getBytes()));\n",
+            "+                    connection.setRequestProperty(\"Authorization\", \"Basic \" + encoding);\n",
+            "+                } else {\n",
+            "+                    handleException(\"Unsupported protocol [\" + protocol + \"]. Supports only http \" +\n",
+            "+                            \"and https with basic authentication.\");\n",
+            "+                }\n",
+            "+            } else {\n",
+            "+                connection = getURLConnection(url);\n",
+            "+            }\n",
+            "             if (connection == null) {\n",
+            "                 if (log.isDebugEnabled()) {\n",
+            "                     log.debug(\"Cannot create a URLConnection for given URL : \" + url);\n"
+          ],
+          "locn": "-184,7 +184,24"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfigUtils.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfigUtils.java"
+    }
+  ],
+  "id": "1508280",
+  "message": "Supporting basic auth protected URLs for loading WSDLs and local entries - Applying patch for SYNAPSE-812",
+  "when": "2013-07-29T23:13:35-04:00",
+  "who": "hiranya"
+}

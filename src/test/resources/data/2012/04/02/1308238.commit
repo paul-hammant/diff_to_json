@@ -1,0 +1,233 @@
+Index: java/modules/documentation/pom.xml
+===================================================================
+--- java/modules/documentation/pom.xml	(revision 1308237)
++++ java/modules/documentation/pom.xml	(revision 1308238)
+@@ -19,9 +19,9 @@
+   -->
+ 
+ <project
+-    xmlns="http://maven.apache.org/POM/4.0.0"
+-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++        xmlns="http://maven.apache.org/POM/4.0.0"
++        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
++        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+@@ -38,67 +38,70 @@
+ 
+     <scm>
+         <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/documentation</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/documentation</developerConnection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/documentation
++        </developerConnection>
+         <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/documentation</url>
+     </scm>
+ 
+     <build>
+         <plugins>
+-	  <plugin>
+-	    <artifactId>maven-site-plugin</artifactId>
+-	    <executions>
+-	      <execution>
+-		<phase>package</phase>
+-		<goals>
+-		  <goal>site</goal>
+-		</goals>
+-	      </execution>
+-	    </executions>
+-	  </plugin>
+-	  <plugin>
+-	    <artifactId>maven-assembly-plugin</artifactId>
+-	    <executions>	     
+-	      <execution>
+-		<phase>package</phase>
+-		<goals>
+-		  <goal>single</goal>
+-		</goals>
+-	      </execution>
+-	    </executions>
+-	    <configuration>	      
+-	      <descriptors>
+-		<descriptor>src/main/assembly/docs.xml</descriptor>
+-	      </descriptors>
+-	    </configuration>
+-	  </plugin>
++            <plugin>
++                <artifactId>maven-site-plugin</artifactId>
++                <executions>
++                    <execution>
++                        <phase>package</phase>
++                        <goals>
++                            <goal>site</goal>
++                        </goals>
++                    </execution>
++                </executions>
++            </plugin>
++            <plugin>
++                <artifactId>maven-assembly-plugin</artifactId>
++                <executions>
++                    <execution>
++                        <phase>package</phase>
++                        <goals>
++                            <goal>single</goal>
++                        </goals>
++                    </execution>
++                </executions>
++                <configuration>
++                    <descriptors>
++                        <descriptor>src/main/assembly/docs.xml</descriptor>
++                    </descriptors>
++                </configuration>
++            </plugin>
+         </plugins>
+     </build>
+ 
+     <reporting>
+-      <plugins>
+-	<plugin>
+-	  <groupId>org.apache.maven.plugins</groupId>
+-	  <artifactId>maven-project-info-reports-plugin</artifactId>
+-	  <reportSets>
+-	    <reportSet>
+-	      <reports>
+-		<report>project-team</report>
+-		<report>mailing-list</report>
+-		<report>issue-tracking</report>
+-		<report>scm</report>
+-		<report>dependency-management</report>
+-		<report>plugin-management</report>
+-	      </reports>
+-	    </reportSet>
+-	  </reportSets>
+-	  <configuration>
+-	    <webAccessUrl>http://svn.apache.org/viewvc/synapse/trunk/java</webAccessUrl>
+-	    <anonymousConnection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java</anonymousConnection>
+-	    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java</developerConnection>
+-	    <checkoutDirectoryName>synapse</checkoutDirectoryName>
+-	  </configuration>
+-	</plugin>
+-      </plugins>
++        <plugins>
++            <plugin>
++                <groupId>org.apache.maven.plugins</groupId>
++                <artifactId>maven-project-info-reports-plugin</artifactId>
++                <reportSets>
++                    <reportSet>
++                        <reports>
++                            <report>project-team</report>
++                            <report>mailing-list</report>
++                            <report>issue-tracking</report>
++                            <report>scm</report>
++                            <report>dependency-management</report>
++                            <report>plugin-management</report>
++                        </reports>
++                    </reportSet>
++                </reportSets>
++                <configuration>
++                    <webAccessUrl>http://svn.apache.org/viewvc/synapse/trunk/java</webAccessUrl>
++                    <anonymousConnection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java
++                    </anonymousConnection>
++                    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java
++                    </developerConnection>
++                    <checkoutDirectoryName>synapse</checkoutDirectoryName>
++                </configuration>
++            </plugin>
++        </plugins>
+     </reporting>
+ 
+ </project>
+Index: java/modules/distribution/src/main/assembly/bin.xml
+===================================================================
+--- java/modules/distribution/src/main/assembly/bin.xml	(revision 1308237)
++++ java/modules/distribution/src/main/assembly/bin.xml	(revision 1308238)
+@@ -130,16 +130,8 @@
+             <directory>src/main/bin/native</directory>
+             <outputDirectory>synapse-${synapse.version}/bin/native</outputDirectory>
+             <fileMode>755</fileMode>
+-        </fileSet>      
+-        <!--fileSet>
+-            <directory>../../src/site/resources/images</directory>
+-            <outputDirectory>synapse-${synapse.version}/docs/images</outputDirectory>
+         </fileSet>
+         <fileSet>
+-            <directory>../../src/site/resources/logos</directory>
+-            <outputDirectory>synapse-${synapse.version}/docs/logos</outputDirectory>
+-        </fileSet-->
+-        <fileSet>
+             <directory>../../modules/samples/services</directory>
+             <outputDirectory>synapse-${synapse.version}/samples/axis2Server/src</outputDirectory>
+         </fileSet>
+@@ -166,56 +158,9 @@
+             </includes>
+             <fileMode>755</fileMode>
+         </fileSet>
+-
+-        <!--<fileSet>-->
+-        <!--<directory>target/javadoc</directory>-->
+-        <!--<outputDirectory>synapse-${synapse.version}/docs/api</outputDirectory>-->
+-        <!--<includes>-->
+-        <!--<include>**/*</include>-->
+-        <!--</includes>-->
+-        <!--</fileSet>-->
+-        <!--<fileSet>-->
+-        <!--<directory>target/additional-libs</directory>-->
+-        <!--<outputDirectory>synapse-${synapse.version}/lib</outputDirectory>-->
+-        <!--<includes>-->
+-        <!--<include>**/*</include>-->
+-        <!--</includes>-->
+-        <!--</fileSet>-->
+-        <!--<fileSet>-->
+-        <!--<directory>target</directory>-->
+-        <!--<outputDirectory>synapse-${synapse.version}/lib</outputDirectory>-->
+-        <!--<includes>-->
+-        <!--<include>synapse.jar</include>-->
+-        <!--</includes>-->
+-        <!--</fileSet>-->
+     </fileSets>
+     <files>
+-        <!--file>
+-            <source>../../src/site/xdoc/Synapse_Configuration_Language.xml</source>
+-            <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
+-            <destName>Synapse_Configuration_Language.html</destName>
+-        </file>
+         <file>
+-            <source>../../src/site/xdoc/Synapse_Samples.xml</source>
+-            <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
+-            <destName>Synapse_Samples.html</destName>
+-        </file>
+-        <file>
+-            <source>../../src/site/xdoc/Synapse_Samples_Setup.xml</source>
+-            <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
+-            <destName>Synapse_Samples_Setup.html</destName>
+-        </file>
+-        <file>
+-            <source>../../src/site/xdoc/Synapse_QuickStart.xml</source>
+-            <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
+-            <destName>Synapse_QuickStart.html</destName>
+-        </file>
+-        <file>
+-            <source>../../src/site/xdoc/Synapse_Extending.xml</source>
+-            <outputDirectory>synapse-${synapse.version}/docs</outputDirectory>
+-            <destName>Synapse_Extending.html</destName>
+-        </file-->
+-        <file>
+             <source>.empty</source>
+             <outputDirectory>synapse-${synapse.version}/work/temp/sampleClient</outputDirectory>
+         </file>
+@@ -234,7 +179,7 @@
+             <outputDirectory>synapse-${synapse.version}/lib</outputDirectory>
+             <excludes>
+                 <exclude>org.apache.synapse:synapse-patches:zip:jars</exclude>
+-		<exclude>org.apache.synapse:synapse-documentation:zip:docs</exclude>
++		        <exclude>org.apache.synapse:synapse-documentation:zip:docs</exclude>
+                 <exclude>org.apache.axis2:addressing:mar</exclude>
+                 <exclude>org.apache.rampart:rampart:mar</exclude>
+                 <exclude>org.apache.sandesha2:sandesha2:mar</exclude>
+-*-*-*-
+Message: Cleaning up some build descriptors
+-*-*-*-
+When: 2012-04-02 01:12:07 -0400 
+-*-*-*-
+Who: hiranya

@@ -1,0 +1,19 @@
+Index: java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTask.java
+===================================================================
+--- java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTask.java	(revision 1509545)
++++ java/modules/transports/optional/amqp/src/main/java/org/apache/synapse/transport/amqp/pollingtask/AMQPTransportPollingTask.java	(revision 1509546)
+@@ -538,7 +538,7 @@
+ 
+                     AMQPTransportHABrokerEntry brokerEntry = haHandler.getConnectionMap().get(key);
+                     if (brokerEntry == null) {
+-                        log.error("No new connection factory were found for key '" + key + "'");
++                        log.error("No new connection factory was found for key '" + key + "'");
+                     } else {
+                         setChannel(brokerEntry.getChannel());
+                         stop();
+-*-*-*-
+Message: fixed wording.
+-*-*-*-
+When: 2013-08-02 01:07:47 -0400 
+-*-*-*-
+Who: rajikak

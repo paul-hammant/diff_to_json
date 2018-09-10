@@ -1,0 +1,66 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                 cfgCtx.getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_CONFIG);\n",
+            "         if (synCfgParam == null) {\n",
+            "             throw new DeploymentException(\"SynapseConfiguration not found. \" +\n",
+            "-                    \"Are you sure that you are running Synapse?\");\n",
+            "+                    \"Unable to continue the deployment operation.\");\n",
+            "         }\n",
+            "         return (SynapseConfiguration) synCfgParam.getValue();\n",
+            "     }\n"
+          ],
+          "locn": "-336,7 +336,7"
+        },
+        {
+          "lines": [
+            "                 cfgCtx.getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_ENV);\n",
+            "         if (synCfgParam == null) {\n",
+            "             throw new DeploymentException(\"SynapseEnvironment not found. \" +\n",
+            "-                    \"Are you sure that you are running Synapse?\");\n",
+            "+                    \"Unable to continue the deployment operation.\");\n",
+            "         }\n",
+            "         return (SynapseEnvironment) synCfgParam.getValue();\n",
+            "     }\n"
+          ],
+          "locn": "-346,7 +346,7"
+        },
+        {
+          "lines": [
+            "                         SynapseConstants.SYNAPSE_SERVER_CONFIG_INFO);\n",
+            "         if (serverCfgParam == null) {\n",
+            "             throw new DeploymentException(\"SynapseConfigurationInformation not found. \" +\n",
+            "-                    \"Are you sure that you are running Synapse?\");\n",
+            "+                    \"Unable to continue the deployment operation.\");\n",
+            "         }\n",
+            "         return (ServerConfigurationInformation) serverCfgParam.getValue();\n",
+            "     }\n"
+          ],
+          "locn": "-358,7 +358,7"
+        },
+        {
+          "lines": [
+            "                         SynapseConstants.SYNAPSE_SERVER_CTX_INFO);\n",
+            "         if (serverCtxParam == null) {\n",
+            "             throw new DeploymentException(\"ServerContextInformation not found. \" +\n",
+            "-                    \"Are you sure that you are running Synapse?\");\n",
+            "+                    \"Unable to continue the deployment operation.\");\n",
+            "         }\n",
+            "         return (ServerContextInformation) serverCtxParam.getValue();\n",
+            "     }\n"
+          ],
+          "locn": "-370,7 +370,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/deployers/AbstractSynapseArtifactDeployer.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/deployers/AbstractSynapseArtifactDeployer.java"
+    }
+  ],
+  "id": "1210843",
+  "message": "Updating some log statements",
+  "when": "2011-12-06T05:12:12-05:00",
+  "who": "hiranya"
+}

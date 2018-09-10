@@ -1,0 +1,106 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                 <tr>\n",
+            "                     <td>http.socket.rcv-buffer-size</td>\n",
+            "                     <td>\n",
+            "-                        Set the size of the buffers used by the underlying platform\n",
+            "+                        Set the size of the buffers (in bytes) used by the underlying platform\n",
+            "                         for incoming network I/O. This value is only a hint. When set, this is a\n",
+            "                         suggestion to the OS kernel from Synapse about the size of buffers to\n",
+            "                         use for the data to be received over the socket\n"
+          ],
+          "locn": "-746,7 +746,7"
+        },
+        {
+          "lines": [
+            "                 <tr>\n",
+            "                     <td>http.socket.snd-buffer-size</td>\n",
+            "                     <td>\n",
+            "-                        Set the size of the buffers used by the underlying platform\n",
+            "+                        Set the size of the buffers (in bytes) used by the underlying platform\n",
+            "                         for outgoing network I/O. This value is only a hint. When set, this is a\n",
+            "                         suggestion to the OS kernel from Synapse about the size of buffers to\n",
+            "                         use for the data to be sent over the socket\n"
+          ],
+          "locn": "-759,7 +759,7"
+        },
+        {
+          "lines": [
+            "                     <td>report</td>\n",
+            "                 </tr>\n",
+            "                 <tr>\n",
+            "+                    <td>io_buffer_size</td>\n",
+            "+                    <td>\n",
+            "+                        Set the size of the I/O buffers (in bytes) used as the pipes between HTTP\n",
+            "+                        listener and sender. Typically, the HTTP listener would write the incoming\n",
+            "+                        message data to one of these buffers, and the sender would read from it to\n",
+            "+                        send the message out.\n",
+            "+                        <div class=\"xmlConf\">io_buffer_size=10240</div>\n",
+            "+                    </td>\n",
+            "+                    <td>No</td>\n",
+            "+                    <td>8192</td>\n",
+            "+                </tr>\n",
+            "+                <tr>\n",
+            "+                    <td>http.user.agent.preserve</td>\n",
+            "+                    <td>\n",
+            "+                        Specify whether Synapse should preserve the User-Agent header sent by the\n",
+            "+                        client applications, when forwarding messages to backend servers. Allowed\n",
+            "+                        values are either true or false. If set to false, Synapse will overwrite\n",
+            "+                        the original User-Agent header value with the string 'Synapse-PT-HttpComponents-NIO'.\n",
+            "+                        <div class=\"xmlConf\">http.user.agent.preserve=true</div>\n",
+            "+                    </td>\n",
+            "+                    <td>No</td>\n",
+            "+                    <td>false</td>\n",
+            "+                </tr>\n",
+            "+                <tr>\n",
+            "+                    <td>http.server.preserve</td>\n",
+            "+                    <td>\n",
+            "+                        Specify whether Synapse should preserve the Server header sent by the\n",
+            "+                        backend servers, when forwarding messages to client applications. Allowed\n",
+            "+                        values are either true or false. If set to false, Synapse will overwrite\n",
+            "+                        the original Server header value with the string 'Synapse-PT-HttpComponents-NIO'.\n",
+            "+                        <div class=\"xmlConf\">http.server.preserve=false</div>\n",
+            "+                    </td>\n",
+            "+                    <td>No</td>\n",
+            "+                    <td>true</td>\n",
+            "+                </tr>\n",
+            "+                <tr>\n",
+            "                     <td>worker_pool_size_core</td>\n",
+            "                     <td>\n",
+            "                         Initial size of the internal thread pool used by the Pass\n"
+          ],
+          "locn": "-841,6 +841,42"
+        }
+      ],
+      "from": "java/modules/documentation/src/site/xdoc/userguide/transports/pass_through.xml",
+      "to": "java/modules/documentation/src/site/xdoc/userguide/transports/pass_through.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     protected HttpProcessor initHttpProcessor() {\n",
+            "         return new ImmutableHttpProcessor(\n",
+            "                 new ResponseDate(),\n",
+            "-                new ResponseServer(\"Synapse-PassThrough-Http\"),\n",
+            "+                new ResponseServer(\"Synapse-PT-HttpComponents-NIO\"),\n",
+            "                 new ResponseContent(),\n",
+            "                 new ResponseConnControl());\n",
+            "     }\n"
+          ],
+          "locn": "-124,7 +124,7"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/SourceConfiguration.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/SourceConfiguration.java"
+    }
+  ],
+  "id": "1513361",
+  "message": "Changed the default Server header of the pt transport (to be consistent with user agent header) - Updated documentation",
+  "when": "2013-08-13T02:06:04-04:00",
+  "who": "hiranya"
+}

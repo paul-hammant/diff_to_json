@@ -1,0 +1,134 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.quartz.*;\r\n",
+            " import org.quartz.impl.StdSchedulerFactory;\r\n",
+            " \r\n",
+            "+import java.util.List;\r\n",
+            " import java.util.Map;\r\n",
+            " import java.util.Properties;\r\n",
+            " \r\n"
+          ],
+          "locn": "-23,6 +23,7"
+        },
+        {
+          "lines": [
+            "         }\r\n",
+            " \r\n",
+            "         try {\r\n",
+            "-            if (log.isDebugEnabled()) {\r\n",
+            "-                log.debug(\"scheduling job : \" + jobDetail + \" with trigger \" + trigger);\r\n",
+            "+            if (taskDescription.getCount() != 0) {\r\n",
+            "+                if (!isTaskAlreadyRunning(jobDetail.getKey())) {\r\n",
+            "+                    if (log.isDebugEnabled()) {\r\n",
+            "+                        log.debug(\"Scheduling job : \" + jobDetail + \" with trigger \" + trigger);\r\n",
+            "+                    }\r\n",
+            "+                    scheduler.scheduleJob(jobDetail, trigger);\r\n",
+            "+                } else {\r\n",
+            "+                    log.warn(\"Did not schedule the job : \" + jobDetail + \". The job is already running.\");\r\n",
+            "+                }\r\n",
+            "+            } else {\r\n",
+            "+                log.warn(\"Did not schedule the job : \" + jobDetail + \". Job count is zero.\");\r\n",
+            "             }\r\n",
+            "-            scheduler.scheduleJob(jobDetail, trigger);\r\n",
+            "         } catch (SchedulerException e) {\r\n",
+            "             throw new SynapseTaskException(\"Error scheduling job : \" + jobDetail\r\n",
+            "                     + \" with trigger \" + trigger);\r\n",
+            "         }\r\n",
+            "-\r\n",
+            "     }\r\n",
+            " \r\n",
+            "     /**\r\n"
+          ],
+          "locn": "-201,15 +202,22"
+        },
+        {
+          "lines": [
+            "         jobDetail.getJobDataMap().put(TaskDescription.INSTANCE, task);\r\n",
+            " \r\n",
+            "         try {\r\n",
+            "-            if (log.isDebugEnabled()) {\r\n",
+            "-                log.debug(\"scheduling job : \" + jobDetail + \" with trigger \" + trigger);\r\n",
+            "+            if (taskDescription.getCount() != 0) {\r\n",
+            "+                if (!isTaskAlreadyRunning(jobDetail.getKey())) {\r\n",
+            "+                    if (log.isDebugEnabled()) {\r\n",
+            "+                        log.debug(\"Scheduling job : \" + jobDetail + \" with trigger \" + trigger);\r\n",
+            "+                    }\r\n",
+            "+                    scheduler.scheduleJob(jobDetail, trigger);\r\n",
+            "+                } else {\r\n",
+            "+                    log.warn(\"Did not schedule the job : \" + jobDetail + \". The job is already running.\");\r\n",
+            "+                }\r\n",
+            "+            } else {\r\n",
+            "+                log.warn(\"Did not schedule the job : \" + jobDetail + \". Job count is zero.\");\r\n",
+            "             }\r\n",
+            "-            scheduler.scheduleJob(jobDetail, trigger);\r\n",
+            "         } catch (SchedulerException e) {\r\n",
+            "             throw new SynapseTaskException(\"Error scheduling job : \" + jobDetail\r\n",
+            "                     + \" with trigger \" + trigger);\r\n"
+          ],
+          "locn": "-258,10 +266,18"
+        },
+        {
+          "lines": [
+            "         return runningTasks;\r\n",
+            "     }\r\n",
+            " \r\n",
+            "+    private boolean isTaskAlreadyRunning(JobKey jobKey) throws SchedulerException {\r\n",
+            "+        List<JobExecutionContext> currentJobs = scheduler.getCurrentlyExecutingJobs();\r\n",
+            "+        JobKey currentJobKey;\r\n",
+            "+        for (JobExecutionContext jobCtx : currentJobs) {\r\n",
+            "+            currentJobKey = jobCtx.getJobDetail().getKey();\r\n",
+            "+            if (currentJobKey.compareTo(jobKey) == 0) {\r\n",
+            "+                //found it!\r\n",
+            "+                log.warn(\"The job \" + jobKey.getName() + \" is already running\");\r\n",
+            "+                return true;\r\n",
+            "+            }\r\n",
+            "+        }\r\n",
+            "+        return false;\r\n",
+            "+    }\r\n",
+            "+\r\n",
+            "     /**\r\n",
+            "      * Sets a Trigger Factory , if it needs to void using default factory\r\n",
+            "      *\r\n"
+          ],
+          "locn": "-346,6 +362,20"
+        },
+        {
+          "lines": [
+            "             schedulerMetaData = schedulerMetaData.append(\"[ Scheduler : \")\r\n",
+            "                     .append(scheduler).append(\" ]\");\r\n",
+            "         }\r\n",
+            "-        return new StringBuffer().append(\"[ TaskScheduler[ Name :\").\r\n",
+            "-                append(name).append(\"]\").append(schedulerMetaData).append(\" ]\").toString();\r\n",
+            "+        return \"[ TaskScheduler[ Name : \" + name + \" ]\" + schedulerMetaData + \" ]\";\r\n",
+            "     }\r\n",
+            " \r\n",
+            "     private void assertInitialized() {\r\n"
+          ],
+          "locn": "-371,8 +401,7"
+        },
+        {
+          "lines": [
+            "     }\r\n",
+            " \r\n",
+            "     private void assertStarted() {\r\n",
+            "-\r\n",
+            "         try {\r\n",
+            "             if (!scheduler.isStarted()) {\r\n",
+            "                 throw new SynapseTaskException(\"Scheduler has not been started yet\", log);\r\n"
+          ],
+          "locn": "-383,7 +412,6"
+        }
+      ],
+      "from": "java/modules/tasks/src/main/java/org/apache/synapse/task/TaskScheduler.java",
+      "to": "java/modules/tasks/src/main/java/org/apache/synapse/task/TaskScheduler.java"
+    }
+  ],
+  "id": "1507748",
+  "message": "Checking whether a specified task is already running before scheduling it. Applying the patch for SYNAPSE-885 with some modifications.",
+  "when": "2013-07-27T19:54:36-04:00",
+  "who": "hiranya"
+}

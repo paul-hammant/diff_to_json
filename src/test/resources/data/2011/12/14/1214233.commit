@@ -1,0 +1,1024 @@
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1214232)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1214233)
+@@ -24,6 +24,7 @@
+ import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.samples.framework.tests.endpoint.*;
+ import org.apache.synapse.samples.framework.tests.message.*;
++import org.apache.synapse.samples.framework.tests.proxy.*;
+ import org.apache.synapse.samples.framework.tests.qos.Sample100;
+ import org.apache.synapse.samples.framework.tests.qos.Sample101;
+ 
+@@ -181,7 +182,7 @@
+         sampleClassRepo.put("54", Sample54.class);
+         sampleClassRepo.put("55", Sample55.class);
+         sampleClassRepo.put("56", Sample56.class);
+-        //sampleClassRepo.put("57", Sample57.class);  //intermittently fail
++        //sampleClassRepo.put("57", Sample57.class);  // intermittently fail
+         sampleClassRepo.put("58", Sample58.class);
+         sampleClassRepo.put("59", Sample59.class);
+ 
+@@ -188,5 +189,15 @@
+         //QoS
+         sampleClassRepo.put("100", Sample100.class);
+         sampleClassRepo.put("101", Sample101.class);
++
++        //Proxy Service
++        sampleClassRepo.put("150", Sample150.class);
++        sampleClassRepo.put("151", Sample151.class);
++        sampleClassRepo.put("152", Sample152.class);
++        //sampleClassRepo.put("153", Sample153.class); // unable to load the JKS files
++        sampleClassRepo.put("154", Sample154.class);
++        sampleClassRepo.put("155", Sample155.class);
++        sampleClassRepo.put("156", Sample156.class);
++        sampleClassRepo.put("157", Sample157.class);
+     }
+ }
+\ No newline at end of file
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample150.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample150.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample150.java	(revision 1214233)
+@@ -0,0 +1,46 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++package org.apache.synapse.samples.framework.tests.proxy;
++
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.samples.framework.SampleClientResult;
++import org.apache.synapse.samples.framework.SynapseTestCase;
++import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
++
++public class Sample150 extends SynapseTestCase {
++
++    private static final Log log = LogFactory.getLog(Sample150.class);
++
++    private StockQuoteSampleClient client;
++
++    public Sample150() {
++        super(150);
++        client = getStockQuoteClient();
++    }
++
++
++    public void testBasicProxy() {
++        String addUrl = "http://localhost:8280/services/StockQuoteProxy";
++        log.info("Running test: Introduction to proxy services");
++        SampleClientResult result = client.requestStandardQuote(addUrl, null, null, "IBM" ,null);
++        assertTrue("Client did not get run successfully ", result.responseReceived());
++    }
++
++}
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample151.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample151.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample151.java	(revision 1214233)
+@@ -0,0 +1,50 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++package org.apache.synapse.samples.framework.tests.proxy;
++
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.samples.framework.SampleClientResult;
++import org.apache.synapse.samples.framework.SynapseTestCase;
++import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
++
++public class Sample151 extends SynapseTestCase {
++
++    private static final Log log = LogFactory.getLog(Sample151.class);
++
++    private StockQuoteSampleClient client;
++
++    public Sample151() {
++        super(151);
++        client = getStockQuoteClient();
++    }
++
++
++    public void testCustomSequencesEndpointsWithProxy() {
++        String addUrl = "http://localhost:8280/services/StockQuoteProxy1";
++        String addUrl2 = "http://localhost:8280/services/StockQuoteProxy2";
++
++        log.info("Running test: Custom sequences and endpoints with proxy services");
++        SampleClientResult result1 = client.requestStandardQuote(addUrl, null, null, "IBM" ,null);
++        assertTrue("Client did not get run successfully ", result1.responseReceived());
++        SampleClientResult result2 = client.requestStandardQuote(addUrl2, null, null, "IBM" ,null);
++        assertTrue("Client did not get run successfully ", result2.responseReceived());
++    }
++
++}
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample152.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample152.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample152.java	(revision 1214233)
+@@ -0,0 +1,50 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++package org.apache.synapse.samples.framework.tests.proxy;
++
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.samples.framework.SampleClientResult;
++import org.apache.synapse.samples.framework.SynapseTestCase;
++import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
++
++public class Sample152 extends SynapseTestCase {
++
++    private static final Log log = LogFactory.getLog(Sample152.class);
++
++    private StockQuoteSampleClient client;
++
++    public Sample152() {
++        super(152);
++        client = getStockQuoteClient();
++    }
++
++
++    public void testTransportAndFormatSwitching() {
++        String url2 = "https://localhost:8243/services/StockQuoteProxy";
++        System.setProperty("javax.net.ssl.trustStore", System.getProperty("user.dir") +
++                "/modules/integration/src/test/resources/trust.jks");
++
++        log.info("Running test: Switching transports and message format from SOAP to REST/POX");
++
++        SampleClientResult result2 = client.requestStandardQuote(null, url2, null, "IBM" ,null);
++        assertTrue("Client did not a response with https ", result2.responseReceived());
++    }
++
++}
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample153.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample153.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample153.java	(revision 1214233)
+@@ -0,0 +1,48 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++package org.apache.synapse.samples.framework.tests.proxy;
++
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.samples.framework.SampleClientResult;
++import org.apache.synapse.samples.framework.SynapseTestCase;
++import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
++
++public class Sample153 extends SynapseTestCase {
++
++    private static final Log log = LogFactory.getLog(Sample153.class);
++
++    private StockQuoteSampleClient client;
++
++    public Sample153() {
++        super(153);
++        client = getStockQuoteClient();
++    }
++
++
++    public void testsRoutingWithoutProcessingSecurityHeaders() {
++        String url = "http://localhost:8280/services/StockQuoteProxy";
++        String policy = "./repository/conf/sample/resources/policy/client_policy_3.xml";
++        log.info("Running test: Routing the messages arrived to a proxy service without " +
++                "processing the security headers");
++        SampleClientResult  result = client.requestStandardQuote(null, url, null, "IBM", policy);
++        assertTrue("Client did not a response with https ", result.responseReceived());
++    }
++
++}
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample154.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample154.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample154.java	(revision 1214233)
+@@ -0,0 +1,48 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++package org.apache.synapse.samples.framework.tests.proxy;
++
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.samples.framework.SampleClientResult;
++import org.apache.synapse.samples.framework.SynapseTestCase;
++import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
++
++import java.util.concurrent.CountDownLatch;
++
++public class Sample154 extends SynapseTestCase {
++
++    private static final Log log = LogFactory.getLog(Sample154.class);
++
++    private StockQuoteSampleClient client;
++    CountDownLatch latch;
++
++    public Sample154() {
++        super(154);
++        client = getStockQuoteClient();
++    }
++
++
++    public void testSessionFullLB() {
++        String trpUrl = "http://localhost:8280/services/LBProxy";
++        log.info("Running test: Load Balancing with Proxy Services ");
++        SampleClientResult result = client.statefulClient(null, trpUrl, 100);
++        assertTrue("Client did not run successfully ", result.responseReceived());
++    }
++}
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample155.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample155.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample155.java	(revision 1214233)
+@@ -0,0 +1,48 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++package org.apache.synapse.samples.framework.tests.proxy;
++
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.samples.framework.SampleClientResult;
++import org.apache.synapse.samples.framework.SynapseTestCase;
++import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
++
++public class Sample155 extends SynapseTestCase {
++
++    private static final Log log = LogFactory.getLog(Sample155.class);
++
++    private StockQuoteSampleClient client;
++
++    public Sample155() {
++        super(155);
++        client = getStockQuoteClient();
++    }
++
++
++    public void testDualQuote() {
++        String addUrl = "http://localhost:8280/services/StockQuoteProxy";
++
++        log.info("Running test: Dual channel invocation on both client side and server " +
++                "side of Synapse with Proxy Services");
++        SampleClientResult result = client.requestDualQuote(addUrl, null, null, "IBM");
++        assertTrue("Client did not get run successfully ", result.responseReceived());
++    }
++
++}
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample156.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample156.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample156.java	(revision 1214233)
+@@ -0,0 +1,46 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++package org.apache.synapse.samples.framework.tests.proxy;
++
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.samples.framework.SampleClientResult;
++import org.apache.synapse.samples.framework.SynapseTestCase;
++import org.apache.synapse.samples.framework.clients.StockQuoteSampleClient;
++
++public class Sample156 extends SynapseTestCase {
++
++    private static final Log log = LogFactory.getLog(Sample156.class);
++
++    private StockQuoteSampleClient client;
++
++    public Sample156() {
++        super(156);
++        client = getStockQuoteClient();
++    }
++
++
++    public void testServiceIntegration() {
++        String addUrl = "http://localhost:8280/services/StockQuoteProxy";
++        log.info("Running test: Service Integration with specifying the receiving sequence");
++        SampleClientResult result = client.requestStandardQuote(addUrl, null, null, "IBM" ,null);
++        assertTrue("Client did not get run successfully ", result.responseReceived());
++    }
++
++}
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample157.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample157.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample157.java	(revision 1214233)
+@@ -0,0 +1,151 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++package org.apache.synapse.samples.framework.tests.proxy;
++
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.http.HttpEntity;
++import org.apache.http.HttpHeaders;
++import org.apache.http.HttpResponse;
++import org.apache.http.client.HttpClient;
++import org.apache.http.client.methods.HttpPost;
++import org.apache.http.entity.StringEntity;
++import org.apache.http.impl.client.DefaultHttpClient;
++import org.apache.http.protocol.HTTP;
++import org.apache.synapse.samples.framework.SynapseTestCase;
++
++import java.io.BufferedReader;
++import java.io.InputStreamReader;
++
++public class Sample157 extends SynapseTestCase {
++
++    private static final Log log = LogFactory.getLog(Sample157.class);
++
++    private String requestXml;
++    private HttpClient httpclient;
++
++    public Sample157() {
++        super(157);
++        httpclient = new DefaultHttpClient();
++
++        requestXml = "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:ser=\"http://services.samples\" xmlns:xsd=\"http://services.samples/xsd\">\n" +
++                "       <soap:Header/>\n" +
++                "       <soap:Body>\n" +
++                "          <ser:getQuote>\n" +
++                "             <ser:request>\n" +
++                "                <xsd:symbol>IBM</xsd:symbol>\n" +
++                "             </ser:request>\n" +
++                "          </ser:getQuote>\n" +
++                "       </soap:Body>\n" +
++                "    </soap:Envelope>";
++    }
++
++
++    public void testRoutingOnHttpHeader() {
++        String url = "http://localhost:8280/services/StockQuoteProxy";
++
++        log.info("Running test: Routing Messages based on HTTP URL, HTTP Headers and Query " +
++                "Parameters");
++
++        // Create a new HttpClient and Post Header
++        HttpPost httpPost = new HttpPost(url);//new HttpPost(availabilityUrl + VERSION_TEXT);
++
++        httpPost.setHeader(HttpHeaders.CONTENT_TYPE, "application/soap+xml;charset=UTF-8");
++        httpPost.setHeader("foo", "bar");
++        HttpResponse response;
++        HttpEntity entity;
++        try {
++            entity = new StringEntity(requestXml, "application/xml", HTTP.UTF_8);
++            httpPost.setEntity(entity);
++            response = httpclient.execute(httpPost);
++            assertNotNull("Did not get a response ", response);
++            HttpEntity resEntity = response.getEntity();
++            assertNotNull("Response is empty", resEntity);
++            BufferedReader rd = new BufferedReader(new InputStreamReader(resEntity.getContent()));
++            String result = "";
++            String line;
++            while ((line = rd.readLine()) != null) {
++                result += line;
++            }
++            System.out.println(result);
++            assertTrue("Response is empty", !"".equals(result));
++        } catch (Exception e) {
++            fail("Errors occurred while sending POST request: " + e.getMessage());
++        }
++
++        url = "http://localhost:8280/services/StockQuoteProxy";
++
++        log.info("Running test: Routing Messages based on HTTP URL, HTTP Headers and Query Parameters");
++
++        // Create a new HttpClient and Post Header
++        httpPost = new HttpPost(url);//new HttpPost(availabilityUrl + VERSION_TEXT);
++
++        httpPost.setHeader(HttpHeaders.CONTENT_TYPE, "application/soap+xml;charset=UTF-8");
++        httpPost.setHeader("my_custom_header1", "foo1");
++
++        try {
++            entity = new StringEntity(requestXml, "application/xml", HTTP.UTF_8);
++            httpPost.setEntity(entity);
++            response = httpclient.execute(httpPost);
++            assertNotNull("Did not get a response ", response);
++            HttpEntity resEntity = response.getEntity();
++            assertNotNull("Response is empty", resEntity);
++            BufferedReader rd = new BufferedReader(new InputStreamReader(resEntity.getContent()));
++            String result = "";
++            String line;
++            while ((line = rd.readLine()) != null) {
++                result += line;
++            }
++            System.out.println(result);
++            assertTrue("Response is empty", !"".equals(result));
++        } catch (Exception e) {
++            fail("Errors occurred while sending POST request: " + e.getMessage());
++        }
++
++        url = "http://localhost:8280/services/StockQuoteProxy?qparam1=qpv_foo&qparam2=qpv_foo2";
++        log.info("Running test: Routing Messages based on HTTP URL, HTTP Headers and Query Parameters");
++
++        // Create a new HttpClient and Post Header
++        httpPost = new HttpPost(url);//new HttpPost(availabilityUrl + VERSION_TEXT);
++
++        httpPost.setHeader(HttpHeaders.CONTENT_TYPE, "application/soap+xml;charset=UTF-8");
++        httpPost.setHeader("my_custom_header2", "bar");
++        httpPost.setHeader("my_custom_header3", "foo");
++
++        try {
++            entity = new StringEntity(requestXml, "application/xml", HTTP.UTF_8);
++            httpPost.setEntity(entity);
++            response = httpclient.execute(httpPost);
++            assertNotNull("Did not get a response ", response);
++            HttpEntity resEntity = response.getEntity();
++            assertNotNull("Response is empty", resEntity);
++            BufferedReader rd = new BufferedReader(new InputStreamReader(resEntity.getContent()));
++            String result = "";
++            String line;
++            while ((line = rd.readLine()) != null) {
++                result += line;
++            }
++            System.out.println(result);
++            assertTrue("Response is empty", !"".equals(result));
++        } catch (Exception e) {
++            fail("Errors occurred while sending POST request: " + e.getMessage());
++        }
++    }
++
++}
+Index: java/modules/integration/src/test/resources/sample150.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample150.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample150.xml	(revision 1214233)
+@@ -0,0 +1,18 @@
++<synapseSample>
++    <sampleID>150</sampleID>
++    <sampleName>Introduction to proxy services</sampleName>
++    <synapseConfig>
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>repository/conf/sample/synapse_sample_150.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+Index: java/modules/integration/src/test/resources/sample151.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample151.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample151.xml	(revision 1214233)
+@@ -0,0 +1,18 @@
++<synapseSample>
++    <sampleID>151</sampleID>
++    <sampleName>Custom sequences and endpoints with proxy services</sampleName>
++    <synapseConfig>
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>repository/conf/sample/synapse_sample_151.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+Index: java/modules/integration/src/test/resources/sample152.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample152.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample152.xml	(revision 1214233)
+@@ -0,0 +1,18 @@
++<synapseSample>
++    <sampleID>152</sampleID>
++    <sampleName>Switching transports and message format from SOAP to REST/POX</sampleName>
++    <synapseConfig>
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>repository/conf/sample/synapse_sample_152.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+Index: java/modules/integration/src/test/resources/sample153.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample153.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample153.xml	(revision 1214233)
+@@ -0,0 +1,18 @@
++<synapseSample>
++    <sampleID>153</sampleID>
++    <sampleName>Routing the messages arrived to a proxy service without processing the security headers</sampleName>
++    <synapseConfig>
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>repository/conf/sample/synapse_sample_153.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+Index: java/modules/integration/src/test/resources/sample154.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample154.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample154.xml	(revision 1214233)
+@@ -0,0 +1,32 @@
++<synapseSample>
++    <sampleID>154</sampleID>
++    <sampleName>Load Balancing with Proxy Services</sampleName>
++    <synapseConfig>
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>repository/conf/sample/synapse_sample_154.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='1'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++	    <httpPort>9001</httpPort>
++	    <httpsPort>9005</httpsPort>
++        </axis2Server>
++        <axis2Server id='2'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++	    <httpPort>9002</httpPort>
++	    <httpsPort>9006</httpsPort>
++        </axis2Server>
++        <axis2Server id='3'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++	    <httpPort>9003</httpPort>
++	    <httpsPort>9007</httpsPort>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+Index: java/modules/integration/src/test/resources/sample155.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample155.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample155.xml	(revision 1214233)
+@@ -0,0 +1,18 @@
++<synapseSample>
++    <sampleID>155</sampleID>
++    <sampleName>Dual channel invocation on both client side and serverside of Synapse with Proxy Services</sampleName>
++    <synapseConfig>
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>repository/conf/sample/synapse_sample_155.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+Index: java/modules/integration/src/test/resources/sample156.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample156.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample156.xml	(revision 1214233)
+@@ -0,0 +1,18 @@
++<synapseSample>
++    <sampleID>156</sampleID>
++    <sampleName>Service Integration with specifying the receiving sequence</sampleName>
++    <synapseConfig>
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>repository/conf/sample/synapse_sample_156.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+Index: java/modules/integration/src/test/resources/sample157.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample157.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample157.xml	(revision 1214233)
+@@ -0,0 +1,18 @@
++<synapseSample>
++    <sampleID>157</sampleID>
++    <sampleName>Conditional Router for Routing Messages based on HTTP URL, HTTP Headers and Query Parameters</sampleName>
++    <synapseConfig>
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>repository/conf/sample/synapse_sample_157.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+Index: java/modules/integration/pom.xml
+===================================================================
+--- java/modules/integration/pom.xml	(revision 1214232)
++++ java/modules/integration/pom.xml	(revision 1214233)
+@@ -90,127 +90,112 @@
+ 
+                                 <property name="temp.dir" value="target/temp"/>
+                                 <property name="classes" value="${temp.dir}/classes"/>
+-                                <property name="services"
+-                                value="target/test_repos/axis2Server/services"/>
++                                <property name="services" value="target/test_repos/axis2Server/services"/>
+ 
+-                                <property name="src"
+-                                value="../samples/services/SimpleStockQuoteService/src"/>
++                                <property name="src" value="../samples/services/SimpleStockQuoteService/src"/>
+ 
+                                 <mkdir dir="${temp.dir}"/>
+                                 <mkdir dir="${classes}"/>
+ 
+                                 <javac debug="on" destdir="${classes}" fork="true" includeantruntime="false">
+-                                <src path="${src}"/>
+-                                <classpath refid="maven.compile.classpath"/>
++                                    <src path="${src}"/>
++                                    <classpath refid="maven.compile.classpath"/>
+                                 </javac>
+ 
+-                                <property name="SSQ.dir"
+-                                value="${temp.dir}/SimpleStockQuote"/>
++                                <property name="SSQ.dir" value="${temp.dir}/SimpleStockQuote"/>
+                                 <mkdir dir="${SSQ.dir}"/>
+ 
+                                 <mkdir dir="${SSQ.dir}/META-INF"/>
+-                                <copy file="${src}/../conf/services.xml"
+-                                tofile="${SSQ.dir}/META-INF/services.xml"/>
++                                <copy file="${src}/../conf/services.xml" tofile="${SSQ.dir}/META-INF/services.xml"/>
+                                 <!--<copy file="${src}/../wsdl/SimpleStockQuoteService.wsdl"-->
+                                 <!--tofile="${SSQ.dir}/META-INF/service.wsdl"/>-->
+                                 <copy toDir="${SSQ.dir}">
+-                                <fileset dir="${classes}">
+-                                <include name="**/*.class"/>
+-                                </fileset>
++                                    <fileset dir="${classes}">
++                                        <include name="**/*.class"/>
++                                    </fileset>
+                                 </copy>
+ 
+                                 <jar destfile="${services}/SimpleStockQuoteService.aar">
+-                                <fileset dir="${SSQ.dir}"/>
++                                    <fileset dir="${SSQ.dir}"/>
+                                 </jar>
+ 
+-                                <property name="src2"
+-                                value="../samples/services/SecureStockQuoteService/src"/>
++                                <property name="src2" value="../samples/services/SecureStockQuoteService/src"/>
+                                 <delete dir="${temp.dir}"/>
+                                 <mkdir dir="${temp.dir}"/>
+                                 <mkdir dir="${classes}"/>
+                                 <javac debug="on" destdir="${classes}" fork="true" includeantruntime="false">
+-                                <src path="${src2}"/>
+-                                <classpath refid="maven.compile.classpath"/>
++                                    <src path="${src2}"/>
++                                    <classpath refid="maven.compile.classpath"/>
+                                 </javac>
+-                                <property name="SSQ2.dir"
+-                                value="${temp.dir}/SecureStockQuoteService"/>
++                                <property name="SSQ2.dir" value="${temp.dir}/SecureStockQuoteService"/>
+                                 <mkdir dir="${SSQ2.dir}"/>
+                                 <mkdir dir="${SSQ2.dir}/META-INF"/>
+-                                <copy file="${src2}/../conf/services.xml"
+-                                tofile="${SSQ2.dir}/META-INF/services.xml"/>
++                                <copy file="${src2}/../conf/services.xml" tofile="${SSQ2.dir}/META-INF/services.xml"/>
+                                 <!--<copy file="${src2}/../wsdl/SimpleStockQuoteService.wsdl"-->
+                                 <!--tofile="${SSQ2.dir}/META-INF/service.wsdl"/>-->
+-                                <copy file="${src2}/../store.jks"
+-                                tofile="${SSQ2.dir}/store.jks"/>
++                                <copy file="${src2}/../store.jks" tofile="${SSQ2.dir}/store.jks"/>
+                                 <copy toDir="${SSQ2.dir}">
+-                                <fileset dir="${classes}">
+-                                <include name="**/*.class"/>
+-                                </fileset>
++                                    <fileset dir="${classes}">
++                                        <include name="**/*.class"/>
++                                    </fileset>
+                                 </copy>
+                                 <jar destfile="${services}/SecureStockQuoteService.aar">
+-                                <fileset dir="${SSQ2.dir}"/>
++                                    <fileset dir="${SSQ2.dir}"/>
+                                 </jar>
+ 
+-                                <property name="src3"
+-                                value="../samples/services/MTOMSwASampleService/src"/>
++                                <property name="src3" value="../samples/services/MTOMSwASampleService/src"/>
+                                 <delete dir="${temp.dir}"/>
+                                 <mkdir dir="${temp.dir}"/>
+                                 <mkdir dir="${classes}"/>
+                                 <javac debug="on" destdir="${classes}" fork="true" includeantruntime="false">
+-                                <src path="${src3}"/>
+-                                <classpath refid="maven.compile.classpath"/>
++                                    <src path="${src3}"/>
++                                    <classpath refid="maven.compile.classpath"/>
+                                 </javac>
+-                                <property name="SSQ3.dir"
+-                                value="${temp.dir}/MTOMSwASampleService"/>
++                                <property name="SSQ3.dir" value="${temp.dir}/MTOMSwASampleService"/>
+                                 <mkdir dir="${SSQ3.dir}"/>
+                                 <mkdir dir="${SSQ3.dir}/META-INF"/>
+-                                <copy file="${src3}/../conf/services.xml"
+-                                tofile="${SSQ3.dir}/META-INF/services.xml"/>
++                                <copy file="${src3}/../conf/services.xml" tofile="${SSQ3.dir}/META-INF/services.xml"/>
+                                 <copy toDir="${SSQ3.dir}">
+-                                <fileset dir="${classes}">
+-                                <include name="**/*.class"/>
+-                                </fileset>
++                                    <fileset dir="${classes}">
++                                        <include name="**/*.class"/>
++                                    </fileset>
+                                 </copy>
+                                 <jar destfile="${services}/MTOMSwASampleService.aar">
+-                                <fileset dir="${SSQ3.dir}"/>
++                                    <fileset dir="${SSQ3.dir}"/>
+                                 </jar>
+ 
+-                                <property name="src4"
+-                                value="../samples/services/ReliableStockQuoteService/src"/>
++                                <property name="src4" value="../samples/services/ReliableStockQuoteService/src"/>
+                                 <delete dir="${temp.dir}"/>
+                                 <mkdir dir="${temp.dir}"/>
+                                 <mkdir dir="${classes}"/>
+                                 <javac debug="on" destdir="${classes}" fork="true" includeantruntime="false">
+-                                <src path="${src4}"/>
+-                                <classpath refid="maven.compile.classpath"/>
++                                    <src path="${src4}"/>
++                                    <classpath refid="maven.compile.classpath"/>
+                                 </javac>
+-                                <property name="RSQ.dir"
+-                                value="${temp.dir}/ReliableStockQuoteService"/>
++                                <property name="RSQ.dir" value="${temp.dir}/ReliableStockQuoteService"/>
+                                 <mkdir dir="${RSQ.dir}"/>
+ 
+                                 <mkdir dir="${RSQ.dir}/META-INF"/>
+-                                <copy file="${src4}/../conf/services.xml"
+-                                tofile="${RSQ.dir}/META-INF/services.xml"/>
++                                <copy file="${src4}/../conf/services.xml" tofile="${RSQ.dir}/META-INF/services.xml"/>
+                                 <!--<copy file="${src4}/../wsdl/ReliableStockQuoteService.wsdl"-->
+                                 <!--tofile="${RSQ.dir}/META-INF/service.wsdl"/>-->
+                                 <copy toDir="${RSQ.dir}">
+-                                <fileset dir="${classes}">
+-                                <include name="**/*.class"/>
+-                                </fileset>
++                                    <fileset dir="${classes}">
++                                        <include name="**/*.class"/>
++                                    </fileset>
+                                 </copy>
+ 
+                                 <jar destfile="${services}/ReliableStockQuoteService.aar">
+-                                <fileset dir="${RSQ.dir}"/>
++                                    <fileset dir="${RSQ.dir}"/>
+                                 </jar>
+ 
+-                                <property name="src5"
+-                                value="../samples/services/LoadbalanceFailoverService/src"/>
++                                <property name="src5" value="../samples/services/LoadbalanceFailoverService/src"/>
+                                 <delete dir="${temp.dir}"/>
+                                 <mkdir dir="${temp.dir}"/>
+                                 <mkdir dir="${classes}"/>
+                                 <javac debug="on" destdir="${classes}" fork="true" includeantruntime="false">
+-                                <src path="${src5}"/>
+-                                <classpath refid="maven.compile.classpath"/>
++                                    <src path="${src5}"/>
++                                    <classpath refid="maven.compile.classpath"/>
+                                 </javac>
+ 
+                                 <property name="LBFA1.dir" value="${temp.dir}/LBService1"/>
+@@ -217,16 +202,15 @@
+                                 <mkdir dir="${LBFA1.dir}"/>
+ 
+                                 <mkdir dir="${LBFA1.dir}/META-INF"/>
+-                                <copy file="${src5}/../conf/service1/services.xml"
+-                                tofile="${LBFA1.dir}/META-INF/services.xml"/>
++                                <copy file="${src5}/../conf/service1/services.xml" tofile="${LBFA1.dir}/META-INF/services.xml"/>
+                                 <copy toDir="${LBFA1.dir}">
+-                                <fileset dir="${classes}">
+-                                <include name="**/LBService1.class"/>
+-                                </fileset>
++                                    <fileset dir="${classes}">
++                                        <include name="**/LBService1.class"/>
++                                    </fileset>
+                                 </copy>
+ 
+                                 <jar destfile="${services}/LBService1.aar">
+-                                <fileset dir="${LBFA1.dir}"/>
++                                    <fileset dir="${LBFA1.dir}"/>
+                                 </jar>
+ 
+                                 <property name="LBFA2.dir" value="${temp.dir}/LBService2"/>
+@@ -233,16 +217,15 @@
+                                 <mkdir dir="${LBFA2.dir}"/>
+ 
+                                 <mkdir dir="${LBFA2.dir}/META-INF"/>
+-                                <copy file="${src5}/../conf/service2/services.xml"
+-                                tofile="${LBFA2.dir}/META-INF/services.xml"/>
++                                <copy file="${src5}/../conf/service2/services.xml" tofile="${LBFA2.dir}/META-INF/services.xml"/>
+                                 <copy toDir="${LBFA2.dir}">
+-                                <fileset dir="${classes}">
+-                                <include name="**/LBService2.class"/>
+-                                </fileset>
++                                    <fileset dir="${classes}">
++                                        <include name="**/LBService2.class"/>
++                                    </fileset>
+                                 </copy>
+ 
+                                 <jar destfile="${services}/LBService2.aar">
+-                                <fileset dir="${LBFA2.dir}"/>
++                                    <fileset dir="${LBFA2.dir}"/>
+                                 </jar>
+ 
+                             </tasks>
+@@ -479,12 +462,6 @@
+             <version>1.6.1</version>
+             <scope>test</scope>
+         </dependency>
+-        <!--<dependency>-->
+-        <!--<groupId>org.slf4j</groupId>-->
+-        <!--<artifactId>slf4j-jdk14</artifactId>-->
+-        <!--<version>1.6.1</version>-->
+-        <!--<scope>test</scope>-->
+-        <!--</dependency>-->
+         <dependency>
+             <groupId>org.apache.derby</groupId>
+             <artifactId>derby</artifactId>
+@@ -497,24 +474,6 @@
+             <version>3.0.1</version>
+             <scope>test</scope>
+         </dependency>
+-        <dependency>
+-            <groupId>org.apache.mina</groupId>
+-            <artifactId>mina-core</artifactId>
+-            <version>1.1.7</version>
+-            <scope>test</scope>
+-        </dependency>
+-        <dependency>
+-            <groupId>quickfixj</groupId>
+-            <artifactId>quickfixj-all</artifactId>
+-            <version>1.4.0</version>
+-            <scope>test</scope>
+-        </dependency>
+-        <!--dependency>
+-            <groupId>quickfixj</groupId>
+-            <artifactId>quickfixj-examples</artifactId>
+-            <version>1.5.0</version>
+-            <scope>test</scope>
+-        </dependency-->
+     </dependencies>
+ 
+ </project>
+-*-*-*-
+Message: Adding proxy service tests
+-*-*-*-
+When: 2011-12-14 08:24:09 -0500 
+-*-*-*-
+Who: hiranya

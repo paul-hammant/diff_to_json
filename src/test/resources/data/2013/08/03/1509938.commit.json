@@ -1,0 +1,268 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "  *  specific language governing permissions and limitations\n",
+            "  *  under the License.\n",
+            "  */\n",
+            "+\n",
+            " package org.apache.synapse.mediators.elementary;\n",
+            " \n",
+            " import org.apache.axiom.om.OMNode;\n"
+          ],
+          "locn": "-16,6 +16,7"
+        },
+        {
+          "lines": [
+            "  */\n",
+            " \n",
+            " public class EnrichMediator extends AbstractMediator {\n",
+            "+\n",
+            "     public static final int CUSTOM = 0;\n",
+            " \n",
+            "     public static final int ENVELOPE = 1;\n"
+          ],
+          "locn": "-52,6 +53,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/EnrichMediator.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/EnrichMediator.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "  *  specific language governing permissions and limitations\n",
+            "  *  under the License.\n",
+            "  */\n",
+            "+\n",
+            " package org.apache.synapse.config.xml;\n",
+            " \n",
+            " import org.apache.axiom.om.OMElement;\n"
+          ],
+          "locn": "-16,6 +16,7"
+        },
+        {
+          "lines": [
+            " import org.apache.synapse.mediators.elementary.Source;\n",
+            " import org.apache.synapse.mediators.elementary.Target;\n",
+            " \n",
+            "-\n",
+            " public class EnrichMediatorSerializer extends AbstractMediatorSerializer {\n",
+            " \n",
+            "     @Override\n"
+          ],
+          "locn": "-27,7 +28,6"
+        },
+        {
+          "lines": [
+            "                     intTypeToString(source.getSourceType())));\n",
+            "         }\n",
+            " \n",
+            "-        if (source.isClone()) {\n",
+            "+        if (!source.isClone()) {\n",
+            "             sourceEle.addAttribute(fac.createOMAttribute(\"clone\", nullNS,\n",
+            "                     Boolean.toString(source.isClone())));\n",
+            "         }\n"
+          ],
+          "locn": "-56,7 +56,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/EnrichMediatorSerializer.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/EnrichMediatorSerializer.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "  *  specific language governing permissions and limitations\n",
+            "  *  under the License.\n",
+            "  */\n",
+            "+\n",
+            " package org.apache.synapse.config.xml;\n",
+            " \n",
+            " import org.apache.axiom.om.OMAbstractFactory;\n"
+          ],
+          "locn": "-16,6 +16,7"
+        },
+        {
+          "lines": [
+            " \n",
+            " import java.util.Properties;\n",
+            " \n",
+            "+public class EnrichMediatorFactory extends AbstractMediatorFactory {\n",
+            " \n",
+            "-public class EnrichMediatorFactory extends AbstractMediatorFactory {\n",
+            "     private static final QName XML_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, \"enrich\");\n",
+            "     private static final QName ATT_PROPERTY = new QName(\"property\");\n",
+            "     private static final QName ATT_XPATH = new QName(\"xpath\");\n"
+          ],
+          "locn": "-32,8 +33,8"
+        },
+        {
+          "lines": [
+            " \n",
+            "     private void populateSource(Source source, OMElement sourceEle) {\n",
+            " \n",
+            "-        // type attribue\n",
+            "+        // type attribute\n",
+            "         OMAttribute typeAttr = sourceEle.getAttribute(ATT_TYPE);\n",
+            "         if (typeAttr != null && typeAttr.getAttributeValue() != null) {\n",
+            "             source.setSourceType(convertTypeToInit(typeAttr.getAttributeValue()));\n"
+          ],
+          "locn": "-81,7 +82,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/EnrichMediatorFactory.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/EnrichMediatorFactory.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "+/*\n",
+            "+ *  Licensed to the Apache Software Foundation (ASF) under one\n",
+            "+ *  or more contributor license agreements.  See the NOTICE file\n",
+            "+ *  distributed with this work for additional information\n",
+            "+ *  regarding copyright ownership.  The ASF licenses this file\n",
+            "+ *  to you under the Apache License, Version 2.0 (the\n",
+            "+ *  \"License\"); you may not use this file except in compliance\n",
+            "+ *  with the License.  You may obtain a copy of the License at\n",
+            "+ *\n",
+            "+ *   http://www.apache.org/licenses/LICENSE-2.0\n",
+            "+ *\n",
+            "+ *  Unless required by applicable law or agreed to in writing,\n",
+            "+ *  software distributed under the License is distributed on an\n",
+            "+ *   * \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n",
+            "+ *  KIND, either express or implied.  See the License for the\n",
+            "+ *  specific language governing permissions and limitations\n",
+            "+ *  under the License.\n",
+            "+ */\n",
+            "+\n",
+            "+package org.apache.synapse.config.xml;\n",
+            "+\n",
+            "+public class EnrichMediatorSerializationTest extends AbstractTestCase {\n",
+            "+\n",
+            "+    private EnrichMediatorFactory factory;\n",
+            "+    private EnrichMediatorSerializer serializer;\n",
+            "+\n",
+            "+    public EnrichMediatorSerializationTest() {\n",
+            "+        super(EnrichMediatorSerializationTest.class.getName());\n",
+            "+        factory = new EnrichMediatorFactory();\n",
+            "+        serializer = new EnrichMediatorSerializer();\n",
+            "+    }\n",
+            "+\n",
+            "+    public void testEnrichMediatorSerializationScenarioOne() throws Exception {\n",
+            "+        String inputXml = \"<enrich xmlns=\\\"http://ws.apache.org/ns/synapse\\\">\" +\n",
+            "+                \"<source type=\\\"envelope\\\"/>\" +\n",
+            "+                \"<target type=\\\"body\\\"/>\" +\n",
+            "+                \"</enrich>\";\n",
+            "+        assertTrue(serialization(inputXml, factory, serializer));\n",
+            "+        assertTrue(serialization(inputXml, serializer));\n",
+            "+    }\n",
+            "+\n",
+            "+    public void testEnrichMediatorSerializationScenarioTwo() throws Exception {\n",
+            "+        String inputXml = \"<enrich xmlns=\\\"http://ws.apache.org/ns/synapse\\\">\" +\n",
+            "+                \"<source type=\\\"property\\\" property=\\\"p1\\\"/>\" +\n",
+            "+                \"<target type=\\\"body\\\"/>\" +\n",
+            "+                \"</enrich>\";\n",
+            "+        assertTrue(serialization(inputXml, factory, serializer));\n",
+            "+        assertTrue(serialization(inputXml, serializer));\n",
+            "+    }\n",
+            "+\n",
+            "+    public void testEnrichMediatorSerializationScenarioThree() throws Exception {\n",
+            "+        String inputXml = \"<enrich xmlns=\\\"http://ws.apache.org/ns/synapse\\\">\" +\n",
+            "+                \"<source type=\\\"property\\\" property=\\\"p1\\\"/>\" +\n",
+            "+                \"<target type=\\\"property\\\" property=\\\"p2\\\"/>\" +\n",
+            "+                \"</enrich>\";\n",
+            "+        assertTrue(serialization(inputXml, factory, serializer));\n",
+            "+        assertTrue(serialization(inputXml, serializer));\n",
+            "+    }\n",
+            "+\n",
+            "+    public void testEnrichMediatorSerializationScenarioFour() throws Exception {\n",
+            "+        String inputXml = \"<enrich xmlns=\\\"http://ws.apache.org/ns/synapse\\\">\" +\n",
+            "+                \"<source type=\\\"envelope\\\" clone=\\\"false\\\"/>\" +\n",
+            "+                \"<target type=\\\"body\\\"/>\" +\n",
+            "+                \"</enrich>\";\n",
+            "+        assertTrue(serialization(inputXml, factory, serializer));\n",
+            "+        assertTrue(serialization(inputXml, serializer));\n",
+            "+    }\n",
+            "+\n",
+            "+    public void testEnrichMediatorSerializationScenarioFive() throws Exception {\n",
+            "+        String inputXml = \"<enrich xmlns=\\\"http://ws.apache.org/ns/synapse\\\">\" +\n",
+            "+                \"<source xpath=\\\"//foo/bar\\\"/>\" +\n",
+            "+                \"<target type=\\\"body\\\"/>\" +\n",
+            "+                \"</enrich>\";\n",
+            "+        assertTrue(serialization(inputXml, factory, serializer));\n",
+            "+        assertTrue(serialization(inputXml, serializer));\n",
+            "+    }\n",
+            "+\n",
+            "+    public void testEnrichMediatorSerializationScenarioSix() throws Exception {\n",
+            "+        String inputXml = \"<enrich xmlns=\\\"http://ws.apache.org/ns/synapse\\\">\" +\n",
+            "+                \"<source type=\\\"property\\\" property=\\\"p1\\\"/>\" +\n",
+            "+                \"<target xpath=\\\"//foo/bar\\\"/>\" +\n",
+            "+                \"</enrich>\";\n",
+            "+        assertTrue(serialization(inputXml, factory, serializer));\n",
+            "+        assertTrue(serialization(inputXml, serializer));\n",
+            "+    }\n",
+            "+\n",
+            "+    public void testEnrichMediatorSerializationScenarioSeven() throws Exception {\n",
+            "+        String inputXml = \"<enrich xmlns=\\\"http://ws.apache.org/ns/synapse\\\">\" +\n",
+            "+                \"<source type=\\\"inline\\\"><foo><bar>text</bar></foo></source>\" +\n",
+            "+                \"<target type=\\\"body\\\"/>\" +\n",
+            "+                \"</enrich>\";\n",
+            "+        assertTrue(serialization(inputXml, factory, serializer));\n",
+            "+        assertTrue(serialization(inputXml, serializer));\n",
+            "+    }\n",
+            "+\n",
+            "+    public void testEnrichMediatorSerializationScenarioEight() throws Exception {\n",
+            "+        String inputXml = \"<enrich xmlns=\\\"http://ws.apache.org/ns/synapse\\\">\" +\n",
+            "+                \"<source type=\\\"inline\\\">foo</source>\" +\n",
+            "+                \"<target type=\\\"body\\\"/>\" +\n",
+            "+                \"</enrich>\";\n",
+            "+        assertTrue(serialization(inputXml, factory, serializer));\n",
+            "+        assertTrue(serialization(inputXml, serializer));\n",
+            "+    }\n",
+            "+\n",
+            "+    public void testEnrichMediatorSerializationScenarioNine() throws Exception {\n",
+            "+        String inputXml = \"<enrich xmlns=\\\"http://ws.apache.org/ns/synapse\\\">\" +\n",
+            "+                \"<source type=\\\"inline\\\" key=\\\"k1\\\"/>\" +\n",
+            "+                \"<target type=\\\"body\\\"/>\" +\n",
+            "+                \"</enrich>\";\n",
+            "+        assertTrue(serialization(inputXml, factory, serializer));\n",
+            "+        assertTrue(serialization(inputXml, serializer));\n",
+            "+    }\n",
+            "+\n",
+            "+    public void testEnrichMediatorSerializationScenarioTen() throws Exception {\n",
+            "+        String inputXml = \"<enrich xmlns=\\\"http://ws.apache.org/ns/synapse\\\">\" +\n",
+            "+                \"<source type=\\\"property\\\" property=\\\"p1\\\"/>\" +\n",
+            "+                \"<target action=\\\"child\\\" xpath=\\\"//foo/bar\\\"/>\" +\n",
+            "+                \"</enrich>\";\n",
+            "+        assertTrue(serialization(inputXml, factory, serializer));\n",
+            "+        assertTrue(serialization(inputXml, serializer));\n",
+            "+    }\n",
+            "+\n",
+            "+    public void testEnrichMediatorSerializationScenarioEleven() throws Exception {\n",
+            "+        String inputXml = \"<enrich xmlns=\\\"http://ws.apache.org/ns/synapse\\\">\" +\n",
+            "+                \"<source type=\\\"property\\\" property=\\\"p1\\\"/>\" +\n",
+            "+                \"<target action=\\\"sibling\\\" xpath=\\\"//foo/bar\\\"/>\" +\n",
+            "+                \"</enrich>\";\n",
+            "+        assertTrue(serialization(inputXml, factory, serializer));\n",
+            "+        assertTrue(serialization(inputXml, serializer));\n",
+            "+    }\n",
+            "+}\n"
+          ],
+          "locn": "-0,0 +1,131"
+        }
+      ],
+      "from": "java/modules/core/src/test/java/org/apache/synapse/config/xml/EnrichMediatorSerializationTest.java",
+      "to": "java/modules/core/src/test/java/org/apache/synapse/config/xml/EnrichMediatorSerializationTest.java"
+    }
+  ],
+  "id": "1509938",
+  "message": "Adding enrich mediator serialization test",
+  "when": "2013-08-03T02:34:54-04:00",
+  "who": "hiranya"
+}

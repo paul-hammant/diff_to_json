@@ -1,0 +1,276 @@
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java	(revision 1509847)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java	(revision 1509848)
+@@ -459,7 +459,7 @@
+         if (conn != null) {
+             errorMessage = "[" + conn + "] " + msg;
+         } else {
+-            errorMessage = "[" + conn + "] " + msg;
++            errorMessage = msg;
+         }
+         log.error(errorMessage, e);
+     }
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ServerWorker.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ServerWorker.java	(revision 1509847)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ServerWorker.java	(revision 1509848)
+@@ -404,9 +404,6 @@
+                 if (soapVersion == 1) {
+                     SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
+                     envelope = fac.getDefaultEnvelope();
+-                } else if (soapVersion == 2) {
+-                    SOAPFactory fac = OMAbstractFactory.getSOAP12Factory();
+-                    envelope = fac.getDefaultEnvelope();
+                 } else {
+                     SOAPFactory fac = OMAbstractFactory.getSOAP12Factory();
+                     envelope = fac.getDefaultEnvelope();
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Axis2HttpRequest.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Axis2HttpRequest.java	(revision 1509847)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Axis2HttpRequest.java	(revision 1509848)
+@@ -387,8 +387,8 @@
+     }
+ 
+     public void setCompleted(boolean completed) {
+-        this.completed = completed;
+         synchronized (this) {
++            this.completed = completed;
+             this.notifyAll();
+         }
+     }
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Access.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Access.java	(revision 1509847)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Access.java	(revision 1509848)
+@@ -40,6 +40,7 @@
+  * org.apache.catalina.valves.AccessLogValve with thanks.
+  */
+ public class Access {
++
+     private static Log log = LogFactory.getLog(Access.class);
+ 
+     /**
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java	(revision 1509847)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java	(revision 1509848)
+@@ -740,8 +740,7 @@
+                                     responseMsgCtx.getProperty("synapse.send") == null) {
+                                 return;
+                             }
+-                        } else if (responseMsgCtx == null ||
+-                                outMsgCtx.getOptions().isUseSeparateListener()) {
++                        } else if (outMsgCtx.getOptions().isUseSeparateListener()) {
+                             // Since we need to notify the SynapseCallback receiver to remove the
+                             // call backs registered  we set a custom property
+                             setHeaders(context, response, outMsgCtx, responseMsgCtx);
+Index: java/modules/core/src/main/java/org/apache/synapse/libraries/model/ArtifactFile.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/libraries/model/ArtifactFile.java	(revision 1509847)
++++ java/modules/core/src/main/java/org/apache/synapse/libraries/model/ArtifactFile.java	(revision 1509848)
+@@ -16,6 +16,7 @@
+  *  specific language governing permissions and limitations
+  *  under the License.
+  */
++
+ package org.apache.synapse.libraries.model;
+ 
+ import org.apache.axiom.om.OMElement;
+@@ -33,7 +34,7 @@
+ 
+     private static final Log log = LogFactory.getLog(ArtifactFile.class);
+ 
+-    protected static String fileName;
++    protected String fileName;
+ 
+     protected OMElement configurationElement;
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/libraries/model/LibraryArtifact.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/libraries/model/LibraryArtifact.java	(revision 1509847)
++++ java/modules/core/src/main/java/org/apache/synapse/libraries/model/LibraryArtifact.java	(revision 1509848)
+@@ -96,7 +96,7 @@
+             LibraryArtifact artifact = subArtifacts.get(artifactName);
+             if (artifact.isLeafArtifact()) {
+                 delegateClassLoading(artifact, library);
+-                //this is where actual artifact is constructed to it's ture form
++                //this is where actual artifact is constructed to its true form
+                 Object template = artifact.file.build();
+                 if (artifact.file instanceof TemplateArtifactFile) {
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java	(revision 1509847)
++++ java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java	(revision 1509848)
+@@ -442,8 +442,8 @@
+             }
+ 
+             // continue stopping the axis2 environment if we created it
+-            if (serverConfigurationInformation.isCreateNewInstance() && configurationContext != null
+-                    && configurationContext.getAxisConfiguration() != null) {
++            if (serverConfigurationInformation.isCreateNewInstance() &&
++                    configurationContext.getAxisConfiguration() != null) {
+                 Map<String, AxisService> serviceMap =
+                         configurationContext.getAxisConfiguration().getServices();
+                 for (AxisService svc : serviceMap.values()) {
+Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ForwardingJob.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ForwardingJob.java	(revision 1509847)
++++ java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ForwardingJob.java	(revision 1509848)
+@@ -161,7 +161,7 @@
+                                 errorStop = true;
+                                 continue;
+ 
+-                            } else if(outCtx == null) {
++                            } else if (outCtx == null) {
+                                 // This Means we have invoked an out only operation
+                                 // remove the message and reset the count
+                                 messageStore.poll();
+Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/resequence/ResequencingJob.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/message/processors/resequence/ResequencingJob.java	(revision 1509847)
++++ java/modules/core/src/main/java/org/apache/synapse/message/processors/resequence/ResequencingJob.java	(revision 1509848)
+@@ -73,7 +73,7 @@
+         }
+ 
+         /** Extract the SynapseXpath object from parameters to identify the sequence number of the message */
+-        if (parameters != null && parameters.get(ResequencingProcessor.SEQUENCE_NUMBER_XPATH) != null) {
++        if (parameters.get(ResequencingProcessor.SEQUENCE_NUMBER_XPATH) != null) {
+             seqNoxPath = (SynapseXPath) parameters.get(ResequencingProcessor.SEQUENCE_NUMBER_XPATH);
+         }
+ 
+@@ -236,7 +236,7 @@
+         try {
+             Thread.sleep(timePeriod);
+         } catch (InterruptedException e) {
+-            log.error(new String("Interrupted while thread sleeping in resequencer"));
++            log.error("Interrupted while thread sleeping in resequencer", e);
+         }
+     }
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/Value.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/Value.java	(revision 1509847)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/Value.java	(revision 1509848)
+@@ -208,7 +208,7 @@
+             }
+             return expression;
+         } catch (Exception e) {
+-            handleException("Can not evaluate escaped expression : " + expr.toString());
++            handleException("Can not evaluate escaped expression : " + expr);
+         }
+         return this.expression;
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/SwitchCase.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/SwitchCase.java	(revision 1509847)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/SwitchCase.java	(revision 1509848)
+@@ -120,10 +120,8 @@
+ 
+         Matcher matcher = regex.matcher(value);
+         if (matcher == null) {
+-
+             log.warn("Matcher for the provided character sequence and the pattern ' "
+                     + regex + " '" + " cannot be found. Switch case will not be executed.");
+-
+             return false;
+         }
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseImportFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseImportFactory.java	(revision 1509847)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseImportFactory.java	(revision 1509848)
+@@ -70,9 +70,4 @@
+         throw new SynapseException(msg);
+     }
+ 
+-    private static void handleException(String msg, Exception e) {
+-        log.error(msg, e);
+-        throw new SynapseException(msg, e);
+-    }
+-
+ }
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseImportSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseImportSerializer.java	(revision 1509847)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseImportSerializer.java	(revision 1509848)
+@@ -47,23 +47,15 @@
+     /**
+      * This method will implements the serialization of SynapseImport object to its configuration
+      *
+-     * @param s the type SynapseImport which is subjected to the serialization
++     * @param synapseImport the type SynapseImport which is subjected to the serialization
+      * @return OMElement serialized in to xml from the given parameters
+      */
+-    public OMElement serializeImport(SynapseImport s) {
+-
+-
+-        if (!(s instanceof SynapseImport)) {
+-            handleException("Unsupported Synapse Import passed in for serialization");
+-        }
+-
+-        SynapseImport synapseImport = (SynapseImport) s;
+-
++    public OMElement serializeImport(SynapseImport synapseImport) {
+         OMElement importElem = fac.createOMElement("import", synNS);
+ 
+         if (synapseImport.getLibName() != null) {
+             importElem.addAttribute(fac.createOMAttribute(
+-                    "name", nullNS, s.getLibName()));
++                    "name", nullNS, synapseImport.getLibName()));
+         } else {
+             handleException("Invalid Synapse Import. Target Library name is required");
+         }
+@@ -70,7 +62,7 @@
+ 
+         if (synapseImport.getLibPackage() != null) {
+             importElem.addAttribute(fac.createOMAttribute(
+-                    "package", nullNS, s.getLibPackage()));
++                    "package", nullNS, synapseImport.getLibPackage()));
+         } else {
+             handleException("Invalid Synapse Import. Target Library package is required");
+         }
+Index: java/modules/core/src/main/java/org/apache/synapse/deployers/ImportDeployer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/deployers/ImportDeployer.java	(revision 1509847)
++++ java/modules/core/src/main/java/org/apache/synapse/deployers/ImportDeployer.java	(revision 1509848)
+@@ -148,9 +148,7 @@
+                     //this is a important step -> we need to unload what ever the components loaded previously
+                     synLib.unLoadLibrary();
+                     //then reload
+-                    if (synLib != null) {
+-                        LibDeployerUtils.loadLibArtifacts(synImport, synLib);
+-                    }
++                    LibDeployerUtils.loadLibArtifacts(synImport, synLib);
+                     log.info("Synapse Library Import named '" + synImportQualfiedName +
+                              " has been deployed from file : "
+                              + fileName);
+Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2MessageContext.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2MessageContext.java	(revision 1509847)
++++ java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2MessageContext.java	(revision 1509848)
+@@ -152,13 +152,10 @@
+         if (o != null && o instanceof Mediator) {
+             return (Mediator) o;
+         } else {
+-            Mediator m = getConfiguration().getSequenceTemplate(key);
+-            if (m instanceof TemplateMediator) {
+-                TemplateMediator templateMediator = (TemplateMediator) m;
+-                synchronized (m) {
+-                    if (!templateMediator.isInitialized()) {
+-                        templateMediator.init(synEnv);
+-                    }
++            TemplateMediator m = getConfiguration().getSequenceTemplate(key);
++            synchronized (m) {
++                if (!m.isInitialized()) {
++                    m.init(synEnv);
+                 }
+             }
+             localEntries.put(key, m);
+-*-*-*-
+Message: Some refactoring and minor improvements - Removing redundant null checks etc.
+-*-*-*-
+When: 2013-08-02 16:42:30 -0400 
+-*-*-*-
+Who: hiranya

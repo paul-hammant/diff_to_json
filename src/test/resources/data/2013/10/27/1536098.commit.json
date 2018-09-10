@@ -1,0 +1,149 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             <exclusions>\n",
+            "                 <exclusion>\n",
+            "                     <groupId>org.apache.woden</groupId>\n",
+            "-                    <artifactId>woden-api</artifactId>\n",
+            "+                    <artifactId>woden-core</artifactId>\n",
+            "                 </exclusion>\n",
+            "             </exclusions>\n",
+            "         </dependency>\n"
+          ],
+          "locn": "-417,7 +417,7"
+        }
+      ],
+      "from": "java/modules/samples/pom.xml",
+      "to": "java/modules/samples/pom.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         </dependency>\n",
+            "         <dependency>\n",
+            "             <groupId>org.apache.woden</groupId>\n",
+            "-            <artifactId>woden-api</artifactId>\n",
+            "+            <artifactId>woden-core</artifactId>\n",
+            "         </dependency>\n",
+            "         <!--dependency>\n",
+            "             <groupId>xerces</groupId>\n"
+          ],
+          "locn": "-143,7 +143,7"
+        }
+      ],
+      "from": "java/modules/distribution/pom.xml",
+      "to": "java/modules/distribution/pom.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             <exclusions>\n",
+            "                 <exclusion>\n",
+            "                     <groupId>org.apache.woden</groupId>\n",
+            "-                    <artifactId>woden-api</artifactId>\n",
+            "+                    <artifactId>woden-core</artifactId>\n",
+            "                 </exclusion>\n",
+            "             </exclusions>\n",
+            "         </dependency>\n"
+          ],
+          "locn": "-346,7 +346,7"
+        }
+      ],
+      "from": "java/modules/integration/pom.xml",
+      "to": "java/modules/integration/pom.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                     </exclusion>\n",
+            "                     <exclusion>\n",
+            "                         <groupId>org.apache.woden</groupId>\n",
+            "-                        <artifactId>woden-api</artifactId>\n",
+            "+                        <artifactId>woden-core</artifactId>\n",
+            "                     </exclusion>\n",
+            "                     <exclusion>\n",
+            "                         <groupId>org.apache.xmlbeans</groupId>\n"
+          ],
+          "locn": "-520,7 +520,7"
+        },
+        {
+          "lines": [
+            "                 <exclusions>\n",
+            "                     <exclusion>\n",
+            "                         <groupId>org.apache.woden</groupId>\n",
+            "-                        <artifactId>woden-api</artifactId>\n",
+            "+                        <artifactId>woden-core</artifactId>\n",
+            "                     </exclusion>\n",
+            "                 </exclusions>\n",
+            "             </dependency>\n"
+          ],
+          "locn": "-535,7 +535,7"
+        },
+        {
+          "lines": [
+            "                 <exclusions>\n",
+            "                     <exclusion>\n",
+            "                         <groupId>org.apache.woden</groupId>\n",
+            "-                        <artifactId>woden-api</artifactId>\n",
+            "+                        <artifactId>woden-core</artifactId>\n",
+            "                     </exclusion>\n",
+            "                 </exclusions>\n",
+            "             </dependency>\n"
+          ],
+          "locn": "-546,7 +546,7"
+        },
+        {
+          "lines": [
+            "                 <exclusions>\n",
+            "                     <exclusion>\n",
+            "                         <groupId>org.apache.woden</groupId>\n",
+            "-                        <artifactId>woden-api</artifactId>\n",
+            "+                        <artifactId>woden-core</artifactId>\n",
+            "                     </exclusion>\n",
+            "                 </exclusions>\n",
+            "                 <type>mar</type>\n"
+          ],
+          "locn": "-557,7 +557,7"
+        },
+        {
+          "lines": [
+            "             </dependency>\n",
+            "             <dependency>\n",
+            "                 <groupId>org.apache.woden</groupId>\n",
+            "-                <artifactId>woden-api</artifactId>\n",
+            "+                <artifactId>woden-core</artifactId>\n",
+            "                 <version>${woden.version}</version>\n",
+            "             </dependency>\n",
+            "             <dependency>\n"
+          ],
+          "locn": "-922,7 +922,7"
+        },
+        {
+          "lines": [
+            "         <aspectj.version>1.6.1</aspectj.version>\n",
+            "         <qfj.version>1.4.0</qfj.version>\n",
+            "         <wso2uri-template.version>1.0.0</wso2uri-template.version>\n",
+            "-        <woden.version>1.0M9</woden.version>\n",
+            "+        <woden.version>1.0-SNAPSHOT</woden.version>\n",
+            "         <activemq.version>5.2.0</activemq.version>\n",
+            "         <snmp4j.version>2.0.3</snmp4j.version>\n",
+            "         <snmp4j.agent.version>2.0.5</snmp4j.agent.version>\n"
+          ],
+          "locn": "-1101,7 +1101,7"
+        }
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    }
+  ],
+  "id": "1536098",
+  "message": "SYNAPSE-985: Make sure that we use the same Woden version as Axis2.",
+  "when": "2013-10-27T07:23:08-04:00",
+  "who": "veithen"
+}

@@ -1,0 +1,351 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                 e.getMessage().toLowerCase().contains(\"connection reset by peer\") ||\n",
+            "                 e.getMessage().toLowerCase().contains(\"forcibly closed\")))) {\n",
+            "             if (log.isDebugEnabled()) {\n",
+            "-                log.debug(\"I/O error (Probably a keepalive connection was closed):\" + e.getMessage());\n",
+            "+                log.debug(\"I/O error (Probably a keep-alive connection was closed):\" + e.getMessage());\n",
+            "             }\n",
+            "         } else if (e.getMessage() != null) {\n",
+            "             String msg = e.getMessage().toLowerCase();\n"
+          ],
+          "locn": "-320,7 +320,7"
+        },
+        {
+          "lines": [
+            "         response.addHeader(HTTP.CONN_DIRECTIVE, HTTP.CONN_CLOSE);\n",
+            " \n",
+            "         // Pre-process HTTP request\n",
+            "-        httpContext.setAttribute(ExecutionContext.HTTP_CONNECTION, conn);\n",
+            "-        httpContext.setAttribute(ExecutionContext.HTTP_REQUEST, null);\n",
+            "-        httpContext.setAttribute(ExecutionContext.HTTP_RESPONSE, response);\n",
+            "+        httpContext.setAttribute(HttpCoreContext.HTTP_CONNECTION, conn);\n",
+            "+        httpContext.setAttribute(HttpCoreContext.HTTP_REQUEST, null);\n",
+            "+        httpContext.setAttribute(HttpCoreContext.HTTP_RESPONSE, response);\n",
+            " \n",
+            "         try {\n",
+            "             sourceConfiguration.getHttpProcessor().process(response, httpContext);\n"
+          ],
+          "locn": "-354,9 +354,9"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.http.message.BasicHttpRequest;\n",
+            " import org.apache.http.nio.ContentEncoder;\n",
+            " import org.apache.http.nio.NHttpClientConnection;\n",
+            "-import org.apache.http.protocol.ExecutionContext;\n",
+            " import org.apache.http.protocol.HTTP;\n",
+            "+import org.apache.http.protocol.HttpContext;\n",
+            "+import org.apache.http.protocol.HttpCoreContext;\n",
+            " import org.apache.synapse.transport.nhttp.NhttpConstants;\n",
+            " import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;\n",
+            " import org.apache.synapse.transport.passthru.config.TargetConfiguration;\n"
+          ],
+          "locn": "-31,8 +31,9"
+        },
+        {
+          "lines": [
+            "         }\n",
+            " \n",
+            "         // Pre-process HTTP request\n",
+            "-        conn.getContext().setAttribute(ExecutionContext.HTTP_CONNECTION, conn);\n",
+            "-        conn.getContext().setAttribute(ExecutionContext.HTTP_TARGET_HOST,\n",
+            "+        HttpContext context = conn.getContext();\n",
+            "+        context.setAttribute(HttpCoreContext.HTTP_CONNECTION, conn);\n",
+            "+        context.setAttribute(HttpCoreContext.HTTP_TARGET_HOST,\n",
+            "                 new HttpHost(url.getHost(), port));\n",
+            "-        conn.getContext().setAttribute(ExecutionContext.HTTP_REQUEST, request);\n",
+            "+        context.setAttribute(HttpCoreContext.HTTP_REQUEST, request);\n",
+            " \n",
+            "         // start the request\n",
+            "-        targetConfiguration.getHttpProcessor().process(request, conn.getContext());\n",
+            "-\n",
+            "+        targetConfiguration.getHttpProcessor().process(request, context);\n",
+            "         conn.submitRequest(request);\n",
+            " \n",
+            "         if (hasEntityBody) {\n"
+          ],
+          "locn": "-213,14 +214,14"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetRequest.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetRequest.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.http.nio.NHttpClientConnection;\n",
+            " import org.apache.commons.logging.Log;\n",
+            " import org.apache.commons.logging.LogFactory;\n",
+            "-import org.apache.http.protocol.ExecutionContext;\n",
+            " import org.apache.http.protocol.HttpContext;\n",
+            "+import org.apache.http.protocol.HttpCoreContext;\n",
+            " \n",
+            " import java.util.List;\n",
+            " import java.util.ArrayList;\n"
+          ],
+          "locn": "-22,8 +22,8"
+        },
+        {
+          "lines": [
+            "     public void release(NHttpClientConnection conn) {\n",
+            "         conn.getMetrics().reset();\n",
+            "         HttpContext ctx = conn.getContext();\n",
+            "-        ctx.removeAttribute(ExecutionContext.HTTP_REQUEST);\n",
+            "-        ctx.removeAttribute(ExecutionContext.HTTP_RESPONSE);\n",
+            "+        ctx.removeAttribute(HttpCoreContext.HTTP_REQUEST);\n",
+            "+        ctx.removeAttribute(HttpCoreContext.HTTP_RESPONSE);\n",
+            " \n",
+            "         lock.lock();\n",
+            "         try {\n"
+          ],
+          "locn": "-86,8 +86,8"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/connections/HostConnections.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/connections/HostConnections.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.http.impl.DefaultConnectionReuseStrategy;\n",
+            " import org.apache.http.nio.ContentEncoder;\n",
+            " import org.apache.http.nio.NHttpServerConnection;\n",
+            "-import org.apache.http.protocol.ExecutionContext;\n",
+            " import org.apache.http.protocol.HTTP;\n",
+            "+import org.apache.http.protocol.HttpContext;\n",
+            "+import org.apache.http.protocol.HttpCoreContext;\n",
+            " import org.apache.synapse.transport.passthru.config.SourceConfiguration;\n",
+            " \n",
+            " import java.io.IOException;\n"
+          ],
+          "locn": "-24,8 +24,9"
+        },
+        {
+          "lines": [
+            "         SourceContext.updateState(conn, ProtocolState.RESPONSE_HEAD);\n",
+            " \n",
+            "         // Pre-process HTTP response\n",
+            "-        conn.getContext().setAttribute(ExecutionContext.HTTP_CONNECTION, conn);\n",
+            "-        conn.getContext().setAttribute(ExecutionContext.HTTP_RESPONSE, response);\n",
+            "-        conn.getContext().setAttribute(ExecutionContext.HTTP_REQUEST,\n",
+            "+        HttpContext context = conn.getContext();\n",
+            "+        context.setAttribute(HttpCoreContext.HTTP_CONNECTION, conn);\n",
+            "+        context.setAttribute(HttpCoreContext.HTTP_RESPONSE, response);\n",
+            "+        context.setAttribute(HttpCoreContext.HTTP_REQUEST,\n",
+            "                 SourceContext.getRequest(conn).getRequest());\n",
+            "         \n",
+            "-        sourceConfiguration.getHttpProcessor().process(response, conn.getContext());\n",
+            "+        sourceConfiguration.getHttpProcessor().process(response, context);\n",
+            "         conn.submitResponse(response);        \n",
+            "     }\n",
+            " \n"
+          ],
+          "locn": "-129,12 +130,13"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceResponse.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceResponse.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " package org.apache.synapse.transport.nhttp;\n",
+            " \n",
+            " import org.apache.http.nio.NHttpClientConnection;\n",
+            "-import org.apache.http.protocol.ExecutionContext;\n",
+            " import org.apache.http.protocol.HttpContext;\n",
+            " import org.apache.http.HttpHost;\n",
+            " import org.apache.commons.logging.Log;\n",
+            " import org.apache.commons.logging.LogFactory;\n",
+            "+import org.apache.http.protocol.HttpCoreContext;\n",
+            " \n",
+            " import java.util.*;\n",
+            " import java.io.IOException;\n"
+          ],
+          "locn": "-19,11 +19,11"
+        },
+        {
+          "lines": [
+            "     /** A map of available connections for reuse. The key selects the host+port of the\n",
+            "      * connection and the value contains a List of available connections to destination\n",
+            "      */\n",
+            "-    private static Map connMap = Collections.synchronizedMap(new HashMap());\n",
+            "+    private static Map<String,List<NHttpClientConnection>> connMap =\n",
+            "+            Collections.synchronizedMap(new HashMap<String,List<NHttpClientConnection>>());\n",
+            " \n",
+            "     public static NHttpClientConnection getConnection(String host, int port) {\n",
+            " \n",
+            "         String key = host + \":\" + Integer.toString(port);\n",
+            "-        List connections = (List) connMap.get(key);\n",
+            "+        List<NHttpClientConnection> connections = connMap.get(key);\n",
+            " \n",
+            "         if (connections == null || connections.isEmpty()) {\n",
+            "             if (log.isDebugEnabled()) {\n"
+          ],
+          "locn": "-35,12 +35,13"
+        },
+        {
+          "lines": [
+            "             return null;\n",
+            " \n",
+            "         } else {\n",
+            "-            NHttpClientConnection conn = null;\n",
+            "-\n",
+            "+            NHttpClientConnection conn;\n",
+            "             synchronized (connections) {\n",
+            "                 while (!connections.isEmpty()) {\n",
+            "-                    conn = (NHttpClientConnection) connections.remove(0);\n",
+            "+                    conn = connections.remove(0);\n",
+            " \n",
+            "                     if (conn.isOpen() && !conn.isStale()) {\n",
+            "                         if (log.isDebugEnabled()) {\n"
+          ],
+          "locn": "-49,11 +50,10"
+        },
+        {
+          "lines": [
+            "     public static void release(NHttpClientConnection conn) {\n",
+            " \n",
+            "         HttpHost host = (HttpHost) conn.getContext().getAttribute(\n",
+            "-            ExecutionContext.HTTP_TARGET_HOST);\n",
+            "+            HttpCoreContext.HTTP_TARGET_HOST);\n",
+            "         String key = host.getHostName() + \":\" + Integer.toString(host.getPort());\n",
+            " \n",
+            "-        List connections = (List) connMap.get(key);\n",
+            "+        List<NHttpClientConnection> connections = connMap.get(key);\n",
+            "         if (connections == null) {\n",
+            "             synchronized(connMap) {\n",
+            "                 // use double locking to make sure\n",
+            "-                connections = (List) connMap.get(key);\n",
+            "+                connections = connMap.get(key);\n",
+            "                 if (connections == null) {\n",
+            "-                    connections = Collections.synchronizedList(new LinkedList());\n",
+            "+                    connections = Collections.synchronizedList(new LinkedList<NHttpClientConnection>());\n",
+            "                     connMap.put(key, connections);\n",
+            "                 }\n",
+            "             }\n"
+          ],
+          "locn": "-80,16 +80,16"
+        },
+        {
+          "lines": [
+            "         ctx.removeAttribute(ClientHandler.REQUEST_SOURCE_BUFFER);\n",
+            "         ctx.removeAttribute(ClientHandler.RESPONSE_SINK_BUFFER);\n",
+            " \n",
+            "-        ctx.removeAttribute(ExecutionContext.HTTP_REQUEST);\n",
+            "-        ctx.removeAttribute(ExecutionContext.HTTP_RESPONSE);\n",
+            "+        ctx.removeAttribute(HttpCoreContext.HTTP_REQUEST);\n",
+            "+        ctx.removeAttribute(HttpCoreContext.HTTP_RESPONSE);\n",
+            " \n",
+            "         conn.resetOutput();\n",
+            "     }\n"
+          ],
+          "locn": "-118,8 +118,8"
+        },
+        {
+          "lines": [
+            "     public static void forget(NHttpClientConnection conn) {\n",
+            " \n",
+            "         HttpHost host = (HttpHost) conn.getContext().getAttribute(\n",
+            "-            ExecutionContext.HTTP_TARGET_HOST);\n",
+            "+            HttpCoreContext.HTTP_TARGET_HOST);\n",
+            "         String key = host.getHostName() + \":\" + Integer.toString(host.getPort());\n",
+            " \n",
+            "-        List connections = (List) connMap.get(key);\n",
+            "+        List<NHttpClientConnection> connections = connMap.get(key);\n",
+            "         if (connections != null) {\n",
+            "             synchronized(connections) {\n",
+            "                 connections.remove(conn);\n"
+          ],
+          "locn": "-127,10 +127,10"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ConnectionPool.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ConnectionPool.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         HttpContext context = conn.getContext();\n",
+            "         context.setAttribute(NhttpConstants.REQ_ARRIVAL_TIME, System.currentTimeMillis());\n",
+            "         HttpRequest request = conn.getHttpRequest();\n",
+            "-        context.setAttribute(ExecutionContext.HTTP_REQUEST, request);\n",
+            "+        context.setAttribute(HttpCoreContext.HTTP_REQUEST, request);\n",
+            "         context.setAttribute(NhttpConstants.MESSAGE_IN_FLIGHT, \"true\");\n",
+            " \n",
+            "         // prepare to collect debug information\n"
+          ],
+          "locn": "-145,7 +145,7"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ServerHandler.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ServerHandler.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             context.setAttribute(REQUEST_SOURCE_BUFFER, outputBuffer);\n",
+            " \n",
+            "             context.setAttribute(AXIS2_HTTP_REQUEST, axis2Req);\n",
+            "-            context.setAttribute(ExecutionContext.HTTP_CONNECTION, conn);\n",
+            "-            context.setAttribute(ExecutionContext.HTTP_TARGET_HOST, axis2Req.getHttpHost());\n",
+            "+            context.setAttribute(HttpCoreContext.HTTP_CONNECTION, conn);\n",
+            "+            context.setAttribute(HttpCoreContext.HTTP_TARGET_HOST, axis2Req.getHttpHost());\n",
+            "             context.setAttribute(OUTGOING_MESSAGE_CONTEXT, axis2Req.getMsgContext());\n",
+            " \n",
+            "             HttpRequest request = axis2Req.getRequest();\n"
+          ],
+          "locn": "-227,8 +227,8"
+        },
+        {
+          "lines": [
+            " \n",
+            "             context.setAttribute(NhttpConstants.ENDPOINT_PREFIX, axis2Req.getEndpointURLPrefix());\n",
+            "             context.setAttribute(NhttpConstants.HTTP_REQ_METHOD, request.getRequestLine().getMethod());\n",
+            "-            context.setAttribute(ExecutionContext.HTTP_REQUEST, request);\n",
+            "+            context.setAttribute(HttpCoreContext.HTTP_REQUEST, request);\n",
+            "             setServerContextAttribute(NhttpConstants.REQ_DEPARTURE_TIME,\n",
+            "                         System.currentTimeMillis(), conn);\n",
+            "             conn.submitRequest(request);\n"
+          ],
+          "locn": "-239,7 +239,7"
+        },
+        {
+          "lines": [
+            "                 entity.setChunked(true);\n",
+            "             }\n",
+            "             response.setEntity(entity);\n",
+            "-            context.setAttribute(ExecutionContext.HTTP_RESPONSE, response);\n",
+            "+            context.setAttribute(HttpCoreContext.HTTP_RESPONSE, response);\n",
+            "             \n",
+            "         } else {\n",
+            "             conn.resetInput();\n"
+          ],
+          "locn": "-955,7 +955,7"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java"
+    }
+  ],
+  "id": "1513221",
+  "message": "Getting rid of the last of deprecated http core APIs (ExecutionContext)",
+  "when": "2013-08-12T14:53:55-04:00",
+  "who": "hiranya"
+}

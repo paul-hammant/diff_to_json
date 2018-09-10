@@ -1,0 +1,84 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            "     <deployer extension=\".aar\" directory=\"services\" class=\"org.apache.axis2.deployment.ServiceDeployer\">\n",
+            "         <serviceBuilderExtension name =\"jwsbuilderExt\" class=\"org.apache.axis2.jaxws.framework.JAXWSServiceBuilderExtension\"/>\n",
+            "-        <serviceBuilderExtension name =\"jwsbuilderExt\" class=\"org.apache.axis2.deployment.WSDLServiceBuilderExtension\"/>\n",
+            "+        <serviceBuilderExtension name =\"wsdlbuilderExt\" class=\"org.apache.axis2.deployment.WSDLServiceBuilderExtension\"/>\n",
+            "     </deployer>\n",
+            " \n",
+            "     <!-- Following parameter will set the host name for the epr-->\n"
+          ],
+          "locn": "-78,7 +78,7"
+        }
+      ],
+      "from": "java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_jms.xml",
+      "to": "java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_jms.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            "     <deployer extension=\".aar\" directory=\"services\" class=\"org.apache.axis2.deployment.ServiceDeployer\">\n",
+            "         <serviceBuilderExtension name =\"jwsbuilderExt\" class=\"org.apache.axis2.jaxws.framework.JAXWSServiceBuilderExtension\"/>\n",
+            "-        <serviceBuilderExtension name =\"jwsbuilderExt\" class=\"org.apache.axis2.deployment.WSDLServiceBuilderExtension\"/>\n",
+            "+        <serviceBuilderExtension name =\"wsdlbuilderExt\" class=\"org.apache.axis2.deployment.WSDLServiceBuilderExtension\"/>\n",
+            "     </deployer>\n",
+            " \n",
+            "     <!-- Following parameter will set the host name for the epr-->\n"
+          ],
+          "locn": "-78,7 +78,7"
+        }
+      ],
+      "from": "java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_def.xml",
+      "to": "java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_def.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            "     <deployer extension=\".aar\" directory=\"services\" class=\"org.apache.axis2.deployment.ServiceDeployer\">\n",
+            "         <serviceBuilderExtension name =\"jwsbuilderExt\" class=\"org.apache.axis2.jaxws.framework.JAXWSServiceBuilderExtension\"/>\n",
+            "-        <serviceBuilderExtension name =\"jwsbuilderExt\" class=\"org.apache.axis2.deployment.WSDLServiceBuilderExtension\"/>\n",
+            "+        <serviceBuilderExtension name =\"wsdlbuilderExt\" class=\"org.apache.axis2.deployment.WSDLServiceBuilderExtension\"/>\n",
+            "     </deployer>\n",
+            " \n",
+            "     <!-- Following parameter will set the host name for the epr-->\n"
+          ],
+          "locn": "-78,7 +78,7"
+        }
+      ],
+      "from": "java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_clustering.xml",
+      "to": "java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_clustering.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            "     <deployer extension=\".aar\" directory=\"services\" class=\"org.apache.axis2.deployment.ServiceDeployer\">\n",
+            "         <serviceBuilderExtension name =\"jwsbuilderExt\" class=\"org.apache.axis2.jaxws.framework.JAXWSServiceBuilderExtension\"/>\n",
+            "-        <serviceBuilderExtension name =\"jwsbuilderExt\" class=\"org.apache.axis2.deployment.WSDLServiceBuilderExtension\"/>\n",
+            "+        <serviceBuilderExtension name =\"wsdlbuilderExt\" class=\"org.apache.axis2.deployment.WSDLServiceBuilderExtension\"/>\n",
+            "     </deployer>\n",
+            " \n",
+            "     <!-- Following parameter will set the host name for the epr-->\n"
+          ],
+          "locn": "-78,7 +78,7"
+        }
+      ],
+      "from": "java/repository/conf/sample/resources/misc/server/axis2.xml",
+      "to": "java/repository/conf/sample/resources/misc/server/axis2.xml"
+    }
+  ],
+  "id": "1349224",
+  "message": "Unique IDs for registered deployer extensions",
+  "when": "2012-06-12T05:59:07-04:00",
+  "who": "hiranya"
+}

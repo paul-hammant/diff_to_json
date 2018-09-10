@@ -1,0 +1,354 @@
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1776133)
++++ java/pom.xml	(revision 1776134)
+@@ -32,7 +32,7 @@
+ 
+     <groupId>org.apache.synapse</groupId>
+     <artifactId>Apache-Synapse</artifactId>
+-    <version>2.2.0-SNAPSHOT</version>
++    <version>3.0.0-SNAPSHOT</version>
+ 
+     <name>Apache Synapse</name>
+     <description>Apache Synapse</description>
+@@ -1020,7 +1020,7 @@
+              maven-antrun-plugin. -->
+         <java.version>1.6</java.version>
+ 
+-        <synapse.version>2.2.0-SNAPSHOT</synapse.version>
++        <synapse.version>3.0.0-SNAPSHOT</synapse.version>
+ 
+         <!-- Apache Commons -->
+         <commons.dbcp.version>1.3</commons.dbcp.version> <!-- We need this version to support JDK 5 -->
+Index: java/modules/securevault/pom.xml
+===================================================================
+--- java/modules/securevault/pom.xml	(revision 1776133)
++++ java/modules/securevault/pom.xml	(revision 1776134)
+@@ -26,7 +26,7 @@
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>2.2.0-SNAPSHOT</version>
++        <version>3.0.0-SNAPSHOT</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+     <artifactId>synapse-securevault</artifactId>
+Index: java/modules/samples/pom.xml
+===================================================================
+--- java/modules/samples/pom.xml	(revision 1776133)
++++ java/modules/samples/pom.xml	(revision 1776134)
+@@ -26,7 +26,7 @@
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>2.2.0-SNAPSHOT</version>
++        <version>3.0.0-SNAPSHOT</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+Index: java/modules/documentation/pom.xml
+===================================================================
+--- java/modules/documentation/pom.xml	(revision 1776133)
++++ java/modules/documentation/pom.xml	(revision 1776134)
+@@ -26,7 +26,7 @@
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>2.2.0-SNAPSHOT</version>
++        <version>3.0.0-SNAPSHOT</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+Index: java/modules/commons/pom.xml
+===================================================================
+--- java/modules/commons/pom.xml	(revision 1776133)
++++ java/modules/commons/pom.xml	(revision 1776134)
+@@ -26,7 +26,7 @@
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>2.2.0-SNAPSHOT</version>
++        <version>3.0.0-SNAPSHOT</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+Index: java/modules/handler/pom.xml
+===================================================================
+--- java/modules/handler/pom.xml	(revision 1776133)
++++ java/modules/handler/pom.xml	(revision 1776134)
+@@ -26,7 +26,7 @@
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>2.2.0-SNAPSHOT</version>
++        <version>3.0.0-SNAPSHOT</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+Index: java/modules/distribution/pom.xml
+===================================================================
+--- java/modules/distribution/pom.xml	(revision 1776133)
++++ java/modules/distribution/pom.xml	(revision 1776134)
+@@ -25,7 +25,7 @@
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>2.2.0-SNAPSHOT</version>
++        <version>3.0.0-SNAPSHOT</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+Index: java/modules/transports/core/nhttp/pom.xml
+===================================================================
+--- java/modules/transports/core/nhttp/pom.xml	(revision 1776133)
++++ java/modules/transports/core/nhttp/pom.xml	(revision 1776134)
+@@ -26,7 +26,7 @@
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>synapse-transports</artifactId>
+-        <version>2.2.0-SNAPSHOT</version>
++        <version>3.0.0-SNAPSHOT</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+Index: java/modules/transports/core/pipe/pom.xml
+===================================================================
+--- java/modules/transports/core/pipe/pom.xml	(revision 1776133)
++++ java/modules/transports/core/pipe/pom.xml	(revision 1776134)
+@@ -26,7 +26,7 @@
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>synapse-transports</artifactId>
+-        <version>2.2.0-SNAPSHOT</version>
++        <version>3.0.0-SNAPSHOT</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+@@ -63,4 +63,4 @@
+         </plugins>
+     </build>
+ 
+-</project>
+\ No newline at end of file
++</project>
+Index: java/modules/transports/core/vfs/pom.xml
+===================================================================
+--- java/modules/transports/core/vfs/pom.xml	(revision 1776133)
++++ java/modules/transports/core/vfs/pom.xml	(revision 1776134)
+@@ -26,7 +26,7 @@
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>synapse-transports</artifactId>
+-        <version>2.2.0-SNAPSHOT</version>
++        <version>3.0.0-SNAPSHOT</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+Index: java/modules/transports/pom.xml
+===================================================================
+--- java/modules/transports/pom.xml	(revision 1776133)
++++ java/modules/transports/pom.xml	(revision 1776134)
+@@ -26,7 +26,7 @@
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>2.2.0-SNAPSHOT</version>
++        <version>3.0.0-SNAPSHOT</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+Index: java/modules/transports/optional/amqp/pom.xml
+===================================================================
+--- java/modules/transports/optional/amqp/pom.xml	(revision 1776133)
++++ java/modules/transports/optional/amqp/pom.xml	(revision 1776134)
+@@ -26,7 +26,7 @@
+ 	<parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>synapse-transports</artifactId>
+-        <version>2.2.0-SNAPSHOT</version>
++        <version>3.0.0-SNAPSHOT</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+Index: java/modules/transports/optional/fix/pom.xml
+===================================================================
+--- java/modules/transports/optional/fix/pom.xml	(revision 1776133)
++++ java/modules/transports/optional/fix/pom.xml	(revision 1776134)
+@@ -26,7 +26,7 @@
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>synapse-transports</artifactId>
+-        <version>2.2.0-SNAPSHOT</version>
++        <version>3.0.0-SNAPSHOT</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+Index: java/modules/integration/pom.xml
+===================================================================
+--- java/modules/integration/pom.xml	(revision 1776133)
++++ java/modules/integration/pom.xml	(revision 1776134)
+@@ -26,7 +26,7 @@
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>2.2.0-SNAPSHOT</version>
++        <version>3.0.0-SNAPSHOT</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+Index: java/modules/migrator/pom.xml
+===================================================================
+--- java/modules/migrator/pom.xml	(revision 1776133)
++++ java/modules/migrator/pom.xml	(revision 1776134)
+@@ -26,7 +26,7 @@
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>2.2.0-SNAPSHOT</version>
++        <version>3.0.0-SNAPSHOT</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+Index: java/modules/packaging/package-archetype/src/main/resources/archetype-resources/pom.xml
+===================================================================
+--- java/modules/packaging/package-archetype/src/main/resources/archetype-resources/pom.xml	(revision 1776133)
++++ java/modules/packaging/package-archetype/src/main/resources/archetype-resources/pom.xml	(revision 1776134)
+@@ -34,7 +34,7 @@
+             <activation>
+                 <property>
+                     <name>synapse.version</name>
+-                    <value>2.2.0-SNAPSHOT</value>
++                    <value>3.0.0-SNAPSHOT</value>
+                 </property>
+             </activation>
+             <repositories>
+Index: java/modules/packaging/package-archetype/pom.xml
+===================================================================
+--- java/modules/packaging/package-archetype/pom.xml	(revision 1776133)
++++ java/modules/packaging/package-archetype/pom.xml	(revision 1776134)
+@@ -25,7 +25,7 @@
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>2.2.0-SNAPSHOT</version>
++        <version>3.0.0-SNAPSHOT</version>
+         <relativePath>../../../pom.xml</relativePath>
+     </parent>
+     <artifactId>synapse-package-archetype</artifactId>
+@@ -70,4 +70,4 @@
+             </plugin>
+         </plugins>
+     </build>
+-</project>
+\ No newline at end of file
++</project>
+Index: java/modules/packaging/package-skeleton/pom.xml
+===================================================================
+--- java/modules/packaging/package-skeleton/pom.xml	(revision 1776133)
++++ java/modules/packaging/package-skeleton/pom.xml	(revision 1776134)
+@@ -25,7 +25,7 @@
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>2.2.0-SNAPSHOT</version>
++        <version>3.0.0-SNAPSHOT</version>
+         <relativePath>../../../pom.xml</relativePath>
+     </parent>
+     <artifactId>synapse-package-skeleton</artifactId>
+Index: java/modules/tasks/pom.xml
+===================================================================
+--- java/modules/tasks/pom.xml	(revision 1776133)
++++ java/modules/tasks/pom.xml	(revision 1776134)
+@@ -26,7 +26,7 @@
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>2.2.0-SNAPSHOT</version>
++        <version>3.0.0-SNAPSHOT</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+Index: java/modules/patches/pom.xml
+===================================================================
+--- java/modules/patches/pom.xml	(revision 1776133)
++++ java/modules/patches/pom.xml	(revision 1776134)
+@@ -25,7 +25,7 @@
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>2.2.0-SNAPSHOT</version>
++        <version>3.0.0-SNAPSHOT</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+     <artifactId>synapse-patches</artifactId>
+Index: java/modules/core/pom.xml
+===================================================================
+--- java/modules/core/pom.xml	(revision 1776133)
++++ java/modules/core/pom.xml	(revision 1776134)
+@@ -26,7 +26,7 @@
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>2.2.0-SNAPSHOT</version>
++        <version>3.0.0-SNAPSHOT</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+Index: java/modules/war/pom.xml
+===================================================================
+--- java/modules/war/pom.xml	(revision 1776133)
++++ java/modules/war/pom.xml	(revision 1776134)
+@@ -26,7 +26,7 @@
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>2.2.0-SNAPSHOT</version>
++        <version>3.0.0-SNAPSHOT</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+Index: java/modules/xar-maven-plugin/pom.xml
+===================================================================
+--- java/modules/xar-maven-plugin/pom.xml	(revision 1776133)
++++ java/modules/xar-maven-plugin/pom.xml	(revision 1776134)
+@@ -24,7 +24,7 @@
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>2.2.0-SNAPSHOT</version>
++        <version>3.0.0-SNAPSHOT</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+Index: java/modules/experimental/pom.xml
+===================================================================
+--- java/modules/experimental/pom.xml	(revision 1776133)
++++ java/modules/experimental/pom.xml	(revision 1776134)
+@@ -26,7 +26,7 @@
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>2.2.0-SNAPSHOT</version>
++        <version>3.0.0-SNAPSHOT</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+Index: java/modules/extensions/pom.xml
+===================================================================
+--- java/modules/extensions/pom.xml	(revision 1776133)
++++ java/modules/extensions/pom.xml	(revision 1776134)
+@@ -26,7 +26,7 @@
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>2.2.0-SNAPSHOT</version>
++        <version>3.0.0-SNAPSHOT</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+-*-*-*-
+Message: Changing snapshot version to next release version 3.0
+-*-*-*-
+When: 2016-12-27 08:56:40 -0500 
+-*-*-*-
+Who: ravi

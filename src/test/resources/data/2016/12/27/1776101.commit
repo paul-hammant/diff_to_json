@@ -1,0 +1,106 @@
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetHandler.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetHandler.java	(revision 1776100)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetHandler.java	(revision 1776101)
+@@ -498,6 +498,15 @@
+         }
+     }
+ 
++    /**
++     * Get the associated configuration of the {@code TargetHandler}
++     *
++     * @return associated {@code TargetConfiguration}
++     */
++    public TargetConfiguration getTargetConfiguration() {
++        return targetConfiguration;
++    }
++
+     private boolean isResponseHaveBodyExpected(
+             final String method, final HttpResponse response) {
+ 
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/PassThroughTransportUtils.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/PassThroughTransportUtils.java	(revision 1776100)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/PassThroughTransportUtils.java	(revision 1776101)
+@@ -41,6 +41,7 @@
+ import org.apache.synapse.transport.passthru.config.TargetConfiguration;
+ import org.apache.synapse.transport.passthru.connections.SourceConnections;
+ import org.apache.synapse.transport.passthru.connections.TargetConnections;
++import org.apache.synapse.transport.utils.conn.SynapseNHttpClientConnection;
+ 
+ import java.net.InetAddress;
+ import java.util.Map;
+@@ -262,7 +263,11 @@
+             TargetContext.updateState(conn, ProtocolState.CLOSING);
+             connections.closeConnection(conn);
+         } else {
+-            connections.releaseConnection(conn);
++            if (conn instanceof SynapseNHttpClientConnection) {
++                ((SynapseNHttpClientConnection) conn).markForRelease();
++            } else {
++                connections.releaseConnection(conn);
++            }
+         }
+     }
+ 
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/conn/SynapseNHttpClientConnection.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/conn/SynapseNHttpClientConnection.java	(revision 1776100)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/conn/SynapseNHttpClientConnection.java	(revision 1776101)
+@@ -30,6 +30,7 @@
+ import org.apache.http.nio.NHttpMessageWriterFactory;
+ import org.apache.http.nio.reactor.IOSession;
+ import org.apache.http.nio.util.ByteBufferAllocator;
++import org.apache.synapse.transport.passthru.TargetHandler;
+ 
+ import java.io.IOException;
+ import java.nio.charset.CharsetDecoder;
+@@ -41,6 +42,8 @@
+  */
+ public class SynapseNHttpClientConnection extends DefaultNHttpClientConnection {
+ 
++    private boolean markedForRelease = false;
++
+     public SynapseNHttpClientConnection(IOSession session,
+                                         int bufferSize,
+                                         int fragmentSizeHint,
+@@ -75,6 +78,12 @@
+     @Override
+     public void consumeInput(final NHttpClientEventHandler handler) {
+         super.consumeInput(handler);
++        if (markedForRelease) {
++            if (handler instanceof TargetHandler) {
++                resetState();
++                ((TargetHandler) handler).getTargetConfiguration().getConnections().releaseConnection(this);
++            }
++        }
+     }
+ 
+     @Override
+@@ -81,4 +90,18 @@
+     public void produceOutput(final NHttpClientEventHandler handler) {
+         super.produceOutput(handler);
+     }
++
++    /**
++     * Mark this connection to be released to the pool.
++     * <p>
++     * This needs to be called after finishing work related to a particular request/response,
++     * and only when keep-alive is enabled
++     */
++    public void markForRelease() {
++        this.markedForRelease = true;
++    }
++
++    private void resetState() {
++        markedForRelease = false;
++    }
+ }
+-*-*-*-
+Message: Fix for SYNAPSE-1014
+-----------------------
+Porting fix from https://github.com/wso2/wso2-synapse/commit/fbc829ae1e52c552aa348967db929fa21a8cf1f6 by Isuru Ranawaka
+-*-*-*-
+When: 2016-12-27 05:15:38 -0500 
+-*-*-*-
+Who: isudana

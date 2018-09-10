@@ -1,0 +1,40 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         <commons.codec.version>1.6</commons.codec.version>\n",
+            " \n",
+            "         <!-- Axis2 and its dependencies -->\n",
+            "-        <axis2.version>1.7.6-SNAPSHOT</axis2.version>\n",
+            "+        <axis2.version>1.7.7-SNAPSHOT</axis2.version>\n",
+            "         <axiom.version>1.2.21-SNAPSHOT</axiom.version>\n",
+            "         <wsdl4j.version>1.6.2</wsdl4j.version>\n",
+            "         <jettison.version>1.3.8</jettison.version>\n"
+          ],
+          "locn": "-1102,7 +1102,7"
+        },
+        {
+          "lines": [
+            " \n",
+            "         <!-- addressing, rampart, neethi -->\n",
+            "         <addressing.version>${axis2.version}</addressing.version>\n",
+            "-        <rampart.version>1.7.1-SNAPSHOT</rampart.version>\n",
+            "+        <rampart.version>1.7.2-SNAPSHOT</rampart.version>\n",
+            "         <neethi.version>3.0.3</neethi.version>\n",
+            "         <jruby.version>1.3.0</jruby.version>\n",
+            "         <bcprov.jdk15.version>140</bcprov.jdk15.version>\n"
+          ],
+          "locn": "-1109,7 +1109,7"
+        }
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    }
+  ],
+  "id": "1805668",
+  "message": "Update Axis2 and Rampart snapshot versions.",
+  "when": "2017-08-21T15:57:10-04:00",
+  "who": "veithen"
+}

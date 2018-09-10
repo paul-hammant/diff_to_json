@@ -1,0 +1,77 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         }\n",
+            "     }\n",
+            " \n",
+            "-    private Endpoint loadAndInitEndpoint(ConfigurationContext cc, String key) {\n",
+            "+    private synchronized Endpoint loadAndInitEndpoint(ConfigurationContext cc, String key) {\n",
+            "         Parameter parameter = cc.getAxisConfiguration().getParameter(\n",
+            "                 SynapseConstants.SYNAPSE_CONFIG);\n",
+            "         Parameter synEnvParameter = cc.getAxisConfiguration().getParameter(\n"
+          ],
+          "locn": "-53,7 +53,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/endpoints/ResolvingEndpoint.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/endpoints/ResolvingEndpoint.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "      * OMElement otherwise.\n",
+            "      * @return Either an OMElement or a String\n",
+            "      */\n",
+            "-    public Object getValue() {\n",
+            "+    public synchronized Object getValue() {\n",
+            "         return value;\n",
+            "     }\n",
+            " \n",
+            "-    public void setValue(Object value) {\n",
+            "+    public synchronized void setValue(Object value) {\n",
+            "         this.value = value;\n",
+            "     }\n",
+            " \n"
+          ],
+          "locn": "-117,11 +117,11"
+        },
+        {
+          "lines": [
+            "      *\n",
+            "      * @return mapper\n",
+            "      */\n",
+            "-    public XMLToObjectMapper getMapper() {\n",
+            "+    public synchronized XMLToObjectMapper getMapper() {\n",
+            "         return mapper;\n",
+            "     }\n",
+            " \n"
+          ],
+          "locn": "-129,7 +129,7"
+        },
+        {
+          "lines": [
+            "      *\n",
+            "      * @param mapper XMLToObjectMapper instance\n",
+            "      */\n",
+            "-    public void setMapper(XMLToObjectMapper mapper) {\n",
+            "+    public synchronized void setMapper(XMLToObjectMapper mapper) {\n",
+            "         this.mapper = mapper;\n",
+            "     }\n",
+            " \n"
+          ],
+          "locn": "-138,7 +138,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/Entry.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/Entry.java"
+    }
+  ],
+  "id": "1210335",
+  "message": "Fixed SYNAPSE-819.",
+  "when": "2011-12-05T00:30:40-05:00",
+  "who": "rajikak"
+}

@@ -1,0 +1,184 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     <!--                  Clustering                       -->\n",
+            "     <!-- ================================================= -->\n",
+            "     <!-- Configure the following for preparing Synapse to a clustered environment -->\n",
+            "-    <cluster class=\"org.apache.axis2.clustering.tribes.TribesClusterManager\" enable=\"false\">\n",
+            "+    <clustering class=\"org.apache.axis2.clustering.tribes.TribesClusterManager\" enable=\"false\">\n",
+            " \n",
+            "         <!--\n",
+            "            This parameter indicates whther the cluster has to be automatically initalized\n"
+          ],
+          "locn": "-343,7 +343,7"
+        },
+        {
+          "lines": [
+            "         </members>\n",
+            " \n",
+            "         <!--\n",
+            "-        Enable the load balancer entry if you need to run this node as a load balancer.\n",
+            "-        Multiple application domains with different LoadBalanceEventHandler implementations\n",
+            "+        Enable the groupManagement entry if you need to run this node as a cluster manager.\n",
+            "+        Multiple application domains with different GroupManagementAgent implementations\n",
+            "         can be defined in this section.\n",
+            "         -->\n",
+            "-        <loadBalancer enable=\"false\">\n",
+            "+        <groupManagement enable=\"false\">\n",
+            "             <applicationDomain name=\"apache.axis2.app.domain\"\n",
+            "+                               description=\"Axis2 group\"\n",
+            "                                handler=\"org.apache.axis2.clustering.DefaultLoadBalanceEventHandler\"/>\n",
+            "-        </loadBalancer>\n",
+            "+        </groupManagement>\n",
+            "             \n",
+            "         <!--\n",
+            "            This interface is responsible for handling context replication. The property changes in\n"
+          ],
+          "locn": "-434,14 +434,15"
+        },
+        {
+          "lines": [
+            "                 </context>\n",
+            "             </replication>\n",
+            "         </contextManager>\n",
+            "-    </cluster>\n",
+            "+    </clustering>\n",
+            " \n",
+            "     <!-- ================================================= -->\n",
+            "     <!-- Phases  -->\n"
+          ],
+          "locn": "-473,7 +474,7"
+        }
+      ],
+      "from": "java/repository/conf/axis2.xml",
+      "to": "java/repository/conf/axis2.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     <!-- ================================================= -->\n",
+            "     <!-- Configure and uncomment following for preparing Axis2 to a clustered environment -->\n",
+            "     <!--\n",
+            "-    <cluster class=\"org.apache.axis2.cluster.tribes.TribesClusterManager\">\n",
+            "+    <clustering class=\"org.apache.axis2.cluster.tribes.TribesClusterManager\">\n",
+            "         <parameter name=\"param1\">value1</parameter>\n",
+            "         <parameter name=\"domain\">apache.axis2.domain</parameter>\n",
+            "     \t<configurationManager class=\"org.apache.axis2.cluster.configuration.TribesConfigurationManager\">\n"
+          ],
+          "locn": "-258,7 +258,7"
+        },
+        {
+          "lines": [
+            "     \t<contextManager class=\"org.apache.axis2.cluster.context.TribesContextManager\">\n",
+            "     \t    <listener class=\"org.apache.axis2.cluster.context.DefaultContextManagerListener\"/>\n",
+            "     \t</contextManager>\n",
+            "-    </cluster>\n",
+            "+    </clustering>\n",
+            "      -->\n",
+            " \n",
+            "     <!-- ================================================= -->\n"
+          ],
+          "locn": "-267,7 +267,7"
+        }
+      ],
+      "from": "java/repository/conf/sample/resources/misc/client/axis2.xml",
+      "to": "java/repository/conf/sample/resources/misc/client/axis2.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     <!-- Clustering  -->\n",
+            "     <!-- ================================================= -->\n",
+            "     <!-- Configure the following for preparing Axis2 to a clustered environment -->\n",
+            "-    <cluster class=\"org.apache.axis2.clustering.tribes.TribesClusterManager\" enable=\"false\">\n",
+            "+    <clustering class=\"org.apache.axis2.clustering.tribes.TribesClusterManager\" enable=\"false\">\n",
+            "         <parameter name=\"AvoidInitiation\">true</parameter>\n",
+            "         <parameter name=\"membershipScheme\">multicast</parameter>\n",
+            "         <parameter name=\"domain\">apache.axis2.app.domain</parameter>\n"
+          ],
+          "locn": "-256,7 +256,7"
+        },
+        {
+          "lines": [
+            "                 </context>\n",
+            "             </replication>\n",
+            "         </contextManager>\n",
+            "-    </cluster>\n",
+            "+    </clustering>\n",
+            "      \n",
+            "     <!-- ================================================= -->\n",
+            "     <!-- Phases  -->\n"
+          ],
+          "locn": "-288,7 +288,7"
+        }
+      ],
+      "from": "java/repository/conf/sample/resources/misc/server/axis2.xml",
+      "to": "java/repository/conf/sample/resources/misc/server/axis2.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     <!--                  Clustering                       -->\n",
+            "     <!-- ================================================= -->\n",
+            "     <!-- Configure the following for preparing Synapse to a clustered environment -->\n",
+            "-    <cluster class=\"org.apache.axis2.clustering.tribes.TribesClusterManager\" enable=\"false\">\n",
+            "+    <clustering class=\"org.apache.axis2.clustering.tribes.TribesClusterManager\" enable=\"false\">\n",
+            " \n",
+            "         <!--\n",
+            "            This parameter indicates whther the cluster has to be automatically initalized\n"
+          ],
+          "locn": "-302,7 +302,7"
+        },
+        {
+          "lines": [
+            "         </members>\n",
+            " \n",
+            "         <!--\n",
+            "-        Enable the load balancer entry if you need to run this node as a load balancer.\n",
+            "-        Multiple application domains with different LoadBalanceEventHandler implementations\n",
+            "+        Enable the groupManagement entry if you need to run this node as a cluster manager.\n",
+            "+        Multiple application domains with different GroupManagementAgent implementations\n",
+            "         can be defined in this section.\n",
+            "         -->\n",
+            "-        <loadBalancer enable=\"false\">\n",
+            "+        <groupManagement enable=\"false\">\n",
+            "             <applicationDomain name=\"apache.axis2.app.domain\"\n",
+            "+                               description=\"Axis2 group\"\n",
+            "                                handler=\"org.apache.axis2.clustering.DefaultLoadBalanceEventHandler\"/>\n",
+            "-        </loadBalancer>\n",
+            "+        </groupManagement>\n",
+            "             \n",
+            "         <!--\n",
+            "            This interface is responsible for handling context replication. The property changes in\n"
+          ],
+          "locn": "-393,14 +393,15"
+        },
+        {
+          "lines": [
+            "                 </context>\n",
+            "             </replication>\n",
+            "         </contextManager>\n",
+            "-    </cluster>\n",
+            "+    </clustering>\n",
+            " \n",
+            "     <!-- ================================================= -->\n",
+            "     <!-- Phases  -->\n"
+          ],
+          "locn": "-432,7 +433,7"
+        }
+      ],
+      "from": "java/modules/packaging/package-archetype/src/main/resources/archetype-resources/repository/conf/axis2.xml",
+      "to": "java/modules/packaging/package-archetype/src/main/resources/archetype-resources/repository/conf/axis2.xml"
+    }
+  ],
+  "id": "1210852",
+  "message": "Updated clustering confguration to be inline with the clustering implementation in the trunk",
+  "when": "2011-12-06T05:29:41-05:00",
+  "who": "azeez"
+}

@@ -1,0 +1,71 @@
+Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java
+===================================================================
+--- java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java	(revision 1504673)
++++ java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportListener.java	(revision 1504674)
+@@ -36,6 +36,7 @@
+ import org.apache.axis2.transport.base.ManagementSupport;
+ import org.apache.axis2.transport.base.threads.WorkerPool;
+ import org.apache.commons.io.FileUtils;
++import org.apache.commons.io.input.AutoCloseInputStream;
+ import org.apache.commons.vfs2.*;
+ import org.apache.commons.vfs2.impl.StandardFileSystemManager;
+ 
+@@ -543,7 +544,7 @@
+                 dataSource = ManagedDataSourceFactory.create(
+                         new FileObjectDataSource(file, contentType));
+             } else {
+-                in = content.getInputStream();
++                in = new AutoCloseInputStream(content.getInputStream());
+                 dataSource = null;
+             }
+             
+@@ -563,15 +564,8 @@
+                     null, //* SOAP Action - not applicable *//
+                     contentType
+                 );
+-            }
+-            finally {
+-                if (in != null) {
+-                    try {
+-                        in.close();
+-                    } catch (IOException ex) {
+-                        handleException("Error closing stream", ex);
+-                    }
+-                } else {
++            } finally {
++                if (dataSource != null) {
+                     dataSource.destroy();
+                 }
+             }
+@@ -585,9 +579,10 @@
+             
+         } finally {
+             try {
++                // As per the Commons-VFS API docs, this will also close the underlying
++                // FileContent object and any open streams.
+                 file.close();
+-            } catch (FileSystemException warn) {
+-                log.warn("Cannot close file after processing : " + file.getName().getPath(), warn);
++            } catch (FileSystemException ignored) {
+             }
+         }
+     }
+Index: java/modules/transports/core/vfs/pom.xml
+===================================================================
+--- java/modules/transports/core/vfs/pom.xml	(revision 1504673)
++++ java/modules/transports/core/vfs/pom.xml	(revision 1504674)
+@@ -58,7 +58,7 @@
+                             !org.apache.commons.io.output,
+                             org.apache.commons.io.output; version=0.0.0,
+                             org.apache.commons.vfs2.*; version=0.0.0,
+-							org.apache.commons.io; version=0.0.0,
++							org.apache.commons.io.*; version=0.0.0,
+                             *; resolution:=optional
+                         </Import-Package>
+                     </instructions>
+-*-*-*-
+Message: Applying the patch for SYNAPSE-847; Getting rid of redundant code to close the file input stream. This is taken care of by the FileObject.close() method. Also using an AutoCloseInputStream so that the input stream will be closed early if Synapse consumes it entirely.
+-*-*-*-
+When: 2013-07-18 17:40:26 -0400 
+-*-*-*-
+Who: hiranya

@@ -1,0 +1,55 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             <type>mar</type>\n",
+            "         </dependency>\n",
+            "         <dependency>\n",
+            "+            <groupId>org.apache.sandesha2</groupId>\n",
+            "+            <artifactId>sandesha2-policy</artifactId>\n",
+            "+            <version>${sandesha2.version}</version>\n",
+            "+            <exclusions>\n",
+            "+                <exclusion>\n",
+            "+                    <groupId>org.apache.axis2</groupId>\n",
+            "+                    <artifactId>axis2</artifactId>\n",
+            "+                </exclusion>\n",
+            "+            </exclusions>\n",
+            "+        </dependency>\n",
+            "+        <dependency>\n",
+            "             <groupId>org.apache.axis2</groupId>\n",
+            "             <artifactId>addressing</artifactId>\n",
+            "             <version>${addressing.version}</version>\n"
+          ],
+          "locn": "-101,6 +101,17"
+        }
+      ],
+      "from": "java/modules/distribution/pom.xml",
+      "to": "java/modules/distribution/pom.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             if (jmxInformation.getRemoteAccessFile() != null) {\n",
+            "                 env.put(\"jmx.remote.x.access.file\", jmxInformation.getRemoteAccessFile());\n",
+            "             }\n",
+            "-        } else {\n",
+            "-            log.warn(\"Using unsecured JMX remote access!\");\n",
+            "         }\n",
+            " \n",
+            "         if (jmxInformation.isRemoteSSL()) {\n"
+          ],
+          "locn": "-223,8 +223,6"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/JmxAdapter.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/JmxAdapter.java"
+    }
+  ],
+  "id": "1220689",
+  "message": "Fixing SYNAPSE-585 and removing an unnecessary warning",
+  "when": "2011-12-19T06:18:09-05:00",
+  "who": "hiranya"
+}

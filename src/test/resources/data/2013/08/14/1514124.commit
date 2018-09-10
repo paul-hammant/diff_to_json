@@ -1,0 +1,25 @@
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java	(revision 1514123)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java	(revision 1514124)
+@@ -193,11 +193,9 @@
+                 synchronized (conn.getContext()) {
+                     // SimpleOutputBuffer is not thread safe
+                     // Explicit synchronization required
+-                    if (outBuf.hasData()) {
+-                        int bytesWritten = outBuf.produceContent(encoder);
+-                        if (metrics != null && bytesWritten > 0) {
+-                            metrics.incrementBytesSent(bytesWritten);
+-                        }
++                    int bytesWritten = outBuf.produceContent(encoder);
++                    if (metrics != null && bytesWritten > 0) {
++                        metrics.incrementBytesSent(bytesWritten);
+                     }
+ 
+                     conn.requestInput();
+-*-*-*-
+Message: No need to check for hasData() - HttpCore handles it correctly
+-*-*-*-
+When: 2013-08-14 21:49:23 -0400 
+-*-*-*-
+Who: hiranya

@@ -1,0 +1,33 @@
+{
+  "changes": [
+    {
+      "chunks": [],
+      "from": "java/modules/integration",
+      "to": "java/modules/integration"
+    },
+    {
+      "chunks": [],
+      "from": "java/modules/migrator",
+      "to": "java/modules/migrator"
+    },
+    {
+      "chunks": [],
+      "from": "java/modules/patches",
+      "to": "java/modules/patches"
+    },
+    {
+      "chunks": [],
+      "from": "java/modules/securevault",
+      "to": "java/modules/securevault"
+    },
+    {
+      "chunks": [],
+      "from": "java/modules/documentation",
+      "to": "java/modules/documentation"
+    }
+  ],
+  "id": "1331828",
+  "message": "Adjusted svn:ignore.\n",
+  "when": "2012-04-28T16:40:28-04:00",
+  "who": "veithen"
+}

@@ -1,0 +1,322 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     private Map<String,Resource> resources = new LinkedHashMap<String,Resource>();\n",
+            "     private List<Handler> handlers = new ArrayList<Handler>();\n",
+            " \n",
+            "+    private int protocol = RESTConstants.PROTOCOL_HTTP_AND_HTTPS;\n",
+            "+\n",
+            "     private VersionStrategy versionStrategy = new DefaultStrategy(this);\n",
+            " \n",
+            "     private String fileName;\n"
+          ],
+          "locn": "-44,6 +44,8"
+        },
+        {
+          "lines": [
+            "         return name;\n",
+            "     }\n",
+            " \n",
+            "+    public int getProtocol() {\n",
+            "+        return protocol;\n",
+            "+    }\n",
+            "+\n",
+            "+    public void setProtocol(int protocol) {\n",
+            "+        this.protocol = protocol;\n",
+            "+    }\n",
+            "+\n",
+            "     public String getAPIName() {\n",
+            "         return name;\n",
+            "     }\n"
+          ],
+          "locn": "-68,6 +70,14"
+        },
+        {
+          "lines": [
+            "                 return false;\n",
+            "             }\n",
+            " \n",
+            "+            org.apache.axis2.context.MessageContext msgCtx =\n",
+            "+                    ((Axis2MessageContext) synCtx).getAxis2MessageContext();\n",
+            "+\n",
+            "             if (host != null || port != -1) {\n",
+            "-                org.apache.axis2.context.MessageContext msgCtx =\n",
+            "-                        ((Axis2MessageContext) synCtx).getAxis2MessageContext();\n",
+            "                 String hostHeader = getHostHeader(msgCtx);\n",
+            "                 if (hostHeader != null) {\n",
+            "                     if (host != null && !host.equals(extractHostName(hostHeader))) {\n"
+          ],
+          "locn": "-176,9 +186,10"
+        },
+        {
+          "lines": [
+            "                     return false;\n",
+            "                 }\n",
+            "             }\n",
+            "+            if (protocol == RESTConstants.PROTOCOL_HTTP_ONLY &&\n",
+            "+                    !Constants.TRANSPORT_HTTP.equals(msgCtx.getIncomingTransportName())) {\n",
+            "+                if (log.isDebugEnabled()) {\n",
+            "+                    log.debug(\"Protocol information does not match - Expected HTTP\");\n",
+            "+                }\n",
+            "+                synCtx.setProperty(RESTConstants.REST_API_TRANSPORT_DENIED, true);\n",
+            "+                synCtx.setProperty(RESTConstants.REST_API_IN_TRANSPORT,\n",
+            "+                        msgCtx.getIncomingTransportName());\n",
+            "+                log.warn(\"Trying to access API : \" + name + \" on restricted transport chanel [\" +\n",
+            "+                        msgCtx.getIncomingTransportName() + \"]\");\n",
+            "+                return false;\n",
+            "+            } else if (protocol == RESTConstants.PROTOCOL_HTTPS_ONLY &&\n",
+            "+                    !Constants.TRANSPORT_HTTPS.equals(msgCtx.getIncomingTransportName())) {\n",
+            "+                if (log.isDebugEnabled()) {\n",
+            "+                    log.debug(\"Protocol information does not match - Expected HTTPS\");\n",
+            "+                }\n",
+            "+                synCtx.setProperty(RESTConstants.REST_API_TRANSPORT_DENIED, true);\n",
+            "+                synCtx.setProperty(RESTConstants.REST_API_IN_TRANSPORT,\n",
+            "+                        msgCtx.getIncomingTransportName());\n",
+            "+                log.warn(\"Trying to access API : \" + name + \" on restricted transport chanel [\" +\n",
+            "+                        msgCtx.getIncomingTransportName() + \"]\");\n",
+            "+                return false;\n",
+            "+            }\n",
+            "         }\n",
+            " \n",
+            "         return true;\n"
+          ],
+          "locn": "-204,6 +215,29"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/rest/API.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/rest/API.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            "     public static final String NO_MATCHING_RESOURCE_HANDLER = \"_resource_mismatch_handler_\";\n",
+            " \n",
+            "+    /** The Synapse MC property that indicates the in-transport */\n",
+            "+    public static final String REST_API_IN_TRANSPORT = \"REST_API_IN_TRANSPORT\";\n",
+            "+    /** The Synapse MC property that marks if the message was denied on the accessed transport */\n",
+            "+    public static final String REST_API_TRANSPORT_DENIED = \"REST_API_TRANSPORT_DENIED\";\n",
+            "+\n",
+            " }\n"
+          ],
+          "locn": "-48,4 +48,9"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/rest/RESTConstants.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/rest/RESTConstants.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            " package org.apache.synapse.config.xml.rest;\n",
+            " \n",
+            "-import org.apache.axiom.om.OMAbstractFactory;\n",
+            "-import org.apache.axiom.om.OMElement;\n",
+            "-import org.apache.axiom.om.OMFactory;\n",
+            "+import org.apache.axiom.om.*;\n",
+            "+import org.apache.axis2.Constants;\n",
+            " import org.apache.synapse.SynapseConstants;\n",
+            " import org.apache.synapse.rest.API;\n",
+            " import org.apache.synapse.rest.Handler;\n",
+            "+import org.apache.synapse.rest.RESTConstants;\n",
+            " import org.apache.synapse.rest.Resource;\n",
+            " \n",
+            " public class APISerializer {\n"
+          ],
+          "locn": "-19,12 +19,12"
+        },
+        {
+          "lines": [
+            "             }\n",
+            "             apiElt.addChild(handlersElt);\n",
+            "         }\n",
+            "+\n",
+            "+        if (api.getProtocol() == RESTConstants.PROTOCOL_HTTP_ONLY) {\n",
+            "+            apiElt.addAttribute(\"transport\", Constants.TRANSPORT_HTTP, null);\n",
+            "+        } else if (api.getProtocol() == RESTConstants.PROTOCOL_HTTPS_ONLY) {\n",
+            "+            apiElt.addAttribute(\"transport\", Constants.TRANSPORT_HTTPS, null);\n",
+            "+        }\n",
+            "+\n",
+            "         return apiElt;\n",
+            "     }\n",
+            " }\n"
+          ],
+          "locn": "-60,6 +60,13"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/rest/APISerializer.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/rest/APISerializer.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            " import org.apache.axiom.om.OMAttribute;\n",
+            " import org.apache.axiom.om.OMElement;\n",
+            "+import org.apache.axis2.Constants;\n",
+            " import org.apache.commons.logging.Log;\n",
+            " import org.apache.commons.logging.LogFactory;\n",
+            " import org.apache.synapse.SynapseException;\n"
+          ],
+          "locn": "-21,6 +21,7"
+        },
+        {
+          "lines": [
+            " import org.apache.synapse.config.xml.XMLConfigConstants;\n",
+            " import org.apache.synapse.rest.API;\n",
+            " import org.apache.synapse.rest.Handler;\n",
+            "+import org.apache.synapse.rest.RESTConstants;\n",
+            " import org.apache.synapse.rest.version.VersionStrategy;\n",
+            " \n",
+            " import javax.xml.namespace.QName;\n"
+          ],
+          "locn": "-27,6 +28,7"
+        },
+        {
+          "lines": [
+            "         OMAttribute nameAtt = apiElt.getAttribute(new QName(\"name\"));\n",
+            "         if (nameAtt == null || \"\".equals(nameAtt.getAttributeValue())) {\n",
+            "             handleException(\"Attribute 'name' is required for an API definition\");\n",
+            "+            return null;\n",
+            "         }\n",
+            " \n",
+            "         OMAttribute contextAtt = apiElt.getAttribute(new QName(\"context\"));\n",
+            "         if (contextAtt == null || \"\".equals(contextAtt.getAttributeValue())) {\n",
+            "             handleException(\"Attribute 'context' is required for an API definition\");\n",
+            "+            return null;\n",
+            "         }\n",
+            " \n",
+            "         API api = new API(nameAtt.getAttributeValue(), contextAtt.getAttributeValue());\n"
+          ],
+          "locn": "-40,11 +42,13"
+        },
+        {
+          "lines": [
+            "             }\n",
+            "         }\n",
+            " \n",
+            "+        OMAttribute transport = apiElt.getAttribute(\n",
+            "+                new QName(XMLConfigConstants.NULL_NAMESPACE, \"transport\"));\n",
+            "+        if (transport != null) {\n",
+            "+            String transports = transport.getAttributeValue();\n",
+            "+            if (!\"\".equals(transports)) {\n",
+            "+                if (Constants.TRANSPORT_HTTP.equals(transports)) {\n",
+            "+                    api.setProtocol(RESTConstants.PROTOCOL_HTTP_ONLY);\n",
+            "+                } else if (Constants.TRANSPORT_HTTPS.equals(transports)) {\n",
+            "+                    api.setProtocol(RESTConstants.PROTOCOL_HTTPS_ONLY);\n",
+            "+                } else {\n",
+            "+                    handleException(\"Invalid protocol name: \" + transports);\n",
+            "+                }\n",
+            "+            }\n",
+            "+        }\n",
+            "         return api;\n",
+            "     }\n",
+            " \n"
+          ],
+          "locn": "-87,6 +91,20"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/rest/APIFactory.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/rest/APIFactory.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         OMElement out = APISerializer.serializeAPI(api);\n",
+            "         assertXMLEqual(xml, out.toString());\n",
+            "     }\n",
+            "+\n",
+            "+    public void testAPISerialization7() throws Exception {\n",
+            "+        String xml = \"<api name=\\\"test\\\" transport=\\\"http\\\" context=\\\"/dictionary\\\" xmlns=\\\"http://ws.apache.org/ns/synapse\\\">\" +\n",
+            "+                \"<resource url-mapping=\\\"/admin/view\\\" inSequence=\\\"in\\\" outSequence=\\\"out\\\"/></api>\";\n",
+            "+        OMElement om = AXIOMUtil.stringToOM(xml);\n",
+            "+        API api = APIFactory.createAPI(om);\n",
+            "+        OMElement out = APISerializer.serializeAPI(api);\n",
+            "+        assertXMLEqual(xml, out.toString());\n",
+            "+    }\n",
+            "+\n",
+            "+    public void testAPISerialization8() throws Exception {\n",
+            "+        String xml = \"<api name=\\\"test\\\" transport=\\\"https\\\" context=\\\"/dictionary\\\" hostname=\\\"apache.org\\\" port=\\\"8243\\\"\" +\n",
+            "+                \" xmlns=\\\"http://ws.apache.org/ns/synapse\\\"><resource url-mapping=\\\"/admin/view/*\\\" \" +\n",
+            "+                \"><inSequence><log/><send/></inSequence><outSequence><log/><send/></outSequence></resource>\" +\n",
+            "+                \"<resource url-mapping=\\\"/admin/*\\\"><inSequence><log/><send/></inSequence><outSequence>\" +\n",
+            "+                \"<log/><send/></outSequence></resource><resource uri-template=\\\"/{char}/{word}\\\">\" +\n",
+            "+                \"<inSequence><send/></inSequence><faultSequence><log level=\\\"full\\\"/></faultSequence>\" +\n",
+            "+                \"</resource><handlers><handler class=\\\"org.apache.synapse.config.xml.rest.TestHandler\\\"/>\" +\n",
+            "+                \"</handlers></api>\";\n",
+            "+        OMElement om = AXIOMUtil.stringToOM(xml);\n",
+            "+        API api = APIFactory.createAPI(om);\n",
+            "+        OMElement out = APISerializer.serializeAPI(api);\n",
+            "+        assertXMLEqual(xml, out.toString());\n",
+            "+    }\n",
+            " }\n"
+          ],
+          "locn": "-93,4 +93,28"
+        }
+      ],
+      "from": "java/modules/core/src/test/java/org/apache/synapse/config/xml/rest/APISerializationTest.java",
+      "to": "java/modules/core/src/test/java/org/apache/synapse/config/xml/rest/APISerializationTest.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         assertNull(synCtx.getProperty(RESTConstants.SYNAPSE_REST_API));\n",
+            "     }\n",
+            " \n",
+            "+    public void testTransportBasedAPIDispatch() throws Exception {\n",
+            "+        API api = new API(TEST_API, \"/test\");\n",
+            "+        api.setProtocol(RESTConstants.PROTOCOL_HTTP_ONLY);\n",
+            "+        SynapseConfiguration synapseConfig = new SynapseConfiguration();\n",
+            "+        synapseConfig.addAPI(TEST_API, api);\n",
+            "+\n",
+            "+        RESTRequestHandler handler = new RESTRequestHandler();\n",
+            "+\n",
+            "+        // Messages with '/test' context should be dispatched\n",
+            "+        MessageContext synCtx = getMessageContext(synapseConfig, false, \"/test\", \"GET\");\n",
+            "+        handler.process(synCtx);\n",
+            "+        assertEquals(TEST_API, synCtx.getProperty(RESTConstants.SYNAPSE_REST_API));\n",
+            "+        synCtx = getMessageContext(synapseConfig, false, \"/test/\", \"GET\");\n",
+            "+        handler.process(synCtx);\n",
+            "+        assertEquals(TEST_API, synCtx.getProperty(RESTConstants.SYNAPSE_REST_API));\n",
+            "+        synCtx = getMessageContext(synapseConfig, false, \"/test/foo/bar?a=5\", \"GET\");\n",
+            "+        handler.process(synCtx);\n",
+            "+        assertEquals(TEST_API, synCtx.getProperty(RESTConstants.SYNAPSE_REST_API));\n",
+            "+        synCtx = getMessageContext(synapseConfig, false, \"/test?a=5\", \"GET\");\n",
+            "+        handler.process(synCtx);\n",
+            "+        assertEquals(TEST_API, synCtx.getProperty(RESTConstants.SYNAPSE_REST_API));\n",
+            "+\n",
+            "+        // Messages sent via HTTPS should NOT be dispatched\n",
+            "+        synCtx = getMessageContext(synapseConfig, true, \"/test\", \"GET\");\n",
+            "+        handler.process(synCtx);\n",
+            "+        assertNull(synCtx.getProperty(RESTConstants.SYNAPSE_REST_API));\n",
+            "+\n",
+            "+        synCtx = getMessageContext(synapseConfig, true, \"/test/foo/bar?a=5\", \"GET\");\n",
+            "+        handler.process(synCtx);\n",
+            "+        assertNull(synCtx.getProperty(RESTConstants.SYNAPSE_REST_API));\n",
+            "+    }\n",
+            "+\n",
+            "     public void testResponseDispatch() throws Exception {\n",
+            "         API api = new API(TEST_API, \"/test\");\n",
+            "         SynapseConfiguration synapseConfig = new SynapseConfiguration();\n"
+          ],
+          "locn": "-80,6 +80,38"
+        }
+      ],
+      "from": "java/modules/core/src/test/java/org/apache/synapse/rest/APIDispatcherTest.java",
+      "to": "java/modules/core/src/test/java/org/apache/synapse/rest/APIDispatcherTest.java"
+    }
+  ],
+  "id": "1511547",
+  "message": "Supporting a transport attribute on API configuration. Patch applied from SYNAPSE-953 with some changes",
+  "when": "2013-08-07T20:20:17-04:00",
+  "who": "hiranya"
+}

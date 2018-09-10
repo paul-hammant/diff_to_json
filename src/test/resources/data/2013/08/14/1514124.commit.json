@@ -1,0 +1,33 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                 synchronized (conn.getContext()) {\n",
+            "                     // SimpleOutputBuffer is not thread safe\n",
+            "                     // Explicit synchronization required\n",
+            "-                    if (outBuf.hasData()) {\n",
+            "-                        int bytesWritten = outBuf.produceContent(encoder);\n",
+            "-                        if (metrics != null && bytesWritten > 0) {\n",
+            "-                            metrics.incrementBytesSent(bytesWritten);\n",
+            "-                        }\n",
+            "+                    int bytesWritten = outBuf.produceContent(encoder);\n",
+            "+                    if (metrics != null && bytesWritten > 0) {\n",
+            "+                        metrics.incrementBytesSent(bytesWritten);\n",
+            "                     }\n",
+            " \n",
+            "                     conn.requestInput();\n"
+          ],
+          "locn": "-193,11 +193,9"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java"
+    }
+  ],
+  "id": "1514124",
+  "message": "No need to check for hasData() - HttpCore handles it correctly",
+  "when": "2013-08-14T21:49:23-04:00",
+  "who": "hiranya"
+}

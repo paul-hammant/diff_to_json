@@ -1,0 +1,40 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         List<InetAddress> ipAddresses = new ArrayList<InetAddress>();\n",
+            "         String ipAddress = null;\n",
+            " \n",
+            "-        Enumeration e = NetworkInterface.getNetworkInterfaces();\n",
+            "+        Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();\n",
+            "         while (e.hasMoreElements()) {\n",
+            "-            NetworkInterface ni = (NetworkInterface) e.nextElement();\n",
+            "+            NetworkInterface ni = e.nextElement();\n",
+            "             // Clustering doesn't work for loop-back addresses, so we are not interested\n",
+            "             // we are not interested in inactive interfaces either\n",
+            "-            // if (ni.isLoopback() || !ni.isUp()) continue; TODO: Find Java 5 alternative\n",
+            "+            if (ni.isLoopback() || !ni.isUp()) continue;\n",
+            " \n",
+            "-            Enumeration e2 = ni.getInetAddresses();\n",
+            "+            Enumeration<InetAddress> e2 = ni.getInetAddresses();\n",
+            "             while (e2.hasMoreElements()) {\n",
+            "-                InetAddress ip = (InetAddress) e2.nextElement();\n",
+            "+                InetAddress ip = e2.nextElement();\n",
+            "                 ipAddresses.add(ip);\n",
+            "             }\n",
+            "         }\n"
+          ],
+          "locn": "-52,16 +52,16"
+        }
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestUtils.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestUtils.java"
+    }
+  ],
+  "id": "1544882",
+  "message": "* Fixed an old todo: we now require Java 1.6.\n* Use generics where appropriate (for Java 1.6).",
+  "when": "2013-11-23T16:36:05-05:00",
+  "who": "veithen"
+}

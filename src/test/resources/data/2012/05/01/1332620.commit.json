@@ -1,0 +1,53 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            " package org.apache.synapse.util;\n",
+            " \n",
+            "-import org.apache.axiom.attachments.Attachments;\n",
+            " import org.apache.axiom.om.OMAbstractFactory;\n",
+            " import org.apache.axiom.om.OMElement;\n",
+            " import org.apache.axiom.om.OMNamespace;\n"
+          ],
+          "locn": "-1,6 +1,5"
+        },
+        {
+          "lines": [
+            "         newMC.setDoingMTOM(ori.isDoingMTOM());\n",
+            "         newMC.setDoingSwA(ori.isDoingSwA());\n",
+            " \n",
+            "-        // if the original request carries any attachments, copy them to the clone\n",
+            "-        // as well, except for the soap part if any\n",
+            "-        Attachments attachments = ori.getAttachmentMap();\n",
+            "-        if (attachments != null && attachments.getAllContentIDs().length > 0) {\n",
+            "-            String[] cIDs = attachments.getAllContentIDs();\n",
+            "-            String soapPart = attachments.getSOAPPartContentID();\n",
+            "-            for (String cID : cIDs) {\n",
+            "-                if (!cID.equals(soapPart)) {\n",
+            "-                    newMC.addAttachment(cID, attachments.getDataHandler(cID));\n",
+            "-                }\n",
+            "-            }\n",
+            "-        }\n",
+            "+        // If the original request carries any attachments, copy them to the clone\n",
+            "+        // as well. Note that with the change introduced by AXIS2-5308 we can simply\n",
+            "+        // copy the reference to the original Attachments object. This should also enable\n",
+            "+        // streaming of MIME parts in certain scenarios.\n",
+            "+        newMC.setAttachmentMap(ori.getAttachmentMap());\n",
+            " \n",
+            "         Iterator itr = ori.getPropertyNames();\n",
+            "         while (itr.hasNext()) {\n"
+          ],
+          "locn": "-195,18 +194,11"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/util/MessageHelper.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/util/MessageHelper.java"
+    }
+  ],
+  "id": "1332620",
+  "message": "Simplified MessageHelper#clonePartially based on the change implemented by AXIS2-5308 (see also SYNAPSE-867).\n",
+  "when": "2012-05-01T07:25:51-04:00",
+  "who": "veithen"
+}

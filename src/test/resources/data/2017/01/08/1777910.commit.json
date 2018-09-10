@@ -1,0 +1,59 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     <dependencies>\n",
+            "         <dependency>\n",
+            "             <groupId>org.quickfixj</groupId>\n",
+            "-            <artifactId>quickfixj-all</artifactId>\n",
+            "+            <artifactId>quickfixj-core</artifactId>\n",
+            "         </dependency>\n",
+            "         <dependency>\n",
+            "+            <groupId>org.quickfixj</groupId>\n",
+            "+            <artifactId>quickfixj-messages-all</artifactId>\n",
+            "+        </dependency>\n",
+            "+        <dependency>\n",
+            "             <groupId>xmlunit</groupId>\n",
+            "             <artifactId>xmlunit</artifactId>\n",
+            "         </dependency>\n"
+          ],
+          "locn": "-108,9 +108,13"
+        }
+      ],
+      "from": "java/modules/transports/optional/fix/pom.xml",
+      "to": "java/modules/transports/optional/fix/pom.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             <!-- Quickfix/J (FIX Transport) -->\n",
+            "             <dependency>\n",
+            "                 <groupId>org.quickfixj</groupId>\n",
+            "-                <artifactId>quickfixj-all</artifactId>\n",
+            "+                <artifactId>quickfixj-core</artifactId>\n",
+            "                 <version>${qfj.version}</version>\n",
+            "             </dependency>\n",
+            "+            <dependency>\n",
+            "+                <groupId>org.quickfixj</groupId>\n",
+            "+                <artifactId>quickfixj-messages-all</artifactId>\n",
+            "+                <version>${qfj.version}</version>\n",
+            "+            </dependency>\n",
+            " \n",
+            "             <!-- Quartz (Scheduled Tasks) -->\n",
+            "             <dependency>\n"
+          ],
+          "locn": "-871,9 +871,14"
+        }
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    }
+  ],
+  "id": "1777910",
+  "message": "Use a minimal set of dependencies in the Fix transport. In particular, don't depend on quickfixj-codegenerator.",
+  "when": "2017-01-08T15:31:20-05:00",
+  "who": "veithen"
+}

@@ -1,0 +1,78 @@
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughConstants.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughConstants.java	(revision 1502732)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughConstants.java	(revision 1502733)
+@@ -53,6 +53,7 @@
+     public static final String CONTENT_TYPE = "CONTENT_TYPE";
+ 
+     public static final String DEFAULT_CONTENT_TYPE = "application/octet-stream";
++    public static final String CONTENT_TYPE_MULTIPART_RELATED = "multipart/related";
+ 
+     public static final String HIDDEN_SERVICE_PARAM_NAME = "hiddenService";
+ 
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetRequest.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetRequest.java	(revision 1502732)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetRequest.java	(revision 1502733)
+@@ -130,9 +130,23 @@
+         
+        
+         //fix for  POST_TO_URI
+-        if(requestMsgCtx.isPropertyTrue(NhttpConstants.POST_TO_URI)){
++        if (requestMsgCtx.isPropertyTrue(NhttpConstants.POST_TO_URI)){
+         	path = url.toString();
+         }
++
++        Object o = requestMsgCtx.getProperty(MessageContext.TRANSPORT_HEADERS);
++        if (o != null && o instanceof Map) {
++            Map _headers = (Map) o;
++            String trpContentType = (String) _headers.get(HTTP.CONTENT_TYPE);
++            if (trpContentType != null && !trpContentType.equals("")) {
++                if (trpContentType.contains(PassThroughConstants.CONTENT_TYPE_MULTIPART_RELATED) &&
++                    !requestMsgCtx.isPropertyTrue(PassThroughConstants.MESSAGE_BUILDER_INVOKED)) {
++                    // If the message is multipart/related but it hasn't been built
++                    // we can copy the content-type header of the request
++                    headers.put(HTTP.CONTENT_TYPE, trpContentType);
++                }
++            }
++        }
+                                                             
+         if (hasEntityBody) {
+             request = new BasicHttpEntityEnclosingRequest(method, path,
+@@ -159,7 +173,7 @@
+         }
+         
+         //setup wsa action..
+-        if(request != null){
++        if (request != null){
+         	
+     		String soapAction = requestMsgCtx.getSoapAction();
+             if (soapAction == null) {
+@@ -225,7 +239,7 @@
+ 	 * 
+ 	 * @param conn
+ 	 * @param requestMsgCtx
+-	 * @param disableChunking
++
+ 	 * @throws IOException
+ 	 * @throws AxisFault
+ 	 */
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1502732)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1502733)
+@@ -177,7 +177,7 @@
+ 
+         //Endpoint
+         sampleClassRepo.put("50", Sample50.class);
+-        //sampleClassRepo.put("51", Sample51.class);
++        sampleClassRepo.put("51", Sample51.class);
+         sampleClassRepo.put("52", Sample52.class);
+         sampleClassRepo.put("53", Sample53.class);
+         sampleClassRepo.put("54", Sample54.class);
+-*-*-*-
+Message: Fixing MTOM, SwA mediation and re-enabling sample51 integration test
+-*-*-*-
+When: 2013-07-12 21:05:21 -0400 
+-*-*-*-
+Who: hiranya

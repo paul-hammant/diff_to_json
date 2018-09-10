@@ -1,0 +1,770 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     </properties>\n",
+            "     <body>\n",
+            "         <section name=\"Contents\">\n",
+            "-            \n",
+            "+            <ul>\n",
+            "+                <li><a href=\"#Intro\">Introduction</a></li>\n",
+            "+                <li>\n",
+            "+                    <a href=\"#SynapseConfig\">Synapse Configuration</a>\n",
+            "+                    <ul>\n",
+            "+                        <li><a href=\"#ServiceMediation\">Service Mediation (Proxy Services)</a></li>\n",
+            "+                        <li><a href=\"#MessageMediation\">Message Mediation</a></li>\n",
+            "+                        <li><a href=\"#TaskScheduling\">Task Scheduling</a></li>\n",
+            "+                        <li><a href=\"#Eventing\">Eventing</a></li>\n",
+            "+                    </ul>\n",
+            "+                </li>\n",
+            "+                <li>\n",
+            "+                    <a href=\"#OverView\">Functional Components Overview</a>\n",
+            "+                    <ul>\n",
+            "+                        <li><a href=\"#MediatorsAndSequences\">Mediators and Sequences</a></li>\n",
+            "+                        <li><a href=\"#Endpoints\">Endpoints</a></li>\n",
+            "+                        <li><a href=\"#ProxyServices\">Proxy Services</a></li>\n",
+            "+                        <li><a href=\"#ScheduledTasks\">Scheduled Tasks</a></li>\n",
+            "+                        <li><a href=\"#Registry\">Remote Registry and Local Registry</a></li>\n",
+            "+                        <li><a href=\"#API\">APIs</a></li>\n",
+            "+                        <li><a href=\"#PriorityExecutors\">Priority Executors</a></li>\n",
+            "+                    </ul>\n",
+            "+                </li>\n",
+            "+                <li><a href=\"#ConfigFiles\">Synapse Configuration Files</a></li>\n",
+            "+                <li><a href=\"#Syntax\">Configuration Syntax</a></li>\n",
+            "+                <li><a href=\"#RegistryConfig\">Registry Configuration</a></li>\n",
+            "+                <li><a href=\"#LocalEntryConfig\">Local Entry (Local Registry) Configuration</a></li>\n",
+            "+                <li><a href=\"#SequenceConfig\">Sequence Configuration</a></li>\n",
+            "+                <li>\n",
+            "+                    <a href=\"#EndpointConfig\">Endpoint Configuration</a>\n",
+            "+                    <ul>\n",
+            "+                        <li><a href=\"#AddressEndpointConfig\">Address Endpoint</a></li>\n",
+            "+                        <li><a href=\"#DefaultEndpointConfig\">Default Endpoint</a></li>\n",
+            "+                        <li><a href=\"#WSDLEndpointConfig\">WSDL Endpoint</a></li>\n",
+            "+                        <li><a href=\"#LBEndpointConfig\">Load Balance Endpoint</a></li>\n",
+            "+                        <li><a href=\"#DLBEndpointConfig\">Dynamic Load Balance Endpoint</a></li>\n",
+            "+                        <li><a href=\"#FOEndpointConfig\">Fail-Over Endpoint</a></li>\n",
+            "+                    </ul>\n",
+            "+                </li>\n",
+            "+                <li><a href=\"#ProxyServiceConfig\">Proxy Service Configuration</a></li>\n",
+            "+                <li><a href=\"#TaskConfig\">Scheduled Task Configuration</a></li>\n",
+            "+                <li><a href=\"#EventSourceConfig\">Event Source Configuration</a></li>\n",
+            "+                <li><a href=\"#APIConfig\">API Configuration</a></li>\n",
+            "+                <li><a href=\"#ExecutorConfig\">Priority Executor Configuration</a></li>\n",
+            "+            </ul>\n",
+            "         </section>\n",
+            "-        <section name=\"Introduction\">\n",
+            "+        <section name=\"Introduction\" id=\"Intro\">\n",
+            "             <p>\n",
+            "                 Apache Synapse loads its configuration from a set of XML files. This enables the\n",
+            "                 user to easily hand edit the configuration, maintain backups and even include the\n"
+          ],
+          "locn": "-24,9 +24,53"
+        },
+        {
+          "lines": [
+            "                 syntax used to configure various elements in Synapse.\n",
+            "             </p>\n",
+            "         </section>\n",
+            "-        <section name=\"The Synapse Configuration\">\n",
+            "+        <section name=\"The Synapse Configuration\" id=\"SynapseConfig\">\n",
+            "             <p>\n",
+            "                 A typical Synapse configuration is comprised of sequences, endpoints, proxy services\n",
+            "                 and local entries. In certain advanced scenarios, Synapse configuration may also\n"
+          ],
+          "locn": "-48,7 +92,7"
+        },
+        {
+          "lines": [
+            "                 Depending on how functional components are used in the Synapse configuration, Synapse\n",
+            "                 can execute in one or more of the following operational modes.\n",
+            "             </p>\n",
+            "-            <subsection name=\"Service Mediation (Proxy Services)\">\n",
+            "+            <subsection name=\"Service Mediation (Proxy Services)\" id=\"ServiceMediation\">\n",
+            "                 <p>\n",
+            "                     In service mediation, the Synapse ESB exposes a service endpoint on the ESB, which\n",
+            "                     accepts messages from clients. Typically these services acts as proxies for existing\n"
+          ],
+          "locn": "-83,7 +127,7"
+        },
+        {
+          "lines": [
+            "                     and VFS file systems.\n",
+            "                 </p>\n",
+            "             </subsection>\n",
+            "-            <subsection name=\"Message Mediation\">\n",
+            "+            <subsection name=\"Message Mediation\" id=\"MessageMediation\">\n",
+            "                 <p>\n",
+            "                     In message mediation, Synapse acts as a transparent proxy for clients. This way,\n",
+            "                     Synapse could be configured to filter all the messages on a network for logging,\n"
+          ],
+          "locn": "-98,7 +142,7"
+        },
+        {
+          "lines": [
+            "                     the name 'main'.\n",
+            "                 </p>\n",
+            "             </subsection>\n",
+            "-            <subsection name=\"Task Scheduling\">\n",
+            "+            <subsection name=\"Task Scheduling\" id=\"TaskScheduling\">\n",
+            "                 <p>\n",
+            "                     In task scheduling, Synapse can execute a predefined task (job) based on a user\n",
+            "                     specified schedule. This way a task can be configured to run exactly once or\n"
+          ],
+          "locn": "-109,7 +153,7"
+        },
+        {
+          "lines": [
+            "                     service, poll databases and execute other periodic maintenance activities.\n",
+            "                 </p>\n",
+            "             </subsection>\n",
+            "-            <subsection name=\"Eventing\">\n",
+            "+            <subsection name=\"Eventing\" id=\"Eventing\">\n",
+            "                 <p>\n",
+            "                     In eventing mode, Synapse can be used as an event source and users or systems can\n",
+            "                     subscribe to receive events from Synapse. Synapse can also act as an event broker\n"
+          ],
+          "locn": "-120,7 +164,7"
+        },
+        {
+          "lines": [
+            "                 </p>\n",
+            "             </subsection>\n",
+            "         </section>\n",
+            "-        <section name=\"Functional Components Overview\">\n",
+            "+        <section name=\"Functional Components Overview\" id=\"Overview\">\n",
+            "             <p>\n",
+            "                 As described in the previous section, Synapse engine is comprised of a range of\n",
+            "                 functional components. Synapse configuration language is used to define, configure\n"
+          ],
+          "locn": "-131,7 +175,7"
+        },
+        {
+          "lines": [
+            "                     <li>Message stores and processors</li>\n",
+            "                 </ul>\n",
+            "             </p>\n",
+            "-            <subsection name=\"Mediators and Sequences\">\n",
+            "+            <subsection name=\"Mediators and Sequences\" id=\"MediatorsAndSequences\">\n",
+            "                 <p>\n",
+            "                     The Synapse ESB defines a 'mediator' as a component which performs a predefined\n",
+            "                     action on a message during a message flow. It is the most fundamental message\n"
+          ],
+          "locn": "-161,7 +205,7"
+        },
+        {
+          "lines": [
+            "                     error is encountered during the execution of the initial sequence.\n",
+            "                 </p>\n",
+            "             </subsection>\n",
+            "-            <subsection name=\"Endpoints\">\n",
+            "+            <subsection name=\"Endpoints\" id=\"Endpoints\">\n",
+            "                 <p>\n",
+            "                     An Endpoint definition within Synapse defines an external service endpoint and\n",
+            "                     any attributes or semantics that should be followed when communicating with that\n"
+          ],
+          "locn": "-206,7 +250,7"
+        },
+        {
+          "lines": [
+            "                     case the 'send' mediator would forward the message to the specified endpoint.\n",
+            "                 </p>\n",
+            "             </subsection>\n",
+            "-            <subsection name=\"Proxy Services\">\n",
+            "+            <subsection name=\"Proxy Services\" id=\"ProxyServices\">\n",
+            "                 <p>\n",
+            "                     A proxy service is a virtual service exposed on Synapse. For the external\n",
+            "                     clients, a proxy service looks like a full fledged web service which has a\n"
+          ],
+          "locn": "-224,7 +268,7"
+        },
+        {
+          "lines": [
+            "                     parameters.\n",
+            "                 </p>\n",
+            "             </subsection>\n",
+            "-            <subsection name=\"Scheduled Tasks\">\n",
+            "+            <subsection name=\"Scheduled Tasks\" id=\"ScheduledTasks\">\n",
+            "                 <p>\n",
+            "                     A scheduled task is a job deployed in the Synapse runtime for periodic execution.\n",
+            "                     Users can program the jobs using the task API (Java) provided by Synapse. Once\n"
+          ],
+          "locn": "-264,7 +308,7"
+        },
+        {
+          "lines": [
+            "                     the Unix Cron syntax.\n",
+            "                 </p>\n",
+            "             </subsection>\n",
+            "-            <subsection name=\"Remote Registry and Local Registry (Local Entries)\">\n",
+            "+            <subsection name=\"Remote Registry and Local Registry (Local Entries)\" id=\"Registry\">\n",
+            "                 <p>\n",
+            "                     Synapse configuration can refer to an external registry/repository for resources\n",
+            "                     such as WSDLs, schemas, scripts, XSLT and XQuery transformations etc. One or\n"
+          ],
+          "locn": "-273,7 +317,7"
+        },
+        {
+          "lines": [
+            "                     interface to suit the actual registry being used.\n",
+            "                 </p>\n",
+            "             </subsection>\n",
+            "-            <subsection name=\"APIs\">\n",
+            "+            <subsection name=\"APIs\" id=\"API\">\n",
+            "                 <p>\n",
+            "                     An API is similar to a web application deployed in Synapse. It provides a\n",
+            "                     convenient approach for filtering and processing HTTP traffic (specially RESTful\n"
+          ],
+          "locn": "-297,7 +341,7"
+        },
+        {
+          "lines": [
+            "                     not be based on REST.\n",
+            "                 </p>\n",
+            "             </subsection>\n",
+            "-            <subsection name=\"Priority Executors\">\n",
+            "+            <subsection name=\"Priority Executors\" id=\"PriorityExecutors\">\n",
+            "                 <p>\n",
+            "                     Priority executors can be used to execute sequences with a given priority.\n",
+            "                     Priority executors are used in high load scenarios where user wants to execute\n"
+          ],
+          "locn": "-326,7 +370,7"
+        },
+        {
+          "lines": [
+            "                 </p>\n",
+            "             </subsection>\n",
+            "         </section>\n",
+            "-        <section name=\"Synapse Configuration Files\">\n",
+            "+        <section name=\"Synapse Configuration Files\" id=\"ConfigFiles\">\n",
+            "             <p>\n",
+            "                 All the XML files pertaining to the Synapse configuration are available in the\n",
+            "                 repository/conf/synapse-config directory of the Synapse installation. This file\n"
+          ],
+          "locn": "-339,7 +383,7"
+        },
+        {
+          "lines": [
+            "     |   `-- task1.xml\n",
+            "     `-- templates</div>\n",
+            "         </section>\n",
+            "-        <section name=\"Configuration Syntax\">\n",
+            "+        <section name=\"Configuration Syntax\" id=\"Syntax\">\n",
+            "             <p>\n",
+            "+                Synapse ESB is configured using an XML based configuration language. This is a\n",
+            "+                Domain Specific Language (DSL) created and maintained by the Synapse community.\n",
+            "+                The language is designed to be simple, intuitive and easy to learn.\n",
+            "+            </p>\n",
+            "+            <p>\n",
+            "                 As stated earlier, the synapse.xml file can be used to define all kinds of artifacts.\n",
+            "                 All these different configuration items should be wrapped in a top level 'definitions'\n",
+            "                 element. A configuration defined in the synapse.xml file looks like this at the\n"
+          ],
+          "locn": "-399,8 +443,13"
+        },
+        {
+          "lines": [
+            "                 types of components in the Synapse configuration.\n",
+            "             </p>\n",
+            "         </section>\n",
+            "-        <section name=\"Registry\" id=\"registry\">\n",
+            "+        <section name=\"Registry Configuration\" id=\"RegistryConfig\">\n",
+            "             <p>\n",
+            "                 The &lt;registry&gt; element is used to define the registry adapter used by the\n",
+            "                 Synapse runtime. The registry provider specifies an implementation class for the\n"
+          ],
+          "locn": "-432,7 +481,7"
+        },
+        {
+          "lines": [
+            "                 'SimpleURLRegistry' and this can be configured as follows:\n",
+            "             </p>\n",
+            "             <div class=\"xmlConf\">&lt;registry provider=\"org.apache.synapse.registry.url.SimpleURLRegistry\"&gt;\n",
+            "-  &lt;parameter name=\"root\"&gt;file:./repository/conf/sample/resources/&lt;/parameter&gt;\n",
+            "-  &lt;parameter name=\"cachableDuration\"&gt;15000&lt;/parameter&gt;\n",
+            "+    &lt;parameter name=\"root\"&gt;file:./repository/conf/sample/resources/&lt;/parameter&gt;\n",
+            "+    &lt;parameter name=\"cachableDuration\"&gt;15000&lt;/parameter&gt;\n",
+            " &lt;/registry&gt;</div>\n",
+            "             <p>\n",
+            "                 The 'root' parameter specifies the root URL of the registry for loaded resources. The\n"
+          ],
+          "locn": "-455,8 +504,8"
+        },
+        {
+          "lines": [
+            "                 expires. (e.g. Check the WSO2 ESB implementation based on Apache Synapse)\n",
+            "             </p>\n",
+            "         </section>\n",
+            "-        <section name=\"Local Entries (Local Registry)\">\n",
+            "+        <section name=\"Local Entry (Local Registry) Configuration\" id=\"LocalEntryConfig\">\n",
+            "             <p>\n",
+            "                 Local entries provide a convenient way to import various external configuration\n",
+            "                 artifacts into the Synapse runtime. This includes WSDLs, policies, XSLT files,\n"
+          ],
+          "locn": "-468,7 +517,7"
+        },
+        {
+          "lines": [
+            " \n",
+            " &lt;localEntry key=\"validate_schema\"&gt;\n",
+            "     &lt;xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"\n",
+            "-     ...\n",
+            "+        ...\n",
+            "     &lt;/xs:schema&gt;\n",
+            " &lt;/localEntry&gt;</div>\n",
+            "             <p>\n"
+          ],
+          "locn": "-493,7 +542,7"
+        },
+        {
+          "lines": [
+            "                 Synapse reloads configuration artifacts as soon as the cache period expires.\n",
+            "             </p>\n",
+            "         </section>\n",
+            "-        <section name=\"Sequences\" id=\"sequences\">\n",
+            "+        <section name=\"Sequence Configuration\" id=\"SequenceConfig\">\n",
+            "             <p>\n",
+            "                 As explained earlier a sequence resembles a message flow in Synapse and consists\n",
+            "                 of an array of mediators. The &lt;sequence&gt; element is used to define a sequence\n"
+          ],
+          "locn": "-518,7 +567,7"
+        },
+        {
+          "lines": [
+            "                 in the Synapse configuration.  Sequences can be defined with names so they can be\n",
+            "                 reused across the Synapse configuration. The sequences named 'main' and 'fault' have\n",
+            "                 special significance in a Synapse configuration. The 'main' sequence handles any message\n",
+            "-                that is accepted for '<a href=\"#message_mediation\">Message Mediation</a>'. The\n",
+            "+                that is accepted for '<a href=\"#MessageMediation\">Message Mediation</a>'. The\n",
+            "                 'fault' sequence is invoked if Synapse encounters a fault, and a custom fault handler\n",
+            "                 is not specified for the sequence via its 'onError' attribute. If the 'main' or\n",
+            "                 'fault' sequences are not defined locally or not found in the Registry, Synapse\n"
+          ],
+          "locn": "-525,7 +574,7"
+        },
+        {
+          "lines": [
+            "             </p>\n",
+            "             <div class=\"xmlConf\">&lt;sequence name=\"string\" [onError=\"string\"] [key=\"string\"] [trace=\"enable\"] [statistics=\"enable\"]&gt;\n",
+            "     mediator*\n",
+            "- &lt;/sequence&gt;</div>\n",
+            "+&lt;/sequence&gt;</div>\n",
+            "             <p>\n",
+            "                 The 'onError' attribute can be used to define a custom error handler sequence.\n",
+            "                 Statistics collection can be activated by setting the 'statistics' attribute to\n"
+          ],
+          "locn": "-544,7 +593,7"
+        },
+        {
+          "lines": [
+            "                 local entry or a remote registry entry.\n",
+            "             </p>\n",
+            "         </section>\n",
+            "-        <section name=\"Endpoints\" id=\"endpoints\">\n",
+            "+        <section name=\"Endpoint Configuration\" id=\"EndpointConfig\">\n",
+            "             <p>\n",
+            "                 An &lt;endpoint&gt; element defines a destination for an outgoing message. There\n",
+            "                 are several types of endpoints that can be defined in a Synapse configuration.\n"
+          ],
+          "locn": "-580,7 +629,7"
+        },
+        {
+          "lines": [
+            "                 takes the following form.\n",
+            "             </p>\n",
+            "             <div class=\"xmlConf\">&lt;endpoint [name=\"string\"] [key=\"string\"]&gt;\n",
+            "-    <a href=\"#address-endpoint\">address-endpoint</a> | <a href=\"#default-endpoint\">default-endpoint</a> | <a href=\"#wsdl-endpoint\">wsdl-endpoint</a> |\n",
+            "-    <a href=\"#load-balanced-endpoint\">load-balanced-endpoint</a> | <a href=\"#fail-over-endpoint\">fail-over-endpoint</a> |\n",
+            "-    <a href=\"#recipient-list-endpoint\">recipient-list-endpoint</a>\n",
+            "+    <a href=\"#AddressEndpointConfig\">address-endpoint</a> | <a href=\"#DefaultEndpointConfig\">default-endpoint</a> | <a href=\"#WSDLEndpointConfig\">wsdl-endpoint</a> |\n",
+            "+    <a href=\"#LBEndpointConfig\">load-balanced-endpoint</a> | <a href=\"#FOEndpointConfig\">fail-over-endpoint</a> | <a href=\"#recipient-list-endpoint\">recipient-list-endpoint</a>\n",
+            " &lt;/endpoint&gt;</div>\n",
+            "             <p>\n",
+            "                 Note how the endpoint definitions always start with an 'endpoint' element. The\n"
+          ],
+          "locn": "-599,9 +648,8"
+        },
+        {
+          "lines": [
+            "                 to the endpoint. These will be available in the 'trace.log' file configured via the\n",
+            "                 log4j.properties file.\n",
+            "             </p>\n",
+            "-            <subsection name=\"Address Endpoint\">\n",
+            "+            <subsection name=\"Address Endpoint\" id=\"AddressEndpointConfig\">\n",
+            "                 <div class=\"xmlConf\">&lt;address uri=\"<em>endpoint address</em>\" [format=\"soap11|soap12|pox|get\"] [optimize=\"mtom|swa\"]\n",
+            "          [encoding=\"<em>charset encoding</em>\"]\n",
+            "          [statistics=\"enable|disable\"] [trace=\"enable|disable\"]&gt;\n",
+            "-  &lt;enableRM [policy=\"<em>key</em>\"]/&gt;?\n",
+            "-  &lt;enableSec [policy=\"<em>key</em>\"]/&gt;?\n",
+            "-  &lt;enableAddressing [version=\"final|submission\"] [separateListener=\"true|false\"]/&gt;?\n",
+            "+    &lt;enableRM [policy=\"<em>key</em>\"]/&gt;?\n",
+            "+    &lt;enableSec [policy=\"<em>key</em>\"]/&gt;?\n",
+            "+    &lt;enableAddressing [version=\"final|submission\"] [separateListener=\"true|false\"]/&gt;?\n",
+            " \n",
+            "-  &lt;timeout&gt;\n",
+            "-    &lt;duration&gt;<em>timeout duration in milliseconds</em>&lt;/duration&gt;\n",
+            "-    &lt;responseAction&gt;discard|fault&lt;/responseAction&gt;\n",
+            "-  &lt;/timeout&gt;?\n",
+            "+    &lt;timeout&gt;\n",
+            "+        &lt;duration&gt;<em>timeout duration in milliseconds</em>&lt;/duration&gt;\n",
+            "+        &lt;responseAction&gt;discard|fault&lt;/responseAction&gt;\n",
+            "+    &lt;/timeout&gt;?\n",
+            " \n",
+            "-  &lt;markForSuspension&gt;\n",
+            "+    &lt;markForSuspension&gt;\n",
+            "         [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]\n",
+            "         &lt;retriesBeforeSuspension&gt;m&lt;/retriesBeforeSuspension&gt;\n",
+            "         &lt;retryDelay&gt;d&lt;/retryDelay&gt;\n",
+            "     &lt;/markForSuspension&gt;\n",
+            " \n",
+            "-  &lt;suspendOnFailure&gt;\n",
+            "+    &lt;suspendOnFailure&gt;\n",
+            "         [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]\n",
+            "         &lt;initialDuration&gt;n&lt;/initialDuration&gt;\n",
+            "         &lt;progressionFactor&gt;r&lt;/progressionFactor&gt;\n"
+          ],
+          "locn": "-621,26 +669,26"
+        },
+        {
+          "lines": [
+            "                     </tbody>\n",
+            "                 </table>\n",
+            "             </subsection>\n",
+            "-            <subsection name=\"Default Endpoint\">\n",
+            "+            <subsection name=\"Default Endpoint\" id=\"DefaultEndpointConfig\">\n",
+            "                 <p>\n",
+            "                     Default endpoint is an endpoint defined for adding QoS and other configurations\n",
+            "                     to the endpoint which is resolved from the 'To' address of the message context.\n"
+          ],
+          "locn": "-727,7 +775,7"
+        },
+        {
+          "lines": [
+            "                 <div class=\"xmlConf\">&lt;default [format=\"soap11|soap12|pox|get\"] [optimize=\"mtom|swa\"]\n",
+            "          [encoding=\"<em>charset encoding</em>\"]\n",
+            "          [statistics=\"enable|disable\"] [trace=\"enable|disable\"]&gt;\n",
+            "-  &lt;enableRM [policy=\"<em>key</em>\"]/&gt;?\n",
+            "-  &lt;enableSec [policy=\"<em>key</em>\"]/&gt;?\n",
+            "-  &lt;enableAddressing [version=\"final|submission\"] [separateListener=\"true|false\"]/&gt;?\n",
+            "+    &lt;enableRM [policy=\"<em>key</em>\"]/&gt;?\n",
+            "+    &lt;enableSec [policy=\"<em>key</em>\"]/&gt;?\n",
+            "+    &lt;enableAddressing [version=\"final|submission\"] [separateListener=\"true|false\"]/&gt;?\n",
+            " \n",
+            "-  &lt;timeout&gt;\n",
+            "-    &lt;duration&gt;<em>timeout duration in milliseconds</em>&lt;/duration&gt;\n",
+            "-    &lt;responseAction&gt;discard|fault&lt;/responseAction&gt;\n",
+            "-  &lt;/timeout&gt;?\n",
+            "+    &lt;timeout&gt;\n",
+            "+        &lt;duration&gt;<em>timeout duration in milliseconds</em>&lt;/duration&gt;\n",
+            "+        &lt;responseAction&gt;discard|fault&lt;/responseAction&gt;\n",
+            "+    &lt;/timeout&gt;?\n",
+            " \n",
+            "-   &lt;markForSuspension&gt;\n",
+            "+    &lt;markForSuspension&gt;\n",
+            "         [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]\n",
+            "         &lt;retriesBeforeSuspension&gt;m&lt;/retriesBeforeSuspension&gt;\n",
+            "         &lt;retryDelay&gt;d&lt;/retryDelay&gt;\n",
+            "     &lt;/markForSuspension&gt;\n",
+            " \n",
+            "-  &lt;suspendOnFailure&gt;\n",
+            "+    &lt;suspendOnFailure&gt;\n",
+            "         [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]\n",
+            "         &lt;initialDuration&gt;n&lt;/initialDuration&gt;\n",
+            "         &lt;progressionFactor&gt;r&lt;/progressionFactor&gt;\n"
+          ],
+          "locn": "-741,22 +789,22"
+        },
+        {
+          "lines": [
+            "     &lt;/suspendOnFailure&gt;\n",
+            " &lt;/default&gt;</div>\n",
+            "             </subsection>\n",
+            "-            <subsection name=\"WSDL Endpoint\">\n",
+            "+            <subsection name=\"WSDL Endpoint\" id=\"WSDLEndpointConfig\">\n",
+            "                 <p>\n",
+            "                     WSDL endpoint is an endpoint definition based on a specified WSDL document. The\n",
+            "                     WSDL document can be specified either as a URI or as an inline definition within\n"
+          ],
+          "locn": "-764,7 +812,7"
+        },
+        {
+          "lines": [
+            "                     'timeout' are same as for an Address endpoint.\n",
+            "                 </p>\n",
+            "                 <div class=\"xmlConf\">&lt;wsdl [uri=\"wsdl-uri\"] service=\"qname\" port/endpoint=\"qname\"&gt;\n",
+            "-      &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt;?\n",
+            "-      &lt;wsdl20:description&gt;...&lt;/wsdl20:description&gt;?\n",
+            "-      &lt;enableRM [policy=\"key\"]/&gt;?\n",
+            "-      &lt;enableSec [policy=\"key\"]/&gt;?\n",
+            "-      &lt;enableAddressing/&gt;?\n",
+            "+    &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt;?\n",
+            "+    &lt;wsdl20:description&gt;...&lt;/wsdl20:description&gt;?\n",
+            "+    &lt;enableRM [policy=\"key\"]/&gt;?\n",
+            "+    &lt;enableSec [policy=\"key\"]/&gt;?\n",
+            "+    &lt;enableAddressing/&gt;?\n",
+            " \n",
+            "-      &lt;timeout&gt;\n",
+            "+    &lt;timeout&gt;\n",
+            "         &lt;duration&gt;timeout duration in milliseconds&lt;/duration&gt;\n",
+            "         &lt;responseAction&gt;discard|fault&lt;/responseAction&gt;\n",
+            "-      &lt;/timeout&gt;?\n",
+            "-      &lt;markForSuspension&gt;\n",
+            "-            [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]\n",
+            "-            &lt;retriesBeforeSuspension&gt;m&lt;/retriesBeforeSuspension&gt;\n",
+            "-            &lt;retryDelay&gt;d&lt;/retryDelay&gt;\n",
+            "-        &lt;/markForSuspension&gt;\n",
+            "+    &lt;/timeout&gt;?\n",
+            "+    &lt;markForSuspension&gt;\n",
+            "+        [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]\n",
+            "+        &lt;retriesBeforeSuspension&gt;m&lt;/retriesBeforeSuspension&gt;\n",
+            "+        &lt;retryDelay&gt;d&lt;/retryDelay&gt;\n",
+            "+    &lt;/markForSuspension&gt;\n",
+            " \n",
+            "-      &lt;suspendOnFailure&gt;\n",
+            "-            [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]\n",
+            "-            &lt;initialDuration&gt;n&lt;/initialDuration&gt;\n",
+            "-            &lt;progressionFactor&gt;r&lt;/progressionFactor&gt;\n",
+            "-            &lt;maximumDuration&gt;l&lt;/maximumDuration&gt;\n",
+            "-        &lt;/suspendOnFailure&gt;\n",
+            "+    &lt;suspendOnFailure&gt;\n",
+            "+        [&lt;errorCodes&gt;xxx,yyy&lt;/errorCodes&gt;]\n",
+            "+        &lt;initialDuration&gt;n&lt;/initialDuration&gt;\n",
+            "+        &lt;progressionFactor&gt;r&lt;/progressionFactor&gt;\n",
+            "+        &lt;maximumDuration&gt;l&lt;/maximumDuration&gt;\n",
+            "+    &lt;/suspendOnFailure&gt;\n",
+            " \n",
+            "-    &lt;/wsdl&gt;</div>\n",
+            "+&lt;/wsdl&gt;</div>\n",
+            "             </subsection>\n",
+            "-            <subsection name=\"Load Balance Endpoint\">\n",
+            "+            <subsection name=\"Load Balance Endpoint\" id=\"LBEndpointConfig\">\n",
+            "                 <p>\n",
+            "                     A Load balanced endpoint distributes the messages (load) among a set of listed\n",
+            "                     endpoints or static members by evaluating the load balancing policy and any other\n"
+          ],
+          "locn": "-774,32 +822,32"
+        },
+        {
+          "lines": [
+            "                 </p>\n",
+            "                 <div class=\"xmlConf\">&lt;loadBalance [policy=\"roundRobin\"] [algorithm=\"impl of org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm\"]\n",
+            "                         [failover=\"true|false\"]&gt;\n",
+            "-        &lt;endpoint .../&gt;+\n",
+            "-        &lt;member hostName=\"host\" [httpPort=\"port\"] [httpsPort=\"port2\"]&gt;+\n",
+            "-    &lt;/loadBalance&gt;\n",
+            "-    &lt;session type=\"http|simpleClientSession\"/&gt;?</div>\n",
+            "+    &lt;endpoint .../&gt;+\n",
+            "+    &lt;member hostName=\"host\" [httpPort=\"port\"] [httpsPort=\"port2\"]&gt;+\n",
+            "+&lt;/loadBalance&gt;\n",
+            "+&lt;session type=\"http|simpleClientSession\"/&gt;?</div>\n",
+            "             </subsection>\n",
+            "-            <subsection name=\"Dynamic Load Balance Endpoint\">\n",
+            "+            <subsection name=\"Dynamic Load Balance Endpoint\" id=\"DLBEndpointConfig\">\n",
+            "                 <p>\n",
+            "                     This is a special variation of the load balance endpoint where instead of\n",
+            "                     having to specify the child endpoints explicitly, the endpoint automatically\n"
+          ],
+          "locn": "-832,12 +880,12"
+        },
+        {
+          "lines": [
+            "                     selected once the currently selected member has failed, and defaults to true.\n",
+            "                 </p>\n",
+            "                 <div class=\"xmlConf\">&lt;dynamicLoadBalance [policy=\"roundRobin\"] [failover=\"true|false\"]&gt;\n",
+            "-    &lt;membershipHandler\n",
+            "-            class=\"impl of org.apache.synapse.core.LoadBalanceMembershipHandler\"&gt;\n",
+            "-            &lt;property name=\"name\" value=\"value\"/&gt;+\n",
+            "+    &lt;membershipHandler class=\"impl of org.apache.synapse.core.LoadBalanceMembershipHandler\"&gt;\n",
+            "+        &lt;property name=\"name\" value=\"value\"/&gt;+\n",
+            "     &lt;/membershipHandler&gt;\n",
+            "-    &lt;/dynamicLoadBalance&gt;</div>\n",
+            "+&lt;/dynamicLoadBalance&gt;</div>\n",
+            "                 <p>\n",
+            "                     Currently Synapse ships with one implementation of the LoadBalanceMembershipHandler\n",
+            "                     interface. This class is named 'Axis2LoadBalanceMembershipHandler' and its\n"
+          ],
+          "locn": "-854,11 +902,10"
+        },
+        {
+          "lines": [
+            "                     usage is demonstrated in sample 57.\n",
+            "                 </p>\n",
+            "             </subsection>\n",
+            "-            <subsection name=\"Fail-Over Endpoint\">\n",
+            "+            <subsection name=\"Fail-Over Endpoint\" id=\"FOEndpointConfig\">\n",
+            "                 <p>\n",
+            "                     Failover endpoints send messages to the listed endpoints with the following\n",
+            "                     failover behavior. At the start, the first listed endpoint is selected as the\n"
+          ],
+          "locn": "-865,7 +912,7"
+        },
+        {
+          "lines": [
+            "                     It is possible to disable this behavior by setting the 'dynamic' attribute to false.\n",
+            "                 </p>\n",
+            "                 <div class=\"xmlConf\">&lt;failover [dynamic=\"true|false\"]&gt;\n",
+            "-  &lt;endpoint .../&gt;+\n",
+            "+    &lt;endpoint .../&gt;+\n",
+            " &lt;/failover&gt;</div>\n",
+            " \n",
+            "             </subsection>\n",
+            "         </section>\n",
+            "-        <section name=\"Proxy Services\">\n",
+            "+        <section name=\"Proxy Service Configuration\" id=\"ProxyServiceConfig\">\n",
+            "             <p>\n",
+            "                 A &lt;proxy&gt; element is used to define a Synapse Proxy service.\n",
+            "             </p>\n",
+            "             <div class=\"xmlConf\">&lt;proxy name=\"string\" [transports=\"(http |https |jms |.. )+|all\"] [pinnedServers=\"(serverName )+\"] [serviceGroup=\"string\"]&gt;\n",
+            "-   &lt;description&gt;...&lt;/description&gt;?\n",
+            "-   &lt;target [inSequence=\"name\"] [outSequence=\"name\"] [faultSequence=\"name\"] [endpoint=\"name\"]&gt;\n",
+            "-      &lt;inSequence&gt;...&lt;/inSequence&gt;?\n",
+            "-      &lt;outSequence&gt;...&lt;/outSequence&gt;?\n",
+            "-      &lt;faultSequence&gt;...&lt;/faultSequence&gt;?\n",
+            "-      &lt;endpoint&gt;...&lt;/endpoint&gt;?\n",
+            "-   &lt;/target&gt;?\n",
+            "-   &lt;publishWSDL key=\"string\" uri=\"string\"&gt;\n",
+            "-      ( &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt; | &lt;wsdl20:description&gt;...&lt;/wsdl20:description&gt; )?\n",
+            "-      &lt;resource location=\"...\" key=\"...\"/&gt;*\n",
+            "-   &lt;/publishWSDL&gt;?\n",
+            "-   &lt;enableAddressing/&gt;?\n",
+            "-   &lt;enableSec/&gt;?\n",
+            "-   &lt;enableRM/&gt;?\n",
+            "-   &lt;policy key=\"string\" [type=\"(in | out)\"]/&gt;? // optional service or message level policies such as (e.g. WS-Security and/or WS-RM policies)\n",
+            "-   &lt;parameter name=\"string\"&gt;  // optional service parameters such as (e.g. transport.jms.ConnectionFactory)\n",
+            "-      string | xml\n",
+            "-   &lt;/parameter&gt;\n",
+            "+    &lt;description&gt;...&lt;/description&gt;?\n",
+            "+    &lt;target [inSequence=\"name\"] [outSequence=\"name\"] [faultSequence=\"name\"] [endpoint=\"name\"]&gt;\n",
+            "+        &lt;inSequence&gt;...&lt;/inSequence&gt;?\n",
+            "+        &lt;outSequence&gt;...&lt;/outSequence&gt;?\n",
+            "+        &lt;faultSequence&gt;...&lt;/faultSequence&gt;?\n",
+            "+        &lt;endpoint&gt;...&lt;/endpoint&gt;?\n",
+            "+    &lt;/target&gt;?\n",
+            "+    &lt;publishWSDL key=\"string\" uri=\"string\"&gt;\n",
+            "+        ( &lt;wsdl:definition&gt;...&lt;/wsdl:definition&gt; | &lt;wsdl20:description&gt;...&lt;/wsdl20:description&gt; )?\n",
+            "+        &lt;resource location=\"...\" key=\"...\"/&gt;*\n",
+            "+    &lt;/publishWSDL&gt;?\n",
+            "+    &lt;enableAddressing/&gt;?\n",
+            "+    &lt;enableSec/&gt;?\n",
+            "+    &lt;enableRM/&gt;?\n",
+            "+    &lt;policy key=\"string\" [type=\"(in | out)\"]/&gt;? // optional service or message level policies such as (e.g. WS-Security and/or WS-RM policies)\n",
+            "+    &lt;parameter name=\"string\"&gt;  // optional service parameters such as (e.g. transport.jms.ConnectionFactory)\n",
+            "+        string | xml\n",
+            "+    &lt;/parameter&gt;\n",
+            " &lt;/proxy&gt;</div>\n",
+            "             <p>\n",
+            "                 A proxy service is created and exposed on the specified transports through the\n"
+          ],
+          "locn": "-881,34 +928,34"
+        },
+        {
+          "lines": [
+            "                 </tbody>\n",
+            "             </table>\n",
+            "         </section>\n",
+            "-        <section name=\"Scheduled Tasks\">\n",
+            "+        <section name=\"Scheduled Task Configuration\" id=\"TaskConfig\">\n",
+            "             <p>\n",
+            "                 A &lt;task&gt; element is used to define a Synapse task (aka startup).\n",
+            "             </p>\n",
+            "             <div class=\"xmlConf\">&lt;task class=\"mypackage.MyTask\" name=\"string\" [pinnedServers=\"(serverName)+\"]&gt;\n",
+            "-   &lt;property name=\"stringProp\" value=\"String\"/&gt;\n",
+            "-   &lt;property name=\"xmlProp\"&gt;\n",
+            "-     &lt;somexml&gt;config&lt;/somexml&gt;\n",
+            "-   &lt;/property&gt;\n",
+            "-   &lt;trigger ([[count=\"10\"]? interval=\"1000\"] | [cron=\"0 * 1 * * ?\"] | [once=(true | false)])/&gt;\n",
+            "+    &lt;property name=\"stringProp\" value=\"String\"/&gt;\n",
+            "+    &lt;property name=\"xmlProp\"&gt;\n",
+            "+        &lt;somexml&gt;config&lt;/somexml&gt;\n",
+            "+    &lt;/property&gt;\n",
+            "+    &lt;trigger ([[count=\"10\"]? interval=\"1000\"] | [cron=\"0 * 1 * * ?\"] | [once=(true | false)])/&gt;\n",
+            " &lt;/task&gt;</div>\n",
+            "             <p>\n",
+            "                 A task is created and scheduled to run at specified time intervals or as specified\n"
+          ],
+          "locn": "-1134,16 +1181,16"
+        },
+        {
+          "lines": [
+            "                 or not.\n",
+            "             </p>\n",
+            "         </section>\n",
+            "-        <section name=\"Event Sources\">\n",
+            "+        <section name=\"Event Source Configuration\" id=\"EventSourceConfig\">\n",
+            "             <p>\n",
+            "                 Event sources enable the user to run Synapse in the eventing mode of operation.\n",
+            "                 Synapse can act as an event source as well as an event broker. An event source\n"
+          ],
+          "locn": "-1176,7 +1223,7"
+        },
+        {
+          "lines": [
+            "                 is defined using the &lt;eventSource&gt; configuration element.\n",
+            "             </p>\n",
+            "             <div class=\"xmlConf\">&lt;eventSource name=\"string\"&gt;\n",
+            "-\t&lt;subscriptionManager class=\"mypackage.MyClass\"&gt;\n",
+            "-\t\t   &lt;parameter name=\"string\"/&gt;\n",
+            "+    &lt;subscriptionManager class=\"mypackage.MyClass\"&gt;\n",
+            "+        &lt;parameter name=\"string\"/&gt;\n",
+            " \t&lt;/subscriptionManager&gt;\n",
+            " &lt;/eventSource&gt;</div>\n",
+            "             <p>\n"
+          ],
+          "locn": "-1183,8 +1230,8"
+        },
+        {
+          "lines": [
+            "                 can be specified using the 'parameter' elements.\n",
+            "             </p>\n",
+            "         </section>\n",
+            "-        <section name=\"APIs\">\n",
+            "+        <section name=\"API Configuration\" id=\"APIConfig\">\n",
+            "             <p>\n",
+            "                 APIs provide a flexible and powerful approach for defining full fledged REST APIs\n",
+            "                 in Synapse. An API definition starts with the &lt;api&gt; element.\n",
+            "             </p>\n",
+            "             <div class=\"xmlConf\">&lt;api name=\"string\" context=\"string\" [hostname=\"string\"][port=\"int\"]&gt;\n",
+            "-   &lt;resource [methods=\"http-method-list\"][inSequence=\"string\"][outSequence=\"string\"]\n",
+            "+    &lt;resource [methods=\"http-method-list\"][inSequence=\"string\"][outSequence=\"string\"]\n",
+            "    \t\t[faultSequence=\"string\"][content-type=\"string\"][user-agent=\"str\"]&gt;\n",
+            "-      &lt;inSequence&gt;...&lt;/inSequence&gt;?\n",
+            "-      &lt;outSequence&gt;...&lt;/outSequence&gt;?\n",
+            "-      &lt;faultSequence&gt;...&lt;/faultSequence&gt;?\n",
+            "+\n",
+            "+        &lt;inSequence&gt;...&lt;/inSequence&gt;?\n",
+            "+        &lt;outSequence&gt;...&lt;/outSequence&gt;?\n",
+            "+        &lt;faultSequence&gt;...&lt;/faultSequence&gt;?\n",
+            "    &lt;/resource&gt;+\n",
+            "    &lt;handlers&gt;\n",
+            "-      &lt;handler class=\"name\"/&gt;+\n",
+            "+        &lt;handler class=\"name\"/&gt;+\n",
+            "    &lt;/handlers&gt;?\n",
+            " &lt;/api&gt;</div>\n",
+            "             <p>\n"
+          ],
+          "locn": "-1202,20 +1249,21"
+        },
+        {
+          "lines": [
+            "                 ful qualified names of the handler implementation classes.\n",
+            "             </p>\n",
+            "         </section>\n",
+            "-        <section name=\"Priority Executors\">\n",
+            "+        <section name=\"Priority Executor Configuration\" id=\"ExecutorConfig\">\n",
+            "             <p>\n",
+            "                 The priority executor configuration syntax takes the following general form.\n",
+            "             </p>\n"
+          ],
+          "locn": "-1241,7 +1289,7"
+        }
+      ],
+      "from": "scratch/hiranya/website/src/site/xdoc/userguide/config.xml",
+      "to": "scratch/hiranya/website/src/site/xdoc/userguide/config.xml"
+    }
+  ],
+  "id": "1222032",
+  "message": "Updated configuration language guide",
+  "when": "2011-12-21T23:50:50-05:00",
+  "who": "hiranya"
+}

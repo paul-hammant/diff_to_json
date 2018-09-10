@@ -1,0 +1,84 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             <groupId>org.bouncycastle</groupId>\n",
+            "             <artifactId>bcprov-jdk15on</artifactId>\n",
+            "         </dependency>\n",
+            "-\n",
+            "-        <dependency>\n",
+            "-            <groupId>org.apache.geronimo.specs</groupId>\n",
+            "-            <artifactId>geronimo-javamail_1.4_spec</artifactId>\n",
+            "-        </dependency>\n",
+            "     </dependencies>\n",
+            " \n",
+            " </project>\n"
+          ],
+          "locn": "-159,11 +159,6"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/pom.xml",
+      "to": "java/modules/transports/core/nhttp/pom.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             <groupId>commons-net</groupId>\n",
+            "             <artifactId>commons-net</artifactId>\n",
+            "         </dependency>\n",
+            "-        <dependency>\n",
+            "-            <groupId>org.apache.geronimo.specs</groupId>\n",
+            "-            <artifactId>geronimo-javamail_1.4_spec</artifactId>\n",
+            "-        </dependency>\n",
+            "     </dependencies>\n",
+            " </project>\n"
+          ],
+          "locn": "-151,9 +151,5"
+        }
+      ],
+      "from": "java/modules/transports/core/vfs/pom.xml",
+      "to": "java/modules/transports/core/vfs/pom.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                 <version>${jms-1.1-spec.version}</version>\n",
+            "             </dependency>\n",
+            "             <dependency>\n",
+            "-                <groupId>org.apache.geronimo.specs</groupId>\n",
+            "-                <artifactId>geronimo-javamail_1.4_spec</artifactId>\n",
+            "-                <version>${javamail-1.4-spec.version}</version>\n",
+            "-            </dependency>\n",
+            "-            <dependency>\n",
+            "                 <groupId>wrapper</groupId>\n",
+            "                 <artifactId>wrapper</artifactId>\n",
+            "                 <version>${wrapper.version}</version>\n"
+          ],
+          "locn": "-935,11 +935,6"
+        },
+        {
+          "lines": [
+            "         <truezip.version>6.6</truezip.version>\n",
+            "         <jsch.version>0.1.31</jsch.version>\n",
+            "         <jms-1.1-spec.version>1.1</jms-1.1-spec.version>\n",
+            "-        <javamail-1.4-spec.version>1.7.1</javamail-1.4-spec.version>\n",
+            "         <httpcore.nio.version>4.2.4</httpcore.nio.version>\n",
+            "         <http.client.version>4.1</http.client.version>\n",
+            "         <aspectj.version>1.6.1</aspectj.version>\n"
+          ],
+          "locn": "-1126,7 +1121,6"
+        }
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    }
+  ],
+  "id": "1510138",
+  "message": "Reverted r1509447; we really don't need JavaMail anymore (in scope compile). It is still a dependency for the unit tests, but the testkit takes care of that.\n",
+  "when": "2013-08-04T08:01:54-04:00",
+  "who": "veithen"
+}

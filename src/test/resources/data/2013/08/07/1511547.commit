@@ -1,0 +1,256 @@
+Index: java/modules/core/src/test/java/org/apache/synapse/config/xml/rest/APISerializationTest.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/config/xml/rest/APISerializationTest.java	(revision 1511546)
++++ java/modules/core/src/test/java/org/apache/synapse/config/xml/rest/APISerializationTest.java	(revision 1511547)
+@@ -93,4 +93,28 @@
+         OMElement out = APISerializer.serializeAPI(api);
+         assertXMLEqual(xml, out.toString());
+     }
++
++    public void testAPISerialization7() throws Exception {
++        String xml = "<api name=\"test\" transport=\"http\" context=\"/dictionary\" xmlns=\"http://ws.apache.org/ns/synapse\">" +
++                "<resource url-mapping=\"/admin/view\" inSequence=\"in\" outSequence=\"out\"/></api>";
++        OMElement om = AXIOMUtil.stringToOM(xml);
++        API api = APIFactory.createAPI(om);
++        OMElement out = APISerializer.serializeAPI(api);
++        assertXMLEqual(xml, out.toString());
++    }
++
++    public void testAPISerialization8() throws Exception {
++        String xml = "<api name=\"test\" transport=\"https\" context=\"/dictionary\" hostname=\"apache.org\" port=\"8243\"" +
++                " xmlns=\"http://ws.apache.org/ns/synapse\"><resource url-mapping=\"/admin/view/*\" " +
++                "><inSequence><log/><send/></inSequence><outSequence><log/><send/></outSequence></resource>" +
++                "<resource url-mapping=\"/admin/*\"><inSequence><log/><send/></inSequence><outSequence>" +
++                "<log/><send/></outSequence></resource><resource uri-template=\"/{char}/{word}\">" +
++                "<inSequence><send/></inSequence><faultSequence><log level=\"full\"/></faultSequence>" +
++                "</resource><handlers><handler class=\"org.apache.synapse.config.xml.rest.TestHandler\"/>" +
++                "</handlers></api>";
++        OMElement om = AXIOMUtil.stringToOM(xml);
++        API api = APIFactory.createAPI(om);
++        OMElement out = APISerializer.serializeAPI(api);
++        assertXMLEqual(xml, out.toString());
++    }
+ }
+Index: java/modules/core/src/test/java/org/apache/synapse/rest/APIDispatcherTest.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/rest/APIDispatcherTest.java	(revision 1511546)
++++ java/modules/core/src/test/java/org/apache/synapse/rest/APIDispatcherTest.java	(revision 1511547)
+@@ -80,6 +80,38 @@
+         assertNull(synCtx.getProperty(RESTConstants.SYNAPSE_REST_API));
+     }
+ 
++    public void testTransportBasedAPIDispatch() throws Exception {
++        API api = new API(TEST_API, "/test");
++        api.setProtocol(RESTConstants.PROTOCOL_HTTP_ONLY);
++        SynapseConfiguration synapseConfig = new SynapseConfiguration();
++        synapseConfig.addAPI(TEST_API, api);
++
++        RESTRequestHandler handler = new RESTRequestHandler();
++
++        // Messages with '/test' context should be dispatched
++        MessageContext synCtx = getMessageContext(synapseConfig, false, "/test", "GET");
++        handler.process(synCtx);
++        assertEquals(TEST_API, synCtx.getProperty(RESTConstants.SYNAPSE_REST_API));
++        synCtx = getMessageContext(synapseConfig, false, "/test/", "GET");
++        handler.process(synCtx);
++        assertEquals(TEST_API, synCtx.getProperty(RESTConstants.SYNAPSE_REST_API));
++        synCtx = getMessageContext(synapseConfig, false, "/test/foo/bar?a=5", "GET");
++        handler.process(synCtx);
++        assertEquals(TEST_API, synCtx.getProperty(RESTConstants.SYNAPSE_REST_API));
++        synCtx = getMessageContext(synapseConfig, false, "/test?a=5", "GET");
++        handler.process(synCtx);
++        assertEquals(TEST_API, synCtx.getProperty(RESTConstants.SYNAPSE_REST_API));
++
++        // Messages sent via HTTPS should NOT be dispatched
++        synCtx = getMessageContext(synapseConfig, true, "/test", "GET");
++        handler.process(synCtx);
++        assertNull(synCtx.getProperty(RESTConstants.SYNAPSE_REST_API));
++
++        synCtx = getMessageContext(synapseConfig, true, "/test/foo/bar?a=5", "GET");
++        handler.process(synCtx);
++        assertNull(synCtx.getProperty(RESTConstants.SYNAPSE_REST_API));
++    }
++
+     public void testResponseDispatch() throws Exception {
+         API api = new API(TEST_API, "/test");
+         SynapseConfiguration synapseConfig = new SynapseConfiguration();
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/rest/APIFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/rest/APIFactory.java	(revision 1511546)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/rest/APIFactory.java	(revision 1511547)
+@@ -21,6 +21,7 @@
+ 
+ import org.apache.axiom.om.OMAttribute;
+ import org.apache.axiom.om.OMElement;
++import org.apache.axis2.Constants;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.SynapseException;
+@@ -27,6 +28,7 @@
+ import org.apache.synapse.config.xml.XMLConfigConstants;
+ import org.apache.synapse.rest.API;
+ import org.apache.synapse.rest.Handler;
++import org.apache.synapse.rest.RESTConstants;
+ import org.apache.synapse.rest.version.VersionStrategy;
+ 
+ import javax.xml.namespace.QName;
+@@ -40,11 +42,13 @@
+         OMAttribute nameAtt = apiElt.getAttribute(new QName("name"));
+         if (nameAtt == null || "".equals(nameAtt.getAttributeValue())) {
+             handleException("Attribute 'name' is required for an API definition");
++            return null;
+         }
+ 
+         OMAttribute contextAtt = apiElt.getAttribute(new QName("context"));
+         if (contextAtt == null || "".equals(contextAtt.getAttributeValue())) {
+             handleException("Attribute 'context' is required for an API definition");
++            return null;
+         }
+ 
+         API api = new API(nameAtt.getAttributeValue(), contextAtt.getAttributeValue());
+@@ -87,6 +91,20 @@
+             }
+         }
+ 
++        OMAttribute transport = apiElt.getAttribute(
++                new QName(XMLConfigConstants.NULL_NAMESPACE, "transport"));
++        if (transport != null) {
++            String transports = transport.getAttributeValue();
++            if (!"".equals(transports)) {
++                if (Constants.TRANSPORT_HTTP.equals(transports)) {
++                    api.setProtocol(RESTConstants.PROTOCOL_HTTP_ONLY);
++                } else if (Constants.TRANSPORT_HTTPS.equals(transports)) {
++                    api.setProtocol(RESTConstants.PROTOCOL_HTTPS_ONLY);
++                } else {
++                    handleException("Invalid protocol name: " + transports);
++                }
++            }
++        }
+         return api;
+     }
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/rest/APISerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/rest/APISerializer.java	(revision 1511546)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/rest/APISerializer.java	(revision 1511547)
+@@ -19,12 +19,12 @@
+ 
+ package org.apache.synapse.config.xml.rest;
+ 
+-import org.apache.axiom.om.OMAbstractFactory;
+-import org.apache.axiom.om.OMElement;
+-import org.apache.axiom.om.OMFactory;
++import org.apache.axiom.om.*;
++import org.apache.axis2.Constants;
+ import org.apache.synapse.SynapseConstants;
+ import org.apache.synapse.rest.API;
+ import org.apache.synapse.rest.Handler;
++import org.apache.synapse.rest.RESTConstants;
+ import org.apache.synapse.rest.Resource;
+ 
+ public class APISerializer {
+@@ -60,6 +60,13 @@
+             }
+             apiElt.addChild(handlersElt);
+         }
++
++        if (api.getProtocol() == RESTConstants.PROTOCOL_HTTP_ONLY) {
++            apiElt.addAttribute("transport", Constants.TRANSPORT_HTTP, null);
++        } else if (api.getProtocol() == RESTConstants.PROTOCOL_HTTPS_ONLY) {
++            apiElt.addAttribute("transport", Constants.TRANSPORT_HTTPS, null);
++        }
++
+         return apiElt;
+     }
+ }
+Index: java/modules/core/src/main/java/org/apache/synapse/rest/API.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/rest/API.java	(revision 1511546)
++++ java/modules/core/src/main/java/org/apache/synapse/rest/API.java	(revision 1511547)
+@@ -44,6 +44,8 @@
+     private Map<String,Resource> resources = new LinkedHashMap<String,Resource>();
+     private List<Handler> handlers = new ArrayList<Handler>();
+ 
++    private int protocol = RESTConstants.PROTOCOL_HTTP_AND_HTTPS;
++
+     private VersionStrategy versionStrategy = new DefaultStrategy(this);
+ 
+     private String fileName;
+@@ -68,6 +70,14 @@
+         return name;
+     }
+ 
++    public int getProtocol() {
++        return protocol;
++    }
++
++    public void setProtocol(int protocol) {
++        this.protocol = protocol;
++    }
++
+     public String getAPIName() {
+         return name;
+     }
+@@ -176,9 +186,10 @@
+                 return false;
+             }
+ 
++            org.apache.axis2.context.MessageContext msgCtx =
++                    ((Axis2MessageContext) synCtx).getAxis2MessageContext();
++
+             if (host != null || port != -1) {
+-                org.apache.axis2.context.MessageContext msgCtx =
+-                        ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+                 String hostHeader = getHostHeader(msgCtx);
+                 if (hostHeader != null) {
+                     if (host != null && !host.equals(extractHostName(hostHeader))) {
+@@ -204,6 +215,29 @@
+                     return false;
+                 }
+             }
++            if (protocol == RESTConstants.PROTOCOL_HTTP_ONLY &&
++                    !Constants.TRANSPORT_HTTP.equals(msgCtx.getIncomingTransportName())) {
++                if (log.isDebugEnabled()) {
++                    log.debug("Protocol information does not match - Expected HTTP");
++                }
++                synCtx.setProperty(RESTConstants.REST_API_TRANSPORT_DENIED, true);
++                synCtx.setProperty(RESTConstants.REST_API_IN_TRANSPORT,
++                        msgCtx.getIncomingTransportName());
++                log.warn("Trying to access API : " + name + " on restricted transport chanel [" +
++                        msgCtx.getIncomingTransportName() + "]");
++                return false;
++            } else if (protocol == RESTConstants.PROTOCOL_HTTPS_ONLY &&
++                    !Constants.TRANSPORT_HTTPS.equals(msgCtx.getIncomingTransportName())) {
++                if (log.isDebugEnabled()) {
++                    log.debug("Protocol information does not match - Expected HTTPS");
++                }
++                synCtx.setProperty(RESTConstants.REST_API_TRANSPORT_DENIED, true);
++                synCtx.setProperty(RESTConstants.REST_API_IN_TRANSPORT,
++                        msgCtx.getIncomingTransportName());
++                log.warn("Trying to access API : " + name + " on restricted transport chanel [" +
++                        msgCtx.getIncomingTransportName() + "]");
++                return false;
++            }
+         }
+ 
+         return true;
+Index: java/modules/core/src/main/java/org/apache/synapse/rest/RESTConstants.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/rest/RESTConstants.java	(revision 1511546)
++++ java/modules/core/src/main/java/org/apache/synapse/rest/RESTConstants.java	(revision 1511547)
+@@ -48,4 +48,9 @@
+ 
+     public static final String NO_MATCHING_RESOURCE_HANDLER = "_resource_mismatch_handler_";
+ 
++    /** The Synapse MC property that indicates the in-transport */
++    public static final String REST_API_IN_TRANSPORT = "REST_API_IN_TRANSPORT";
++    /** The Synapse MC property that marks if the message was denied on the accessed transport */
++    public static final String REST_API_TRANSPORT_DENIED = "REST_API_TRANSPORT_DENIED";
++
+ }
+-*-*-*-
+Message: Supporting a transport attribute on API configuration. Patch applied from SYNAPSE-953 with some changes
+-*-*-*-
+When: 2013-08-07 20:20:17 -0400 
+-*-*-*-
+Who: hiranya

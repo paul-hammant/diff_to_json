@@ -1,0 +1,28 @@
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1731427)
++++ java/pom.xml	(revision 1731428)
+@@ -191,7 +191,7 @@
+                 <plugin>
+                     <groupId>org.apache.maven.plugins</groupId>
+                     <artifactId>maven-site-plugin</artifactId>
+-                    <version>3.0</version>
++                    <version>3.3</version>
+                 </plugin>
+                 <plugin>
+                     <groupId>org.apache.maven.plugins</groupId>
+@@ -966,7 +966,7 @@
+         <plugins>
+             <plugin>
+                 <artifactId>maven-site-plugin</artifactId>
+-                <version>3.0</version>
++                <version>3.3</version>
+                 <inherited>false</inherited>
+             </plugin>
+             <plugin>
+-*-*-*-
+Message: updating site plugin version to fix a build failure
+-*-*-*-
+When: 2016-02-20 12:15:55 -0500 
+-*-*-*-
+Who: isudana

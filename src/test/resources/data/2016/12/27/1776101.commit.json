@@ -1,0 +1,140 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         }\n",
+            "     }\n",
+            " \n",
+            "+    /**\n",
+            "+     * Get the associated configuration of the {@code TargetHandler}\n",
+            "+     *\n",
+            "+     * @return associated {@code TargetConfiguration}\n",
+            "+     */\n",
+            "+    public TargetConfiguration getTargetConfiguration() {\n",
+            "+        return targetConfiguration;\n",
+            "+    }\n",
+            "+\n",
+            "     private boolean isResponseHaveBodyExpected(\n",
+            "             final String method, final HttpResponse response) {\n",
+            " \n"
+          ],
+          "locn": "-498,6 +498,15"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetHandler.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetHandler.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.synapse.transport.passthru.config.TargetConfiguration;\n",
+            " import org.apache.synapse.transport.passthru.connections.SourceConnections;\n",
+            " import org.apache.synapse.transport.passthru.connections.TargetConnections;\n",
+            "+import org.apache.synapse.transport.utils.conn.SynapseNHttpClientConnection;\n",
+            " \n",
+            " import java.net.InetAddress;\n",
+            " import java.util.Map;\n"
+          ],
+          "locn": "-41,6 +41,7"
+        },
+        {
+          "lines": [
+            "             TargetContext.updateState(conn, ProtocolState.CLOSING);\n",
+            "             connections.closeConnection(conn);\n",
+            "         } else {\n",
+            "-            connections.releaseConnection(conn);\n",
+            "+            if (conn instanceof SynapseNHttpClientConnection) {\n",
+            "+                ((SynapseNHttpClientConnection) conn).markForRelease();\n",
+            "+            } else {\n",
+            "+                connections.releaseConnection(conn);\n",
+            "+            }\n",
+            "         }\n",
+            "     }\n",
+            " \n"
+          ],
+          "locn": "-262,7 +263,11"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/PassThroughTransportUtils.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/PassThroughTransportUtils.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.http.nio.NHttpMessageWriterFactory;\n",
+            " import org.apache.http.nio.reactor.IOSession;\n",
+            " import org.apache.http.nio.util.ByteBufferAllocator;\n",
+            "+import org.apache.synapse.transport.passthru.TargetHandler;\n",
+            " \n",
+            " import java.io.IOException;\n",
+            " import java.nio.charset.CharsetDecoder;\n"
+          ],
+          "locn": "-30,6 +30,7"
+        },
+        {
+          "lines": [
+            "  */\n",
+            " public class SynapseNHttpClientConnection extends DefaultNHttpClientConnection {\n",
+            " \n",
+            "+    private boolean markedForRelease = false;\n",
+            "+\n",
+            "     public SynapseNHttpClientConnection(IOSession session,\n",
+            "                                         int bufferSize,\n",
+            "                                         int fragmentSizeHint,\n"
+          ],
+          "locn": "-41,6 +42,8"
+        },
+        {
+          "lines": [
+            "     @Override\n",
+            "     public void consumeInput(final NHttpClientEventHandler handler) {\n",
+            "         super.consumeInput(handler);\n",
+            "+        if (markedForRelease) {\n",
+            "+            if (handler instanceof TargetHandler) {\n",
+            "+                resetState();\n",
+            "+                ((TargetHandler) handler).getTargetConfiguration().getConnections().releaseConnection(this);\n",
+            "+            }\n",
+            "+        }\n",
+            "     }\n",
+            " \n",
+            "     @Override\n"
+          ],
+          "locn": "-75,6 +78,12"
+        },
+        {
+          "lines": [
+            "     public void produceOutput(final NHttpClientEventHandler handler) {\n",
+            "         super.produceOutput(handler);\n",
+            "     }\n",
+            "+\n",
+            "+    /**\n",
+            "+     * Mark this connection to be released to the pool.\n",
+            "+     * <p>\n",
+            "+     * This needs to be called after finishing work related to a particular request/response,\n",
+            "+     * and only when keep-alive is enabled\n",
+            "+     */\n",
+            "+    public void markForRelease() {\n",
+            "+        this.markedForRelease = true;\n",
+            "+    }\n",
+            "+\n",
+            "+    private void resetState() {\n",
+            "+        markedForRelease = false;\n",
+            "+    }\n",
+            " }\n"
+          ],
+          "locn": "-81,4 +90,18"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/conn/SynapseNHttpClientConnection.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/utils/conn/SynapseNHttpClientConnection.java"
+    }
+  ],
+  "id": "1776101",
+  "message": "Fix for SYNAPSE-1014\n-----------------------\nPorting fix from https://github.com/wso2/wso2-synapse/commit/fbc829ae1e52c552aa348967db929fa21a8cf1f6 by Isuru Ranawaka",
+  "when": "2016-12-27T05:15:38-05:00",
+  "who": "isudana"
+}

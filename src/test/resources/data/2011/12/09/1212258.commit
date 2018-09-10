@@ -1,0 +1,48 @@
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java	(revision 1212257)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ListenerContext.java	(revision 1212258)
+@@ -249,7 +249,7 @@
+         NHttpConfiguration cfg = NHttpConfiguration.getInstance();
+         params
+             .setIntParameter(HttpConnectionParams.SO_TIMEOUT,
+-                cfg.getProperty(HttpConnectionParams.SO_TIMEOUT, 60000))
++                cfg.getProperty(NhttpConstants.SO_TIMEOUT_RECEIVER, 60000))
+             .setIntParameter(HttpConnectionParams.SOCKET_BUFFER_SIZE,
+                 cfg.getProperty(HttpConnectionParams.SOCKET_BUFFER_SIZE, 8 * 1024))
+             .setBooleanParameter(HttpConnectionParams.STALE_CONNECTION_CHECK,
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/NhttpConstants.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/NhttpConstants.java	(revision 1212257)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/NhttpConstants.java	(revision 1212258)
+@@ -146,4 +146,11 @@
+     public static final String ENDPOINTS_CONFIGURATION = "endpointsConfiguration";
+ 
+     public static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
++
++    /**
++     * nhttp property that must be defined in nhttp.properties to set receiver timeout
++     * and sender timeout.
++     */
++    public static final String SO_TIMEOUT_RECEIVER = "http.socket.timeout.receiver";
++    public static final String SO_TIMEOUT_SENDER = "http.socket.timeout.sender";
+ }
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java	(revision 1212257)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/HttpCoreNIOSender.java	(revision 1212258)
+@@ -263,7 +263,7 @@
+         HttpParams params = new BasicHttpParams();
+         params
+             .setIntParameter(HttpConnectionParams.SO_TIMEOUT,
+-                cfg.getProperty(HttpConnectionParams.SO_TIMEOUT, 60000))
++                cfg.getProperty(NhttpConstants.SO_TIMEOUT_SENDER, 60000))
+             .setIntParameter(HttpConnectionParams.CONNECTION_TIMEOUT,
+                 cfg.getProperty(HttpConnectionParams.CONNECTION_TIMEOUT, 10000))
+             .setIntParameter(HttpConnectionParams.SOCKET_BUFFER_SIZE,
+-*-*-*-
+Message: Fix forSYNAPSE-824
+-*-*-*-
+When: 2011-12-09 01:21:15 -0500 
+-*-*-*-
+Who: charith

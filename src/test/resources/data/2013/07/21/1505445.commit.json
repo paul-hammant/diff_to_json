@@ -1,0 +1,43 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.synapse.util.xpath.SynapseXPath;\n",
+            " import org.jaxen.JaxenException;\n",
+            " \n",
+            "-import java.util.Iterator;\n",
+            " import java.util.List;\n",
+            " \n",
+            " /**\n"
+          ],
+          "locn": "-39,7 +39,6"
+        },
+        {
+          "lines": [
+            "                 }\n",
+            " \n",
+            "                 if (synLog.isTraceOrDebugEnabled()) {\n",
+            "-                    synLog.traceOrDebug(\"Submitting \" + (msgNumber+1) + \" of \" + msgNumber +\n",
+            "-                        \" messages for processing in parallel\");\n",
+            "+                    synLog.traceOrDebug(\"Submitting \" + (msgNumber + 1) + \" of \" + msgNumber +\n",
+            "+                            (target.isAsynchronous() ?\n",
+            "+                                    \" messages for processing in parallel\" :\n",
+            "+                                    \" messages for processing sequentially\"));\n",
+            "                 }\n",
+            " \n",
+            "                 target.mediate(\n"
+          ],
+          "locn": "-124,8 +123,10"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/eip/splitter/IterateMediator.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/eip/splitter/IterateMediator.java"
+    }
+  ],
+  "id": "1505445",
+  "message": "Applying the patch for SYNAPSE-945. Fixing a debug log statement.",
+  "when": "2013-07-21T14:56:06-04:00",
+  "who": "hiranya"
+}

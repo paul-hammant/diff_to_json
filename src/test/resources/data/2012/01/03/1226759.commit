@@ -1,0 +1,18 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/message/store/AbstractMessageStore.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/message/store/AbstractMessageStore.java	(revision 1226758)
++++ java/modules/core/src/main/java/org/apache/synapse/message/store/AbstractMessageStore.java	(revision 1226759)
+@@ -144,6 +144,7 @@
+ 
+ 
+     public void destroy() {
++        MBeanRegistrar.getInstance().unRegisterMBean("MessageStore", this.name);
+     }
+ 
+     public void setDescription(String description) {
+-*-*-*-
+Message: Unregistering message store MBeans
+-*-*-*-
+When: 2012-01-03 07:37:20 -0500 
+-*-*-*-
+Who: hiranya

@@ -1,0 +1,655 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     <!--POJO deployer , this will alow users to drop .class file and make that into a service-->\n",
+            "     <deployer extension=\".class\" directory=\"pojo\" class=\"org.apache.axis2.deployment.POJODeployer\"/>\n",
+            " \n",
+            "+    <deployer extension=\".aar\" directory=\"services\" class=\"org.apache.axis2.deployment.ServiceDeployer\">\n",
+            "+        <serviceBuilderExtension name =\"jwsbuilderExt\" class=\"org.apache.axis2.jaxws.framework.JAXWSServiceBuilderExtension\"/>\n",
+            "+        <serviceBuilderExtension name =\"jwsbuilderExt\" class=\"org.apache.axis2.deployment.WSDLServiceBuilderExtension\"/>\n",
+            "+    </deployer>\n",
+            "+\n",
+            "     <!-- Following parameter will set the host name for the epr-->\n",
+            "     <!--<parameter name=\"hostname\" locked=\"true\">myhost.com</parameter>-->\n",
+            " \n"
+          ],
+          "locn": "-76,6 +76,11"
+        }
+      ],
+      "from": "java/repository/conf/sample/resources/misc/server/axis2.xml",
+      "to": "java/repository/conf/sample/resources/misc/server/axis2.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.axis2.description.Parameter;\n",
+            " import org.apache.axis2.transport.MessageFormatter;\n",
+            " import org.apache.axis2.transport.OutTransportInfo;\n",
+            "+import org.apache.axis2.transport.TransportUtils;\n",
+            " import org.apache.axis2.transport.base.AbstractTransportSender;\n",
+            " import org.apache.axis2.transport.base.BaseUtils;\n",
+            " import org.apache.axis2.transport.base.ManagementSupport;\n"
+          ],
+          "locn": "-26,6 +26,7"
+        },
+        {
+          "lines": [
+            "     private void populateResponseFile(FileObject responseFile, MessageContext msgContext,\n",
+            "                                       boolean append, boolean lockingEnabled) throws AxisFault {\n",
+            "         \n",
+            "-        MessageFormatter messageFormatter = BaseUtils.getMessageFormatter(msgContext);\n",
+            "+        MessageFormatter messageFormatter = TransportUtils.getMessageFormatter(msgContext);\n",
+            "         OMOutputFormat format = BaseUtils.getOMOutputFormat(msgContext);\n",
+            "         \n",
+            "         try {\n"
+          ],
+          "locn": "-225,7 +226,7"
+        },
+        {
+          "lines": [
+            "             CountingOutputStream os = new CountingOutputStream(\n",
+            "                     responseFile.getContent().getOutputStream(append));\n",
+            "             try {\n",
+            "-                messageFormatter.writeTo(msgContext, format, os, true);\n",
+            "+                messageFormatter.writeTo(msgContext, format, os, false);\n",
+            "             } finally {\n",
+            "                 os.close();\n",
+            "             }\n"
+          ],
+          "locn": "-232,7 +233,7"
+        }
+      ],
+      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java",
+      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     <!--POJO deployer , this will alow users to drop .class file and make that into a service-->\n",
+            "     <deployer extension=\".class\" directory=\"pojo\" class=\"org.apache.axis2.deployment.POJODeployer\"/>\n",
+            " \n",
+            "+    <deployer extension=\".aar\" directory=\"services\" class=\"org.apache.axis2.deployment.ServiceDeployer\">\n",
+            "+        <serviceBuilderExtension name =\"jwsbuilderExt\" class=\"org.apache.axis2.jaxws.framework.JAXWSServiceBuilderExtension\"/>\n",
+            "+        <serviceBuilderExtension name =\"jwsbuilderExt\" class=\"org.apache.axis2.deployment.WSDLServiceBuilderExtension\"/>\n",
+            "+    </deployer>\n",
+            "+\n",
+            "     <!-- Following parameter will set the host name for the epr-->\n",
+            "     <!--<parameter name=\"hostname\" locked=\"true\">myhost.com</parameter>-->\n",
+            " \n"
+          ],
+          "locn": "-76,6 +76,11"
+        }
+      ],
+      "from": "java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_jms.xml",
+      "to": "java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_jms.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     <!--POJO deployer , this will alow users to drop .class file and make that into a service-->\n",
+            "     <deployer extension=\".class\" directory=\"pojo\" class=\"org.apache.axis2.deployment.POJODeployer\"/>\n",
+            " \n",
+            "+    <deployer extension=\".aar\" directory=\"services\" class=\"org.apache.axis2.deployment.ServiceDeployer\">\n",
+            "+        <serviceBuilderExtension name =\"jwsbuilderExt\" class=\"org.apache.axis2.jaxws.framework.JAXWSServiceBuilderExtension\"/>\n",
+            "+        <serviceBuilderExtension name =\"jwsbuilderExt\" class=\"org.apache.axis2.deployment.WSDLServiceBuilderExtension\"/>\n",
+            "+    </deployer>\n",
+            "+\n",
+            "     <!-- Following parameter will set the host name for the epr-->\n",
+            "     <!--<parameter name=\"hostname\" locked=\"true\">myhost.com</parameter>-->\n",
+            " \n"
+          ],
+          "locn": "-76,6 +76,11"
+        }
+      ],
+      "from": "java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_def.xml",
+      "to": "java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_def.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     <!--POJO deployer , this will alow users to drop .class file and make that into a service-->\n",
+            "     <deployer extension=\".class\" directory=\"pojo\" class=\"org.apache.axis2.deployment.POJODeployer\"/>\n",
+            " \n",
+            "+    <deployer extension=\".aar\" directory=\"services\" class=\"org.apache.axis2.deployment.ServiceDeployer\">\n",
+            "+        <serviceBuilderExtension name =\"jwsbuilderExt\" class=\"org.apache.axis2.jaxws.framework.JAXWSServiceBuilderExtension\"/>\n",
+            "+        <serviceBuilderExtension name =\"jwsbuilderExt\" class=\"org.apache.axis2.deployment.WSDLServiceBuilderExtension\"/>\n",
+            "+    </deployer>\n",
+            "+\n",
+            "     <!-- Following parameter will set the host name for the epr-->\n",
+            "     <!--<parameter name=\"hostname\" locked=\"true\">myhost.com</parameter>-->\n",
+            " \n"
+          ],
+          "locn": "-76,6 +76,11"
+        }
+      ],
+      "from": "java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_clustering.xml",
+      "to": "java/modules/integration/src/test/resources/axis2Xml/axis2Server/axis2_clustering.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "+/*\n",
+            "+ * Licensed to the Apache Software Foundation (ASF) under one\n",
+            "+ * or more contributor license agreements.  See the NOTICE file\n",
+            "+ * distributed with this work for additional information\n",
+            "+ * regarding copyright ownership.  The ASF licenses this file\n",
+            "+ * to you under the Apache License, Version 2.0 (the\n",
+            "+ * \"License\"); you may not use this file except in compliance\n",
+            "+ * with the License.  You may obtain a copy of the License at\n",
+            "+ *\n",
+            "+ * http://www.apache.org/licenses/LICENSE-2.0\n",
+            "+ *\n",
+            "+ * Unless required by applicable law or agreed to in writing,\n",
+            "+ * software distributed under the License is distributed on an\n",
+            "+ *  * \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n",
+            "+ * KIND, either express or implied.  See the License for the\n",
+            "+ * specific language governing permissions and limitations\n",
+            "+ * under the License.\n",
+            "+ */\n",
+            "+\n",
+            "+package org.apache.synapse.message.store;\n",
+            "+\n",
+            "+import junit.framework.TestCase;\n",
+            "+import org.apache.synapse.MessageContext;\n",
+            "+import org.apache.synapse.mediators.TestUtils;\n",
+            "+\n",
+            "+import java.util.List;\n",
+            "+import java.util.NoSuchElementException;\n",
+            "+\n",
+            "+public class InMemoryMessageStoreTest extends TestCase {\n",
+            "+    \n",
+            "+    public void testBasics() throws Exception {\n",
+            "+        MessageStore store = new InMemoryMessageStore();\n",
+            "+        populateStore(store, 10);\n",
+            "+        \n",
+            "+        // test size()\n",
+            "+        assertEquals(10, store.size());\n",
+            "+        \n",
+            "+        // test get(index)\n",
+            "+        for (int i = 0; i < 10; i++) {\n",
+            "+            assertEquals(\"ID\" + i, store.get(i).getMessageID());\n",
+            "+        }\n",
+            "+\n",
+            "+        // test get(messageId)\n",
+            "+        for (int i = 0; i < 10; i++) {\n",
+            "+            assertEquals(\"ID\" + i, store.get(\"ID\" + i).getMessageID());\n",
+            "+        }\n",
+            "+        \n",
+            "+        // test getAll()\n",
+            "+        List<MessageContext> list = store.getAll();\n",
+            "+        assertEquals(10, list.size());\n",
+            "+        for (int i = 0; i < 10; i++) {\n",
+            "+            assertEquals(\"ID\" + i, list.get(i).getMessageID());\n",
+            "+        }\n",
+            "+        \n",
+            "+        // test peek()\n",
+            "+        assertEquals(\"ID0\", store.peek().getMessageID());\n",
+            "+        \n",
+            "+        // test poll()\n",
+            "+        for (int i = 0; i < 10; i++) {\n",
+            "+            assertEquals(\"ID\" + i, store.poll().getMessageID());\n",
+            "+        }\n",
+            "+\n",
+            "+        populateStore(store, 10);\n",
+            "+\n",
+            "+        // test remove()\n",
+            "+        for (int i = 0; i < 10; i++) {\n",
+            "+            assertEquals(\"ID\" + i, store.remove().getMessageID());\n",
+            "+        }\n",
+            "+        try {\n",
+            "+            store.remove();\n",
+            "+            fail();\n",
+            "+        } catch (NoSuchElementException expected) {\n",
+            "+\n",
+            "+        }\n",
+            "+\n",
+            "+        populateStore(store, 10);\n",
+            "+\n",
+            "+        // test clear()\n",
+            "+        assertEquals(10, store.size());\n",
+            "+        store.clear();\n",
+            "+        assertEquals(0, store.size());\n",
+            "+    }\n",
+            "+    \n",
+            "+    public void testOrderedDelivery1() throws Exception {\n",
+            "+        MessageStore store = new InMemoryMessageStore();        \n",
+            "+\n",
+            "+        for (int i = 0; i < 100; i++) {\n",
+            "+            store.offer(createMessageContext(\"ID\" + i));\n",
+            "+        }\n",
+            "+        \n",
+            "+        for (int i = 0; i < 100; i++) {\n",
+            "+            assertEquals(\"ID\" + i, store.poll().getMessageID());\n",
+            "+        }\n",
+            "+    }\n",
+            "+    \n",
+            "+    public void testOrderedDelivery2() throws  Exception {\n",
+            "+        MessageStore store = new InMemoryMessageStore();\n",
+            "+        store.offer(createMessageContext(\"FOO\"));\n",
+            "+\n",
+            "+        MessageContext msg = store.peek();\n",
+            "+        assertEquals(\"FOO\", msg.getMessageID());\n",
+            "+\n",
+            "+        store.offer(createMessageContext(\"BAR\"));\n",
+            "+        msg = store.poll();\n",
+            "+        assertEquals(\"FOO\", msg.getMessageID());\n",
+            "+\n",
+            "+        msg = store.peek();\n",
+            "+        assertEquals(\"BAR\", msg.getMessageID());\n",
+            "+    }\n",
+            "+    \n",
+            "+    private MessageContext createMessageContext(String identifier) throws Exception {\n",
+            "+        MessageContext msg = TestUtils.createLightweightSynapseMessageContext(\"<test/>\");\n",
+            "+        msg.setMessageID(identifier);\n",
+            "+        return msg;\n",
+            "+    }\n",
+            "+    \n",
+            "+    private void populateStore(MessageStore store, int count) throws Exception {\n",
+            "+        for (int i = 0; i < count; i++) {\n",
+            "+            store.offer(createMessageContext(\"ID\" + i));\n",
+            "+        }\n",
+            "+    }\n",
+            "+}\n"
+          ],
+          "locn": "-0,0 +1,122"
+        }
+      ],
+      "from": "java/modules/core/src/test/java/org/apache/synapse/message/store/InMemoryMessageStoreTest.java",
+      "to": "java/modules/core/src/test/java/org/apache/synapse/message/store/InMemoryMessageStoreTest.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import javax.xml.transform.Source;\n",
+            " import javax.xml.transform.dom.DOMSource;\n",
+            " \n",
+            "+import org.apache.axiom.om.OMAbstractFactory;\n",
+            " import org.apache.axiom.om.OMElement;\n",
+            "-import org.apache.axiom.om.impl.dom.DOOMAbstractFactory;\n",
+            " import org.apache.axiom.om.util.ElementHelper;\n",
+            " import org.w3c.dom.Element;\n",
+            " \n"
+          ],
+          "locn": "-22,8 +22,8"
+        },
+        {
+          "lines": [
+            " public class DOOMSourceBuilder implements SourceBuilder {\n",
+            "     public Source getSource(OMElement node) {\n",
+            "         return new DOMSource(\n",
+            "-                ((Element) ElementHelper.importOMElement(node,\n",
+            "-                DOOMAbstractFactory.getOMFactory())).getOwnerDocument());\n",
+            "+                ((Element) ElementHelper.importOMElement(node, OMAbstractFactory.getMetaFactory(\n",
+            "+                        OMAbstractFactory.FEATURE_DOM).getOMFactory())).getOwnerDocument());\n",
+            "     }\n",
+            " \n",
+            "     public void release() {\n"
+          ],
+          "locn": "-34,8 +34,8"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/util/jaxp/DOOMSourceBuilder.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/util/jaxp/DOOMSourceBuilder.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.axis2.addressing.RelatesTo;\n",
+            " import org.apache.axis2.client.OperationClient;\n",
+            " import org.apache.axis2.client.Options;\n",
+            "-import org.apache.axis2.client.async.Callback;\n",
+            " import org.apache.axis2.context.ConfigurationContext;\n",
+            " import org.apache.axis2.context.MessageContext;\n",
+            " import org.apache.axis2.context.ServiceContext;\n"
+          ],
+          "locn": "-26,7 +26,6"
+        },
+        {
+          "lines": [
+            " \t\t\treturn oc.getMessageContext(messageLabel);\n",
+            " \t\t}\n",
+            " \n",
+            "-        /**\n",
+            "-         * same as OutInAxisOperationClient\n",
+            "-         */\n",
+            "-        public void setCallback(Callback callback) {\n",
+            "-\t\t\tthis.callback = callback;\n",
+            "-\t\t}\n",
+            "-\n",
+            " \t\tpublic void executeImpl(boolean block) throws AxisFault {\n",
+            " \n",
+            "             // if the MEP is completed, throw a fault\n"
+          ],
+          "locn": "-84,13 +83,6"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/DynamicAxisOperation.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/DynamicAxisOperation.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.synapse.MessageContext;\n",
+            " \n",
+            " import java.util.*;\n",
+            "-import java.util.concurrent.ConcurrentHashMap;\n",
+            "+import java.util.concurrent.ConcurrentLinkedQueue;\n",
+            " import java.util.concurrent.locks.Lock;\n",
+            " import java.util.concurrent.locks.ReentrantLock;\n",
+            " \n"
+          ],
+          "locn": "-24,7 +24,7"
+        },
+        {
+          "lines": [
+            "     private static final Log log = LogFactory.getLog(InMemoryMessageStore.class);\n",
+            " \n",
+            "     /** The map that keeps the stored messages */\n",
+            "-    private Map<String, MessageContext> messageList = new ConcurrentHashMap<String, MessageContext>();\n",
+            "+    private Queue<MessageContext> messageList = new ConcurrentLinkedQueue<MessageContext>();\n",
+            " \n",
+            "     private Lock lock = new ReentrantLock();\n",
+            " \n"
+          ],
+          "locn": "-36,7 +36,7"
+        },
+        {
+          "lines": [
+            "         try {\n",
+            "             if (messageContext != null) {\n",
+            "                 messageContext.getEnvelope().build();\n",
+            "-                messageList.put(messageContext.getMessageID(), messageContext);\n",
+            "-                /** Notify observers */\n",
+            "+                messageList.offer(messageContext);\n",
+            "+                // Notify observers\n",
+            "                 notifyMessageAddition(messageContext.getMessageID());\n",
+            "                 if (log.isDebugEnabled()) {\n",
+            "-                    log.debug(\"Message with id \" + messageContext.getMessageID() +\n",
+            "-                            \" stored\");\n",
+            "+                    log.debug(\"Message with id \" + messageContext.getMessageID() + \" stored\");\n",
+            "                 }\n",
+            "             }\n",
+            "         } finally {\n"
+          ],
+          "locn": "-45,12 +45,11"
+        },
+        {
+          "lines": [
+            " \n",
+            "     public MessageContext poll() {\n",
+            "         lock.lock();\n",
+            "-        MessageContext context;\n",
+            "         try {\n",
+            "-            context = peek();\n",
+            "-            if(context !=null) {\n",
+            "-                messageList.remove(context.getMessageID());\n",
+            "-                /** Notify observers */\n",
+            "+            MessageContext context = messageList.poll();\n",
+            "+            if (context != null) {\n",
+            "+                // notify observers\n",
+            "                 notifyMessageRemoval(context.getMessageID());\n",
+            "             }\n",
+            "+            return context;\n",
+            "         } finally {\n",
+            "             lock.unlock();\n",
+            "         }\n",
+            "-        return context;\n",
+            "     }\n",
+            " \n",
+            "     public MessageContext peek() {\n",
+            "-        if (messageList.size() > 0) {\n",
+            "-            return (MessageContext) messageList.values().toArray()[0];\n",
+            "-        }\n",
+            "-\n",
+            "-        return null;\n",
+            "+        return messageList.peek();        \n",
+            "     }\n",
+            " \n",
+            "     public MessageContext remove() throws NoSuchElementException {\n",
+            "-        MessageContext context = poll();\n",
+            "-        if(context == null) {\n",
+            "-            throw  new NoSuchElementException();\n",
+            "+        lock.lock();\n",
+            "+        try {\n",
+            "+            MessageContext msgCtx = messageList.remove();\n",
+            "+            if (msgCtx != null) {\n",
+            "+                notifyMessageRemoval(msgCtx.getMessageID());\n",
+            "+            }\n",
+            "+            return msgCtx;\n",
+            "+        } finally {\n",
+            "+            lock.unlock();\n",
+            "         }\n",
+            "-\n",
+            "-        return context;\n",
+            "-\n",
+            "     }\n",
+            " \n",
+            "     public MessageContext get(int index) {\n",
+            "-        if(index >=0 && index < messageList.size()) {\n",
+            "-            return (MessageContext) messageList.values().toArray()[index];\n",
+            "+        lock.lock();\n",
+            "+        try {\n",
+            "+            if (index >= 0 && index < messageList.size()) {\n",
+            "+                int i = 0;\n",
+            "+                for (MessageContext msgCtx : messageList) {\n",
+            "+                    if (index == i) {\n",
+            "+                        return msgCtx;\n",
+            "+                    }\n",
+            "+                    i++;\n",
+            "+                }\n",
+            "+            }\n",
+            "+            return null;\n",
+            "+        } finally {\n",
+            "+            lock.unlock();\n",
+            "         }\n",
+            "-        return null;\n",
+            "     }\n",
+            " \n",
+            "     public MessageContext remove(String messageID) {\n"
+          ],
+          "locn": "-62,43 +61,51"
+        },
+        {
+          "lines": [
+            "         lock.lock();\n",
+            "         try {\n",
+            "             if (messageID != null) {\n",
+            "-               if(messageList.remove(messageID) != null) {\n",
+            "-                   /** Notify observers */\n",
+            "+                MessageContext removable = null;\n",
+            "+                for (MessageContext msgCtx : messageList) {\n",
+            "+                    if (msgCtx.getMessageID().equals(messageID)) {\n",
+            "+                        removable = msgCtx;\n",
+            "+                        break;\n",
+            "+                    }\n",
+            "+                }\n",
+            "+\n",
+            "+                if (removable != null && messageList.remove(removable)) {\n",
+            "                     notifyMessageRemoval(messageID);\n",
+            "-               }\n",
+            "-\n",
+            "+                }\n",
+            "             }\n",
+            "         } finally {\n",
+            "             lock.unlock();\n"
+          ],
+          "locn": "-105,11 +112,17"
+        },
+        {
+          "lines": [
+            "     public void clear() {\n",
+            "         lock.lock();\n",
+            "         try {\n",
+            "-\n",
+            "-            for (String k : messageList.keySet()) {\n",
+            "-                messageList.remove(k);\n",
+            "-                /** Notify observers */\n",
+            "-                notifyMessageRemoval(k);\n",
+            "+            while (!messageList.isEmpty()) {\n",
+            "+                // We need to call remove() here because we need the notifications\n",
+            "+                // to get fired properly for each removal\n",
+            "+                remove();\n",
+            "             }\n",
+            "         } finally {\n",
+            "             lock.unlock();\n"
+          ],
+          "locn": "-120,11 +133,10"
+        },
+        {
+          "lines": [
+            "         lock.lock();\n",
+            "         try {\n",
+            "             List<MessageContext> returnList = new ArrayList<MessageContext>();\n",
+            "-            for (Map.Entry<String, MessageContext> entry : messageList.entrySet()) {\n",
+            "-                returnList.add(entry.getValue());\n",
+            "-            }\n",
+            "+            returnList.addAll(messageList);\n",
+            "             return returnList;\n",
+            "         } finally {\n",
+            "             lock.unlock();\n"
+          ],
+          "locn": "-135,9 +147,7"
+        },
+        {
+          "lines": [
+            "         lock.lock();\n",
+            "         try {\n",
+            "             if (messageId != null) {\n",
+            "-                return messageList.get(messageId);\n",
+            "+                for (MessageContext msgCtx : messageList) {\n",
+            "+                    if (msgCtx.getMessageID().equals(messageId)) {\n",
+            "+                        return msgCtx;\n",
+            "+                    }\n",
+            "+                }\n",
+            "             }\n",
+            "         } finally {\n",
+            "             lock.unlock();\n"
+          ],
+          "locn": "-148,7 +158,11"
+        },
+        {
+          "lines": [
+            "         return null;\n",
+            "     }\n",
+            " \n",
+            "-\n",
+            "     public int size() {\n",
+            "         return messageList.size();\n",
+            "     }\n"
+          ],
+          "locn": "-156,7 +170,6"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/message/store/InMemoryMessageStore.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/message/store/InMemoryMessageStore.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             <artifactId>synapse-vfs-transport</artifactId>\n",
+            "             <scope>test</scope>\n",
+            "         </dependency>\n",
+            "+        <dependency>\n",
+            "+            <groupId>org.apache.ws.commons.axiom</groupId>\n",
+            "+            <artifactId>axiom-dom</artifactId>\n",
+            "+        </dependency>\n",
+            " \t    <dependency>\n",
+            " \t        <!-- Required for validate mediator tests on JDK 5 -->\n",
+            "             <groupId>xerces</groupId>\n"
+          ],
+          "locn": "-283,6 +283,10"
+        }
+      ],
+      "from": "java/modules/core/pom.xml",
+      "to": "java/modules/core/pom.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " package org.apache.synapse.mediators.bsf;\n",
+            " \n",
+            " import org.apache.axiom.om.OMElement;\n",
+            "+import org.apache.axiom.om.OMText;\n",
+            " import org.apache.axiom.om.impl.llom.OMTextImpl;\n",
+            " import org.apache.synapse.Mediator;\n",
+            " import org.apache.synapse.config.xml.AbstractMediatorSerializer;\n"
+          ],
+          "locn": "-19,6 +19,7"
+        },
+        {
+          "lines": [
+            "             }\n",
+            "         } else {\n",
+            "             script.addAttribute(fac.createOMAttribute(\"language\", nullNS, language));\n",
+            "-            OMTextImpl textData = (OMTextImpl) fac.createOMText(\n",
+            "-                    scriptMediator.getScriptSrc().trim());\n",
+            "-            textData.setType(XMLStreamConstants.CDATA);\n",
+            "+            OMText textData = fac.createOMText(scriptMediator.getScriptSrc().trim(),\n",
+            "+                    XMLStreamConstants.CDATA);\n",
+            "             script.addChild(textData);\n",
+            "         }\n",
+            " \n"
+          ],
+          "locn": "-61,9 +62,8"
+        }
+      ],
+      "from": "java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMediatorSerializer.java",
+      "to": "java/modules/extensions/src/main/java/org/apache/synapse/mediators/bsf/ScriptMediatorSerializer.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            " import net.sf.saxon.javax.xml.xquery.*;\n",
+            " import net.sf.saxon.xqj.SaxonXQDataSource;\n",
+            "+import org.apache.axiom.om.OMAbstractFactory;\n",
+            " import org.apache.axiom.om.OMElement;\n",
+            " import org.apache.axiom.om.OMNode;\n",
+            " import org.apache.axiom.om.OMText;\n",
+            " import org.apache.axiom.om.impl.builder.StAXOMBuilder;\n",
+            "-import org.apache.axiom.om.impl.dom.DOOMAbstractFactory;\n",
+            " import org.apache.axiom.om.util.ElementHelper;\n",
+            " import org.apache.synapse.MessageContext;\n",
+            " import org.apache.synapse.SynapseException;\n"
+          ],
+          "locn": "-20,11 +20,11"
+        },
+        {
+          "lines": [
+            "                 xqDynamicContext.\n",
+            "                         bindObject(name,\n",
+            "                                 new DOMSource(((Element) ElementHelper.\n",
+            "-                                        importOMElement(variableValue,\n",
+            "-                                                DOOMAbstractFactory.getOMFactory())).\n",
+            "+                                        importOMElement(variableValue, OMAbstractFactory.getMetaFactory(\n",
+            "+                                                OMAbstractFactory.FEATURE_DOM).getOMFactory())).\n",
+            "                                         getOwnerDocument()), null);\n",
+            "             } else {\n",
+            "                 xqDynamicContext.bindDocument(name,\n"
+          ],
+          "locn": "-611,8 +611,8"
+        }
+      ],
+      "from": "java/modules/extensions/src/main/java/org/apache/synapse/mediators/xquery/XQueryMediator.java",
+      "to": "java/modules/extensions/src/main/java/org/apache/synapse/mediators/xquery/XQueryMediator.java"
+    }
+  ],
+  "id": "1349221",
+  "message": "Fixing some compilation errors caused by API changes in Axis2 and Axiom. Updated the sample server axis2.xml files to be consistent with the changes recently made in the Axis2 ServiceDeployer. Fixing a race condition in the in memory message store.",
+  "when": "2012-06-12T05:57:32-04:00",
+  "who": "hiranya"
+}

@@ -1,0 +1,19 @@
+Index: java/modules/distribution/src/main/bin/synapse.sh
+===================================================================
+--- java/modules/distribution/src/main/bin/synapse.sh	(revision 1776083)
++++ java/modules/distribution/src/main/bin/synapse.sh	(revision 1776084)
+@@ -169,7 +169,7 @@
+ echo "Using JAVA_HOME:       $JAVA_HOME"
+ echo "Using SYNAPSE_XML:     $SYNAPSE_XML"
+ 
+-$JAVA_HOME/bin/java -server -Xms128M -Xmx128M \
++$JAVA_HOME/bin/java -server -Xms512M -Xmx512M \
+     $XDEBUG \
+     $TEMP_PROPS \
+     -Dorg.apache.xerces.xni.parser.XMLParserConfiguration=org.apache.xerces.parsers.XMLGrammarCachingConfiguration \
+-*-*-*-
+Message: Increase default heap allocation to 512M
+-*-*-*-
+When: 2016-12-26 22:01:32 -0500 
+-*-*-*-
+Who: isudana

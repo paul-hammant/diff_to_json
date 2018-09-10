@@ -1,0 +1,54 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     }\n",
+            " \n",
+            "     public Member getNextApplicationMember(String host) {\n",
+            "-        DomainAlgorithmContext domainAlgorithmContext = hostDomainAlgorithmContextMap.get(host);\n",
+            "-        if(domainAlgorithmContext == null) {\n",
+            "-            throw new SynapseException(\"Domain not found for host\" + host);\n",
+            "-        }\n",
+            "+        DomainAlgorithmContext domainAlgorithmContext = getDomainAlgorithmContext(host);\n",
+            "         String lbDomain = domainAlgorithmContext.getDomain();\n",
+            "         LoadbalanceAlgorithm algorithm = domainAlgorithmContext.getAlgorithm();\n",
+            "         GroupManagementAgent groupMgtAgent = clusteringAgent.getGroupManagementAgent(lbDomain);\n"
+          ],
+          "locn": "-96,10 +96,7"
+        },
+        {
+          "lines": [
+            "         return algorithm.getNextApplicationMember(context);\n",
+            "     }\n",
+            " \n",
+            "+    private DomainAlgorithmContext getDomainAlgorithmContext(String host) {\n",
+            "+        DomainAlgorithmContext domainAlgorithmContext = hostDomainAlgorithmContextMap.get(host);\n",
+            "+        if(domainAlgorithmContext == null) {\n",
+            "+            int indexOfDot;\n",
+            "+            if ((indexOfDot = host.indexOf(\".\")) != -1) {\n",
+            "+                domainAlgorithmContext = getDomainAlgorithmContext(host.substring(indexOfDot + 1));\n",
+            "+            } else {\n",
+            "+                throw new SynapseException(\"Domain not found for host\" + host);\n",
+            "+            }\n",
+            "+        }\n",
+            "+        return domainAlgorithmContext;\n",
+            "+    }\n",
+            "+\n",
+            "     public LoadbalanceAlgorithm getLoadbalanceAlgorithm() {\n",
+            "         return null;\n",
+            "     }\n"
+          ],
+          "locn": "-115,6 +112,19"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/ServiceLoadBalanceMembershipHandler.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/ServiceLoadBalanceMembershipHandler.java"
+    }
+  ],
+  "id": "1213668",
+  "message": "Dispatch *.foo.com sort of request hosts to clusters mapped to foo.com \n\n",
+  "when": "2011-12-13T07:56:15-05:00",
+  "who": "azeez"
+}

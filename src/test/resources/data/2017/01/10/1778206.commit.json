@@ -1,0 +1,93 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "-# Licensed to the Apache Software Foundation (ASF) under one\n",
+            "-# or more contributor license agreements.  See the NOTICE file\n",
+            "-# distributed with this work for additional information\n",
+            "-# regarding copyright ownership.  The ASF licenses this file\n",
+            "-# to you under the Apache License, Version 2.0 (the\n",
+            "-# \"License\"); you may not use this file except in compliance\n",
+            "-# with the License.  You may obtain a copy of the License at\n",
+            "-# \n",
+            "-#   http://www.apache.org/licenses/LICENSE-2.0\n",
+            "-# \n",
+            "-# Unless required by applicable law or agreed to in writing,\n",
+            "-# software distributed under the License is distributed on an\n",
+            "-# \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n",
+            "-# KIND, either express or implied.  See the License for the\n",
+            "-# specific language governing permissions and limitations\n",
+            "-# under the License.\n",
+            "-\n",
+            "-product.name=Apache Synapse\n",
+            "-product.version=3.0.0\n",
+            "-\n"
+          ],
+          "locn": "-1,20 +0,0"
+        }
+      ],
+      "from": "java/modules/core/src/test/resources/synapse-libraries/assembly/filter.properties",
+      "to": "java/modules/core/src/test/resources/synapse-libraries/assembly/filter.properties"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                         </goals>\n",
+            "                         <configuration>\n",
+            "                             <finalName>synapse</finalName>\t\n",
+            "-                            <filters>\n",
+            "-                                <filter>\n",
+            "-                                    ${basedir}/src/test/resources/synapse-libraries/assembly/filter.properties\n",
+            "-                                </filter>\n",
+            "-                            </filters>\n",
+            "                             <descriptors>\n",
+            "                                 <descriptor>src/test/resources/synapse-libraries/assembly/assemble-lib.xml\n",
+            "                                 </descriptor>\n"
+          ],
+          "locn": "-82,11 +82,6"
+        },
+        {
+          "lines": [
+            "                         </goals>\n",
+            "                         <configuration>\n",
+            "                             <finalName>synapse</finalName>\n",
+            "-                            <filters>\n",
+            "-                                <filter>\n",
+            "-                                    ${basedir}/src/test/resources/synapse-libraries/assembly/filter.properties\n",
+            "-                                </filter>\n",
+            "-                            </filters>\n",
+            "                             <descriptors>\n",
+            "                                 <descriptor>src/test/resources/synapse-libraries/assembly/assemble-eiptest-lib.xml\n",
+            "                                 </descriptor>\n"
+          ],
+          "locn": "-101,11 +96,6"
+        },
+        {
+          "lines": [
+            "                         </goals>\n",
+            "                         <configuration>\n",
+            "                             <finalName>synapse</finalName>\n",
+            "-                            <filters>\n",
+            "-                                <filter>\n",
+            "-                                    ${basedir}/src/test/resources/synapse-libraries/assembly/filter.properties\n",
+            "-                                </filter>\n",
+            "-                            </filters>\n",
+            "                             <descriptors>\n",
+            "                                 <descriptor>src/test/resources/synapse-libraries/assembly/assemble-eipcore-lib.xml\n",
+            "                                 </descriptor>\n"
+          ],
+          "locn": "-120,11 +110,6"
+        }
+      ],
+      "from": "java/modules/core/pom.xml",
+      "to": "java/modules/core/pom.xml"
+    }
+  ],
+  "id": "1778206",
+  "message": "Remove unused filter.properties.",
+  "when": "2017-01-10T16:33:19-05:00",
+  "who": "veithen"
+}

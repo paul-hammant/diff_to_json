@@ -1,0 +1,106 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     public static final String CONTENT_TYPE = \"CONTENT_TYPE\";\n",
+            " \n",
+            "     public static final String DEFAULT_CONTENT_TYPE = \"application/octet-stream\";\n",
+            "+    public static final String CONTENT_TYPE_MULTIPART_RELATED = \"multipart/related\";\n",
+            " \n",
+            "     public static final String HIDDEN_SERVICE_PARAM_NAME = \"hiddenService\";\n",
+            " \n"
+          ],
+          "locn": "-53,6 +53,7"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughConstants.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughConstants.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         \n",
+            "        \n",
+            "         //fix for  POST_TO_URI\n",
+            "-        if(requestMsgCtx.isPropertyTrue(NhttpConstants.POST_TO_URI)){\n",
+            "+        if (requestMsgCtx.isPropertyTrue(NhttpConstants.POST_TO_URI)){\n",
+            "         \tpath = url.toString();\n",
+            "         }\n",
+            "+\n",
+            "+        Object o = requestMsgCtx.getProperty(MessageContext.TRANSPORT_HEADERS);\n",
+            "+        if (o != null && o instanceof Map) {\n",
+            "+            Map _headers = (Map) o;\n",
+            "+            String trpContentType = (String) _headers.get(HTTP.CONTENT_TYPE);\n",
+            "+            if (trpContentType != null && !trpContentType.equals(\"\")) {\n",
+            "+                if (trpContentType.contains(PassThroughConstants.CONTENT_TYPE_MULTIPART_RELATED) &&\n",
+            "+                    !requestMsgCtx.isPropertyTrue(PassThroughConstants.MESSAGE_BUILDER_INVOKED)) {\n",
+            "+                    // If the message is multipart/related but it hasn't been built\n",
+            "+                    // we can copy the content-type header of the request\n",
+            "+                    headers.put(HTTP.CONTENT_TYPE, trpContentType);\n",
+            "+                }\n",
+            "+            }\n",
+            "+        }\n",
+            "                                                             \n",
+            "         if (hasEntityBody) {\n",
+            "             request = new BasicHttpEntityEnclosingRequest(method, path,\n"
+          ],
+          "locn": "-130,9 +130,23"
+        },
+        {
+          "lines": [
+            "         }\n",
+            "         \n",
+            "         //setup wsa action..\n",
+            "-        if(request != null){\n",
+            "+        if (request != null){\n",
+            "         \t\n",
+            "     \t\tString soapAction = requestMsgCtx.getSoapAction();\n",
+            "             if (soapAction == null) {\n"
+          ],
+          "locn": "-159,7 +173,7"
+        },
+        {
+          "lines": [
+            " \t * \n",
+            " \t * @param conn\n",
+            " \t * @param requestMsgCtx\n",
+            "-\t * @param disableChunking\n",
+            "+\n",
+            " \t * @throws IOException\n",
+            " \t * @throws AxisFault\n",
+            " \t */\n"
+          ],
+          "locn": "-225,7 +239,7"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetRequest.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetRequest.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            "         //Endpoint\n",
+            "         sampleClassRepo.put(\"50\", Sample50.class);\n",
+            "-        //sampleClassRepo.put(\"51\", Sample51.class);\n",
+            "+        sampleClassRepo.put(\"51\", Sample51.class);\n",
+            "         sampleClassRepo.put(\"52\", Sample52.class);\n",
+            "         sampleClassRepo.put(\"53\", Sample53.class);\n",
+            "         sampleClassRepo.put(\"54\", Sample54.class);\n"
+          ],
+          "locn": "-177,7 +177,7"
+        }
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java"
+    }
+  ],
+  "id": "1502733",
+  "message": "Fixing MTOM, SwA mediation and re-enabling sample51 integration test",
+  "when": "2013-07-12T21:05:21-04:00",
+  "who": "hiranya"
+}

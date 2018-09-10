@@ -1,0 +1,26 @@
+Index: java/src/site/xdoc/Synapse_Samples.xml
+===================================================================
+--- java/src/site/xdoc/Synapse_Samples.xml	(revision 1210936)
++++ java/src/site/xdoc/Synapse_Samples.xml	(revision 1210937)
+@@ -1807,7 +1807,13 @@
+ &lt;/definitions&gt;
+ </pre>
+ <p>
+-<strong>Objective: Demonstrate Service-aware dynamic load balancing between a couple of nodes which belong to two different Services. Here, the word Service is used in the context of Cloud Service. A Cloud Service consists of a number of nodes. In this context, a Cloud Service is also associated with a clustering domain</strong> </p>
++<strong>
++    Objective: Demonstrate Service-aware dynamic load balancing between a couple of nodes which belong to two different Services.
++    Here, the word Service is used in the context of Cloud Service. A Cloud Service consists of a number of nodes.
++    In this context, a Cloud Service is also associated with a clustering domain. 
++    This can be used in place of the DynamicLoadbalanceEndpoint as well.
++</strong>
++</p>
+ <p>
+ <strong>Prerequisites:</strong>
+ <br/>
+-*-*-*-
+Message: Added more info about the ServiceDynamicLoadbalanceEndpoint
+
+-*-*-*-
+When: 2011-12-06 09:36:04 -0500 
+-*-*-*-
+Who: azeez

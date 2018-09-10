@@ -1,0 +1,49 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            " <p>\n",
+            " <strong>\n",
+            "     Objective: Demonstrate Service-aware dynamic load balancing between a couple of nodes which belong to two different Services.\n",
+            "+</strong>    \n",
+            "+</p>\n",
+            "+<p>\n",
+            "     Here, the word Service is used in the context of Cloud Service. A Cloud Service consists of a number of nodes.\n",
+            "     In this context, a Cloud Service is also associated with a clustering domain. \n",
+            "     This can be used in place of the DynamicLoadbalanceEndpoint as well.\n",
+            "-</strong>\n",
+            " </p>\n",
+            " <p>\n",
+            " <strong>Prerequisites:</strong>\n"
+          ],
+          "locn": "-1809,10 +1809,12"
+        },
+        {
+          "lines": [
+            " <br/>\n",
+            " Put the following entries into the /etc/hosts file on your machine.\n",
+            " \n",
+            "-<pre>\n",
+            "-127.0.0.1&nbsp;&nbsp;&nbsp;test1.synapse.apache.org\n",
+            "-127.0.0.1&nbsp;&nbsp;&nbsp;test2.synapse.apache.org\n",
+            "+<pre xml:space=\"preserve\">\n",
+            "+127.0.0.1    test1.synapse.apache.org\n",
+            "+127.0.0.1    test2.synapse.apache.org\n",
+            " </pre>\n",
+            " \n",
+            " <br/>Enable clustering in the &lt;Synapse installation directory&gt;/ repository/conf/axis2.xml file. This can be done by setting the &quot;enable&quot; attribute of the &quot;clustering&quot; element.\n"
+          ],
+          "locn": "-1819,9 +1821,9"
+        }
+      ],
+      "from": "java/src/site/xdoc/Synapse_Samples.xml",
+      "to": "java/src/site/xdoc/Synapse_Samples.xml"
+    }
+  ],
+  "id": "1211838",
+  "message": "committing patch for https://issues.apache.org/jira/browse/SYNAPSE-822",
+  "when": "2011-12-08T06:23:50-05:00",
+  "who": "uswick"
+}

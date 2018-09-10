@@ -1,0 +1,30 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             <scope>test</scope>\n",
+            "         </dependency>\n",
+            "         <dependency>\n",
+            "+            <groupId>org.apache.axis2</groupId>\n",
+            "+            <artifactId>axis2-json</artifactId>\n",
+            "+            <scope>test</scope>\n",
+            "+        </dependency>\n",
+            "+        <dependency>\n",
+            "             <groupId>org.apache.synapse</groupId>\n",
+            "             <artifactId>synapse-vfs-transport</artifactId>\n",
+            "             <scope>test</scope>\n"
+          ],
+          "locn": "-319,6 +319,11"
+        }
+      ],
+      "from": "java/modules/core/pom.xml",
+      "to": "java/modules/core/pom.xml"
+    }
+  ],
+  "id": "1776227",
+  "message": "Fixing test failure, due to bundling axis2-json in distribution.",
+  "when": "2016-12-27T23:56:11-05:00",
+  "who": "ravi"
+}

@@ -1,0 +1,23 @@
+Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java
+===================================================================
+--- java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java	(revision 1775995)
++++ java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java	(revision 1775996)
+@@ -239,6 +239,12 @@
+             } finally {
+                 if (replyFile != null) {
+                     try {
++                        if (fsManager!= null &&
++                            replyFile.getName() != null && replyFile.getName().getScheme() != null &&
++                            replyFile.getName().getScheme().startsWith("file") &&
++                            replyFile.getParent() != null && replyFile.getParent().getFileSystem() != null) {
++                            fsManager.closeFileSystem(replyFile.getParent().getFileSystem());
++                        }
+                         replyFile.close();
+                     } catch (FileSystemException ignore) {}
+                 }
+-*-*-*-
+Message: Fix for SYNAPSE-998 by Vanji - Patch slightly modified
+-*-*-*-
+When: 2016-12-25 02:22:25 -0500 
+-*-*-*-
+Who: isudana

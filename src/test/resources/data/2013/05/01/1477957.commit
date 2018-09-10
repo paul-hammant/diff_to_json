@@ -1,0 +1,28 @@
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1477956)
++++ java/pom.xml	(revision 1477957)
+@@ -1288,6 +1288,17 @@
+             <email>rajikak AT apache.org</email>
+         </developer>
+         <developer>
++            <name>Kasun Indrasiri</name>
++            <id>kasun</id>
++            <email>kasun AT apache.org</email>
++	    <organization>WSO2</organization>
++        </developer> 
++	<developer>
++            <name>Udayanga Wickramasinghe</name>
++            <id>uswick</id>
++            <email>uswick AT apache.org</email>
++        </developer>
++        <developer>
+             <name>Miyuru Wanninayaka</name>
+             <id>miyuru</id>
+             <email>miyuru AT apache.org</email>
+-*-*-*-
+Message: Updating project list
+-*-*-*-
+When: 2013-05-01 07:43:30 -0400 
+-*-*-*-
+Who: kasun

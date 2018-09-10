@@ -1,0 +1,28 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             }\n",
+            "         }\n",
+            " \n",
+            "-        contentAware = definition != null && (definition.getFormat() != null ||\n",
+            "+        contentAware = definition != null &&\n",
+            "+                ((definition.getFormat() != null && !definition.getFormat().equals(SynapseConstants.FORMAT_REST)) ||\n",
+            "                 definition.isSecurityOn() || definition.isReliableMessagingOn() ||\n",
+            "                 definition.isAddressingOn());\n",
+            "     }\n"
+          ],
+          "locn": "-217,7 +217,8"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/endpoints/AbstractEndpoint.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/endpoints/AbstractEndpoint.java"
+    }
+  ],
+  "id": "1505444",
+  "message": "Applying the patch for SYNAPSE-943. Prevent message building when the endpoint format is set to rest.",
+  "when": "2013-07-21T14:53:18-04:00",
+  "who": "hiranya"
+}

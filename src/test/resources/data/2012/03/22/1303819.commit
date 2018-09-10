@@ -1,0 +1,43 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/rest/API.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/rest/API.java	(revision 1303818)
++++ java/modules/core/src/main/java/org/apache/synapse/rest/API.java	(revision 1303819)
+@@ -66,6 +66,10 @@
+         return name;
+     }
+ 
++    public String getVersion(){
++        return versionStrategy.getVersion();
++    }
++
+     public String getContext() {
+         return context;
+     }
+Index: java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfiguration.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfiguration.java	(revision 1303818)
++++ java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfiguration.java	(revision 1303819)
+@@ -317,7 +317,7 @@
+     public void addAPI(String name, API api) {
+         if (!apiTable.containsKey(name)) {
+             for (API existingAPI : apiTable.values()) {
+-                if (existingAPI.getContext().equals(api.getContext())) {
++                if (api.getVersion().equals(existingAPI.getVersion()) && existingAPI.getContext().equals(api.getContext())) {
+                     handleException("URL context: " + api.getContext() + " is already registered" +
+                             " with the API: " + existingAPI.getName());
+                 }
+@@ -333,7 +333,7 @@
+             handleException("No API exists by the name: " + name);
+         } else {
+             for (API existingAPI : apiTable.values()) {
+-                if (existingAPI.getContext().equals(api.getContext()) && !name.equals(api.getName())) {
++                if (api.getVersion().equals(existingAPI.getVersion()) && existingAPI.getContext().equals(api.getContext()) && !name.equals(api.getName())) {
+                     handleException("URL context: " + api.getContext() + " is already registered" +
+                             " with the API: " + existingAPI.getName());
+                 }
+-*-*-*-
+Message: committing patch for API versioning deployment
+-*-*-*-
+When: 2012-03-22 10:57:08 -0400 
+-*-*-*-
+Who: uswick

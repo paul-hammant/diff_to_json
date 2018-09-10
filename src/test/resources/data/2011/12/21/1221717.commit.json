@@ -1,0 +1,88 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                 </p>\n",
+            "                 <ul>\n",
+            "                     <li>\n",
+            "-                        Place your mediation in <tt>repository/conf/synapse.xml</tt>.\n",
+            "+                        Place your mediation configuration in <tt>repository/conf/synapse-config</tt>\n",
+            "+                        directory.\n",
+            "                     </li>\n",
+            "                     <li>\n",
+            "                         Place any additional files such as WSDL files, endpoint definitions, etc.\n"
+          ],
+          "locn": "-140,7 +140,8"
+        },
+        {
+          "lines": [
+            "                     only a few simple steps. To begin with, change to the directory where you want to\n",
+            "                     create the project and issue the following command:\n",
+            "                 </p>\n",
+            "-                <div class=\"source\">\n",
+            "-                    <div class=\"command\">mvn archetype:generate -DarchetypeCatalog=http://synapse.apache.org</div>\n",
+            "-                </div>\n",
+            "+                <div class=\"command\">mvn archetype:generate -DarchetypeCatalog=http://synapse.apache.org</div>\n",
+            "                 <p>\n",
+            "                     In case of problems, you can try to use the latest version of the archetype catalog:\n",
+            "                 </p>\n",
+            "-                <div class=\"source\">\n",
+            "-                    <div class=\"command\">mvn archetype:generate <br/>-DarchetypeCatalog=http://svn.apache.org/repos/asf/synapse/trunk/java/src/site/resources</div>\n",
+            "-                </div>\n",
+            "+                <div class=\"command\">mvn archetype:generate -DarchetypeCatalog=http://svn.apache.org/repos/asf/synapse/trunk/java/src/site/resources</div>\n",
+            "                 <p>\n",
+            "                     Finally, if you have build Synapse from sources, you don't need to specify a\n",
+            "                     catalog at all: the archetype is added automatically to the local catalog during\n"
+          ],
+          "locn": "-246,15 +247,11"
+        },
+        {
+          "lines": [
+            "                 </p>\n",
+            "                 <ul>\n",
+            "                     <li>\n",
+            "-                        Add your mediation configuration to <tt>repository/conf/synapse.xml</tt>.\n",
+            "+                        Add your mediation configuration to <tt>repository/conf/synapse-config</tt>\n",
+            "+                        directory.\n",
+            "                     </li>\n",
+            "                     <li>\n",
+            "                         Customize the dependencies in <tt>pom.xml</tt>. In particular if additional\n"
+          ],
+          "locn": "-274,7 +271,8"
+        },
+        {
+          "lines": [
+            "                         Enable and configure additional transports in <tt>repository/conf/axis2.xml</tt>.\n",
+            "                     </li>\n",
+            "                     <li>\n",
+            "-                        Place any other files referenced by <tt>synapse.xml</tt> into the\n",
+            "+                        Place any other files referenced by mediation configuration into the\n",
+            "                         <tt>repository</tt> directory.\n",
+            "                     </li>\n",
+            "                 </ul>\n",
+            "                 <p>\n",
+            "-                    The project is built as usually with the following command:\n",
+            "+                    The project is built as usual with the following command:\n",
+            "                 </p>\n",
+            "-                <div class=\"source\">\n",
+            "-                    <div class=\"command\">mvn package</div>\n",
+            "-                </div>\n",
+            "+                <div class=\"command\">mvn package</div>\n",
+            "                 <p>\n",
+            "                     This will create a ZIP file (in the <tt>target</tt> directory) containing\n",
+            "                     everything that is needed to run your custom Synapse configuration. You only\n"
+          ],
+          "locn": "-285,16 +283,14"
+        }
+      ],
+      "from": "scratch/hiranya/website/src/site/xdoc/userguide/deployment.xml",
+      "to": "scratch/hiranya/website/src/site/xdoc/userguide/deployment.xml"
+    }
+  ],
+  "id": "1221717",
+  "message": "doc update",
+  "when": "2011-12-21T08:30:12-05:00",
+  "who": "hiranya"
+}

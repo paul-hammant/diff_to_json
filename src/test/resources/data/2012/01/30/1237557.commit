@@ -1,0 +1,2105 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfiguration.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfiguration.java	(revision 1237556)
++++ java/modules/core/src/main/java/org/apache/synapse/config/SynapseConfiguration.java	(revision 1237557)
+@@ -28,7 +28,10 @@
+ import org.apache.synapse.config.xml.TemplateMediatorFactory;
+ import org.apache.synapse.config.xml.XMLToTemplateMapper;
+ import org.apache.synapse.config.xml.endpoints.TemplateFactory;
++import org.apache.synapse.libraries.imports.SynapseImport;
++import org.apache.synapse.libraries.model.Library;
+ import org.apache.synapse.endpoints.Template;
++import org.apache.synapse.libraries.util.LibDeployerUtils;
+ import org.apache.synapse.mediators.template.TemplateMediator;
+ import org.apache.synapse.message.processors.MessageProcessor;
+ import org.apache.synapse.message.store.MessageStore;
+@@ -161,6 +164,15 @@
+      */
+     private SynapseArtifactDeploymentStore artifactDeploymentStore = new SynapseArtifactDeploymentStore();
+ 
++    /**
++     * Holds synapse Libraries indexed by library qualified name
++     */
++    Map<String,Library> synapseLibraries = new ConcurrentHashMap<String,Library>();
++
++    /**
++     * Holds the library imports  currently being included into Synapse engine
++     */
++    Map<String,SynapseImport> synapseImports = new ConcurrentHashMap<String,SynapseImport>();
+     private boolean allowHotUpdate = true;
+ 
+     /**
+@@ -405,6 +417,11 @@
+             }
+         }
+ 
++        //load from available libraries
++        TemplateMediator templateFromLib = LibDeployerUtils.getLibArtifact(synapseLibraries, key, TemplateMediator.class);
++        if (templateFromLib != null) {
++            return templateFromLib;
++        }
+         return null;
+     }
+ 
+@@ -1596,6 +1613,75 @@
+     }
+ 
+     /**
++     * Add Synapse library to configuration with given name
++     *
++     * @param name      of synapse lib
++     * @param library instance
++     */
++    public void addSynapseLibrary(String name, Library library) {
++        if (!(synapseLibraries.containsKey(name))) {
++            synapseLibraries.put(name, library);
++        } else {
++            handleException("Duplicate Synapse Library " + name);
++        }
++    }
++
++    /**
++     * Get all Synapse libraries in the Synapse configuration
++     *
++     * @return Return Map that contains all the Synapse libraries
++     */
++    public Map<String, Library> getSynapseLibraries() {
++        return synapseLibraries;
++    }
++
++    /**
++     * remove the Synapse library from the synapse configuration
++     *
++     * @param name of the lib
++     * @return Removed Synapse library instance
++     */
++    public Library removeSynapseLibrary(String name) {
++        return synapseLibraries.remove(name);
++    }
++
++
++
++    /**
++     * Add Synapse Import to a configuration with given name
++     *
++     * @param name      of synapse lib
++     * @param synImport instance
++     */
++    public void addSynapseImport(String name, SynapseImport synImport) {
++        if (!(synapseImports.containsKey(name))) {
++            synapseImports.put(name, synImport);
++        } else {
++            handleException("Duplicate Synapse Library " + name);
++        }
++    }
++
++    /**
++     * Get all Synapse libraries in the Synapse configuration
++     *
++     * @return Return Map that contains all the Synapse libraries
++     */
++    public Map<String, SynapseImport> getSynapseImports() {
++        return synapseImports;
++    }
++
++    /**
++     * remove the Synapse library from the synapse configuration
++     *
++     * @param name of the lib
++     * @return Removed Synapse library instance
++     */
++    public SynapseImport removeSynapseImport(String name) {
++        return synapseImports.remove(name);
++    }
++
++
++    /**
+      * Sets the description of the configuration
+      *
+      * @param description tobe set to the artifact
+@@ -1709,6 +1795,11 @@
+                 }
+             }
+         }
++         //load from available libraries
++        Template templateFromLib = LibDeployerUtils.getLibArtifact(synapseLibraries, key, Template.class);
++        if (templateFromLib != null) {
++            return templateFromLib;
++        }
+ 
+         return null;
+     }
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseImportFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseImportFactory.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseImportFactory.java	(revision 1237557)
+@@ -0,0 +1,78 @@
++/*
++*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
++*
++*  WSO2 Inc. licenses this file to you under the Apache License,
++*  Version 2.0 (the "License"); you may not use this file except
++*  in compliance with the License.
++*  You may obtain a copy of the License at
++*
++*    http://www.apache.org/licenses/LICENSE-2.0
++*
++* Unless required by applicable law or agreed to in writing,
++* software distributed under the License is distributed on an
++* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++* KIND, either express or implied.  See the License for the
++* specific language governing permissions and limitations
++* under the License.
++*/
++package org.apache.synapse.config.xml;
++
++import org.apache.axiom.om.OMAttribute;
++import org.apache.axiom.om.OMElement;
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.SynapseException;
++import org.apache.synapse.libraries.imports.SynapseImport;
++
++import javax.xml.namespace.QName;
++import java.util.Iterator;
++import java.util.Properties;
++
++public class SynapseImportFactory {
++
++    private static final Log log = LogFactory.getLog(SynapseImportFactory.class);
++
++    public static final QName NAME_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "name");
++    public static final QName PACKAGE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "package");
++
++    public static final QName ARTIFACT_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
++            "artifact");
++
++    @SuppressWarnings({"UnusedDeclaration"})
++    public static SynapseImport createImport(OMElement elem, Properties properties) {
++
++        OMAttribute pkgAtt = elem.getAttribute(PACKAGE_Q);
++        SynapseImport synapseImport = new SynapseImport();
++
++
++        OMAttribute nameAtt = elem.getAttribute(NAME_Q);
++
++        if (nameAtt != null) {
++            synapseImport.setLibName(nameAtt.getAttributeValue());
++        } else {
++            handleException("Synapse Import Target Library name is not specified");
++        }
++
++        if (pkgAtt != null) {
++            synapseImport.setLibPackage(pkgAtt.getAttributeValue());
++        } else {
++            handleException("Synapse Import Target Library package is not specified");
++        }
++
++        log.info("Successfully created Synapse Import: " + nameAtt.getAttributeValue());
++        return synapseImport;
++    }
++
++
++
++    private static void handleException(String msg) {
++        log.error(msg);
++        throw new SynapseException(msg);
++    }
++
++    private static void handleException(String msg, Exception e) {
++        log.error(msg, e);
++        throw new SynapseException(msg, e);
++    }
++
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/XMLConfigConstants.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/XMLConfigConstants.java	(revision 1237556)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/XMLConfigConstants.java	(revision 1237557)
+@@ -66,6 +66,7 @@
+     public static final QName DESCRIPTION_ELT = new QName(SYNAPSE_NAMESPACE, "description");
+     public static final QName SEQUENCE_ELT    = new QName(SYNAPSE_NAMESPACE, "sequence");
+     public static final QName TEMPLATE_ELT    = new QName(SYNAPSE_NAMESPACE, "template");
++    public static final QName IMPORT_ELT    = new QName(SYNAPSE_NAMESPACE, "import");
+     public static final QName ENDPOINT_ELT    = new QName(SYNAPSE_NAMESPACE, "endpoint");
+     public static final QName ENTRY_ELT       = new QName(SYNAPSE_NAMESPACE, "localEntry");
+     public static final QName REGISTRY_ELT    = new QName(SYNAPSE_NAMESPACE, "registry");
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateMediatorFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateMediatorFactory.java	(revision 1237556)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/TemplateMediatorFactory.java	(revision 1237557)
+@@ -77,7 +77,7 @@
+                 if (paramNameAttr != null) {
+                     paramNames.add(paramNameAttr.getAttributeValue());
+                 }
+-                child.detach();
++//                child.detach();
+             }
+         }
+         templateMediator.setParameters(paramNames);
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseImportSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseImportSerializer.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseImportSerializer.java	(revision 1237557)
+@@ -0,0 +1,21 @@
++/*
++*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
++*
++*  WSO2 Inc. licenses this file to you under the Apache License,
++*  Version 2.0 (the "License"); you may not use this file except
++*  in compliance with the License.
++*  You may obtain a copy of the License at
++*
++*    http://www.apache.org/licenses/LICENSE-2.0
++*
++* Unless required by applicable law or agreed to in writing,
++* software distributed under the License is distributed on an
++* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++* KIND, either express or implied.  See the License for the
++* specific language governing permissions and limitations
++* under the License.
++*/
++package org.apache.synapse.config.xml;
++
++public class SynapseImportSerializer {
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MultiXMLConfigurationBuilder.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/MultiXMLConfigurationBuilder.java	(revision 1237556)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/MultiXMLConfigurationBuilder.java	(revision 1237557)
+@@ -29,6 +29,7 @@
+ import org.apache.synapse.Startup;
+ import org.apache.synapse.SynapseConstants;
+ import org.apache.synapse.endpoints.Template;
++import org.apache.synapse.libraries.imports.SynapseImport;
+ import org.apache.synapse.mediators.template.TemplateMediator;
+ import org.apache.synapse.SynapseException;
+ import org.apache.synapse.message.processors.MessageProcessor;
+@@ -89,6 +90,7 @@
+     public static final String MESSAGE_STORE_DIR        = "message-stores";
+     public static final String MESSAGE_PROCESSOR_DIR    = "message-processors";
+     public static final String REST_API_DIR             = "api";
++    public static final String SYNAPSE_IMPORTS_DIR   = "imports";
+ 
+     public static final String REGISTRY_FILE       = "registry.xml";
+ 
+@@ -132,6 +134,7 @@
+         createExecutors(synapseConfig, root, properties);
+         createMessageStores(synapseConfig, root, properties);
+         createMessageProcessors(synapseConfig, root, properties);
++        createSynapseImports(synapseConfig, root, properties);
+         createAPIs(synapseConfig, root, properties);
+ 
+         return synapseConfig;
+@@ -440,6 +443,29 @@
+         }
+     }
+ 
++    private static void createSynapseImports(SynapseConfiguration synapseConfig, String root, Properties properties) {
++        File synImportsDir = new File(root, SYNAPSE_IMPORTS_DIR);
++        if (synImportsDir.exists()) {
++            if (log.isDebugEnabled()) {
++                log.debug("Loading Synapse Imports from :" + synImportsDir.getPath());
++            }
++            Iterator synImports = FileUtils.iterateFiles(synImportsDir, extensions, false);
++            while (synImports.hasNext()) {
++                File file = (File) synImports.next();
++                OMElement document = getOMElement(file);
++                SynapseImport synImp = SynapseXMLConfigurationFactory.defineImport(
++                        synapseConfig, document, properties);
++                if (synImp != null) {
++                    synImp.setFileName(file.getName());
++                    synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
++                                                                           synImp.getName());
++                }
++            }
++        }
++
++    }
++
++
+     private static void createAPIs(SynapseConfiguration synapseConfig,
+                                             String rootDirPath, Properties properties) {
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseXMLConfigurationFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseXMLConfigurationFactory.java	(revision 1237556)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseXMLConfigurationFactory.java	(revision 1237557)
+@@ -29,6 +29,9 @@
+ import org.apache.synapse.config.xml.endpoints.TemplateFactory;
+ import org.apache.synapse.config.xml.rest.APIFactory;
+ import org.apache.synapse.endpoints.Template;
++import org.apache.synapse.libraries.imports.SynapseImport;
++import org.apache.synapse.libraries.model.Library;
++import org.apache.synapse.libraries.util.LibDeployerUtils;
+ import org.apache.synapse.mediators.template.TemplateMediator;
+ import org.apache.synapse.message.processors.MessageProcessor;
+ import org.apache.synapse.message.store.MessageStore;
+@@ -79,6 +82,8 @@
+                     }
+                 } else if (XMLConfigConstants.TEMPLATE_ELT.equals(elt.getQName())) {
+                     defineTemplate(config, elt, properties);
++                } else if (XMLConfigConstants.IMPORT_ELT.equals(elt.getQName())) {
++                    defineImport(config, elt, properties);
+                 } else if (XMLConfigConstants.ENDPOINT_ELT.equals(elt.getQName())) {
+                     defineEndpoint(config, elt, properties);
+                 } else if (XMLConfigConstants.ENTRY_ELT.equals(elt.getQName())) {
+@@ -286,6 +291,19 @@
+         return processor;
+     }
+ 
++    public static SynapseImport defineImport(SynapseConfiguration config, OMElement elt, Properties properties) {
++        SynapseImport synImport = SynapseImportFactory.createImport(elt, properties);
++        String libIndexString = LibDeployerUtils.getQualifiedName(synImport);
++        config.addSynapseImport(libIndexString, synImport);
++
++        //get corresponding library for loading imports if available
++        Library synLib = config.getSynapseLibraries().get(libIndexString);
++        if (synLib != null) {
++            LibDeployerUtils.loadLibArtifacts(synImport, synLib);
++        }
++        return synImport;
++    }
++
+     public static Template defineEndpointTemplate(SynapseConfiguration config,
+                                                     OMElement elem, Properties properties) {
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/deployers/LibraryArtifactDeployer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/deployers/LibraryArtifactDeployer.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/deployers/LibraryArtifactDeployer.java	(revision 1237557)
+@@ -0,0 +1,217 @@
++/*
++*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
++*
++*  WSO2 Inc. licenses this file to you under the Apache License,
++*  Version 2.0 (the "License"); you may not use this file except
++*  in compliance with the License.
++*  You may obtain a copy of the License at
++*
++*    http://www.apache.org/licenses/LICENSE-2.0
++*
++* Unless required by applicable law or agreed to in writing,
++* software distributed under the License is distributed on an
++* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++* KIND, either express or implied.  See the License for the
++* specific language governing permissions and limitations
++* under the License.
++*/
++package org.apache.synapse.deployers;
++
++import org.apache.axiom.om.OMElement;
++import org.apache.axiom.om.OMException;
++import org.apache.axis2.deployment.DeploymentException;
++import org.apache.axis2.deployment.repository.util.DeploymentFileData;
++import org.apache.commons.io.FilenameUtils;
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.ServerState;
++import org.apache.synapse.libraries.imports.SynapseImport;
++import org.apache.synapse.libraries.model.Library;
++import org.apache.synapse.libraries.model.SynapseLibrary;
++import org.apache.synapse.libraries.util.LibDeployerUtils;
++
++import java.io.File;
++import java.io.IOException;
++import java.util.Properties;
++
++public class LibraryArtifactDeployer extends AbstractSynapseArtifactDeployer {
++    private static final Log log = LogFactory.getLog(LibraryArtifactDeployer.class);
++
++    public void deploy(DeploymentFileData deploymentFileData) throws DeploymentException {
++        String libFilePath = FilenameUtils.normalize(deploymentFileData.getAbsolutePath());
++        if (log.isDebugEnabled()) {
++            log.debug("Deployment of the synapse library artifact from file : " + libFilePath + " : STARTED");
++        }
++
++        if (getServerContextInformation().getServerState() != ServerState.STARTED) {
++            // synapse server has not yet being started
++            if (log.isDebugEnabled()) {
++                log.debug("Skipped the library artifact deployment (since the Synapse " +
++                          "server doesn't seem to be started yet), from file : "
++                          + deploymentFileData.getAbsolutePath());
++            }
++            return;
++        }
++        try {
++            SynapseArtifactDeploymentStore deploymentStore = getSynapseConfiguration().getArtifactDeploymentStore();
++
++            Library lib = LibDeployerUtils.createSynapseLibrary(libFilePath);
++            String libArtifactName = lib.getQName().toString();
++            if (log.isDebugEnabled()) {
++                log.debug("Created the Synapse Library : " + libArtifactName + "  from : " + libFilePath);
++            }
++
++            if (deploymentStore.isUpdatingArtifact(libFilePath)) {
++
++                if (log.isDebugEnabled()) {
++                    log.debug("Updating Library artifact detected with filename : " + libFilePath);
++                }
++                // this is an hot-update case
++                String existingArtifactName
++                        = deploymentStore.getUpdatingArtifactWithFileName(libFilePath);
++                deploymentStore.removeUpdatingArtifact(libFilePath);
++                undeploySynapseArtifact(existingArtifactName);
++
++                //deploy from beginning
++                //add the library to synapse Config
++                completeDeployment(lib, libArtifactName);
++
++            } else {
++                // new artifact hot-deployment case
++                try {
++                    //add the library to synapse Config
++                    completeDeployment(lib, libArtifactName);
++                } catch (SynapseArtifactDeploymentException sade) {
++                    log.error("Deployment of the Synapse Artifact from file : "
++                              + libFilePath + " : Failed!", sade);
++                    /*log.info("The file has been backed up into : "
++                             + backupFile(deploymentFileData.getFile()));*/
++                }
++            }
++            if (libArtifactName != null) {
++                deploymentStore.addArtifact(libFilePath, libArtifactName);
++            }
++
++            log.info("Synapse Library named '" + lib.toString()
++                     + "' has been deployed from file : " + libFilePath);
++
++        } catch (IOException ex) {
++            handleDeploymentError("Deployment of synapse artifact failed. Error reading "
++                                  + libFilePath + " : " + ex.getMessage(), ex);
++        } catch (Exception ex) {
++            handleDeploymentError("Deployment of synapse artifact failed for synapse libray at : "
++                                  + libFilePath + " : " + ex.getMessage(), ex);
++        }
++
++        if (log.isDebugEnabled()) {
++            log.debug("Deployment of the synapse artifact from file : "
++                      + libFilePath + " : COMPLETED");
++        }
++
++    }
++
++    private void completeDeployment(Library lib, String libArtifactName) throws DeploymentException {
++        getSynapseConfiguration().addSynapseLibrary(lib.getQName().toString(), lib);
++        if (log.isDebugEnabled()) {
++            log.debug("Synapse Library Deployment for lib: " + libArtifactName + " Completed");
++        }
++
++        //each time a library is deployed we check with available imports  and
++        //if necessary (ie:- relevant import is available) load the libraries
++        SynapseImport synImport = getSynapseConfiguration().getSynapseImports().get(libArtifactName);
++
++        if (synImport != null) {
++            LibDeployerUtils.loadLibArtifacts(synImport, lib);
++            if (log.isDebugEnabled()) {
++                log.debug("Loading Synapse Library: " + libArtifactName + " into memory for Import");
++            }
++        }
++    }
++
++    public void undeploy(String fileName) throws DeploymentException {
++        fileName = FilenameUtils.normalize(fileName);
++        if (log.isDebugEnabled()) {
++            log.debug("UnDeployment of the synapse library from file : "
++                      + fileName + " : STARTED");
++        }
++
++        SynapseArtifactDeploymentStore deploymentStore =
++                getSynapseConfiguration().getArtifactDeploymentStore();
++
++        if (deploymentStore.containsFileName(fileName)) {
++            File undeployingFile = new File(fileName);
++            // axis2 treats Hot-Update as (Undeployment + deployment), where synapse needs to
++            // differentiate the Hot-Update from the above two, since it needs some validations for
++            // a real undeployment. Also this makes sure a zero downtime of the synapse artifacts
++            // which are being Hot-deployed
++            if (undeployingFile.exists()) {
++                if (log.isDebugEnabled()) {
++                    log.debug("Marking artifact as updating from file : " + fileName);
++                }
++                // if the file exists, which means it has been updated and is a Hot-Update case
++                if (!deploymentStore.isRestoredFile(fileName)) {
++                    deploymentStore.addUpdatingArtifact(
++                            fileName, deploymentStore.getArtifactNameForFile(fileName));
++                    deploymentStore.removeArtifactWithFileName(fileName);
++                }
++            } else {
++                // if the file doesn't exists then it is an actual undeployment
++                String artifactName = deploymentStore.getArtifactNameForFile(fileName);
++                try {
++                    //do un-deployment
++                    undeploySynapseArtifact(artifactName);
++
++                    deploymentStore.removeArtifactWithFileName(fileName);
++                    log.info("Synapse Library named '" + artifactName + "' has been undeployed");
++                } catch (SynapseArtifactDeploymentException sade) {
++                    log.error("Unable to undeploy the synapse library artifact from file : " + fileName, sade);
++                }
++            }
++        } else {
++            String msg = "Artifact representing the filename "
++                         + fileName + " is not deployed on Synapse";
++            log.error(msg);
++            throw new DeploymentException(msg);
++        }
++
++        if (log.isDebugEnabled()) {
++            log.debug("UnDeployment of the synapse library artifact from file : "
++                      + fileName + " : COMPLETED");
++        }
++    }
++
++    public void undeploySynapseArtifact(String artifactName) {
++        //get Old Lib config
++        Library existingLib = null;
++        try {
++            existingLib = getSynapseConfiguration().getSynapseLibraries().get(artifactName);
++            existingLib.unLoadLibrary();
++            getSynapseConfiguration().removeSynapseLibrary(artifactName);
++        } catch (DeploymentException e) {
++            handleDeploymentError(e.getMessage(),e);
++        }
++    }
++
++    private void handleDeploymentError(String msg, Exception e){
++        log.error(msg, e);
++    }
++
++    //avoid implementing any of the below methods since these are unusable in this library deployment
++    // scenario . we just want to inherit some of the methods from  AbstractSynapseArtifactDeployer
++    public void setDirectory(String directory) {
++    }
++
++    public void setExtension(String extension) {
++    }
++
++    public String deploySynapseArtifact(OMElement artifactConfig, String fileName, Properties properties) {
++        return null;
++    }
++
++    public String updateSynapseArtifact(OMElement artifactConfig, String fileName, String existingArtifactName, Properties properties) {
++        return null;
++    }
++
++    public void restoreSynapseArtifact(String artifactName) {
++    }
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/deployers/ImportDeployer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/deployers/ImportDeployer.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/deployers/ImportDeployer.java	(revision 1237557)
+@@ -0,0 +1,256 @@
++/*
++*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
++*
++*  WSO2 Inc. licenses this file to you under the Apache License,
++*  Version 2.0 (the "License"); you may not use this file except
++*  in compliance with the License.
++*  You may obtain a copy of the License at
++*
++*    http://www.apache.org/licenses/LICENSE-2.0
++*
++* Unless required by applicable law or agreed to in writing,
++* software distributed under the License is distributed on an
++* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++* KIND, either express or implied.  See the License for the
++* specific language governing permissions and limitations
++* under the License.
++*/
++package org.apache.synapse.deployers;
++
++import org.apache.axiom.om.OMElement;
++import org.apache.axis2.deployment.DeploymentException;
++import org.apache.commons.io.FileUtils;
++import org.apache.commons.io.FilenameUtils;
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.config.xml.SynapseImportFactory;
++import org.apache.synapse.libraries.imports.SynapseImport;
++import org.apache.synapse.libraries.model.Library;
++import org.apache.synapse.libraries.util.LibDeployerUtils;
++
++import javax.xml.namespace.QName;
++import java.io.File;
++import java.io.IOException;
++import java.util.Properties;
++
++public class ImportDeployer extends AbstractSynapseArtifactDeployer {
++
++    private static Log log = LogFactory.getLog(ImportDeployer.class);
++
++    @Override
++    public String deploySynapseArtifact(OMElement artifactConfig, String fileName,
++                                        Properties properties) {
++
++        if (log.isDebugEnabled()) {
++            log.debug("Synapse Import Deployment from file : " + fileName + " : Started");
++        }
++
++        try {
++            SynapseImport synImport = SynapseImportFactory.createImport(artifactConfig, properties);
++            String synImportQualfiedName = LibDeployerUtils.getQualifiedName(synImport);
++
++            SynapseImport existingImport = getSynapseConfiguration().getSynapseImports().get(synImportQualfiedName);
++
++            if (existingImport != null) {
++                //a synapse import with the same name (name + version) already exists
++                //we should not allow multiple such imports
++                log.warn("Synapse Import with the name : " + synImportQualfiedName + " already exists! " +
++                         "Could not load multiple Imports of same type.");
++                String backedUp = backupFile(new File(fileName));
++                log.info("Synapse Import with the name : " + synImportQualfiedName + " is now backed up in : "
++                         + backedUp);
++                return null;
++            } else {
++                if (synImport != null) {
++                    synImport.setFileName((new File(fileName)).getName());
++                    getSynapseConfiguration().addSynapseImport(synImportQualfiedName, synImport);
++                    //get corresponding library for loading imports if available
++                    Library synLib = getSynapseConfiguration().getSynapseLibraries()
++                            .get(synImportQualfiedName);
++                    if (synLib != null) {
++                        LibDeployerUtils.loadLibArtifacts(synImport, synLib);
++                    }
++                    log.info("Synapse Library Import named '" + synImportQualfiedName +
++                             " has been deployed from file : "
++                             + fileName);
++                    return synImportQualfiedName;
++                } else {
++                    handleSynapseArtifactDeploymentError("Synapse Import Deployment Failed. " +
++                                                         "The artifact described in the file " +
++                                                         fileName + " is not a valid import");
++                }
++            }
++        } catch (Exception e) {
++            handleSynapseArtifactDeploymentError(
++                    "Sequence Deployment from the file : " + fileName + " : Failed.", e);
++        }
++
++        return null;
++    }
++
++    @Override
++    public String updateSynapseArtifact(OMElement artifactConfig, String fileName,
++                                        String existingArtifactName, Properties properties) {
++
++        if (log.isDebugEnabled()) {
++            log.debug("Synapse Import Deployment from file : " + fileName + " : Started");
++        }
++
++        try {
++            SynapseImport synImport = SynapseImportFactory.createImport(artifactConfig, properties);
++            String synImportQualfiedName = LibDeployerUtils.getQualifiedName(synImport);
++
++            if (synImport == null) {
++                handleSynapseArtifactDeploymentError("Synapse Import update failed. The artifact " +
++                                                     "defined in the file: " + fileName + " is not a valid import.");
++                return null;
++            }
++
++            if (log.isDebugEnabled()) {
++                log.debug("Synapse Import: " + synImportQualfiedName + " has been built from the file: " + fileName);
++            }
++
++            if (existingArtifactName.equals(synImportQualfiedName)) {
++                //normal update ,import Qualified Name(lib name + version) has not changed
++                synImport.setFileName((new File(fileName)).getName());
++                getSynapseConfiguration().addSynapseImport(synImportQualfiedName, synImport);
++                //get corresponding library for loading imports if available
++                Library synLib = getSynapseConfiguration().getSynapseLibraries()
++                        .get(synImportQualfiedName);
++                if (synLib != null) {
++                    //this is a important step -> we need to unload what ever the components loaded previously
++                    //then reload
++                    synLib.unLoadLibrary();
++                    LibDeployerUtils.loadLibArtifacts(synImport, synLib);
++                }
++                log.info("Synapse Library Import named '" + synImportQualfiedName +
++                         " has been deployed from file : "
++                         + fileName);
++            } else {
++                //when updating ,import Qualified Name has been changed !!
++                //check for any other import with the same name
++                SynapseImport existingImport = getSynapseConfiguration().getSynapseImports().get(synImportQualfiedName);
++                if (existingImport != null) {
++                    //a synapse import with the same name (name + version) already exists
++                    //we should not allow multiple such imports
++                    log.warn("Synapse Import with the name : " + synImportQualfiedName + " already exists! " +
++                             "Could not load multiple Imports of same type.");
++                    String backedUp = backupFile(new File(fileName));
++                    log.info("Synapse Import with the name : " + synImportQualfiedName + " is now backed up in : "
++                             + backedUp);
++                    return null;
++                }else {
++                    synImport.setFileName((new File(fileName)).getName());
++                    getSynapseConfiguration().addSynapseImport(synImportQualfiedName, synImport);
++                    //get corresponding library for loading imports if available
++                    Library synLib = getSynapseConfiguration().getSynapseLibraries()
++                            .get(synImportQualfiedName);
++                    //this is a important step -> we need to unload what ever the components loaded previously
++                    synLib.unLoadLibrary();
++                    //then reload
++                    if (synLib != null) {
++                        LibDeployerUtils.loadLibArtifacts(synImport, synLib);
++                    }
++                    log.info("Synapse Library Import named '" + synImportQualfiedName +
++                             " has been deployed from file : "
++                             + fileName);
++                }
++            }
++
++            log.info("Synapse Import: " + synImportQualfiedName + " has been updated from the file: " + fileName);
++
++            waitForCompletion(); // Give some time for worker threads to release the old sequence
++            return synImportQualfiedName;
++
++        } catch (Exception e) {
++            handleSynapseArtifactDeploymentError("Error while updating the Synapse Import from the " +
++                                                 "file: " + fileName);
++        }
++
++        return null;
++    }
++
++    @Override
++    public void undeploySynapseArtifact(String artifactName) {
++
++        if (log.isDebugEnabled()) {
++            log.debug("Undeployment of the Synapse Import named : "
++                      + artifactName + " : Started");
++        }
++        try {
++            SynapseImport undeployingImport = getSynapseConfiguration().getSynapseImports().get(artifactName);
++            if (undeployingImport != null) {
++                getSynapseConfiguration().removeSynapseImport(artifactName);
++                //get corresponding library for un-loading this import
++                Library synLib = getSynapseConfiguration().getSynapseLibraries().get(artifactName);
++                if (synLib != null) {
++                    //this is a important step -> we need to unload what ever the components loaded thru this import
++                    synLib.unLoadLibrary();
++                }
++                log.info("Synapse Import : " + artifactName + "' has been undeployed");
++            } else {
++                log.warn("Synapse Import : " + artifactName + " has already been undeployed");
++            }
++        } catch (Exception e) {
++            handleSynapseArtifactDeploymentError(
++                    "Undeployement of Synapse Import named : " + artifactName + " : Failed", e);
++        }
++    }
++
++    @Override
++    public void restoreSynapseArtifact(String artifactName) {
++        //TODO implement --> need to implement the serializer
++
++/*
++        if (log.isDebugEnabled()) {
++            log.debug("Restoring the Sequence with name : " + artifactName + " : Started");
++        }
++
++        try {
++            SequenceMediator seq
++                    = getSynapseConfiguration().getDefinedSequences().get(artifactName);
++            OMElement seqElem = MediatorSerializerFinder.getInstance().getSerializer(seq).
++                    serializeMediator(null, seq);
++            if (seq.getFileName() != null) {
++                String fileName = getServerConfigurationInformation().getSynapseXMLLocation()
++                                  + File.separator + MultiXMLConfigurationBuilder.SEQUENCES_DIR
++                                  + File.separator + seq.getFileName();
++                writeToFile(seqElem, fileName);
++                if (log.isDebugEnabled()) {
++                    log.debug("Restoring the Sequence with name : " + artifactName + " : Completed");
++                }
++                log.info("Sequence named '" + artifactName + "' has been restored");
++            } else {
++                handleSynapseArtifactDeploymentError("Couldn't restore the sequence named '"
++                                                     + artifactName + "', filename cannot be found");
++            }
++        } catch (Exception e) {
++            handleSynapseArtifactDeploymentError(
++                    "Restoring of the sequence named '" + artifactName + "' has failed", e);
++        }
++*/
++    }
++
++    private String backupFile(File file) throws DeploymentException {
++        String filePath = FilenameUtils.normalize(file.getAbsolutePath());
++
++        String backupFilePath = filePath + ".back";
++        int backupIndex = 0;
++        while (backupIndex >= 0) {
++            if (new File(backupFilePath).exists()) {
++                backupIndex++;
++                backupFilePath = filePath + "." + backupIndex + ".back";
++            } else {
++                backupIndex = -1;
++                try {
++                    FileUtils.moveFile(file, new File(backupFilePath));
++                } catch (IOException e) {
++                    handleSynapseArtifactDeploymentError("Error while backing up the artifact: " +
++                                                         file.getName(), e);
++                }
++            }
++        }
++        return backupFilePath;
++    }
++
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2MessageContext.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2MessageContext.java	(revision 1237556)
++++ java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2MessageContext.java	(revision 1237557)
+@@ -152,7 +152,7 @@
+         if (o != null && o instanceof Mediator) {
+             return (Mediator) o;
+         } else {
+-            Mediator m = getConfiguration().getSequence(key);
++            Mediator m = getConfiguration().getSequenceTemplate(key);
+             if (m instanceof TemplateMediator) {
+                 TemplateMediator templateMediator = (TemplateMediator) m;
+                 synchronized (m) {
+Index: java/modules/core/src/main/java/org/apache/synapse/libraries/model/ArtifactFile.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/libraries/model/ArtifactFile.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/libraries/model/ArtifactFile.java	(revision 1237557)
+@@ -0,0 +1,66 @@
++/*
++*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
++*
++*  WSO2 Inc. licenses this file to you under the Apache License,
++*  Version 2.0 (the "License"); you may not use this file except
++*  in compliance with the License.
++*  You may obtain a copy of the License at
++*
++*    http://www.apache.org/licenses/LICENSE-2.0
++*
++* Unless required by applicable law or agreed to in writing,
++* software distributed under the License is distributed on an
++* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++* KIND, either express or implied.  See the License for the
++* specific language governing permissions and limitations
++* under the License.
++*/
++package org.apache.synapse.libraries.model;
++
++import org.apache.axiom.om.OMElement;
++import org.apache.axiom.om.impl.builder.StAXOMBuilder;
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.SynapseException;
++import org.apache.synapse.deployers.SynapseArtifactDeploymentException;
++
++import javax.xml.stream.XMLStreamException;
++import java.io.*;
++
++public abstract class ArtifactFile {
++
++    private static final Log log = LogFactory.getLog(ArtifactFile.class);
++
++    protected static String fileName;
++
++    protected OMElement configurationElement;
++
++    public abstract Object build();
++
++    public ArtifactFile(String fileXmlPath){
++        fileName = fileXmlPath;
++        File f = new File(fileXmlPath);
++        if (!f.exists()) {
++            throw new SynapseArtifactDeploymentException("file not found at : " + fileXmlPath);
++        }
++        InputStream xmlInputStream = null;
++        try {
++            xmlInputStream = new FileInputStream(f);
++            configurationElement = new StAXOMBuilder(xmlInputStream).getDocumentElement();
++        } catch (FileNotFoundException e) {
++               throw new SynapseArtifactDeploymentException("file not found at : " + fileXmlPath);
++        } catch (XMLStreamException e) {
++            throw new SynapseArtifactDeploymentException("Error while parsing the artifacts.xml file : " + fileXmlPath , e);
++        } finally {
++            if (xmlInputStream != null) {
++                try {
++                    xmlInputStream.close();
++                } catch (IOException e) {
++                    log.error("Error while closing input stream for file artifact.", e);
++                }
++            }
++        }
++    }
++
++
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/libraries/model/LibraryArtifact.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/libraries/model/LibraryArtifact.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/libraries/model/LibraryArtifact.java	(revision 1237557)
+@@ -0,0 +1,223 @@
++/*
++*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
++*
++*  WSO2 Inc. licenses this file to you under the Apache License,
++*  Version 2.0 (the "License"); you may not use this file except
++*  in compliance with the License.
++*  You may obtain a copy of the License at
++*
++*    http://www.apache.org/licenses/LICENSE-2.0
++*
++* Unless required by applicable law or agreed to in writing,
++* software distributed under the License is distributed on an
++* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++* KIND, either express or implied.  See the License for the
++* specific language governing permissions and limitations
++* under the License.
++*/
++package org.apache.synapse.libraries.model;
++
++import org.apache.axiom.om.OMElement;
++import org.apache.synapse.SynapseArtifact;
++import org.apache.synapse.SynapseConstants;
++import org.apache.synapse.config.xml.MediatorFactoryFinder;
++import org.apache.synapse.config.xml.XMLConfigConstants;
++import org.apache.synapse.config.xml.endpoints.TemplateFactory;
++import org.apache.synapse.deployers.SynapseArtifactDeploymentException;
++import org.apache.synapse.endpoints.Template;
++import org.apache.synapse.mediators.template.TemplateMediator;
++
++import javax.xml.namespace.QName;
++import java.io.File;
++import java.util.HashMap;
++import java.util.Map;
++import java.util.Properties;
++
++public class LibraryArtifact implements SynapseArtifact{
++
++    protected String name;
++    protected String type;
++    protected String description;
++
++    String extractedPath;
++    ArtifactFile file;
++    int unresolvedDeps = 0;
++
++    Map<String, LibraryArtifact> subArtifacts;
++
++    private LibraryArtifact parent;
++
++
++    public LibraryArtifact(String  name) {
++        this.name = name;
++        subArtifacts = new HashMap<String, LibraryArtifact>();
++    }
++
++
++    public void setupFile(String filename) {
++        if (filename != null && !"".equals(filename)) {
++            if ("synapse/template".equals(getArtifactType())) {
++                file = this.new TemplateArtifactFile(filename);
++            } else {
++                throw new SynapseArtifactDeploymentException("Unsupported Type for synapse lib artifact.");
++            }
++        } else {
++            throw new SynapseArtifactDeploymentException("Invalid file specified for lib artifact.");
++        }
++    }
++
++    private String getArtifactType() {
++        if (type != null) {
++            return type;
++        } else if (parent != null) {
++            return parent.getArtifactType();
++        }
++        return "";
++    }
++
++    public void addSubArtifact(LibraryArtifact artifact) {
++        if (artifact != null) {
++            subArtifacts.put(artifact.toString(), artifact);
++            unresolvedDeps++;
++        }
++    }
++
++    public String  getName() {
++        return name;
++    }
++
++    public boolean isLeafArtifact() {
++        return file == null ? false : true;
++    }
++
++    public void loadComponentsInto(SynapseLibrary library) {
++        for (String artifactName : subArtifacts.keySet()) {
++            LibraryArtifact artifact = subArtifacts.get(artifactName);
++            if (artifact.isLeafArtifact()) {
++                //this is where actual artifact is constructed to it's ture form
++                Object template = artifact.file.build();
++                if (artifact.file instanceof TemplateArtifactFile) {
++
++                    if (template instanceof TemplateMediator) {
++                        String templateName = ((TemplateMediator) template).getName();
++                        library.addComponent(getQualifiedName(library.getPackage(), templateName), template);
++                    } else if (template instanceof Template) {
++                        String templateName = ((Template) template).getName();
++                        library.addComponent(getQualifiedName(library.getPackage(), templateName), template);
++                    } else if (template != null) {
++                        library.addComponent(getQualifiedName(library.getPackage(),
++                                                              artifact.getName()), template);
++                    } else {
++                        throw new SynapseArtifactDeploymentException("Cannot load components into " +
++                                                                     "Synapse Library. Component " +
++                                                                     "cannot be built for " + artifactName);
++                    }
++                }
++            } else {
++                artifact.loadComponentsInto(library);
++            }
++        }
++    }
++
++    private String getQualifiedName(String aPackage, String templateName) {
++        return aPackage + "." + templateName;
++    }
++
++    public void setPath(String path) {
++        if (!path.endsWith(File.separator)) {
++            path = path + File.separator;
++        }
++        this.extractedPath = path;
++    }
++
++    public String toString() {
++        return name;
++    }
++
++    public String getType() {
++        return type;
++    }
++
++    public void setType(String type) {
++        this.type = type;
++    }
++
++    public void setParent(LibraryArtifact parent) {
++        this.parent = parent;
++    }
++
++    public void setDescription(String description) {
++        this.description = description;
++    }
++
++    public String getDescription() {
++        return description;  //To change body of implemented methods use File | Settings | File Templates.
++    }
++
++    private class TemplateArtifactFile extends ArtifactFile {
++        public TemplateArtifactFile(String fileXmlPath) {
++            super(extractedPath + fileXmlPath);
++        }
++
++        @Override
++        public Object build() {
++            Object templateObject = null;
++            OMElement element = configurationElement.getFirstChildWithName(
++                    new QName(SynapseConstants.SYNAPSE_NAMESPACE, "sequence"));
++            if (element != null) {
++                String name = element.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
++                try {
++                    templateObject = MediatorFactoryFinder.getInstance().getMediator(configurationElement, new Properties());
++                } catch (Exception e) {
++                    String msg = "Template configuration : " + name + " cannot be built" +
++                            "for Synapse Library artifact : " + LibraryArtifact.this.name;;
++//                        handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_TEMPLATES, msg, e);
++                    throw new SynapseArtifactDeploymentException(msg,e);
++                }
++                return templateObject;
++            } else {
++                element = configurationElement.getFirstChildWithName(
++                        new QName(SynapseConstants.SYNAPSE_NAMESPACE, "endpoint"));
++                if (element != null) {
++                    TemplateFactory templateFactory = new TemplateFactory();
++                    String name = element.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE,
++                                                                      "name"));
++                    try {
++                        templateObject = templateFactory.createEndpointTemplate(configurationElement,
++                                                                                new Properties());
++                    } catch (Exception e) {
++                        String msg = "Endpoint Template: " + name + "configuration cannot be built " +
++                                     "for Synapse Library artifact : " + LibraryArtifact.this.name;
++//                        handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_TEMPLATES, msg, e);
++                        throw new SynapseArtifactDeploymentException(msg,e);
++                    }
++                }
++            }
++            return templateObject;
++        }
++
++    }
++
++    public static class Dependency {
++
++        private String name;
++        boolean markAsResolved = false;
++
++        public Dependency(String  name) {
++            this.name = name;
++        }
++
++        public String getName() {
++            return name;
++        }
++
++        public boolean resolveWith(LibraryArtifact artifact) {
++            return markAsResolved == name.equals(artifact.name);
++        }
++
++        public boolean isResolved() {
++            return markAsResolved;
++        }
++    }
++
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/libraries/model/Library.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/libraries/model/Library.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/libraries/model/Library.java	(revision 1237557)
+@@ -0,0 +1,71 @@
++/*
++*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
++*
++*  WSO2 Inc. licenses this file to you under the Apache License,
++*  Version 2.0 (the "License"); you may not use this file except
++*  in compliance with the License.
++*  You may obtain a copy of the License at
++*
++*    http://www.apache.org/licenses/LICENSE-2.0
++*
++* Unless required by applicable law or agreed to in writing,
++* software distributed under the License is distributed on an
++* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++* KIND, either express or implied.  See the License for the
++* specific language governing permissions and limitations
++* under the License.
++*/
++package org.apache.synapse.libraries.model;
++
++import org.apache.synapse.SynapseArtifact;
++
++import javax.xml.namespace.QName;
++
++public interface Library extends SynapseArtifact {
++
++    /**
++     * get Fully qualified Name of the Library
++     * @return returns the logical name of the Synapse library which constitutes of [package + library name]
++     */
++    public QName getQName();
++
++    /**
++     * returns the package that this Library belongs to
++     * @return  package name
++     */
++    public String getPackage();
++
++    /**
++     * return synapse lib artifact deployed by this library with the given artifact name
++     *
++     * @param artifacName
++     * @return
++     */
++    public Object getArtifact(String artifacName);
++
++    /**
++     * gives the Artifact description for the given artifact name (if available)
++     * @param artifactName
++     * @return
++     */
++    public String getArtifactDescription(String  artifactName);
++
++    /**
++     * load all library artifacts on this library for each and every namespace
++     * this should be called when a import is taking place
++     *
++     * @return success
++     */
++    public boolean loadLibrary();
++
++    /**
++     * unload all library artifacts on this library
++     * this should be called when a import is no longer valid/ non-existent or library being
++     * undeployed
++     *
++     * @return success
++     */
++    public boolean unLoadLibrary();
++
++
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/libraries/model/SynapseLibrary.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/libraries/model/SynapseLibrary.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/libraries/model/SynapseLibrary.java	(revision 1237557)
+@@ -0,0 +1,180 @@
++/*
++*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
++*
++*  WSO2 Inc. licenses this file to you under the Apache License,
++*  Version 2.0 (the "License"); you may not use this file except
++*  in compliance with the License.
++*  You may obtain a copy of the License at
++*
++*    http://www.apache.org/licenses/LICENSE-2.0
++*
++* Unless required by applicable law or agreed to in writing,
++* software distributed under the License is distributed on an
++* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++* KIND, either express or implied.  See the License for the
++* specific language governing permissions and limitations
++* under the License.
++*/
++package org.apache.synapse.libraries.model;
++
++import javax.xml.namespace.QName;
++import java.util.ArrayList;
++import java.util.HashMap;
++import java.util.List;
++import java.util.Map;
++
++public class SynapseLibrary implements Library {
++    private String packageN = null;
++
++    /**
++     * this is the logical name of the Synapse library which constitutes of [package + library name]
++     */
++    protected QName qualifiedName = null;
++
++    public List<LibraryArtifact.Dependency> dependencies;
++
++    private Map<String , LibraryArtifact> depNameToArtifactIndex = new HashMap<String , LibraryArtifact>();
++
++    private Map<String, Object> libComponentIndex = new HashMap<String, Object>();
++
++    private Map<String, String> libArtifactDetails = new HashMap<String, String >();
++
++    private String description;
++
++    private boolean isLoaded = false;
++
++    public SynapseLibrary(String name, String packageName) {
++        this.packageN = packageName;
++        if (packageName != null && !"".equals(packageName)) {
++            qualifiedName = new QName(packageName, name);
++        } else {
++            qualifiedName = new QName(name);
++        }
++        dependencies = new ArrayList<LibraryArtifact.Dependency>();
++    }
++
++    public QName getQName() {
++        return qualifiedName;
++    }
++
++    public String getName() {
++        return qualifiedName.getLocalPart();
++    }
++
++    public void addDependency(LibraryArtifact.Dependency artifactDep) {
++        dependencies.add(artifactDep);
++    }
++
++    public void addComponent(String qualifiedName, Object libComponent) {
++        libComponentIndex.put(qualifiedName, libComponent);
++    }
++
++    public void addArtifactDescription(LibraryArtifact artifact){
++        libArtifactDetails.put(artifact.getName(),artifact.getDescription());
++    }
++
++    public String  getArtifactDescription(String  artifactName){
++        return libArtifactDetails.get(artifactName);
++    }
++
++    public void removeComponent(String qualifiedName) {
++        libComponentIndex.remove(qualifiedName);
++    }
++
++    public boolean resolveDependencies(List<LibraryArtifact> unresolvedPrincipalArtifactList) {
++        int unresolvedDeps = dependencies.size();
++        for (LibraryArtifact.Dependency dependency : dependencies) {
++            for (LibraryArtifact current : unresolvedPrincipalArtifactList) {
++                if (dependency.resolveWith(current)) {
++                    unresolvedDeps--;
++                    depNameToArtifactIndex.put(dependency.getName(), current);
++                    break;
++                }
++            }
++        }
++
++        if (unresolvedDeps == 0) {
++            dependencies.clear();
++            return true;
++        } else {
++            return false;
++        }
++    }
++
++    /**
++     * load all library artifacts on this library
++     * this should be called when a import is taking place
++     *
++     * @return success
++     */
++    public synchronized boolean loadLibrary() {
++        if (!isLoaded) {
++            for (String  artifactName : depNameToArtifactIndex.keySet()) {
++                loadLibrary(artifactName);
++            }
++        }
++        isLoaded = true;
++        return true;
++    }
++
++    /**
++     * load all library artifacts on this library for the given QName
++     * this should be called when a import is taking place
++     *
++     * @return success
++     */
++    public synchronized void loadLibrary(String  artifactDependencyName) {
++        LibraryArtifact libAr = depNameToArtifactIndex.get(artifactDependencyName);
++        libAr.loadComponentsInto(this);
++
++        //TODO once all components are loaded iterate and initialize Lifecycle method #init() ?
++    }
++
++    /**
++     * unload all library artifacts on this library for the given QName
++     * this should be called when a import is no longer valid/ non-existent
++     *
++     * @return success
++     */
++    public synchronized boolean unLoadLibrary() {
++        //TODO when components are un-loaded iterate and execute Lifecycle method #destroy() ?
++        libComponentIndex.clear();
++        isLoaded = false;
++        return true;
++    }
++
++    public void clear() {
++        depNameToArtifactIndex.clear();
++        libArtifactDetails.clear();
++        libComponentIndex.clear();
++    }
++
++    /**
++     * return synapse lib artifact deployed by this library with the given Local name
++     *
++     * @param artifacName
++     * @return
++     */
++    public Object getArtifact(String artifacName) {
++        if (libComponentIndex.containsKey(artifacName)) {
++            return libComponentIndex.get(artifacName);
++        }
++        return null;
++    }
++
++    public String toString() {
++        return qualifiedName.toString();
++    }
++
++    public String getPackage() {
++        return packageN;
++    }
++
++    public void setDescription(String description) {
++        this.description = description;
++    }
++
++    public String getDescription() {
++        return description;
++    }
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/libraries/imports/SynapseImport.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/libraries/imports/SynapseImport.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/libraries/imports/SynapseImport.java	(revision 1237557)
+@@ -0,0 +1,56 @@
++/*
++*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
++*
++*  WSO2 Inc. licenses this file to you under the Apache License,
++*  Version 2.0 (the "License"); you may not use this file except
++*  in compliance with the License.
++*  You may obtain a copy of the License at
++*
++*    http://www.apache.org/licenses/LICENSE-2.0
++*
++* Unless required by applicable law or agreed to in writing,
++* software distributed under the License is distributed on an
++* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++* KIND, either express or implied.  See the License for the
++* specific language governing permissions and limitations
++* under the License.
++*/
++package org.apache.synapse.libraries.imports;
++
++import org.apache.synapse.libraries.util.LibDeployerUtils;
++
++public class SynapseImport {
++
++    private String importedLibName;
++    private String importedLibPackage;
++    private String fileName;
++
++    public String getLibName() {
++        return importedLibName;
++    }
++
++    public void setLibName(String name) {
++        this.importedLibName = name;
++    }
++
++    public String getLibPackage() {
++        return importedLibPackage;
++    }
++
++    public void setLibPackage(String version) {
++        this.importedLibPackage = version;
++    }
++
++    public String getFileName() {
++        return fileName;
++    }
++
++    public void setFileName(String fileName) {
++        this.fileName = fileName;
++    }
++
++    public String getName() {
++        return LibDeployerUtils.getQualifiedName(this);
++    }
++
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/libraries/util/LibDeployerConstants.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/libraries/util/LibDeployerConstants.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/libraries/util/LibDeployerConstants.java	(revision 1237557)
+@@ -0,0 +1,39 @@
++/*
++*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
++*
++*  WSO2 Inc. licenses this file to you under the Apache License,
++*  Version 2.0 (the "License"); you may not use this file except
++*  in compliance with the License.
++*  You may obtain a copy of the License at
++*
++*    http://www.apache.org/licenses/LICENSE-2.0
++*
++* Unless required by applicable law or agreed to in writing,
++* software distributed under the License is distributed on an
++* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++* KIND, either express or implied.  See the License for the
++* specific language governing permissions and limitations
++* under the License.
++*/
++package org.apache.synapse.libraries.util;
++
++public class LibDeployerConstants {
++
++    public static final String SYNAPSE_LIBS = "libs";
++    public static final String NAME = "name";
++    public static final String TYPE = "type";
++    public static final String VERSION = "version";
++
++    public static final String ARTIFACT_XML = "artifact.xml";
++
++    public static final String ARTIFACT = "artifact";
++    public static final String DEPENDENCY = "dependency";
++
++    public static final String SUB_ARTIFACTS = "subArtifacts";
++    public static final String FILE = "file";
++    public static final String PACKAGE_ATTR = "package";
++    public static final String DESCRIPTION_ELEMENT = "description";
++    public static final String ARTIFACTS_XML = "artifacts.xml";
++
++    public static final String SYNAPSE_LIB_FORMAT = "zip";
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/libraries/util/LibDeployerUtils.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/libraries/util/LibDeployerUtils.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/libraries/util/LibDeployerUtils.java	(revision 1237557)
+@@ -0,0 +1,460 @@
++/*
++*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
++*
++*  WSO2 Inc. licenses this file to you under the Apache License,
++*  Version 2.0 (the "License"); you may not use this file except
++*  in compliance with the License.
++*  You may obtain a copy of the License at
++*
++*    http://www.apache.org/licenses/LICENSE-2.0
++*
++* Unless required by applicable law or agreed to in writing,
++* software distributed under the License is distributed on an
++* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++* KIND, either express or implied.  See the License for the
++* specific language governing permissions and limitations
++* under the License.
++*/
++package org.apache.synapse.libraries.util;
++
++import org.apache.axiom.om.OMAttribute;
++import org.apache.axiom.om.OMElement;
++import org.apache.axiom.om.impl.builder.StAXOMBuilder;
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.SynapseException;
++import org.apache.synapse.deployers.SynapseArtifactDeploymentException;
++import org.apache.synapse.libraries.imports.SynapseImport;
++import org.apache.synapse.libraries.model.Library;
++import org.apache.synapse.libraries.model.LibraryArtifact;
++import org.apache.synapse.libraries.model.SynapseLibrary;
++
++import javax.xml.namespace.QName;
++import javax.xml.stream.XMLStreamException;
++import java.io.*;
++import java.util.*;
++import java.util.zip.ZipEntry;
++import java.util.zip.ZipFile;
++
++public class LibDeployerUtils {
++
++    public static final String APP_UNZIP_DIR;
++
++    static {
++        String javaTempDir = System.getProperty("java.io.tmpdir");
++        APP_UNZIP_DIR = javaTempDir.endsWith(File.separator) ?
++                        javaTempDir + LibDeployerConstants.SYNAPSE_LIBS :
++                        javaTempDir + File.separator + LibDeployerConstants.SYNAPSE_LIBS;
++        createDir(APP_UNZIP_DIR);
++    }
++
++    private static final Log log = LogFactory.getLog(LibDeployerUtils.class);
++
++
++
++    public static Library createSynapseLibrary(String libPath) {
++        String libFilePath = LibDeployerUtils.formatPath(libPath);
++        //extract
++        String extractPath = LibDeployerUtils.extractSynapseLib(libFilePath);
++        //create synapse lib metadata
++        SynapseLibrary synapseLib = LibDeployerUtils.populateDependencies(extractPath + LibDeployerConstants.ARTIFACTS_XML);
++        //resolve synapse lib artifacts
++        LibDeployerUtils.searchAndResolveDependencies(extractPath, synapseLib);
++        return synapseLib;
++    }
++
++    /**
++     * populate Dependencies using main root artifacts.xml.. Schema for artifacts.xml is follwing
++     *
++     *<artifacts>
++         <artifact name="SampleLib" package="synapse.sample" >
++                <dependency artifact="templates1" /> +
++                <description>sample synapse library</description> ?
++         </artifact>
++    </artifacts>
++     *
++     * @param libXmlPath
++     * @return
++     */
++    private static SynapseLibrary populateDependencies(String libXmlPath) {
++        File f = new File(libXmlPath);
++        if (!f.exists()) {
++            throw new SynapseException("artifacts.xml file not found at : " + libXmlPath);
++        }
++        InputStream xmlInputStream = null;
++        try {
++            xmlInputStream = new FileInputStream(f);
++            OMElement documentElement = new StAXOMBuilder(xmlInputStream).getDocumentElement();
++            if (documentElement == null) {
++                throw new SynapseArtifactDeploymentException("Document element for artifacts.xml is " +
++                                                             "null. Can't build " +
++                                                             "the synapse library configuration");
++            }
++            Iterator artifactItr = documentElement.getChildrenWithLocalName(LibDeployerConstants.ARTIFACT);
++            SynapseLibrary mainSynLibArtifact = null;
++            mainSynLibArtifact = createSynapseLibraryWithDeps(((OMElement) artifactItr.next()));
++            if (mainSynLibArtifact == null) {
++                throw new SynapseArtifactDeploymentException("artifacts.xml is invalid. <artifact> element" +
++                                                             " Not Found ");
++            }
++            return mainSynLibArtifact;
++        } catch (FileNotFoundException e) {
++            throw new SynapseArtifactDeploymentException("artifacts.xml File cannot be loaded from " + libXmlPath, e);
++
++        } catch (XMLStreamException e) {
++            throw new SynapseArtifactDeploymentException("Error while parsing the artifacts.xml file ", e);
++        } finally {
++            if (xmlInputStream != null) {
++                try {
++                    xmlInputStream.close();
++                } catch (IOException e) {
++                    log.error("Error while closing input stream.", e);
++                }
++            }
++        }
++    }
++
++    /**
++     * Builds the Artifact object when an artifact element is given
++     *
++     * @param artifactEle - artifact OMElement
++     * @return created Artifact object
++     */
++    private static SynapseLibrary createSynapseLibraryWithDeps(OMElement artifactEle) {
++        if (artifactEle == null) {
++            return null;
++        }
++        SynapseLibrary synLib = new SynapseLibrary(readAttribute(artifactEle, LibDeployerConstants.NAME),
++                                                   readAttribute(artifactEle, LibDeployerConstants.PACKAGE_ATTR));
++        synLib.setDescription(readChildText(artifactEle,LibDeployerConstants.DESCRIPTION_ELEMENT));
++        // read the dependencies
++        Iterator itr = artifactEle.getChildrenWithLocalName(LibDeployerConstants.DEPENDENCY);
++        while (itr.hasNext()) {
++            OMElement depElement = (OMElement) itr.next();
++            // create a synLib for each dependency and add to the root synLib
++            LibraryArtifact.Dependency dep = new LibraryArtifact.Dependency(readAttribute(depElement,
++                                                                     LibDeployerConstants.ARTIFACT));
++            synLib.addDependency(dep);
++        }
++
++        return synLib;
++    }
++
++
++    /**
++     * Deploys all artifacts under a root artifact..
++     *
++     * @param rootDirPath - root dir of the extracted artifact
++     * @param library     - lib instance
++     */
++    private static void searchAndResolveDependencies(String rootDirPath,
++                                                    SynapseLibrary library) {
++        List<LibraryArtifact> libraryArtifacts = new ArrayList<LibraryArtifact>();
++        File extractedDir = new File(rootDirPath);
++        File[] allFiles = extractedDir.listFiles();
++        if (allFiles == null) {
++            return;
++        }
++
++
++        // search for all directories under the extracted path
++        for (File artifactDirectory : allFiles) {
++            if (!artifactDirectory.isDirectory()) {
++                continue;
++            }
++
++            String directoryPath = formatPath(artifactDirectory.getAbsolutePath());
++            String artifactXmlPath = directoryPath + File.separator + LibDeployerConstants.ARTIFACT_XML;
++
++            File f = new File(artifactXmlPath);
++            // if the artifact.xml not found, ignore this dir
++            if (!f.exists()) {
++                continue;
++            }
++
++            LibraryArtifact artifact = null;
++            InputStream xmlInputStream = null;
++            try {
++                xmlInputStream = new FileInputStream(f);
++                artifact = buildArtifact(library, xmlInputStream, directoryPath);
++            } catch (FileNotFoundException e) {
++                log.warn("Error while resolving synapse lib dir :"
++                                                             + artifactDirectory.getName() +
++                                                             " artifacts.xml File cannot be loaded " +
++                                                             "from " + artifactXmlPath, e);
++            } catch (Exception e) {
++                log.warn("Error ocurred while resolving synapse lib dir :"
++                                                             + artifactDirectory.getName() +
++                                                             " for artifacts.xml path" + artifactXmlPath, e);
++            } finally {
++                if (xmlInputStream != null) {
++                    try {
++                        xmlInputStream.close();
++                    } catch (IOException e) {
++                        log.error("Error while closing input stream.", e);
++                    }
++                }
++            }
++
++            if (artifact == null) {
++                log.warn("Could not build lib artifact for path : " + directoryPath + " Synapse Library :" +
++                         library.getQName() + ". Continue searching for other lib artifacts");
++                continue;
++
++            }
++            libraryArtifacts.add(artifact);
++        }
++        boolean isDepsResolved = library.resolveDependencies(libraryArtifacts);
++        if (!isDepsResolved) {
++            throw new SynapseArtifactDeploymentException("Error when resolving Dependencies for lib : " + library.toString());
++        }
++    }
++
++    /**
++     * Builds the artifact from the given input steam and adds it as a dependency in the provided
++     *  parent Synapse library artifact
++     *
++     * @param library
++     * @param artifactXmlStream - xml input stream of the artifact.xml
++     * @param directoryPath
++     * @return - Artifact instance if successfull. otherwise null..
++     */
++    private static LibraryArtifact buildArtifact(SynapseLibrary library, InputStream artifactXmlStream, String directoryPath) {
++        LibraryArtifact artifact = null;
++        try {
++            OMElement artElement = new StAXOMBuilder(artifactXmlStream).getDocumentElement();
++
++            if (LibDeployerConstants.ARTIFACT.equals(artElement.getLocalName())) {
++                artifact = populateLibraryArtifact(artElement, directoryPath, null, library);
++            } else {
++                log.error("artifact.xml is invalid. Error occurred while resolving Synapse Library : "
++                          + library.getQName());
++                return null;
++            }
++        } catch (XMLStreamException e) {
++            throw new SynapseArtifactDeploymentException("Error parsing artifact.xml for path : " +
++                                                         directoryPath ,e);
++        }
++
++        if (artifact == null || artifact.getName() == null) {
++            log.error("Invalid artifact found in Synapse Library : "
++                      + library.getQName() );
++            return null;
++        }
++        return artifact;
++    }
++
++
++    /**
++     * Builds the Artifact object when an root artifact element is given . Schema for artifact.xml
++     * is as follows
++     * <artifact name="templates1" type="synapse/template" >
++
++        <subArtifacts>
++            <artifact name="greet_func1" >
++                    <file>templ1_ns1.xml</file>
++                    <description>sample synapse library artifact Description</description> ?
++            </artifact> *
++        </subArtifacts> *
++
++        <description>sample synapse library artifact Description</description> ?
++    </artifact>
++     *
++     * @param artifactEle - artifact OMElement
++     * @return created Artifact object
++     */
++    private static LibraryArtifact populateLibraryArtifact(OMElement artifactEle, String artifactPath,
++                                                          LibraryArtifact parent , SynapseLibrary library) {
++        if (artifactEle == null || artifactPath == null ) {
++            return null;
++        }
++
++        LibraryArtifact artifact = new LibraryArtifact(readAttribute(artifactEle, LibDeployerConstants.NAME));
++        artifact.setParent(parent);
++        artifact.setType(readAttribute(artifactEle, LibDeployerConstants.TYPE));
++        artifact.setPath(artifactPath);
++
++        artifact.setDescription(readChildText(artifactEle,LibDeployerConstants.DESCRIPTION_ELEMENT));
++        //add a description of this artifact(if availalbe) to Synapse Library
++        library.addArtifactDescription(artifact);
++        // read the subArtifacts
++        OMElement subArtifactsElement = artifactEle
++                .getFirstChildWithName(new QName(LibDeployerConstants.SUB_ARTIFACTS));
++        if (subArtifactsElement != null) {
++            Iterator subArtItr = subArtifactsElement.getChildrenWithLocalName(LibDeployerConstants.ARTIFACT);
++            while (subArtItr.hasNext()) {
++                // as this is also an artifact, use recursion
++                LibraryArtifact subArtifact = populateLibraryArtifact((OMElement) subArtItr.next(), artifactPath, artifact, library);
++                artifact.addSubArtifact(subArtifact);
++            }
++        }
++
++        // read and check for files
++        Iterator fileItr = artifactEle.getChildrenWithLocalName(LibDeployerConstants.FILE);
++        while (fileItr.hasNext()) {
++            OMElement fileElement = (OMElement) fileItr.next();
++            artifact.setupFile(fileElement.getText());
++        }
++        return artifact;
++    }
++
++    public static void loadLibArtifacts(SynapseImport synImport, Library library) {
++        if (synImport.getLibName().equals(library.getQName().getLocalPart()) &&
++            synImport.getLibPackage().equals(library.getPackage())) {
++            library.loadLibrary();
++        }
++    }
++
++    public static <T> T getLibArtifact(Map<String, Library> librarySet, String key, Class<T> type) {
++        for (Library synapseLibrary : librarySet.values()) {
++            try {
++                T artifact = (T) synapseLibrary.getArtifact(key);
++                if (artifact != null) {
++                    return artifact;
++                }
++            } catch (Exception e) {
++                //ignore
++            }
++        }
++        return null;
++    }
++
++    public static String getQualifiedName(SynapseImport synImport){
++        return new QName(synImport.getLibPackage(),synImport.getLibName()).toString();
++    }
++
++
++    ///////////////////////
++    ////////////////// Start Common Utility Methods
++    /**
++     * Reads an attribute in the given element and returns the value of that attribute
++     *
++     * @param element - Element to search
++     * @param attName - attribute name
++     * @return if the attribute found, return value. else null.
++     */
++    public static String readAttribute(OMElement element, String attName) {
++        if (element == null) {
++            return null;
++        }
++        OMAttribute temp = element.getAttribute(new QName(attName));
++        if (temp != null) {
++            return temp.getAttributeValue();
++        }
++        return null;
++    }
++
++    public static String readChildText(OMElement element, String ln) {
++        return readChildText(element, ln, null);
++    }
++
++    /**
++     * Reads a text node which is in a child element of the given element and returns the text
++     * value.
++     *
++     * @param element - Element to search
++     * @param ln      - Child element name
++     * @param ns      - Child element namespace
++     * @return if the child text element found, return text value. else null.
++     */
++    public static String readChildText(OMElement element, String ln, String ns) {
++        if (element == null) {
++            return null;
++        }
++        OMElement temp = element.getFirstChildWithName(new QName(ns, ln));
++        if (temp != null) {
++            return temp.getText();
++        }
++        return null;
++    }
++
++
++    /**
++     * Extract the Synapse Library at the provided path to the java temp dir. Return the
++     * extracted location
++     *
++     * @param libPath - Absolute path of the Synapse Lib archive file
++     * @return - extracted location
++     * @throws SynapseException - error on extraction
++     */
++    public static String extractSynapseLib(String libPath) throws SynapseException {
++        libPath = formatPath(libPath);
++        String fileName = libPath.substring(libPath.lastIndexOf('/') + 1);
++        String dest = APP_UNZIP_DIR + File.separator + System.currentTimeMillis() +
++                      fileName + File.separator;
++        createDir(dest);
++
++        try {
++            extract(libPath, dest);
++        } catch (IOException e) {
++            throw new SynapseException("Error while extracting Synapse Library : " + fileName, e);
++        }
++        return dest;
++    }
++
++    /**
++     * Format the string paths to match any platform.. windows, linux etc..
++     *
++     * @param path - input file path
++     * @return formatted file path
++     */
++    public static String formatPath(String path) {
++        // removing white spaces
++        path = path.replaceAll("\\b\\s+\\b", "%20");
++        // replacing all "\" with "/"
++        return path.replace('\\', '/');
++    }
++
++    private static void extract(String sourcePath, String destPath) throws IOException {
++        Enumeration entries;
++        ZipFile zipFile;
++
++        zipFile = new ZipFile(sourcePath);
++        entries = zipFile.entries();
++
++        while (entries.hasMoreElements()) {
++            ZipEntry entry = (ZipEntry) entries.nextElement();
++            // we don't need to copy the META-INF dir
++            if (entry.getName().startsWith("META-INF/")) {
++                continue;
++            }
++            // if the entry is a directory, create a new dir
++            if (entry.isDirectory()) {
++                createDir(destPath + entry.getName());
++                continue;
++            }
++            // if the entry is a file, write the file
++            copyInputStream(zipFile.getInputStream(entry),
++                            new BufferedOutputStream(new FileOutputStream(destPath + entry.getName())));
++        }
++        zipFile.close();
++    }
++
++
++    public static void createDir(String path) {
++        File temp = new File(path);
++        if (!temp.exists() && !temp.mkdir()) {
++            log.error("Error while creating directory : " + path);
++        }
++    }
++
++    private static void copyInputStream(InputStream in, OutputStream out)
++            throws IOException {
++        byte[] buffer = new byte[40960];
++        int len;
++
++        while ((len = in.read(buffer)) >= 0) {
++            out.write(buffer, 0, len);
++        }
++
++        in.close();
++        out.close();
++    }
++
++    /////////////////// End Of Common Utility Methods
++
++
++    public static void main(String[] args) {
++        new SynapseLibrary(null, null).resolveDependencies(null);
++    }
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java	(revision 1237556)
++++ java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java	(revision 1237557)
+@@ -31,11 +31,17 @@
+ import org.apache.axis2.format.PlainTextBuilder;
+ import org.apache.axis2.phaseresolver.PhaseException;
+ import org.apache.axis2.phaseresolver.PhaseMetadata;
++import org.apache.commons.io.FileUtils;
++import org.apache.commons.io.FilenameUtils;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
+ import org.apache.synapse.commons.datasource.DataSourceRepositoryHolder;
+ import org.apache.synapse.commons.util.RMIRegistryController;
+ import org.apache.synapse.config.*;
++import org.apache.synapse.libraries.imports.SynapseImport;
++import org.apache.synapse.libraries.model.Library;
++import org.apache.synapse.libraries.util.LibDeployerConstants;
++import org.apache.synapse.libraries.util.LibDeployerUtils;
+ import org.apache.synapse.securevault.SecurityConstants;
+ import org.apache.synapse.securevault.secret.SecretCallbackHandler;
+ import org.apache.synapse.commons.datasource.DataSourceInformationRepository;
+@@ -51,6 +57,7 @@
+ import org.apache.synapse.util.xpath.ext.SynapseXpathVariableResolver;
+ import org.apache.synapse.util.xpath.ext.XpathExtensionUtil;
+ 
++import java.io.File;
+ import java.util.*;
+ 
+ /**
+@@ -205,7 +212,43 @@
+ 
+     }
+ 
++    private void initSynapseLibraries(SynapseConfiguration synapseConfig, String root) {
++        File synLibDir = new File(root, "repository" + File.separator +"conf" +
++                                        File.separator +"synapse-libs");
++        if (synLibDir.exists()) {
++            if (log.isDebugEnabled()) {
++                log.debug("Loading Synapse Libraries from :" + synLibDir.getPath());
++            }
+ 
++            Iterator synLibFile = FileUtils.iterateFiles(synLibDir, new String[]{LibDeployerConstants.SYNAPSE_LIB_FORMAT}, false);
++            while (synLibFile.hasNext()) {
++                File file = (File) synLibFile.next();
++                Library lib = LibDeployerUtils.createSynapseLibrary(FilenameUtils.normalize(file.getAbsolutePath()));
++                String libArtifactName = lib.getQName().toString();
++                //add the library to synapse Config
++                synapseConfig.addSynapseLibrary(lib.toString(), lib);
++                synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
++                                                                           libArtifactName);
++                if (log.isDebugEnabled()) {
++                    log.debug("Synapse Library Deployment for lib: " + libArtifactName + " Completed");
++                }
++
++                //each time a library is deployed we check with available imports  and
++                //if necessary (ie:- relevant import is available) load the libraries
++                SynapseImport synImport = synapseConfig.getSynapseImports().get(libArtifactName);
++                if (synImport != null) {
++                    LibDeployerUtils.loadLibArtifacts(synImport, lib);
++                    if (log.isDebugEnabled()) {
++                        log.debug("Loading Synapse Library: " + libArtifactName + " into memory for Import");
++                    }
++
++                }
++            }
++        }
++
++    }
++
++
+     /**
+      * {@inheritDoc}
+      */
+@@ -470,6 +513,7 @@
+             synapseConfiguration = SynapseConfigurationBuilder.getDefaultConfiguration();
+         }
+ 
++        initSynapseLibraries(synapseConfiguration, serverConfigurationInformation.getSynapseHome());
+         Enumeration keys = properties.keys();
+         while (keys.hasMoreElements()) {
+             String key = (String) keys.nextElement();
+Index: java/modules/core/pom.xml
+===================================================================
+--- java/modules/core/pom.xml	(revision 1237556)
++++ java/modules/core/pom.xml	(revision 1237557)
+@@ -147,6 +147,7 @@
+                             org.apache.synapse.endpoints.*,
+                             org.apache.synapse.eventing.*,
+                             org.apache.synapse.mediators.*,
++                            org.apache.synapse.libraries.*,
+                             org.apache.synapse.message.*,
+                             org.apache.synapse.metrics.*,
+                             org.apache.synapse.registry.*,
+Index: java/repository/conf/axis2.xml
+===================================================================
+--- java/repository/conf/axis2.xml	(revision 1237556)
++++ java/repository/conf/axis2.xml	(revision 1237557)
+@@ -93,6 +93,8 @@
+     <deployer extension="xml" directory="conf/synapse-config/message-stores" class="org.apache.synapse.deployers.MessageStoreDeployer"/>
+     <deployer extension="xml" directory="conf/synapse-config/message-processors" class="org.apache.synapse.deployers.MessageProcessorDeployer"/>
+     <deployer extension="xml" directory="conf/synapse-config/api" class="org.apache.synapse.deployers.APIDeployer"/>
++    <deployer extension="xml" directory="conf/synapse-config/imports" class="org.apache.synapse.deployers.ImportDeployer"/>
++    <deployer extension="zip" directory="conf/synapse-libs" class="org.apache.synapse.deployers.LibraryArtifactDeployer"/>
+ 
+     <!-- Following parameter will set the host name for the epr-->
+     <!--<parameter name="hostname" locked="true">myhost.com</parameter>-->
+-*-*-*-
+Message: including changes for Synapse Libraries implementation.. With Synapse libraries users can deploy synapse configurations using a .zip file on the fly and can be accessed as a thirdparty package , similar to java libraries..Currently this is tightly coupled with synapse templates..
+-*-*-*-
+When: 2012-01-30 02:48:16 -0500 
+-*-*-*-
+Who: uswick

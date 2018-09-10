@@ -1,0 +1,53 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         return executor;\r\n",
+            "     }\r\n",
+            " \r\n",
+            "-    public static MessageStore defineMessageStore(SynapseConfiguration config ,\r\n",
+            "+    public static MessageStore defineMessageStore(SynapseConfiguration config,\r\n",
+            "                                                   OMElement elem, Properties properties) {\r\n",
+            "-        MessageStore messageStore = MessageStoreFactory.createMessageStore(elem, properties);\r\n",
+            "-        config.addMessageStore(messageStore.getName(), messageStore);\r\n",
+            "+        MessageStore messageStore = null;\r\n",
+            "+        try {\r\n",
+            "+            messageStore = MessageStoreFactory.createMessageStore(elem, properties);\r\n",
+            "+            config.addMessageStore(messageStore.getName(), messageStore);\r\n",
+            "+        } catch (Exception e) {\r\n",
+            "+            String msg = \"Message Store configuration cannot be built\";\r\n",
+            "+            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_MESSAGE_STORES, msg, e);\r\n",
+            "+        }\r\n",
+            "         return messageStore;\r\n",
+            "     }\r\n",
+            " \r\n",
+            "     public static MessageProcessor defineMessageProcessor(SynapseConfiguration config,\r\n",
+            "                                                           OMElement elem, Properties properties) {\r\n",
+            "-        MessageProcessor processor  = MessageProcessorFactory.createMessageProcessor(elem);\r\n",
+            "-        config.addMessageProcessor(processor.getName(), processor);\r\n",
+            "+        MessageProcessor processor = null;\r\n",
+            "+        try {\r\n",
+            "+            processor = MessageProcessorFactory.createMessageProcessor(elem);\r\n",
+            "+            config.addMessageProcessor(processor.getName(), processor);\r\n",
+            "+        } catch (Exception e) {\r\n",
+            "+            String msg = \"Message Processor configuration cannot be built\";\r\n",
+            "+            handleConfigurationError(SynapseConstants.FAIL_SAFE_MODE_MESSAGE_PROCESSORS, msg, e);\r\n",
+            "+        }\r\n",
+            "         return processor;\r\n",
+            "     }\r\n",
+            " \r\n"
+          ],
+          "locn": "-277,17 +277,29"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseXMLConfigurationFactory.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseXMLConfigurationFactory.java"
+    }
+  ],
+  "id": "1505197",
+  "message": "Applying patch for SYNAPSE-941. Fail safe mode for message stores and processors.",
+  "when": "2013-07-20T16:17:45-04:00",
+  "who": "hiranya"
+}

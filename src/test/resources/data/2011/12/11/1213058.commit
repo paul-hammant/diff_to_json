@@ -1,0 +1,23 @@
+Index: java/src/site/resources/doap_Synapse.rdf
+===================================================================
+--- java/src/site/resources/doap_Synapse.rdf	(revision 1213057)
++++ java/src/site/resources/doap_Synapse.rdf	(revision 1213058)
+@@ -35,9 +35,9 @@
+     <download-page rdf:resource="http://synapse.apache.org/download.cgi" />
+     <programming-language>Java</programming-language>
+     <category rdf:resource="http://projects.apache.org/category/xml" />
+-    <category rdf:resource="http://www.apache.org/category/http"/>
+-    <category rdf:resource="http://www.apache.org/category/network-server"/>
+-    <category rdf:resource="http://www.apache.org/category/network-client"/>
++    <category rdf:resource="http://projects.apache.org/category/http"/> 
++    <category rdf:resource="http://projects.apache.org/category/network-server"/> 
++    <category rdf:resource="http://projects.apache.org/category/network-client"/>
+     
+     <release>
+       <Version>
+-*-*-*-
+Message: SYNAPSE-826: Fixed an error in the DOAP file.
+-*-*-*-
+When: 2011-12-11 15:41:34 -0500 
+-*-*-*-
+Who: veithen

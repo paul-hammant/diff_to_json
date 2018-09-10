@@ -1,0 +1,79 @@
+Index: java/modules/transports/core/nhttp/src/test/java/org/apache/synapse/transport/utils/sslcert/RevocationVerificationTest.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/test/java/org/apache/synapse/transport/utils/sslcert/RevocationVerificationTest.java	(revision 1731394)
++++ java/modules/transports/core/nhttp/src/test/java/org/apache/synapse/transport/utils/sslcert/RevocationVerificationTest.java	(revision 1731395)
+@@ -18,17 +18,19 @@
+  */
+ package org.apache.synapse.transport.utils.sslcert;
+ 
+-import junit.framework.TestCase;
+ import org.apache.synapse.transport.utils.sslcert.crl.CRLCache;
+ import org.apache.synapse.transport.utils.sslcert.crl.CRLVerifier;
+ import org.apache.synapse.transport.utils.sslcert.ocsp.OCSPCache;
+ import org.apache.synapse.transport.utils.sslcert.ocsp.OCSPVerifier;
+ import org.apache.synapse.transport.utils.sslcert.pathvalidation.CertificatePathValidator;
++import org.junit.Assert;
++import org.junit.Ignore;
++import org.junit.Test;
+ 
+ import java.security.Security;
+ import java.security.cert.X509Certificate;
+ 
+-public class RevocationVerificationTest extends TestCase {
++public class RevocationVerificationTest extends Assert {
+ 
+     /**
+      * Tests CRL Path Validation with the use of a real certificate chain. The verification process
+@@ -40,6 +42,8 @@
+      *
+      * @throws Exception
+      */
++    @Test
++    @Ignore("Unit tests with builtin expiration date are bad")
+     public void testCRLPathValidation() throws Exception {
+         //Add BouncyCastle as Security Provider.
+         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+@@ -54,6 +58,7 @@
+      *
+      * @throws Exception
+      */
++    @Test
+     public void testCRLPathValidationWithFakeCerts() throws Exception {
+         //Add BouncyCastle as Security Provider.
+         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+@@ -76,6 +81,8 @@
+      *
+      * @throws Exception
+      */
++    @Test
++    @Ignore("Unit tests with builtin expiration date are bad")
+     public void testOCSPPathValidation() throws Exception {
+         //Add BouncyCastle as Security Provider.
+         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+@@ -91,6 +98,7 @@
+      *
+      * @throws Exception
+      */
++    @Test
+     public void testOCSPPathValidationWithFakeCerts() throws Exception {
+ 
+         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1731394)
++++ java/pom.xml	(revision 1731395)
+@@ -1079,7 +1079,7 @@
+         <geronimo-spec.version>1.1</geronimo-spec.version>
+ 
+         <!-- misc -->
+-        <junit.version>3.8.2</junit.version>
++        <junit.version>4.12</junit.version>
+         <!-- Warning: log4j versions above 1.2.14 introduce additional transitive dependencies,
+              some of which are not available from the Maven central repository. -->
+         <log4j.version>1.2.14</log4j.version>
+-*-*-*-
+Message: Disable two test cases which are fundamentally broken because they will always fail after a certain date.
+-*-*-*-
+When: 2016-02-20 07:52:50 -0500 
+-*-*-*-
+Who: veithen

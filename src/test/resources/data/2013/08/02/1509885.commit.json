@@ -1,0 +1,99 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                         task(in the whole transport, i.e. only a single AMQP proxy per flow)\n",
+            "                         to achieve in order delivery</dd>\n",
+            "                     <dt>\n",
+            "-                        <tt>transport.amqp.InitialReconnectDuration</tt>\n",
+            "-                    </dt>\n",
+            "-                    <dd>If a polling task encounter an exception due to some reason(most probably\n",
+            "-                        due to broker outage) the number of milliseconds it should be suspended\n",
+            "-                        before next re-try</dd>\n",
+            "-                    <dt>\n",
+            "-                        <tt>transport.amqp.ReconnectionProgressionFactor</tt>\n",
+            "-                    </dt>\n",
+            "-                    <dd>If the polling task fails again after the initial re-connection duration,\n",
+            "-                        next suspend duration will be calculated using this.</dd>\n",
+            "-                    <dt>\n",
+            "-                        <tt>transport.amqp.MaximumReconnectionDuration</tt>\n",
+            "-                    </dt>\n",
+            "-                    <dd>The maximum duration to suspend the polling task in case of an error. The\n",
+            "-                        current suspend duration will reach this value by following the series;\n",
+            "-                        transport.amqp.ReconnectionProgressionFactor * transport.amqp.InitialReconnectDuration.\n",
+            "-                        This upper bound is there because nobody wants to wait a long time until the\n",
+            "-                        next re-try if the broker is alive.\n",
+            "-                    </dd>\n",
+            "-                    <dt>\n",
+            "                         <tt>transport.amqp.ConnectionFactoryName</tt>\n",
+            "                     </dt>\n",
+            "                     <dd>The connection factory to be used either with consumer or producer.</dd>\n"
+          ],
+          "locn": "-935,26 +935,6"
+        },
+        {
+          "lines": [
+            "                     </dt>\n",
+            "                     <dd>Message context property to set the type of the AMQP message</dd>\n",
+            "                     <dt>\n",
+            "+                        <tt>AMQP_PRODUCER_TX</tt>\n",
+            "+                    </dt>\n",
+            "+                    <dd>Use transactions at producer side. Possible values are tx(for blocking transactions),\n",
+            "+                        lwpc(for light weight producer connections).\n",
+            "+                    </dd>\n",
+            "+                    <dt>\n",
+            "                         <tt>connection-factory-pool-size</tt>\n",
+            "                     </dt>\n",
+            "                     <dd>A system property to set the worker pool size of the connection factory executor service.</dd>\n"
+          ],
+          "locn": "-1033,6 +1013,12"
+        },
+        {
+          "lines": [
+            "                         <tt>semaphore-time-out</tt>\n",
+            "                     </dt>\n",
+            "                     <dd>A system property to set the time out(in seconds) of semaphore which waits for\n",
+            "-                    a response.</dd>\n",
+            "+                    a response.\n",
+            "+                    </dd>\n",
+            "                     <dt>\n",
+            "-                        <tt>AMQP_PRODUCER_TX</tt>\n",
+            "+                        <tt>initial-reconnect-duration</tt>\n",
+            "                     </dt>\n",
+            "-                    <dd>Use transactions at producer side. Possible values are tx(for blocking transactions),\n",
+            "-                        lwpc(for light weight producer connections).</dd>\n",
+            "+                    <dd>If a polling task encounter an exception due to some reason(most probably\n",
+            "+                        due to broker outage) it will be suspended until a successful re-connect.\n",
+            "+                        This system property defines the initial duration that the re-connection\n",
+            "+                        check task should should be suspended(1000 ms by default) before next re-try.</dd>\n",
+            "+                    <dt>\n",
+            "+                        <tt>reconnection-progression-factor</tt>\n",
+            "+                    </dt>\n",
+            "+                    <dd>A system property to define the factor(2.0 by default) to multiply the initial\n",
+            "+                        suspended duration to calculate the next suspending duration for the\n",
+            "+                        re-connection check task.</dd>\n",
+            "+                    <dt>\n",
+            "+                        <tt>maximum-reconnection-duration</tt>\n",
+            "+                    </dt>\n",
+            "+                    <dd>The maximum duration that re-connection check task should be suspended(\n",
+            "+                        10 minutes by default). After this time is reached, the suspended duration\n",
+            "+                        will be fall back to its original initial configured duration.\n",
+            "+                    </dd>\n",
+            "                 </dl>\n",
+            "             </subsection>\n",
+            "             <subsection name=\"Sample Configurations\" id=\"amqp_transport_ex\">\n"
+          ],
+          "locn": "-1044,12 +1030,28"
+        }
+      ],
+      "from": "java/modules/documentation/src/site/xdoc/userguide/transports.xml",
+      "to": "java/modules/documentation/src/site/xdoc/userguide/transports.xml"
+    }
+  ],
+  "id": "1509885",
+  "message": "fixed the amqp docs.",
+  "when": "2013-08-02T18:03:33-04:00",
+  "who": "rajikak"
+}

@@ -1,0 +1,164 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.axiom.om.OMElement;\n",
+            " import org.apache.axiom.om.OMNode;\n",
+            " import org.apache.axiom.om.OMText;\n",
+            "+import org.apache.axiom.om.util.AXIOMUtil;\n",
+            " import org.apache.axiom.soap.SOAPBody;\n",
+            " import org.apache.axiom.soap.SOAPEnvelope;\n",
+            " import org.apache.axis2.AxisFault;\n"
+          ],
+          "locn": "-21,6 +21,7"
+        },
+        {
+          "lines": [
+            " import org.apache.synapse.util.xpath.SynapseXPath;\n",
+            " import org.jaxen.JaxenException;\n",
+            " \n",
+            "+import javax.xml.stream.XMLStreamException;\n",
+            " import java.util.ArrayList;\n",
+            " \n",
+            " /**\n"
+          ],
+          "locn": "-30,6 +31,7"
+        },
+        {
+          "lines": [
+            "             }\n",
+            "         } else if (targetType == EnrichMediator.PROPERTY) {\n",
+            "             assert property != null : \"Property cannot be null for PROPERTY type\";\n",
+            "-            synContext.setProperty(property, sourceNodeList);  \n",
+            "+            Object propertyObj = synContext.getProperty(property);\n",
+            "+            if (propertyObj != null && ACTION_ADD_CHILD.equals(action)) {\n",
+            "+                OMElement documentElement;\n",
+            "+                if (propertyObj instanceof OMElement) {\n",
+            "+                    documentElement = (OMElement) propertyObj;\n",
+            "+                } else {\n",
+            "+                    try {\n",
+            "+                        documentElement = AXIOMUtil.stringToOM(propertyObj.toString());\n",
+            "+                    } catch (XMLStreamException e) {\n",
+            "+                        throw new SynapseException(\"Error while converting property value into\" +\n",
+            "+                                \" an OMElement\");\n",
+            "+                    }\n",
+            "+                }\n",
+            "+                insertElement(sourceNodeList, documentElement, synLog);\n",
+            "+                synContext.setProperty(property, documentElement);\n",
+            "+            } else {\n",
+            "+                synContext.setProperty(property, sourceNodeList);\n",
+            "+            }\n",
+            "         }\n",
+            "     }\n",
+            " \n"
+          ],
+          "locn": "-136,7 +138,24"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/Target.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/elementary/Target.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             if (propertyAttr != null && propertyAttr.getAttributeValue() != null) {\n",
+            "                 target.setProperty(propertyAttr.getAttributeValue());\n",
+            "             } else {\n",
+            "-                handleException(\"xpath attribute is required for CUSTOM type\");\n",
+            "+                handleException(\"property attribute is required for property type\");\n",
+            "             }\n",
+            "         }\n",
+            "     }\n"
+          ],
+          "locn": "-162,7 +162,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/EnrichMediatorFactory.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/EnrichMediatorFactory.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "+package org.apache.synapse.mediators.elementary;\n",
+            "+\n",
+            "+import junit.framework.TestCase;\n",
+            "+import org.apache.axiom.om.OMAbstractFactory;\n",
+            "+import org.apache.axiom.om.OMElement;\n",
+            "+import org.apache.axiom.om.OMFactory;\n",
+            "+import org.apache.synapse.MessageContext;\n",
+            "+import org.apache.synapse.mediators.TestUtils;\n",
+            "+\n",
+            "+import javax.xml.namespace.QName;\n",
+            "+\n",
+            "+public class EnrichMediatorTest extends TestCase {\n",
+            "+\n",
+            "+    public void testEnrich1() throws Exception {\n",
+            "+        OMFactory fac = OMAbstractFactory.getOMFactory();\n",
+            "+        OMElement element = fac.createOMElement(new QName(\"test\"));\n",
+            "+        element.setText(\"12345\");\n",
+            "+\n",
+            "+        EnrichMediator mediator = new EnrichMediator();\n",
+            "+        Source source = new Source();\n",
+            "+        source.setSourceType(EnrichMediator.INLINE);\n",
+            "+        source.setInlineOMNode(element);\n",
+            "+\n",
+            "+        Target target = new Target();\n",
+            "+        target.setTargetType(EnrichMediator.BODY);\n",
+            "+        mediator.setSource(source);\n",
+            "+        mediator.setTarget(target);\n",
+            "+\n",
+            "+        MessageContext msgContext = TestUtils.getTestContext(\"<empty/>\");\n",
+            "+        mediator.mediate(msgContext);\n",
+            "+        OMElement firstElement = msgContext.getEnvelope().getBody().getFirstElement();\n",
+            "+        assertEquals(\"test\", firstElement.getLocalName());\n",
+            "+        assertEquals(\"12345\", firstElement.getText());\n",
+            "+    }\n",
+            "+\n",
+            "+    public void testEnrich2() throws Exception {\n",
+            "+        OMFactory fac = OMAbstractFactory.getOMFactory();\n",
+            "+        OMElement element = fac.createOMElement(new QName(\"test\"));\n",
+            "+        element.setText(\"12345\");\n",
+            "+\n",
+            "+        OMElement propElement = fac.createOMElement(new QName(\"property\"));\n",
+            "+\n",
+            "+        EnrichMediator mediator = new EnrichMediator();\n",
+            "+        Source source = new Source();\n",
+            "+        source.setSourceType(EnrichMediator.INLINE);\n",
+            "+        source.setInlineOMNode(element);\n",
+            "+\n",
+            "+        Target target = new Target();\n",
+            "+        target.setTargetType(EnrichMediator.PROPERTY);\n",
+            "+        target.setProperty(\"foo\");\n",
+            "+        target.setAction(Target.ACTION_ADD_CHILD);\n",
+            "+        mediator.setSource(source);\n",
+            "+        mediator.setTarget(target);\n",
+            "+\n",
+            "+        MessageContext msgContext = TestUtils.getTestContext(\"<empty/>\");\n",
+            "+        msgContext.setProperty(\"foo\", propElement);\n",
+            "+\n",
+            "+        mediator.mediate(msgContext);\n",
+            "+        OMElement firstElement = msgContext.getEnvelope().getBody().getFirstElement();\n",
+            "+        assertEquals(\"empty\", firstElement.getLocalName());\n",
+            "+\n",
+            "+        OMElement result = (OMElement) msgContext.getProperty(\"foo\");\n",
+            "+        assertEquals(\"property\", result.getLocalName());\n",
+            "+        assertEquals(\"test\", result.getFirstElement().getLocalName());\n",
+            "+    }\n",
+            "+}\n"
+          ],
+          "locn": "-0,0 +1,66"
+        }
+      ],
+      "from": "java/modules/core/src/test/java/org/apache/synapse/mediators/elementary/EnrichMediatorTest.java",
+      "to": "java/modules/core/src/test/java/org/apache/synapse/mediators/elementary/EnrichMediatorTest.java"
+    }
+  ],
+  "id": "1504692",
+  "message": "Applying the patch for SYNAPSE-887 with some modifications. Adding a test case to verify the fix.",
+  "when": "2013-07-18T18:23:33-04:00",
+  "who": "hiranya"
+}

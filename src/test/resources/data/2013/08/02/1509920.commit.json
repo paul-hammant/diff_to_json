@@ -1,0 +1,393 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         } catch (IOException e) {\r\n",
+            "             log.error(\"Error while initializing SNMP\", e);\r\n",
+            "         }\r\n",
+            "+\r\n",
+            "+        SynapseCallbackReceiver.getInstance().init(serverContextInformation.getSynapseConfiguration(),\r\n",
+            "+                serverContextInformation);\r\n",
+            "     }\r\n",
+            " \r\n",
+            "     /**\r\n"
+          ],
+          "locn": "-348,6 +348,9"
+        },
+        {
+          "lines": [
+            "                     }\r\n",
+            "                 }\r\n",
+            "             }\r\n",
+            "+\r\n",
+            "+            SynapseCallbackReceiver.getInstance().destroy();\r\n",
+            "         } catch (AxisFault e) {\r\n",
+            "             log.error(\"Error stopping the Axis2 Environment\");\r\n",
+            "         }\r\n"
+          ],
+          "locn": "-459,6 +462,8"
+        },
+        {
+          "lines": [
+            "             }\r\n",
+            "             int pendingTransportThreads = pendingListenerThreads + pendingSenderThreads;\r\n",
+            " \r\n",
+            "-            int pendingCallbacks = serverContextInformation.getCallbackCount();\r\n",
+            "+            int pendingCallbacks = SynapseCallbackReceiver.getInstance().getCallbackCount();\r\n",
+            "             if (pendingCallbacks > 0) {\r\n",
+            "                 log.info(\"Waiting for: \" + pendingCallbacks + \" callbacks/replies..\");\r\n",
+            "             }\r\n"
+          ],
+          "locn": "-621,7 +626,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     private SynapseConfiguration synapseConfiguration;\r\n",
+            "     /* Keeps the SynapseEnvironment */\r\n",
+            "     private SynapseEnvironment synapseEnvironment;\r\n",
+            "-    /** Callback receiver */    \r\n",
+            "-    private SynapseCallbackReceiver synapseCallbackReceiver;\r\n",
+            "     /** State of the server */\r\n",
+            "     private ServerState serverState = ServerState.UNDETERMINED;\r\n",
+            "     /** Reference to the server configuration */\r\n"
+          ],
+          "locn": "-38,8 +38,6"
+        },
+        {
+          "lines": [
+            "         this.synapseEnvironment = synapseEnvironment;\r\n",
+            "     }\r\n",
+            " \r\n",
+            "-    public SynapseCallbackReceiver getSynapseCallbackReceiver() {\r\n",
+            "-        return synapseCallbackReceiver;\r\n",
+            "-    }\r\n",
+            "-\r\n",
+            "-    public void setSynapseCallbackReceiver(SynapseCallbackReceiver synapseCallbackReceiver) {\r\n",
+            "-        this.synapseCallbackReceiver = synapseCallbackReceiver;\r\n",
+            "-    }\r\n",
+            "-\r\n",
+            "     public ServerConfigurationInformation getServerConfigurationInformation() {\r\n",
+            "         return serverConfigurationInformation;\r\n",
+            "     }\r\n",
+            "-\r\n",
+            "-    /**\r\n",
+            "-     * Returns the number of current callbacks.\r\n",
+            "-     *\r\n",
+            "-     * @return the number of current callbacks.\r\n",
+            "-     */\r\n",
+            "-    public int getCallbackCount() {\r\n",
+            "-        if (synapseCallbackReceiver != null) {\r\n",
+            "-            return synapseCallbackReceiver.getCallbackCount();\r\n",
+            "-        }\r\n",
+            "-        return 0;\r\n",
+            "-    }\r\n",
+            " }\r\n"
+          ],
+          "locn": "-95,27 +93,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/ServerContextInformation.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/ServerContextInformation.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.commons.logging.LogFactory;\n",
+            " import org.apache.synapse.SynapseConstants;\n",
+            " import org.apache.synapse.SynapseException;\n",
+            "-import org.apache.synapse.ServerContextInformation;\n",
+            " import org.apache.synapse.config.SynapseConfiguration;\n",
+            " \n",
+            " import javax.xml.namespace.QName;\n"
+          ],
+          "locn": "-27,7 +27,6"
+        },
+        {
+          "lines": [
+            "     public static final String OUT_IN_OPERATION   = \"anonOutInOp\";\n",
+            "     public static final String OUT_ONLY_OPERATION = \"anonOutonlyOp\";\n",
+            " \n",
+            "-    private static SynapseCallbackReceiver synapseCallbackReceiver = null;\n",
+            "-\n",
+            "     /**\n",
+            "      * Creates an AxisService for the requested QoS for sending out messages\n",
+            "      * Callers must guarantee that if wsRMon or wsSecOn is required, that wsAddrOn is also set\n"
+          ],
+          "locn": "-50,8 +49,6"
+        },
+        {
+          "lines": [
+            "         try {\n",
+            "             DynamicAxisOperation dynamicOperation =\n",
+            "                 new DynamicAxisOperation(new QName(OUT_IN_OPERATION));\n",
+            "-            dynamicOperation.setMessageReceiver(getCallbackReceiver(synCfg, axisCfg));\n",
+            "+            dynamicOperation.setMessageReceiver(SynapseCallbackReceiver.getInstance());\n",
+            "             AxisMessage inMsg = new AxisMessage();\n",
+            "             inMsg.setName(\"in-message\");\n",
+            "             inMsg.setParent(dynamicOperation);\n"
+          ],
+          "locn": "-161,7 +158,7"
+        },
+        {
+          "lines": [
+            " \n",
+            "             OutOnlyAxisOperation asyncOperation =\n",
+            "                 new OutOnlyAxisOperation(new QName(OUT_ONLY_OPERATION));\n",
+            "-            asyncOperation.setMessageReceiver(getCallbackReceiver(synCfg, axisCfg));\n",
+            "+            asyncOperation.setMessageReceiver(SynapseCallbackReceiver.getInstance());\n",
+            "             AxisMessage outOnlyMsg = new AxisMessage();\n",
+            "             outOnlyMsg.setName(\"out-message\");\n",
+            "             outOnlyMsg.setParent(asyncOperation);\n"
+          ],
+          "locn": "-173,7 +170,7"
+        },
+        {
+          "lines": [
+            " \n",
+            "         } catch (AxisFault e) {\n",
+            "             handleException(\n",
+            "-                \"Error occured while creating an anonymous service for QoS : \" +\n",
+            "+                \"Error occurred while creating an anonymous service for QoS : \" +\n",
+            "                  serviceKey, e);\n",
+            "         }\n",
+            "         return null;\n",
+            "     }\n",
+            "-\n",
+            "-    /**\n",
+            "-     * Create a single callback receiver if required, and return its reference\n",
+            "-     * @param synCfg the Synapse configuration\n",
+            "-     * @param axisCfg axis configuration\n",
+            "-     * @return the callback receiver thats created or now exists\n",
+            "-     */\n",
+            "-    private static synchronized SynapseCallbackReceiver getCallbackReceiver(\n",
+            "-            SynapseConfiguration synCfg, AxisConfiguration axisCfg) {\n",
+            "-\n",
+            "-        if (synapseCallbackReceiver == null) {\n",
+            "-            Parameter serverCtxParam =\n",
+            "-                    axisCfg.getParameter(\n",
+            "-                            SynapseConstants.SYNAPSE_SERVER_CTX_INFO);\n",
+            "-            if (serverCtxParam == null ||\n",
+            "-                    !(serverCtxParam.getValue() instanceof ServerContextInformation)) {\n",
+            "-                String msg = \"ServerContextInformation not found\";\n",
+            "-                log.error(msg);\n",
+            "-                throw new SynapseException(msg);\n",
+            "-            }\n",
+            "-\n",
+            "-            ServerContextInformation contextInformation =\n",
+            "-                    (ServerContextInformation) serverCtxParam.getValue();\n",
+            "-\n",
+            "-            synapseCallbackReceiver = new SynapseCallbackReceiver(synCfg, contextInformation);\n",
+            "-\n",
+            "-            contextInformation.setSynapseCallbackReceiver(synapseCallbackReceiver);\n",
+            "-        }\n",
+            "-        return synapseCallbackReceiver;\n",
+            "-    }\n",
+            " }\n"
+          ],
+          "locn": "-193,39 +190,9"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/AnonymousServiceFactory.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/AnonymousServiceFactory.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "+package org.apache.synapse.core.axis2;\n",
+            "+\n",
+            "+public class SynapseCallbackStoreView implements SynapseCallbackStoreViewMBean {\n",
+            "+\n",
+            "+    private SynapseCallbackReceiver receiver;\n",
+            "+\n",
+            "+    public SynapseCallbackStoreView(SynapseCallbackReceiver receiver) {\n",
+            "+        this.receiver = receiver;\n",
+            "+    }\n",
+            "+\n",
+            "+    public int getCallbackCount() {\n",
+            "+        return receiver.getCallbackCount();\n",
+            "+    }\n",
+            "+\n",
+            "+    public String[] getPendingCallbacks() {\n",
+            "+        return receiver.getPendingCallbacks();\n",
+            "+    }\n",
+            "+}\n"
+          ],
+          "locn": "-0,0 +1,18"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/SynapseCallbackStoreView.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/SynapseCallbackStoreView.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "+package org.apache.synapse.core.axis2;\n",
+            "+\n",
+            "+/**\n",
+            "+ * JMX MBean interface for monitoring the Synapse callback store.\n",
+            "+ */\n",
+            "+public interface SynapseCallbackStoreViewMBean {\n",
+            "+\n",
+            "+    /**\n",
+            "+     * Get the number of pending callbacks in Synapse callback store\n",
+            "+     *\n",
+            "+     * @return An integer\n",
+            "+     */\n",
+            "+    public int getCallbackCount();\n",
+            "+\n",
+            "+    /**\n",
+            "+     * Get the IDs (message IDs) of the pending callbacks in Synapse callback store\n",
+            "+     *\n",
+            "+     * @return An array of strings\n",
+            "+     */\n",
+            "+    public String[] getPendingCallbacks();\n",
+            "+\n",
+            "+}\n"
+          ],
+          "locn": "-0,0 +1,22"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/SynapseCallbackStoreViewMBean.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/SynapseCallbackStoreViewMBean.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.synapse.ServerContextInformation;\n",
+            " import org.apache.synapse.aspects.statistics.ErrorLogFactory;\n",
+            " import org.apache.synapse.aspects.statistics.StatisticsReporter;\n",
+            "+import org.apache.synapse.commons.jmx.MBeanRegistrar;\n",
+            " import org.apache.synapse.config.SynapseConfigUtils;\n",
+            " import org.apache.synapse.config.SynapseConfiguration;\n",
+            " import org.apache.synapse.endpoints.Endpoint;\n"
+          ],
+          "locn": "-40,6 +40,7"
+        },
+        {
+          "lines": [
+            " \n",
+            "     private static final Log log = LogFactory.getLog(SynapseCallbackReceiver.class);\n",
+            " \n",
+            "+    private static final String CALLBACK_STORE_CATEGORY = \"SynapseCallbackStore\";\n",
+            "+    private static final String CALLBACK_STORE_NAME = \"SynapseCallbackStore\";\n",
+            "+\n",
+            "+    private static final SynapseCallbackReceiver instance = new SynapseCallbackReceiver();\n",
+            "+\n",
+            "     /** This is the synchronized callbackStore that maps outgoing messageID's to callback objects */\n",
+            "     private final Map<String, AxisCallback> callbackStore;  // will be made thread safe in the constructor\n",
+            " \n",
+            "+    private boolean initialized = false;\n",
+            "+\n",
+            "+    private SynapseCallbackReceiver() {\n",
+            "+        callbackStore = Collections.synchronizedMap(new HashMap<String, AxisCallback>());\n",
+            "+    }\n",
+            "+\n",
+            "     /**\n",
+            "-     * Create the *single* instance of this class that would be used by all anonymous services\n",
+            "+     * Get the singleton SynapseCallbackReceiver instance\n",
+            "+     *\n",
+            "+     * @return A SynapseCallbackReceiver\n",
+            "+     */\n",
+            "+    public static SynapseCallbackReceiver getInstance() {\n",
+            "+        return instance;\n",
+            "+    }\n",
+            "+\n",
+            "+    /**\n",
+            "+     * Initialize the singleton instance of this class that would be used by all anonymous services\n",
+            "      * used for outgoing messaging.\n",
+            "+     *\n",
+            "      * @param synCfg the Synapse configuration\n",
+            "      * @param contextInformation server runtime information\n",
+            "      */\n",
+            "-    public SynapseCallbackReceiver(SynapseConfiguration synCfg,\n",
+            "+    public void init(SynapseConfiguration synCfg,\n",
+            "                                    ServerContextInformation contextInformation) {\n",
+            " \n",
+            "-        callbackStore = Collections.synchronizedMap(new HashMap<String, AxisCallback>());\n",
+            "+        if (initialized) {\n",
+            "+            log.warn(\"Attempted to re-initialize SynapseCallbackReceiver\");\n",
+            "+            return;\n",
+            "+        }\n",
+            " \n",
+            "+        if (log.isDebugEnabled()) {\n",
+            "+            log.debug(\"Initializing SynapseCallbackReceiver\");\n",
+            "+        }\n",
+            "+\n",
+            "         // create the Timer object and a TimeoutHandler task\n",
+            "         TimeoutHandler timeoutHandler = new TimeoutHandler(callbackStore, contextInformation);\n",
+            "         \n"
+          ],
+          "locn": "-61,20 +62,48"
+        },
+        {
+          "lines": [
+            " \n",
+            "         // schedule timeout handler to run every n seconds (n : specified or defaults to 15s)\n",
+            "         timeOutTimer.schedule(timeoutHandler, 0, timeoutHandlerInterval);\n",
+            "+\n",
+            "+        MBeanRegistrar.getInstance().registerMBean(new SynapseCallbackStoreView(this),\n",
+            "+                CALLBACK_STORE_CATEGORY, CALLBACK_STORE_NAME);\n",
+            "+        initialized = true;\n",
+            "     }\n",
+            " \n",
+            "+    /**\n",
+            "+     * Destroy and cleanup this callback receiver instance\n",
+            "+     */\n",
+            "+    public void destroy() {\n",
+            "+        if (!initialized) {\n",
+            "+            log.warn(\"Attempted to destroy uninitialized SynapseCallbackReceiver\");\n",
+            "+            return;\n",
+            "+        }\n",
+            "+\n",
+            "+        if (log.isDebugEnabled()) {\n",
+            "+            log.debug(\"Destroying SynapseCallbackReceiver\");\n",
+            "+        }\n",
+            "+        MBeanRegistrar.getInstance().unRegisterMBean(CALLBACK_STORE_CATEGORY,\n",
+            "+                CALLBACK_STORE_NAME);\n",
+            "+        initialized = false;\n",
+            "+    }\n",
+            "+\n",
+            "     public int getCallbackCount() {\n",
+            "         return callbackStore.size();\n",
+            "     }\n",
+            " \n",
+            "+    public String[] getPendingCallbacks() {\n",
+            "+        Set<String> keys = callbackStore.keySet();\n",
+            "+        List<String> list = new ArrayList<String>();\n",
+            "+        synchronized (callbackStore) {\n",
+            "+            Iterator<String> iterator = keys.iterator();\n",
+            "+            while (iterator.hasNext()) {\n",
+            "+                list.add(iterator.next());\n",
+            "+            }\n",
+            "+        }\n",
+            "+        return list.toArray(new String[list.size()]);\n",
+            "+    }\n",
+            "+\n",
+            "     public void addCallback(String MsgID, AxisCallback callback) {\n",
+            "         callbackStore.put(MsgID, callback);\n",
+            "         if (log.isDebugEnabled()) {\n"
+          ],
+          "locn": "-83,12 +112,45"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/SynapseCallbackReceiver.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/SynapseCallbackReceiver.java"
+    }
+  ],
+  "id": "1509920",
+  "message": "Adding a JMX MBean to monitor the synapse call back store - SYNAPSE-528",
+  "when": "2013-08-02T20:37:18-04:00",
+  "who": "hiranya"
+}

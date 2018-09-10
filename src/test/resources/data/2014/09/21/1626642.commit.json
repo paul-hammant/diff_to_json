@@ -1,0 +1,161 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "      * @param outFileURI URI of the file to which the message is delivered\n",
+            "      */\n",
+            "     VFSOutTransportInfo(String outFileURI, boolean fileLocking) {\n",
+            "-\n",
+            "         if (outFileURI.startsWith(VFSConstants.VFS_PREFIX)) {\n",
+            "             this.outFileURI = outFileURI.substring(VFSConstants.VFS_PREFIX.length());\n",
+            "         } else {\n"
+          ],
+          "locn": "-52,7 +52,6"
+        },
+        {
+          "lines": [
+            " \n",
+            "         if (properties.containsKey(VFSConstants.TRANSPORT_FILE_USE_TEMP_FILE)) {\n",
+            "             String useTempFile = properties.get(VFSConstants.TRANSPORT_FILE_USE_TEMP_FILE);\n",
+            "-            isUseTempFile = Boolean.valueOf(useTempFile).booleanValue();\n",
+            "+            isUseTempFile = Boolean.valueOf(useTempFile);\n",
+            "         }\n",
+            " \n",
+            "         if (properties.containsKey(VFSConstants.RECONNECT_TIMEOUT)) {\n"
+          ],
+          "locn": "-69,7 +68,7"
+        },
+        {
+          "lines": [
+            "         if (properties.containsKey(VFSConstants.TRANSPORT_FILE_LOCKING)) {\n",
+            "             String strFileLocking = properties.get(VFSConstants.TRANSPORT_FILE_LOCKING);\n",
+            "             if (VFSConstants.TRANSPORT_FILE_LOCKING_ENABLED.equals(strFileLocking)) {\n",
+            "-                fileLocking = true;\n",
+            "+                this.fileLocking = true;\n",
+            "             } else if (VFSConstants.TRANSPORT_FILE_LOCKING_DISABLED.equals(strFileLocking)) {\n",
+            "-                fileLocking = false;\n",
+            "+                this.fileLocking = false;\n",
+            "             }\n",
+            "         } else {\n",
+            "             this.fileLocking = fileLocking;\n"
+          ],
+          "locn": "-82,9 +81,9"
+        },
+        {
+          "lines": [
+            "         }\n",
+            " \n",
+            "         if (properties.containsKey(VFSConstants.APPEND)) {\n",
+            "-            String strAppend = properties.get(VFSConstants.APPEND);\n",
+            "-            append = Boolean.parseBoolean(strAppend);\n",
+            "+            append = Boolean.parseBoolean(properties.get(VFSConstants.APPEND));\n",
+            "         }\n",
+            " \n",
+            "         if (log.isDebugEnabled()) {\n"
+          ],
+          "locn": "-91,8 +90,7"
+        }
+      ],
+      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSOutTransportInfo.java",
+      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSOutTransportInfo.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " *  specific language governing permissions and limitations\n",
+            " *  under the License.\n",
+            " */\n",
+            "+\n",
+            " package org.apache.synapse.transport.vfs;\n",
+            " \n",
+            " import org.apache.axiom.om.OMOutputFormat;\n"
+          ],
+          "locn": "-16,6 +16,7"
+        },
+        {
+          "lines": [
+            " import org.apache.commons.vfs2.FileType;\n",
+            " import org.apache.commons.vfs2.impl.StandardFileSystemManager;\n",
+            " \n",
+            "-import java.io.File;\n",
+            " import java.io.IOException;\n",
+            " \n",
+            " /**\n"
+          ],
+          "locn": "-38,7 +39,6"
+        },
+        {
+          "lines": [
+            "  */\n",
+            " public class VFSTransportSender extends AbstractTransportSender implements ManagementSupport {\n",
+            " \n",
+            "-    public static final String TRANSPORT_NAME = \"vfs\";\n",
+            "-\n",
+            "     /** The VFS file system manager */\n",
+            "     private FileSystemManager fsManager = null;\n",
+            " \n"
+          ],
+          "locn": "-49,8 +49,6"
+        },
+        {
+          "lines": [
+            "     /**\n",
+            "      * By default file locking in VFS transport is turned on at a global level\n",
+            "      *\n",
+            "-     * NOTE: DO NOT USE THIS FLAG, USE PollTableEntry#isFileLockingEnabled() TO CHECK WHETHR\n",
+            "+     * NOTE: DO NOT USE THIS FLAG, USE PollTableEntry#isFileLockingEnabled() TO CHECK WHETHER\n",
+            "      * FILE LOCKING IS ENABLED\n",
+            "      */\n",
+            "     private boolean globalFileLockingFlag = true;\n"
+          ],
+          "locn": "-57,7 +55,7"
+        },
+        {
+          "lines": [
+            "         if (vfsOutInfo != null) {\n",
+            "             FileObject replyFile = null;\n",
+            "             try {\n",
+            "-                \n",
+            "                 boolean wasError = true;\n",
+            "                 int retryCount = 0;\n",
+            "                 int maxRetryCount = vfsOutInfo.getMaxRetryCount();\n"
+          ],
+          "locn": "-122,7 +120,6"
+        },
+        {
+          "lines": [
+            "                 String tempTargetFileName, actualTargetFileName = null;\n",
+            " \n",
+            "                 while (wasError) {\n",
+            "-                    \n",
+            "                     try {\n",
+            "                         retryCount++;\n",
+            "                         replyFile = fsManager.resolveFile(vfsOutInfo.getOutFileURI());\n"
+          ],
+          "locn": "-132,7 +129,6"
+        },
+        {
+          "lines": [
+            "                 }\n",
+            "                 \n",
+            "                 if (replyFile.exists()) {\n",
+            "-\n",
+            "                     if (replyFile.getType() == FileType.FOLDER) {\n",
+            "                         if (isUseTempFile) {\n",
+            "                             tempTargetFileName = VFSUtils.generateTempFileName();\n"
+          ],
+          "locn": "-161,7 +157,6"
+        }
+      ],
+      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java",
+      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java"
+    }
+  ],
+  "id": "1626642",
+  "message": "minor code cleanup in vfs module",
+  "when": "2014-09-21T18:04:10-04:00",
+  "who": "hiranya"
+}

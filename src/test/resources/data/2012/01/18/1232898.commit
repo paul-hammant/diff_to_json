@@ -1,0 +1,170 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/eip/aggregator/AggregateMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/eip/aggregator/AggregateMediator.java	(revision 1232897)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/eip/aggregator/AggregateMediator.java	(revision 1232898)
+@@ -135,7 +135,7 @@
+             Aggregate aggregate = null;
+             String correlationIdName = (id != null ? EIPConstants.AGGREGATE_CORRELATION + "." + id :
+                     EIPConstants.AGGREGATE_CORRELATION);
+-            // if a correlateExpression is provided and there is a coresponding
++            // if a correlateExpression is provided and there is a corresponding
+             // element in the current message prepare to correlate the messages on that
+             if (correlateExpression != null
+                     && correlateExpression.evaluate(synCtx) != null) {
+@@ -180,7 +180,7 @@
+                 }
+ 
+             } else if (synCtx.getProperty(correlationIdName) != null) {
+-                // if the correlattion cannot be found using the correlateExpression then
++                // if the correlation cannot be found using the correlateExpression then
+                 // try the default which is through the AGGREGATE_CORRELATION message property
+                 // which is the unique original message id of a split or iterate operation and
+                 // which thus can be used to uniquely group messages into aggregates
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/GetPropertyFunction.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/GetPropertyFunction.java	(revision 1232897)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/GetPropertyFunction.java	(revision 1232898)
+@@ -41,6 +41,7 @@
+ import javax.activation.DataHandler;
+ import java.io.BufferedReader;
+ import java.io.IOException;
++import java.io.InputStream;
+ import java.io.InputStreamReader;
+ import java.text.Format;
+ import java.text.SimpleDateFormat;
+@@ -326,8 +327,10 @@
+                         OMText omText = (OMText) propEntry.getValue();
+                         DataHandler dh = (DataHandler) omText.getDataHandler();
+                         if (omText.getDataHandler() != null) {
++                            InputStream in = null;
+                             try {
+-                                InputStreamReader streamReader = new InputStreamReader(dh.getInputStream());
++                                in = dh.getInputStream();
++                                InputStreamReader streamReader = new InputStreamReader(in);
+                                 BufferedReader stringReader = new BufferedReader(streamReader);
+                                 StringBuilder omTextString = new StringBuilder(NULL_STRING);
+                                 String tempStr;
+@@ -337,6 +340,12 @@
+                                 return omTextString.toString();
+                             } catch (IOException e) {
+                                 return NULL_STRING;
++                            } finally {
++                                if (in != null) {
++                                    try {
++                                        in.close();
++                                    } catch (IOException ignore) { }
++                                }
+                             }
+                         } else {
+                             omText.getText();
+Index: java/modules/core/src/main/java/org/apache/synapse/endpoints/TemplateEndpoint.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/endpoints/TemplateEndpoint.java	(revision 1232897)
++++ java/modules/core/src/main/java/org/apache/synapse/endpoints/TemplateEndpoint.java	(revision 1232898)
+@@ -119,7 +119,7 @@
+                 // this endpoint is static -->
+                 // since template-endpoint is static, should ONLY be loaded at initialization to prevent
+                 // reloading every single time this endpoint is executed..
+-                // incase tempalate config has changed this endpoint should be redeployed
++                // in case template config has changed this endpoint should be redeployed
+                 reLoad = false;
+             }
+         }
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MultiXMLConfigurationBuilder.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/MultiXMLConfigurationBuilder.java	(revision 1232897)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/MultiXMLConfigurationBuilder.java	(revision 1232898)
+@@ -41,6 +41,7 @@
+ import org.apache.synapse.endpoints.Endpoint;
+ import org.apache.synapse.eventing.SynapseEventSource;
+ import org.apache.synapse.mediators.base.SequenceMediator;
++import org.apache.synapse.rest.API;
+ 
+ import javax.xml.namespace.QName;
+ import javax.xml.stream.XMLStreamException;
+@@ -130,7 +131,8 @@
+         createEventSources(synapseConfig, root, properties);
+         createExecutors(synapseConfig, root, properties);
+         createMessageStores(synapseConfig, root, properties);
+-        createMessageProcessors(synapseConfig,root,properties);
++        createMessageProcessors(synapseConfig, root, properties);
++        createAPIs(synapseConfig, root, properties);
+ 
+         return synapseConfig;
+     }
+@@ -414,7 +416,6 @@
+         }
+     }
+ 
+-
+     private static void createMessageProcessors(SynapseConfiguration synapseConfig,
+                                             String rootDirPath, Properties properties) {
+ 
+@@ -439,7 +440,29 @@
+         }
+     }
+ 
++    private static void createAPIs(SynapseConfiguration synapseConfig,
++                                            String rootDirPath, Properties properties) {
+ 
++        File apiDir = new File(rootDirPath, REST_API_DIR);
++        if (apiDir.exists()) {
++            if (log.isDebugEnabled()) {
++                log.debug("Loading APIs from :" + apiDir.getPath());
++            }
++
++            Iterator apiIterator = FileUtils.iterateFiles(apiDir, extensions, false);
++            while (apiIterator.hasNext()) {
++                File file = (File) apiIterator.next();
++                OMElement document = getOMElement(file);
++                API api = SynapseXMLConfigurationFactory.defineAPI(synapseConfig, document);
++                if (api != null) {
++                    api.setFileName(file.getName());
++                    synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
++                            api.getName());
++                }
++            }
++        }
++    }
++
+     private static OMElement getOMElement(File file) {
+         FileInputStream is;
+         OMElement document = null;
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseXMLConfigurationFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseXMLConfigurationFactory.java	(revision 1232897)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseXMLConfigurationFactory.java	(revision 1232898)
+@@ -319,9 +319,10 @@
+         }
+     }
+ 
+-    public static void defineAPI(SynapseConfiguration config, OMElement elem) {
++    public static API defineAPI(SynapseConfiguration config, OMElement elem) {
+         API api = APIFactory.createAPI(elem);
+         config.addAPI(api.getName(), api);
++        return api;
+     }
+ 
+     private static void handleException(String msg) {
+Index: java/modules/core/pom.xml
+===================================================================
+--- java/modules/core/pom.xml	(revision 1232897)
++++ java/modules/core/pom.xml	(revision 1232898)
+@@ -210,6 +210,11 @@
+         </dependency>
+         <dependency>
+             <groupId>net.sf.saxon</groupId>
++            <artifactId>saxon</artifactId>
++            <scope>test</scope>
++        </dependency>
++        <dependency>
++            <groupId>net.sf.saxon</groupId>
+             <artifactId>saxon-dom</artifactId>
+             <scope>test</scope>
+         </dependency>
+-*-*-*-
+Message: Some refactoring and building REST APIs at startup
+-*-*-*-
+When: 2012-01-18 09:22:49 -0500 
+-*-*-*-
+Who: hiranya

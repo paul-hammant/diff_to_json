@@ -1,0 +1,31 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             <id>rajika</id>\n",
+            "             <email>rajikak AT apache.org</email>\n",
+            "         </developer>\n",
+            "+        <developer>\n",
+            "+            <name>Miyuru Wanninayaka</name>\n",
+            "+            <id>miyuru</id>\n",
+            "+            <email>miyuru AT apache.org</email>\n",
+            "+            <organization>WSO2</organization>\n",
+            "+        </developer>\n",
+            " \n",
+            "     </developers>\n",
+            " \n"
+          ],
+          "locn": "-1322,6 +1322,12"
+        }
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    }
+  ],
+  "id": "1327824",
+  "message": "added myself as a developer",
+  "when": "2012-04-19T00:57:13-04:00",
+  "who": "miyuru"
+}

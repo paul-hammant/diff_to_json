@@ -1,0 +1,36 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         </parameter>\n",
+            "     </transportReceiver>-->\n",
+            " \n",
+            "-    <transportReceiver name=\"vfs\" class=\"org.apache.synapse.transport.vfs.VFSTransportListener\"/>\n",
+            "+    <!--Uncomment this for VFS transport support\n",
+            "+    <transportReceiver name=\"vfs\" class=\"org.apache.synapse.transport.vfs.VFSTransportListener\"/> -->\n",
+            " \n",
+            "-    <transportReceiver name=\"mailto\" class=\"org.apache.axis2.transport.mail.MailTransportListener\">\n",
+            "+    <!--Uncomment this for Mail transport support\n",
+            "+    <transportReceiver name=\"mailto\" class=\"org.apache.axis2.transport.mail.MailTransportListener\"> -->\n",
+            "         <!-- configure any optional POP3/IMAP properties\n",
+            "         check com.sun.mail.pop3 and com.sun.mail.imap package documentation for more details-->\n",
+            "-    </transportReceiver>\n",
+            "+    <!-- </transportReceiver> -->\n",
+            " \n",
+            "     <!--Uncomment this for FIX transport support\n",
+            "     <transportReceiver name=\"fix\" class=\"org.apache.synapse.transport.fix.FIXTransportListener\">\n"
+          ],
+          "locn": "-244,12 +244,14"
+        }
+      ],
+      "from": "java/repository/conf/axis2.xml",
+      "to": "java/repository/conf/axis2.xml"
+    }
+  ],
+  "id": "1609891",
+  "message": "disable mail transport and vfs transport listener by default - fix for SYNAPSE-978",
+  "when": "2014-07-12T04:40:37-04:00",
+  "who": "isudana"
+}

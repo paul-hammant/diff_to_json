@@ -1,0 +1,23 @@
+Index: java/modules/distribution/src/main/assembly/bin.xml
+===================================================================
+--- java/modules/distribution/src/main/assembly/bin.xml	(revision 1776228)
++++ java/modules/distribution/src/main/assembly/bin.xml	(revision 1776229)
+@@ -89,12 +89,6 @@
+                 <include>providers.xml</include>
+                 <include>identity.jks</include>
+                 <include>trust.jks</include>
+-            </includes>
+-        </fileSet>
+-        <fileSet>
+-            <directory>../../modules/distribution/src/main/conf</directory>
+-            <outputDirectory>synapse-${synapse.version}/repository/conf</outputDirectory>
+-            <includes>
+                 <include>log4j.properties</include>
+             </includes>
+         </fileSet>
+-*-*-*-
+Message: Reverting r1776152
+-*-*-*-
+When: 2016-12-28 01:13:54 -0500 
+-*-*-*-
+Who: ravi

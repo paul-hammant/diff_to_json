@@ -1,0 +1,149 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/rest/dispatch/URLMappingHelper.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/rest/dispatch/URLMappingHelper.java	(revision 1502937)
++++ java/modules/core/src/main/java/org/apache/synapse/rest/dispatch/URLMappingHelper.java	(revision 1502938)
+@@ -36,6 +36,8 @@
+             }
+         } else if (urlMapping.startsWith("*.")) {
+             extension = urlMapping.substring(1);
++        } else if (urlMapping.length() > 1 && urlMapping.endsWith("/")){
++            exactMatch = urlMapping.substring(0, urlMapping.length() - 1);
+         } else {
+             exactMatch = urlMapping;
+         }
+Index: java/modules/core/src/main/java/org/apache/synapse/rest/version/URLBasedVersionStrategy.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/rest/version/URLBasedVersionStrategy.java	(revision 1502937)
++++ java/modules/core/src/main/java/org/apache/synapse/rest/version/URLBasedVersionStrategy.java	(revision 1502938)
+@@ -39,7 +39,7 @@
+         String pathStringAfterContext = path.substring(context.length());
+ 
+         //check if context can be invalid for path url and avoid matching a false version string
+-        if (pathStringAfterContext != null && !pathStringAfterContext.startsWith("/")) {
++        if (pathStringAfterContext == null || !pathStringAfterContext.startsWith("/")) {
+             return false;
+         }
+ 
+@@ -46,7 +46,7 @@
+         //path after context will be starting from a "/" and compute index for next immediate "/"
+         int indexOfNextSlash = pathStringAfterContext.substring(1).indexOf("/");
+ 
+-        String incomingVersionStr = null;
++        String incomingVersionStr;
+         if (indexOfNextSlash != -1) {
+             incomingVersionStr = pathStringAfterContext.substring(1, indexOfNextSlash + 1);
+         } else {
+@@ -65,31 +65,4 @@
+     public String getVersionParam() {
+         return versionParam;
+     }
+-
+-/*
+-    public static void main(String[] args) {
+-        String version = "1.0.0";
+-//        String version = "1.0.1";
+-
+-//        String path = "/test/1.0.1/foo/abc/";
+-//        String path = "/test/1.0/foo/abc/";
+-//        String path = "/test/1.0/foo/abc/abc='asasa'";
+-        String path = "/test11.0.0/1.0/foo/abc/abc='asasa'";
+-
+-//        String context = "/test";
+-//        String context = "/test123";
+-        String context = "/test";
+-        String pathStringAfterContext = path.substring(context.length());
+-
+-        System.out.println("pathStringAfterContext : " + pathStringAfterContext);
+-
+-        int indexOfNextSlash = pathStringAfterContext.substring(1).indexOf("/");
+-        System.out.println(indexOfNextSlash);
+-        String incomingVersionStr = pathStringAfterContext.substring(1, indexOfNextSlash + 1);
+-        System.out.println("incomingVersionStr : " + incomingVersionStr);
+-
+-        System.out.println(version.equals(incomingVersionStr));
+-    }
+-*/
+-
+ }
+Index: java/modules/core/src/main/java/org/apache/synapse/rest/API.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/rest/API.java	(revision 1502937)
++++ java/modules/core/src/main/java/org/apache/synapse/rest/API.java	(revision 1502938)
+@@ -29,6 +29,7 @@
+ import org.apache.synapse.rest.dispatch.DispatcherHelper;
+ import org.apache.synapse.rest.dispatch.RESTDispatcher;
+ import org.apache.synapse.rest.version.DefaultStrategy;
++import org.apache.synapse.rest.version.URLBasedVersionStrategy;
+ import org.apache.synapse.rest.version.VersionStrategy;
+ import org.apache.synapse.config.xml.rest.VersionStrategyFactory;
+ import org.apache.synapse.transport.nhttp.NhttpConstants;
+@@ -56,8 +57,8 @@
+     }
+ 
+     /**
+-     * get Fully Qualified name of this API
+-     * @return returns the key combiantion for API NAME + VERSION
++     * Get the full qualified name of this API
++     * @return returns the key combination for API NAME + VERSION
+      */
+     public String getName() {
+         //check if a versioning strategy exists
+@@ -153,8 +154,12 @@
+     boolean canProcess(MessageContext synCtx) {
+         if (synCtx.isResponse()) {
+             String apiName = (String) synCtx.getProperty(RESTConstants.SYNAPSE_REST_API);
+-            String version = (String) synCtx.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
+-            if (!name.equals(apiName) && !versionStrategy.getVersion().equals(version)) {
++            Object versionObj = synCtx.getProperty(RESTConstants.SYNAPSE_REST_API_VERSION);
++            String version = "";
++            if (versionObj != null) {
++                version = (String) versionObj;
++            }
++            if (!name.equals(apiName) || !versionStrategy.getVersion().equals(version)) {
+                 return false;
+             }
+         } else {
+@@ -214,6 +219,28 @@
+         synCtx.setProperty(RESTConstants.SYNAPSE_REST_API_VERSION, versionStrategy.getVersion());
+         synCtx.setProperty(RESTConstants.REST_API_CONTEXT, context);
+ 
++        // Remove the API context part from the REST_URL_POSTFIX
++        String restURLPostfix = (String) ((Axis2MessageContext) synCtx).getAxis2MessageContext().
++                getProperty(NhttpConstants.REST_URL_POSTFIX);
++        if (restURLPostfix != null) {
++            if (!restURLPostfix.startsWith("/")) {
++                restURLPostfix = "/" + restURLPostfix;
++            }
++            if (restURLPostfix.startsWith(context)) {
++                restURLPostfix = restURLPostfix.substring(context.length());
++            }
++            if (versionStrategy instanceof URLBasedVersionStrategy) {
++                String version = versionStrategy.getVersion();
++                if (restURLPostfix.startsWith(version)) {
++                    restURLPostfix = restURLPostfix.substring(version.length());
++                } else if (restURLPostfix.startsWith("/" + version)) {
++                    restURLPostfix = restURLPostfix.substring(version.length() + 1);
++                }
++            }
++            ((Axis2MessageContext) synCtx).getAxis2MessageContext().
++                    setProperty(NhttpConstants.REST_URL_POSTFIX,restURLPostfix);
++        }
++
+         for (Handler handler : handlers) {
+             if (log.isDebugEnabled()) {
+                 log.debug("Processing message with ID: " + synCtx.getMessageID() + " through " +
+@@ -247,7 +274,7 @@
+ 
+ 
+         String path = RESTUtils.getFullRequestPath(synCtx);
+-        String subPath = null;
++        String subPath;
+         if (versionStrategy.getVersionType().equals(VersionStrategyFactory.TYPE_URL)) {
+             //for URL based
+             //request --> http://{host:port}/context/version/path/to/resource
+-*-*-*-
+Message: Removing the context portion from the REST_URL_POSTFIX when mediating a request through an API
+-*-*-*-
+When: 2013-07-14 01:32:22 -0400 
+-*-*-*-
+Who: hiranya

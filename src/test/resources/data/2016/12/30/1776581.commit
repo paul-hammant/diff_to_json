@@ -1,0 +1,1872 @@
+Index: java/modules/tasks/pom.xml
+===================================================================
+--- java/modules/tasks/pom.xml	(revision 1776580)
++++ java/modules/tasks/pom.xml	(revision 1776581)
+@@ -1,87 +1,84 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+-  ~  Licensed to the Apache Software Foundation (ASF) under one
+-  ~  or more contributor license agreements.  See the NOTICE file
+-  ~  distributed with this work for additional information
+-  ~  regarding copyright ownership.  The ASF licenses this file
+-  ~  to you under the Apache License, Version 2.0 (the
+-  ~  "License"); you may not use this file except in compliance
+-  ~  with the License.  You may obtain a copy of the License at
+-  ~
+-  ~   http://www.apache.org/licenses/LICENSE-2.0
+-  ~
+-  ~  Unless required by applicable law or agreed to in writing,
+-  ~  software distributed under the License is distributed on an
+-  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-  ~  KIND, either express or implied.  See the License for the
+-  ~  specific language governing permissions and limitations
+-  ~  under the License.
+-  -->
+-
+-<project
+-        xmlns="http://maven.apache.org/POM/4.0.0"
+-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+-    <modelVersion>4.0.0</modelVersion>
+-    <parent>
+-        <groupId>org.apache.synapse</groupId>
+-        <artifactId>Apache-Synapse</artifactId>
+-        <version>3.0.0-SNAPSHOT</version>
+-        <relativePath>../../pom.xml</relativePath>
+-    </parent>
+-
+-    <groupId>org.apache.synapse</groupId>
+-    <artifactId>synapse-tasks</artifactId>
+-    <name>Apache Synapse - Tasks</name>
+-    <description>Apache Synapse - Scheduled Tasks Core</description>
+-    <packaging>bundle</packaging>
+-
+-    <scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/tasks</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/tasks</developerConnection>
+-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/tasks</url>
+-    </scm>
+-
+-    <build>
+-        <plugins>
+-            <plugin>
+-                <groupId>org.apache.maven.plugins</groupId>
+-                <artifactId>maven-surefire-plugin</artifactId>
+-            </plugin>
+-            <plugin>
+-                <groupId>org.apache.felix</groupId>
+-                <artifactId>maven-bundle-plugin</artifactId>
+-                <extensions>true</extensions>
+-                <configuration>
+-                    <instructions>
+-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+-                        <Export-Package>
+-                            org.apache.synapse.task.*,
+-                        </Export-Package>
+-                        <Import-Package>
+-                            !javax.xml.namespace,
+-                            javax.xml.namespace; version=0.0.0,
+-                            *;resolution:=optional,
+-                        </Import-Package>
+-                        <DynamicImport-Package>*</DynamicImport-Package>
+-                    </instructions>
+-                </configuration>
+-            </plugin>
+-        </plugins>
+-    </build>
+-
+-    <dependencies>
+-        <dependency>
+-            <groupId>org.apache.synapse</groupId>
+-            <artifactId>synapse-commons</artifactId>
+-        </dependency>
+-        <dependency>
+-            <groupId>org.quartz-scheduler</groupId>
+-            <artifactId>quartz</artifactId>
+-        </dependency>
+-        <dependency>
+-            <groupId>commons-collections</groupId>
+-            <artifactId>commons-collections</artifactId>
+-        </dependency>
+-    </dependencies>
+-</project>
++<?xml version="1.0" encoding="UTF-8"?>
++<!--
++  ~  Licensed to the Apache Software Foundation (ASF) under one
++  ~  or more contributor license agreements.  See the NOTICE file
++  ~  distributed with this work for additional information
++  ~  regarding copyright ownership.  The ASF licenses this file
++  ~  to you under the Apache License, Version 2.0 (the
++  ~  "License"); you may not use this file except in compliance
++  ~  with the License.  You may obtain a copy of the License at
++  ~
++  ~   http://www.apache.org/licenses/LICENSE-2.0
++  ~
++  ~  Unless required by applicable law or agreed to in writing,
++  ~  software distributed under the License is distributed on an
++  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++  ~  KIND, either express or implied.  See the License for the
++  ~  specific language governing permissions and limitations
++  ~  under the License.
++  -->
++
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++    <modelVersion>4.0.0</modelVersion>
++    <parent>
++        <groupId>org.apache.synapse</groupId>
++        <artifactId>Apache-Synapse</artifactId>
++        <version>3.0.0</version>
++        <relativePath>../../pom.xml</relativePath>
++    </parent>
++
++    <groupId>org.apache.synapse</groupId>
++    <artifactId>synapse-tasks</artifactId>
++    <name>Apache Synapse - Tasks</name>
++    <description>Apache Synapse - Scheduled Tasks Core</description>
++    <packaging>bundle</packaging>
++
++    <scm>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/tasks</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/tasks</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/modules/tasks</url>
++    </scm>
++
++    <build>
++        <plugins>
++            <plugin>
++                <groupId>org.apache.maven.plugins</groupId>
++                <artifactId>maven-surefire-plugin</artifactId>
++            </plugin>
++            <plugin>
++                <groupId>org.apache.felix</groupId>
++                <artifactId>maven-bundle-plugin</artifactId>
++                <extensions>true</extensions>
++                <configuration>
++                    <instructions>
++                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
++                        <Export-Package>
++                            org.apache.synapse.task.*,
++                        </Export-Package>
++                        <Import-Package>
++                            !javax.xml.namespace,
++                            javax.xml.namespace; version=0.0.0,
++                            *;resolution:=optional,
++                        </Import-Package>
++                        <DynamicImport-Package>*</DynamicImport-Package>
++                    </instructions>
++                </configuration>
++            </plugin>
++        </plugins>
++    </build>
++
++    <dependencies>
++        <dependency>
++            <groupId>org.apache.synapse</groupId>
++            <artifactId>synapse-commons</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>org.quartz-scheduler</groupId>
++            <artifactId>quartz</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>commons-collections</groupId>
++            <artifactId>commons-collections</artifactId>
++        </dependency>
++    </dependencies>
++</project>
+Index: java/modules/patches/pom.xml
+===================================================================
+--- java/modules/patches/pom.xml	(revision 1776580)
++++ java/modules/patches/pom.xml	(revision 1776581)
+@@ -17,15 +17,12 @@
+   ~  specific language governing permissions and limitations
+   ~  under the License.
+   -->
+-<project
+-        xmlns="http://maven.apache.org/POM/4.0.0"
+-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>3.0.0-SNAPSHOT</version>
++        <version>3.0.0</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+     <artifactId>synapse-patches</artifactId>
+@@ -38,9 +35,9 @@
+     </description>
+ 
+     <scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/patches</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/patches</developerConnection>
+-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/patches</url>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/patches</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/patches</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/modules/patches</url>
+     </scm>
+ 
+     <build>
+@@ -72,7 +69,7 @@
+                             <target>
+                                 <unjar dest="${project.build.outputDirectory}">
+                                     <fileset dir="${basedir}/jars">
+-                                        <include name="**/*.jar"/>
++                                        <include name="**/*.jar" />
+                                     </fileset>
+                                 </unjar>
+                             </target>
+Index: java/modules/core/pom.xml
+===================================================================
+--- java/modules/core/pom.xml	(revision 1776580)
++++ java/modules/core/pom.xml	(revision 1776581)
+@@ -18,15 +18,12 @@
+   ~  under the License.
+   -->
+ 
+-<project
+-    xmlns="http://maven.apache.org/POM/4.0.0"
+-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>3.0.0-SNAPSHOT</version>
++        <version>3.0.0</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+@@ -39,9 +36,9 @@
+     <url>http://synapse.apache.org</url>
+ 
+     <scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/core</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/core</developerConnection>
+-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/core</url>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/core</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/core</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/modules/core</url>
+     </scm>
+ 
+     <build>
+@@ -146,16 +143,16 @@
+                         <phase>generate-test-resources</phase>
+                         <configuration>
+                             <tasks>
+-                                <echo message="*** Creating a testing repository ***"/>
+-                                <mkdir dir="target/test_repos"/>
+-                                <mkdir dir="target/test_repos/synapse/modules"/>
+-                                <mkdir dir="target/test_repos/synapse/services"/>
+-                                <mkdir dir="target/test_repos/client/modules"/>
+-                                <mkdir dir="target/test_repos/synapse/synapse-libraries"/>
+-                                <mkdir dir="target/library_repos"/>
+-                                <copy file="target/synapse-test-lib.zip" todir="target/test_repos/synapse/synapse-libraries"/>
+-                                <copy file="target/synapse-eiptest-lib.zip" todir="target/test_repos/synapse/synapse-libraries"/>
+-                                <copy file="target/synapse-eipcore-lib.zip" todir="target/library_repos"/>
++                                <echo message="*** Creating a testing repository ***" />
++                                <mkdir dir="target/test_repos" />
++                                <mkdir dir="target/test_repos/synapse/modules" />
++                                <mkdir dir="target/test_repos/synapse/services" />
++                                <mkdir dir="target/test_repos/client/modules" />
++                                <mkdir dir="target/test_repos/synapse/synapse-libraries" />
++                                <mkdir dir="target/library_repos" />
++                                <copy file="target/synapse-test-lib.zip" todir="target/test_repos/synapse/synapse-libraries" />
++                                <copy file="target/synapse-eiptest-lib.zip" todir="target/test_repos/synapse/synapse-libraries" />
++                                <copy file="target/synapse-eipcore-lib.zip" todir="target/library_repos" />
+                             </tasks>
+                         </configuration>
+                         <goals>
+Index: java/modules/war/pom.xml
+===================================================================
+--- java/modules/war/pom.xml	(revision 1776580)
++++ java/modules/war/pom.xml	(revision 1776581)
+@@ -18,15 +18,12 @@
+   ~  under the License.
+   -->
+ 
+-<project
+-        xmlns="http://maven.apache.org/POM/4.0.0"
+-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>3.0.0-SNAPSHOT</version>
++        <version>3.0.0</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+@@ -37,9 +34,9 @@
+     <packaging>war</packaging>
+ 
+     <scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/war</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/war</developerConnection>
+-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/war</url>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/war</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/war</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/modules/war</url>
+     </scm>
+ 
+     <dependencies>
+Index: java/modules/xar-maven-plugin/pom.xml
+===================================================================
+--- java/modules/xar-maven-plugin/pom.xml	(revision 1776580)
++++ java/modules/xar-maven-plugin/pom.xml	(revision 1776581)
+@@ -17,14 +17,12 @@
+   ~  specific language governing permissions and limitations
+   ~  under the License.
+   -->
+-<project xmlns="http://maven.apache.org/POM/4.0.0"
+-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>3.0.0-SNAPSHOT</version>
++        <version>3.0.0</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+@@ -34,9 +32,9 @@
+     <description>Maven 2 plugin to create Synapse extension archives</description>
+ 
+     <scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/xar-maven-plugin</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/xar-maven-plugin</developerConnection>
+-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/xar-maven-plugin</url>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/xar-maven-plugin</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/xar-maven-plugin</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/modules/xar-maven-plugin</url>
+     </scm>
+     
+     <dependencies>
+Index: java/modules/experimental/pom.xml
+===================================================================
+--- java/modules/experimental/pom.xml	(revision 1776580)
++++ java/modules/experimental/pom.xml	(revision 1776581)
+@@ -1,77 +1,74 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+-  ~  Licensed to the Apache Software Foundation (ASF) under one
+-  ~  or more contributor license agreements.  See the NOTICE file
+-  ~  distributed with this work for additional information
+-  ~  regarding copyright ownership.  The ASF licenses this file
+-  ~  to you under the Apache License, Version 2.0 (the
+-  ~  "License"); you may not use this file except in compliance
+-  ~  with the License.  You may obtain a copy of the License at
+-  ~
+-  ~   http://www.apache.org/licenses/LICENSE-2.0
+-  ~
+-  ~  Unless required by applicable law or agreed to in writing,
+-  ~  software distributed under the License is distributed on an
+-  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-  ~  KIND, either express or implied.  See the License for the
+-  ~  specific language governing permissions and limitations
+-  ~  under the License.
+-  -->
+-
+-<project
+-    xmlns="http://maven.apache.org/POM/4.0.0"
+-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+-    <modelVersion>4.0.0</modelVersion>
+-    <parent>
+-        <groupId>org.apache.synapse</groupId>
+-        <artifactId>Apache-Synapse</artifactId>
+-        <version>3.0.0-SNAPSHOT</version>
+-        <relativePath>../../pom.xml</relativePath>
+-    </parent>
+-
+-    <groupId>org.apache.synapse</groupId>
+-    <artifactId>synapse-experimental</artifactId>
+-    
+-    <name>Apache Synapse - Experimental code</name>
+-    <description>Apache Synapse - Experimental code (use at your own risk!)</description>
+-    <packaging>bundle</packaging>
+-
+-    <scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/experimental</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/experimental</developerConnection>
+-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/experimental</url>
+-    </scm>
+-
+-    <build>
+-        <plugins>
+-            <plugin>
+-                <groupId>org.apache.felix</groupId>
+-                <artifactId>maven-bundle-plugin</artifactId>
+-                <extensions>true</extensions>
+-                <configuration>
+-                    <instructions>
+-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+-                        <Export-Package>
+-                            org.apache.synapse.experimental.*,
+-                        </Export-Package>
+-                        <Import-Package>
+-                            !javax.xml.namespace,
+-                            javax.xml.namespace; version=0.0.0,
+-                            *;resolution:=optional,
+-                        </Import-Package>
+-                        <DynamicImport-Package>*</DynamicImport-Package>
+-                    </instructions>
+-                </configuration>
+-            </plugin>
+-        </plugins>
+-    </build>
+-
+-    <dependencies>
+-        <dependency>
+-            <groupId>org.apache.synapse</groupId>
+-            <artifactId>synapse-core</artifactId>
+-        </dependency>
+-    </dependencies>
+-
+-</project>
++<?xml version="1.0" encoding="UTF-8"?>
++<!--
++  ~  Licensed to the Apache Software Foundation (ASF) under one
++  ~  or more contributor license agreements.  See the NOTICE file
++  ~  distributed with this work for additional information
++  ~  regarding copyright ownership.  The ASF licenses this file
++  ~  to you under the Apache License, Version 2.0 (the
++  ~  "License"); you may not use this file except in compliance
++  ~  with the License.  You may obtain a copy of the License at
++  ~
++  ~   http://www.apache.org/licenses/LICENSE-2.0
++  ~
++  ~  Unless required by applicable law or agreed to in writing,
++  ~  software distributed under the License is distributed on an
++  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++  ~  KIND, either express or implied.  See the License for the
++  ~  specific language governing permissions and limitations
++  ~  under the License.
++  -->
++
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++    <modelVersion>4.0.0</modelVersion>
++    <parent>
++        <groupId>org.apache.synapse</groupId>
++        <artifactId>Apache-Synapse</artifactId>
++        <version>3.0.0</version>
++        <relativePath>../../pom.xml</relativePath>
++    </parent>
++
++    <groupId>org.apache.synapse</groupId>
++    <artifactId>synapse-experimental</artifactId>
++    
++    <name>Apache Synapse - Experimental code</name>
++    <description>Apache Synapse - Experimental code (use at your own risk!)</description>
++    <packaging>bundle</packaging>
++
++    <scm>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/experimental</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/experimental</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/modules/experimental</url>
++    </scm>
++
++    <build>
++        <plugins>
++            <plugin>
++                <groupId>org.apache.felix</groupId>
++                <artifactId>maven-bundle-plugin</artifactId>
++                <extensions>true</extensions>
++                <configuration>
++                    <instructions>
++                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
++                        <Export-Package>
++                            org.apache.synapse.experimental.*,
++                        </Export-Package>
++                        <Import-Package>
++                            !javax.xml.namespace,
++                            javax.xml.namespace; version=0.0.0,
++                            *;resolution:=optional,
++                        </Import-Package>
++                        <DynamicImport-Package>*</DynamicImport-Package>
++                    </instructions>
++                </configuration>
++            </plugin>
++        </plugins>
++    </build>
++
++    <dependencies>
++        <dependency>
++            <groupId>org.apache.synapse</groupId>
++            <artifactId>synapse-core</artifactId>
++        </dependency>
++    </dependencies>
++
++</project>
+Index: java/modules/extensions/pom.xml
+===================================================================
+--- java/modules/extensions/pom.xml	(revision 1776580)
++++ java/modules/extensions/pom.xml	(revision 1776581)
+@@ -18,15 +18,12 @@
+   ~  under the License.
+   -->
+ 
+-<project
+-    xmlns="http://maven.apache.org/POM/4.0.0"
+-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>3.0.0-SNAPSHOT</version>
++        <version>3.0.0</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+@@ -38,9 +35,9 @@
+     <packaging>bundle</packaging>
+ 
+     <scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/extensions</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/extensions</developerConnection>
+-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/extensions</url>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/extensions</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/extensions</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/modules/extensions</url>
+     </scm>
+ 
+     <build>
+Index: java/modules/securevault/pom.xml
+===================================================================
+--- java/modules/securevault/pom.xml	(revision 1776580)
++++ java/modules/securevault/pom.xml	(revision 1776581)
+@@ -1,107 +1,104 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<!--
+-  ~  Licensed to the Apache Software Foundation (ASF) under one
+-  ~  or more contributor license agreements.  See the NOTICE file
+-  ~  distributed with this work for additional information
+-  ~  regarding copyright ownership.  The ASF licenses this file
+-  ~  to you under the Apache License, Version 2.0 (the
+-  ~  "License"); you may not use this file except in compliance
+-  ~  with the License.  You may obtain a copy of the License at
+-  ~
+-  ~   http://www.apache.org/licenses/LICENSE-2.0
+-  ~
+-  ~  Unless required by applicable law or agreed to in writing,
+-  ~  software distributed under the License is distributed on an
+-  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+-  ~  KIND, either express or implied.  See the License for the
+-  ~  specific language governing permissions and limitations
+-  ~  under the License.
+-  -->
+-
+-<project
+-        xmlns="http://maven.apache.org/POM/4.0.0"
+-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+-    <modelVersion>4.0.0</modelVersion>
+-    <parent>
+-        <groupId>org.apache.synapse</groupId>
+-        <artifactId>Apache-Synapse</artifactId>
+-        <version>3.0.0-SNAPSHOT</version>
+-        <relativePath>../../pom.xml</relativePath>
+-    </parent>
+-    <artifactId>synapse-securevault</artifactId>
+-    <name>Apache Synapse - Secure Vault</name>
+-    <description>Apache Synapse - Secure vault</description>
+-    <packaging>bundle</packaging>
+-
+-    <scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/securevault</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/securevault</developerConnection>
+-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/securevault</url>
+-    </scm>
+-
+-    <build>
+-        <plugins>
+-            <plugin>
+-                <artifactId>maven-compiler-plugin</artifactId>
+-            </plugin>
+-            <plugin>
+-                <artifactId>maven-surefire-plugin</artifactId>
+-            </plugin>
+-            <plugin>
+-                <groupId>org.apache.felix</groupId>
+-                <artifactId>maven-bundle-plugin</artifactId>
+-                <extensions>true</extensions>
+-                <configuration>
+-                    <instructions>
+-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+-                        <Export-Package>
+-                            org.apache.synapse.securevault.*,
+-                        </Export-Package>
+-                        <Import-Package>
+-                            !javax.xml.namespace,
+-                            javax.xml.namespace; version=0.0.0,
+-                            *;resolution:=optional,
+-                        </Import-Package>
+-                        <DynamicImport-Package>*</DynamicImport-Package>
+-                    </instructions>
+-                </configuration>
+-            </plugin>
+-        </plugins>
+-    </build>
+-    <dependencies>
+-        <dependency>
+-            <groupId>org.apache.ws.commons.axiom</groupId>
+-            <artifactId>axiom-api</artifactId>
+-        </dependency>
+-        <dependency>
+-            <groupId>org.apache.ws.commons.axiom</groupId>
+-            <artifactId>axiom-impl</artifactId>
+-        </dependency>
+-        <dependency>
+-            <groupId>log4j</groupId>
+-            <artifactId>log4j</artifactId>
+-        </dependency>
+-        <dependency>
+-            <groupId>jline</groupId>
+-            <artifactId>jline</artifactId>
+-        </dependency>
+-        <dependency>
+-            <groupId>junit</groupId>
+-            <artifactId>junit</artifactId>
+-            <scope>test</scope>
+-        </dependency>
+-        <dependency>
+-            <groupId>commons-cli</groupId>
+-            <artifactId>commons-cli</artifactId>
+-        </dependency>
+-        <dependency>
+-            <groupId>commons-io</groupId>
+-            <artifactId>commons-io</artifactId>
+-        </dependency>
+-        <dependency>
+-            <groupId>commons-codec</groupId>
+-            <artifactId>commons-codec</artifactId>
+-        </dependency>
+-    </dependencies>
+-</project>
++<?xml version="1.0" encoding="UTF-8"?>
++<!--
++  ~  Licensed to the Apache Software Foundation (ASF) under one
++  ~  or more contributor license agreements.  See the NOTICE file
++  ~  distributed with this work for additional information
++  ~  regarding copyright ownership.  The ASF licenses this file
++  ~  to you under the Apache License, Version 2.0 (the
++  ~  "License"); you may not use this file except in compliance
++  ~  with the License.  You may obtain a copy of the License at
++  ~
++  ~   http://www.apache.org/licenses/LICENSE-2.0
++  ~
++  ~  Unless required by applicable law or agreed to in writing,
++  ~  software distributed under the License is distributed on an
++  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++  ~  KIND, either express or implied.  See the License for the
++  ~  specific language governing permissions and limitations
++  ~  under the License.
++  -->
++
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++    <modelVersion>4.0.0</modelVersion>
++    <parent>
++        <groupId>org.apache.synapse</groupId>
++        <artifactId>Apache-Synapse</artifactId>
++        <version>3.0.0</version>
++        <relativePath>../../pom.xml</relativePath>
++    </parent>
++    <artifactId>synapse-securevault</artifactId>
++    <name>Apache Synapse - Secure Vault</name>
++    <description>Apache Synapse - Secure vault</description>
++    <packaging>bundle</packaging>
++
++    <scm>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/securevault</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/securevault</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/modules/securevault</url>
++    </scm>
++
++    <build>
++        <plugins>
++            <plugin>
++                <artifactId>maven-compiler-plugin</artifactId>
++            </plugin>
++            <plugin>
++                <artifactId>maven-surefire-plugin</artifactId>
++            </plugin>
++            <plugin>
++                <groupId>org.apache.felix</groupId>
++                <artifactId>maven-bundle-plugin</artifactId>
++                <extensions>true</extensions>
++                <configuration>
++                    <instructions>
++                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
++                        <Export-Package>
++                            org.apache.synapse.securevault.*,
++                        </Export-Package>
++                        <Import-Package>
++                            !javax.xml.namespace,
++                            javax.xml.namespace; version=0.0.0,
++                            *;resolution:=optional,
++                        </Import-Package>
++                        <DynamicImport-Package>*</DynamicImport-Package>
++                    </instructions>
++                </configuration>
++            </plugin>
++        </plugins>
++    </build>
++    <dependencies>
++        <dependency>
++            <groupId>org.apache.ws.commons.axiom</groupId>
++            <artifactId>axiom-api</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>org.apache.ws.commons.axiom</groupId>
++            <artifactId>axiom-impl</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>log4j</groupId>
++            <artifactId>log4j</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>jline</groupId>
++            <artifactId>jline</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>junit</groupId>
++            <artifactId>junit</artifactId>
++            <scope>test</scope>
++        </dependency>
++        <dependency>
++            <groupId>commons-cli</groupId>
++            <artifactId>commons-cli</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>commons-io</groupId>
++            <artifactId>commons-io</artifactId>
++        </dependency>
++        <dependency>
++            <groupId>commons-codec</groupId>
++            <artifactId>commons-codec</artifactId>
++        </dependency>
++    </dependencies>
++</project>
+Index: java/modules/samples/pom.xml
+===================================================================
+--- java/modules/samples/pom.xml	(revision 1776580)
++++ java/modules/samples/pom.xml	(revision 1776581)
+@@ -18,15 +18,12 @@
+   ~  under the License.
+   -->
+ 
+-<project
+-        xmlns="http://maven.apache.org/POM/4.0.0"
+-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>3.0.0-SNAPSHOT</version>
++        <version>3.0.0</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+@@ -38,9 +35,9 @@
+     <packaging>bundle</packaging>
+ 
+     <scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/samples</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/samples</developerConnection>
+-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/samples</url>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/samples</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/samples</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/modules/samples</url>
+     </scm>
+ 
+     <profiles>
+@@ -57,189 +54,163 @@
+                                 <phase>generate-test-resources</phase>
+                                 <configuration>
+                                     <tasks>
+-                                        <echo message="*** Creating a sample n2n testing repository ***"/>
++                                        <echo message="*** Creating a sample n2n testing repository ***" />
+ 
+-                                        <mkdir dir="target/test_repos"/>
+-                                        <mkdir dir="target/test_repos/axis2Server"/>
+-                                        <mkdir dir="target/test_repos/axis2Client"/>
+-                                        <mkdir dir="target/test_repos/synapse"/>
+-                                        <mkdir dir="target/test_repos/synapse"/>
+-                                        <mkdir dir="target/test_repos/synapse/modules"/>
+-                                        <mkdir dir="target/test_repos/synapse/conf"/>
+-                                        <mkdir dir="target/test_repos/axis2Server/services"/>
+-                                        <mkdir dir="target/test_repos/axis2Server/modules"/>
+-                                        <mkdir dir="target/test_repos/axis2Server/conf"/>
+-                                        <mkdir dir="target/test_repos/axis2Client/modules"/>
+-                                        <mkdir dir="target/test_repos/axis2Client/conf"/>
++                                        <mkdir dir="target/test_repos" />
++                                        <mkdir dir="target/test_repos/axis2Server" />
++                                        <mkdir dir="target/test_repos/axis2Client" />
++                                        <mkdir dir="target/test_repos/synapse" />
++                                        <mkdir dir="target/test_repos/synapse" />
++                                        <mkdir dir="target/test_repos/synapse/modules" />
++                                        <mkdir dir="target/test_repos/synapse/conf" />
++                                        <mkdir dir="target/test_repos/axis2Server/services" />
++                                        <mkdir dir="target/test_repos/axis2Server/modules" />
++                                        <mkdir dir="target/test_repos/axis2Server/conf" />
++                                        <mkdir dir="target/test_repos/axis2Client/modules" />
++                                        <mkdir dir="target/test_repos/axis2Client/conf" />
+ 
+-                                        <copy file="../../repository/conf/sample/resources/misc/server/axis2.xml"
+-                                              tofile="target/test_repos/axis2Server/conf/axis2.xml"/>
+-                                        <copy file="../../repository/conf/sample/resources/misc/client/axis2.xml"
+-                                              tofile="target/test_repos/axis2Client/conf/axis2.xml"/>
+-                                        <copy file="../../repository/conf/axis2.xml"
+-                                              tofile="target/test_repos/synapse/conf/axis2.xml"/>
+-                                        <copy file="../core/src/main/resources/trust.jks"
+-                                              tofile="target/test_repos/synapse/conf/trust.jks"/>
+-                                        <copy file="../core/src/main/resources/identity.jks"
+-                                              tofile="target/test_repos/synapse/conf/identity.jks"/>
+-                                        <copy file="../core/src/test/resources/keystore.jks"
+-                                              tofile="target/test_repos/synapse/conf/keystore.jks"/>
++                                        <copy file="../../repository/conf/sample/resources/misc/server/axis2.xml" tofile="target/test_repos/axis2Server/conf/axis2.xml" />
++                                        <copy file="../../repository/conf/sample/resources/misc/client/axis2.xml" tofile="target/test_repos/axis2Client/conf/axis2.xml" />
++                                        <copy file="../../repository/conf/axis2.xml" tofile="target/test_repos/synapse/conf/axis2.xml" />
++                                        <copy file="../core/src/main/resources/trust.jks" tofile="target/test_repos/synapse/conf/trust.jks" />
++                                        <copy file="../core/src/main/resources/identity.jks" tofile="target/test_repos/synapse/conf/identity.jks" />
++                                        <copy file="../core/src/test/resources/keystore.jks" tofile="target/test_repos/synapse/conf/keystore.jks" />
+ 
+-                                        <property name="temp.dir" value="target/temp"/>
+-                                        <property name="classes" value="${temp.dir}/classes"/>
+-                                        <property name="services"
+-                                                  value="target/test_repos/axis2Server/services"/>
++                                        <property name="temp.dir" value="target/temp" />
++                                        <property name="classes" value="${temp.dir}/classes" />
++                                        <property name="services" value="target/test_repos/axis2Server/services" />
+ 
+-                                        <property name="src"
+-                                                  value="services/SimpleStockQuoteService/src"/>
++                                        <property name="src" value="services/SimpleStockQuoteService/src" />
+ 
+-                                        <mkdir dir="${temp.dir}"/>
+-                                        <mkdir dir="${classes}"/>
++                                        <mkdir dir="${temp.dir}" />
++                                        <mkdir dir="${classes}" />
+ 
+                                         <javac debug="on" destdir="${classes}" fork="true">
+-                                            <src path="${src}"/>
+-                                            <classpath refid="maven.compile.classpath"/>
++                                            <src path="${src}" />
++                                            <classpath refid="maven.compile.classpath" />
+                                         </javac>
+ 
+-                                        <property name="SSQ.dir"
+-                                                  value="${temp.dir}/SimpleStockQuote"/>
+-                                        <mkdir dir="${SSQ.dir}"/>
++                                        <property name="SSQ.dir" value="${temp.dir}/SimpleStockQuote" />
++                                        <mkdir dir="${SSQ.dir}" />
+ 
+-                                        <mkdir dir="${SSQ.dir}/META-INF"/>
+-                                        <copy file="${src}/../conf/services.xml"
+-                                              tofile="${SSQ.dir}/META-INF/services.xml"/>
+-                                        <copy file="${src}/../wsdl/SimpleStockQuoteService.wsdl"
+-                                              tofile="${SSQ.dir}/META-INF/service.wsdl"/>
++                                        <mkdir dir="${SSQ.dir}/META-INF" />
++                                        <copy file="${src}/../conf/services.xml" tofile="${SSQ.dir}/META-INF/services.xml" />
++                                        <copy file="${src}/../wsdl/SimpleStockQuoteService.wsdl" tofile="${SSQ.dir}/META-INF/service.wsdl" />
+                                         <copy toDir="${SSQ.dir}">
+                                             <fileset dir="${classes}">
+-                                                <include name="**/*.class"/>
++                                                <include name="**/*.class" />
+                                             </fileset>
+                                         </copy>
+ 
+                                         <jar destfile="${services}/SimpleStockQuoteService.aar">
+-                                            <fileset dir="${SSQ.dir}"/>
++                                            <fileset dir="${SSQ.dir}" />
+                                         </jar>
+ 
+-                                        <property name="src2"
+-                                                  value="services/SecureStockQuoteService/src"/>
+-                                        <delete dir="${temp.dir}"/>
+-                                        <mkdir dir="${temp.dir}"/>
+-                                        <mkdir dir="${classes}"/>
++                                        <property name="src2" value="services/SecureStockQuoteService/src" />
++                                        <delete dir="${temp.dir}" />
++                                        <mkdir dir="${temp.dir}" />
++                                        <mkdir dir="${classes}" />
+                                         <javac debug="on" destdir="${classes}" fork="true">
+-                                            <src path="${src2}"/>
+-                                            <classpath refid="maven.compile.classpath"/>
++                                            <src path="${src2}" />
++                                            <classpath refid="maven.compile.classpath" />
+                                         </javac>
+-                                        <property name="SSQ2.dir"
+-                                                  value="${temp.dir}/SecureStockQuoteService"/>
+-                                        <mkdir dir="${SSQ2.dir}"/>
+-                                        <mkdir dir="${SSQ2.dir}/META-INF"/>
+-                                        <copy file="${src2}/../conf/services.xml"
+-                                              tofile="${SSQ2.dir}/META-INF/services.xml"/>
+-                                        <copy file="${src2}/../wsdl/SimpleStockQuoteService.wsdl"
+-                                              tofile="${SSQ2.dir}/META-INF/service.wsdl"/>
+-                                        <copy file="${src2}/../store.jks"
+-                                              tofile="${SSQ2.dir}/store.jks"/>
++                                        <property name="SSQ2.dir" value="${temp.dir}/SecureStockQuoteService" />
++                                        <mkdir dir="${SSQ2.dir}" />
++                                        <mkdir dir="${SSQ2.dir}/META-INF" />
++                                        <copy file="${src2}/../conf/services.xml" tofile="${SSQ2.dir}/META-INF/services.xml" />
++                                        <copy file="${src2}/../wsdl/SimpleStockQuoteService.wsdl" tofile="${SSQ2.dir}/META-INF/service.wsdl" />
++                                        <copy file="${src2}/../store.jks" tofile="${SSQ2.dir}/store.jks" />
+                                         <copy toDir="${SSQ2.dir}">
+                                             <fileset dir="${classes}">
+-                                                <include name="**/*.class"/>
++                                                <include name="**/*.class" />
+                                             </fileset>
+                                         </copy>
+                                         <jar destfile="${services}/SecureStockQuoteService.aar">
+-                                            <fileset dir="${SSQ2.dir}"/>
++                                            <fileset dir="${SSQ2.dir}" />
+                                         </jar>
+ 
+-                                        <property name="src3"
+-                                                  value="services/MTOMSwASampleService/src"/>
+-                                        <delete dir="${temp.dir}"/>
+-                                        <mkdir dir="${temp.dir}"/>
+-                                        <mkdir dir="${classes}"/>
++                                        <property name="src3" value="services/MTOMSwASampleService/src" />
++                                        <delete dir="${temp.dir}" />
++                                        <mkdir dir="${temp.dir}" />
++                                        <mkdir dir="${classes}" />
+                                         <javac debug="on" destdir="${classes}" fork="true">
+-                                            <src path="${src3}"/>
+-                                            <classpath refid="maven.compile.classpath"/>
++                                            <src path="${src3}" />
++                                            <classpath refid="maven.compile.classpath" />
+                                         </javac>
+-                                        <property name="SSQ3.dir"
+-                                                  value="${temp.dir}/MTOMSwASampleService"/>
+-                                        <mkdir dir="${SSQ3.dir}"/>
+-                                        <mkdir dir="${SSQ3.dir}/META-INF"/>
+-                                        <copy file="${src3}/../conf/services.xml"
+-                                              tofile="${SSQ3.dir}/META-INF/services.xml"/>
++                                        <property name="SSQ3.dir" value="${temp.dir}/MTOMSwASampleService" />
++                                        <mkdir dir="${SSQ3.dir}" />
++                                        <mkdir dir="${SSQ3.dir}/META-INF" />
++                                        <copy file="${src3}/../conf/services.xml" tofile="${SSQ3.dir}/META-INF/services.xml" />
+                                         <copy toDir="${SSQ3.dir}">
+                                             <fileset dir="${classes}">
+-                                                <include name="**/*.class"/>
++                                                <include name="**/*.class" />
+                                             </fileset>
+                                         </copy>
+                                         <jar destfile="${services}/MTOMSwASampleService.aar">
+-                                            <fileset dir="${SSQ3.dir}"/>
++                                            <fileset dir="${SSQ3.dir}" />
+                                         </jar>
+ 
+-                                        <property name="src4"
+-                                                  value="services/ReliableStockQuoteService/src"/>
+-                                        <delete dir="${temp.dir}"/>
+-                                        <mkdir dir="${temp.dir}"/>
+-                                        <mkdir dir="${classes}"/>
++                                        <property name="src4" value="services/ReliableStockQuoteService/src" />
++                                        <delete dir="${temp.dir}" />
++                                        <mkdir dir="${temp.dir}" />
++                                        <mkdir dir="${classes}" />
+                                         <javac debug="on" destdir="${classes}" fork="true">
+-                                            <src path="${src4}"/>
+-                                            <classpath refid="maven.compile.classpath"/>
++                                            <src path="${src4}" />
++                                            <classpath refid="maven.compile.classpath" />
+                                         </javac>
+-                                        <property name="RSQ.dir"
+-                                                  value="${temp.dir}/ReliableStockQuoteService"/>
+-                                        <mkdir dir="${RSQ.dir}"/>
++                                        <property name="RSQ.dir" value="${temp.dir}/ReliableStockQuoteService" />
++                                        <mkdir dir="${RSQ.dir}" />
+ 
+-                                        <mkdir dir="${RSQ.dir}/META-INF"/>
+-                                        <copy file="${src4}/../conf/services.xml"
+-                                              tofile="${RSQ.dir}/META-INF/services.xml"/>
+-                                        <copy file="${src4}/../wsdl/ReliableStockQuoteService.wsdl"
+-                                              tofile="${RSQ.dir}/META-INF/service.wsdl"/>
++                                        <mkdir dir="${RSQ.dir}/META-INF" />
++                                        <copy file="${src4}/../conf/services.xml" tofile="${RSQ.dir}/META-INF/services.xml" />
++                                        <copy file="${src4}/../wsdl/ReliableStockQuoteService.wsdl" tofile="${RSQ.dir}/META-INF/service.wsdl" />
+                                         <copy toDir="${RSQ.dir}">
+                                             <fileset dir="${classes}">
+-                                                <include name="**/*.class"/>
++                                                <include name="**/*.class" />
+                                             </fileset>
+                                         </copy>
+ 
+                                         <jar destfile="${services}/ReliableStockQuoteService.aar">
+-                                            <fileset dir="${RSQ.dir}"/>
++                                            <fileset dir="${RSQ.dir}" />
+                                         </jar>
+ 
+-                                        <property name="src5"
+-                                                  value="services/LoadbalanceFailoverService/src"/>
+-                                        <delete dir="${temp.dir}"/>
+-                                        <mkdir dir="${temp.dir}"/>
+-                                        <mkdir dir="${classes}"/>
++                                        <property name="src5" value="services/LoadbalanceFailoverService/src" />
++                                        <delete dir="${temp.dir}" />
++                                        <mkdir dir="${temp.dir}" />
++                                        <mkdir dir="${classes}" />
+                                         <javac debug="on" destdir="${classes}" fork="true">
+-                                            <src path="${src5}"/>
+-                                            <classpath refid="maven.compile.classpath"/>
++                                            <src path="${src5}" />
++                                            <classpath refid="maven.compile.classpath" />
+                                         </javac>
+ 
+-                                        <property name="LBFA1.dir" value="${temp.dir}/LBService1"/>
+-                                        <mkdir dir="${LBFA1.dir}"/>
++                                        <property name="LBFA1.dir" value="${temp.dir}/LBService1" />
++                                        <mkdir dir="${LBFA1.dir}" />
+ 
+-                                        <mkdir dir="${LBFA1.dir}/META-INF"/>
+-                                        <copy file="${src5}/../conf/service1/services.xml"
+-                                              tofile="${LBFA1.dir}/META-INF/services.xml"/>
++                                        <mkdir dir="${LBFA1.dir}/META-INF" />
++                                        <copy file="${src5}/../conf/service1/services.xml" tofile="${LBFA1.dir}/META-INF/services.xml" />
+                                         <copy toDir="${LBFA1.dir}">
+                                             <fileset dir="${classes}">
+-                                                <include name="**/LBService1.class"/>
++                                                <include name="**/LBService1.class" />
+                                             </fileset>
+                                         </copy>
+ 
+                                         <jar destfile="${services}/LBService1.aar">
+-                                            <fileset dir="${LBFA1.dir}"/>
++                                            <fileset dir="${LBFA1.dir}" />
+                                         </jar>
+ 
+-                                        <property name="LBFA2.dir" value="${temp.dir}/LBService2"/>
+-                                        <mkdir dir="${LBFA2.dir}"/>
++                                        <property name="LBFA2.dir" value="${temp.dir}/LBService2" />
++                                        <mkdir dir="${LBFA2.dir}" />
+ 
+-                                        <mkdir dir="${LBFA2.dir}/META-INF"/>
+-                                        <copy file="${src5}/../conf/service2/services.xml"
+-                                              tofile="${LBFA2.dir}/META-INF/services.xml"/>
++                                        <mkdir dir="${LBFA2.dir}/META-INF" />
++                                        <copy file="${src5}/../conf/service2/services.xml" tofile="${LBFA2.dir}/META-INF/services.xml" />
+                                         <copy toDir="${LBFA2.dir}">
+                                             <fileset dir="${classes}">
+-                                                <include name="**/LBService2.class"/>
++                                                <include name="**/LBService2.class" />
+                                             </fileset>
+                                         </copy>
+ 
+                                         <jar destfile="${services}/LBService2.aar">
+-                                            <fileset dir="${LBFA2.dir}"/>
++                                            <fileset dir="${LBFA2.dir}" />
+                                         </jar>
+ 
+                                     </tasks>
+Index: java/modules/documentation/pom.xml
+===================================================================
+--- java/modules/documentation/pom.xml	(revision 1776580)
++++ java/modules/documentation/pom.xml	(revision 1776581)
+@@ -18,15 +18,12 @@
+   ~  under the License.
+   -->
+ 
+-<project
+-        xmlns="http://maven.apache.org/POM/4.0.0"
+-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>3.0.0-SNAPSHOT</version>
++        <version>3.0.0</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+@@ -37,10 +34,10 @@
+     <description>Apache Synapse - Documentation Pack</description>
+ 
+     <scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/documentation</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/documentation
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/documentation</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/documentation
+         </developerConnection>
+-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/documentation</url>
++        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/modules/documentation</url>
+     </scm>
+ 
+     <build>
+Index: java/modules/commons/pom.xml
+===================================================================
+--- java/modules/commons/pom.xml	(revision 1776580)
++++ java/modules/commons/pom.xml	(revision 1776581)
+@@ -18,15 +18,12 @@
+   ~  under the License.
+   -->
+ 
+-<project
+-    xmlns="http://maven.apache.org/POM/4.0.0"
+-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>3.0.0-SNAPSHOT</version>
++        <version>3.0.0</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+@@ -38,9 +35,9 @@
+     <packaging>bundle</packaging>
+ 
+     <scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/commons</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/commons</developerConnection>
+-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/commons</url>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/commons</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/commons</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/modules/commons</url>
+     </scm>
+ 
+     <build>
+Index: java/modules/handler/pom.xml
+===================================================================
+--- java/modules/handler/pom.xml	(revision 1776580)
++++ java/modules/handler/pom.xml	(revision 1776581)
+@@ -18,15 +18,12 @@
+   ~  under the License.
+   -->
+ 
+-<project
+-        xmlns="http://maven.apache.org/POM/4.0.0"
+-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>3.0.0-SNAPSHOT</version>
++        <version>3.0.0</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+@@ -38,9 +35,9 @@
+     <packaging>bundle</packaging>
+ 
+     <scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/handler</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/handler</developerConnection>
+-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/handler</url>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/handler</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/handler</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/modules/handler</url>
+     </scm>
+ 
+     <build>
+@@ -74,8 +71,7 @@
+                         <phase>package</phase>
+                         <configuration>
+                             <tasks>
+-                                <copy file="target/synapse-handler-${synapse.version}.jar"
+-                                      tofile="target/synapse-handler-${synapse.version}.mar"/>
++                                <copy file="target/synapse-handler-${synapse.version}.jar" tofile="target/synapse-handler-${synapse.version}.mar" />
+                             </tasks>
+                         </configuration>
+                         <goals>
+Index: java/modules/distribution/pom.xml
+===================================================================
+--- java/modules/distribution/pom.xml	(revision 1776580)
++++ java/modules/distribution/pom.xml	(revision 1776581)
+@@ -17,15 +17,12 @@
+   ~  under the License.
+   -->
+ 
+-<project
+-        xmlns="http://maven.apache.org/POM/4.0.0"
+-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>3.0.0-SNAPSHOT</version>
++        <version>3.0.0</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+@@ -37,9 +34,9 @@
+     <packaging>pom</packaging>
+ 
+     <scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/distribution</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/distribution</developerConnection>
+-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/distribution</url>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/distribution</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/distribution</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/modules/distribution</url>
+     </scm>
+ 
+     <dependencies>
+Index: java/modules/transports/optional/fix/pom.xml
+===================================================================
+--- java/modules/transports/optional/fix/pom.xml	(revision 1776580)
++++ java/modules/transports/optional/fix/pom.xml	(revision 1776581)
+@@ -18,15 +18,12 @@
+   ~  under the License.
+   -->
+ 
+-<project
+-    xmlns="http://maven.apache.org/POM/4.0.0"
+-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>synapse-transports</artifactId>
+-        <version>3.0.0-SNAPSHOT</version>
++        <version>3.0.0</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+@@ -37,9 +34,9 @@
+     <packaging>bundle</packaging>
+ 
+     <scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/optional/fix</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/optional/fix</developerConnection>
+-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports/core/optional/fix</url>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/transports/optional/fix</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/transports/optional/fix</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/transports/core/optional/fix</url>
+     </scm>
+ 
+     <build>
+Index: java/modules/transports/optional/amqp/pom.xml
+===================================================================
+--- java/modules/transports/optional/amqp/pom.xml	(revision 1776580)
++++ java/modules/transports/optional/amqp/pom.xml	(revision 1776581)
+@@ -18,15 +18,13 @@
+ under the License.
+ -->
+ 
+-<project xmlns="http://maven.apache.org/POM/4.0.0"
+-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+ 
+ 	<parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>synapse-transports</artifactId>
+-        <version>3.0.0-SNAPSHOT</version>
++        <version>3.0.0</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+@@ -42,9 +40,9 @@
+ 
+ 
+ 	<scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/optional/amqp</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/optional/amqp</developerConnection>
+-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports/core/optional/amqp</url>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/transports/optional/amqp</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/transports/optional/amqp</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/transports/core/optional/amqp</url>
+     </scm>
+ 
+     <build>
+@@ -69,7 +67,7 @@
+                     <instructions>
+                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                         <Bundle-Name>${project.artifactId}</Bundle-Name>
+-                        <Private-Package></Private-Package>
++                        <Private-Package />
+                         <Export-Package>org.apache.synapse.transport.amqp.*</Export-Package>
+                         <Import-Package>
+                             *;resolution:=optional
+Index: java/modules/transports/core/nhttp/pom.xml
+===================================================================
+--- java/modules/transports/core/nhttp/pom.xml	(revision 1776580)
++++ java/modules/transports/core/nhttp/pom.xml	(revision 1776581)
+@@ -18,15 +18,12 @@
+   ~  under the License.
+   -->
+ 
+-<project
+-    xmlns="http://maven.apache.org/POM/4.0.0"
+-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>synapse-transports</artifactId>
+-        <version>3.0.0-SNAPSHOT</version>
++        <version>3.0.0</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+@@ -37,9 +34,9 @@
+     <packaging>bundle</packaging>
+ 
+     <scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/core/nhttp</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/core/nhttp</developerConnection>
+-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports/core/nhttp</url>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/transports/core/nhttp</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/transports/core/nhttp</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/modules/transports/core/nhttp</url>
+     </scm>
+ 
+     <build>
+Index: java/modules/transports/core/pipe/pom.xml
+===================================================================
+--- java/modules/transports/core/pipe/pom.xml	(revision 1776580)
++++ java/modules/transports/core/pipe/pom.xml	(revision 1776581)
+@@ -18,15 +18,12 @@
+   ~  under the License.
+   -->
+ 
+-<project
+-    xmlns="http://maven.apache.org/POM/4.0.0"
+-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>synapse-transports</artifactId>
+-        <version>3.0.0-SNAPSHOT</version>
++        <version>3.0.0</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+@@ -37,9 +34,9 @@
+     <packaging>bundle</packaging>
+ 
+     <scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/core/pipe</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/core/pipe</developerConnection>
+-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports/core/pipe</url>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/transports/core/pipe</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/transports/core/pipe</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/modules/transports/core/pipe</url>
+     </scm>
+ 
+     <build>
+Index: java/modules/transports/core/vfs/pom.xml
+===================================================================
+--- java/modules/transports/core/vfs/pom.xml	(revision 1776580)
++++ java/modules/transports/core/vfs/pom.xml	(revision 1776581)
+@@ -18,15 +18,12 @@
+   ~  under the License.
+   -->
+ 
+-<project
+-    xmlns="http://maven.apache.org/POM/4.0.0"
+-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>synapse-transports</artifactId>
+-        <version>3.0.0-SNAPSHOT</version>
++        <version>3.0.0</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+@@ -37,9 +34,9 @@
+     <packaging>bundle</packaging>
+ 
+     <scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/core/vfs</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports/core/vfs</developerConnection>
+-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports/core/vfs</url>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/transports/core/vfs</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/transports/core/vfs</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/modules/transports/core/vfs</url>
+     </scm>
+ 
+     <build>
+Index: java/modules/transports/pom.xml
+===================================================================
+--- java/modules/transports/pom.xml	(revision 1776580)
++++ java/modules/transports/pom.xml	(revision 1776581)
+@@ -18,15 +18,12 @@
+   ~  under the License.
+   -->
+ 
+-<project
+-    xmlns="http://maven.apache.org/POM/4.0.0"
+-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>3.0.0-SNAPSHOT</version>
++        <version>3.0.0</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+@@ -37,9 +34,9 @@
+     <packaging>pom</packaging>
+ 
+     <scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/transports</developerConnection>
+-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/transports</url>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/transports</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/transports</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/modules/transports</url>
+     </scm>
+ 
+     <modules>
+Index: java/modules/integration/pom.xml
+===================================================================
+--- java/modules/integration/pom.xml	(revision 1776580)
++++ java/modules/integration/pom.xml	(revision 1776581)
+@@ -18,15 +18,12 @@
+   ~  under the License.
+   -->
+ 
+-<project
+-        xmlns="http://maven.apache.org/POM/4.0.0"
+-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>3.0.0-SNAPSHOT</version>
++        <version>3.0.0</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+@@ -38,9 +35,9 @@
+     <!--<packaging>bundle</packaging>-->
+ 
+     <scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/integration</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/integration</developerConnection>
+-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/integration</url>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/integration</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/integration</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/modules/integration</url>
+     </scm>
+ 
+     <build>
+@@ -54,156 +51,156 @@
+                         <phase>generate-test-resources</phase>
+                         <configuration>
+                             <tasks>
+-                                <echo message="*** Creating testing repositories for synapse samples"/>
+-                                <mkdir dir="target/test_repos"/>
+-                                <mkdir dir="target/test_repos/axis2Server"/>
+-                                <mkdir dir="target/test_repos/axis2Client"/>
+-                                <mkdir dir="target/test_repos/synapse"/>
+-                                <mkdir dir="target/test_repos/synapse"/>
+-                                <mkdir dir="target/test_repos/synapse/modules"/>
+-                                <mkdir dir="target/test_repos/synapse/conf"/>
+-                                <mkdir dir="target/test_repos/axis2Server/services"/>
+-                                <mkdir dir="target/test_repos/axis2Server/modules"/>
+-                                <mkdir dir="target/test_repos/axis2Server/conf"/>
+-                                <mkdir dir="target/test_repos/axis2Client/modules"/>
+-                                <mkdir dir="target/test_repos/axis2Client/conf"/>
++                                <echo message="*** Creating testing repositories for synapse samples" />
++                                <mkdir dir="target/test_repos" />
++                                <mkdir dir="target/test_repos/axis2Server" />
++                                <mkdir dir="target/test_repos/axis2Client" />
++                                <mkdir dir="target/test_repos/synapse" />
++                                <mkdir dir="target/test_repos/synapse" />
++                                <mkdir dir="target/test_repos/synapse/modules" />
++                                <mkdir dir="target/test_repos/synapse/conf" />
++                                <mkdir dir="target/test_repos/axis2Server/services" />
++                                <mkdir dir="target/test_repos/axis2Server/modules" />
++                                <mkdir dir="target/test_repos/axis2Server/conf" />
++                                <mkdir dir="target/test_repos/axis2Client/modules" />
++                                <mkdir dir="target/test_repos/axis2Client/conf" />
+ 
+                                 <copy todir="target/test_repos/axis2Server/conf/">
+                                     <fileset dir="src/test/resources/axis2Xml/axis2Server">
+-                                        <include name="*.xml"/>
++                                        <include name="*.xml" />
+                                     </fileset>
+                                 </copy>
+                                 <copy todir="target/test_repos/synapse/conf/">
+                                     <fileset dir="src/test/resources/axis2Xml/synapse">
+-                                        <include name="*.xml"/>
++                                        <include name="*.xml" />
+                                     </fileset>
+                                 </copy>
+                                 <copy todir="target/test_repos/axis2Client/conf/">
+                                     <fileset dir="src/test/resources/axis2Xml/axis2Client">
+-                                        <include name="*.xml"/>
++                                        <include name="*.xml" />
+                                     </fileset>
+                                 </copy>
+ 
+                                 <!--<copy file="src/test/resources/trust.jks"-->
+-                                <!--tofile="target/test_repos/synapse/conf/trust.jks"/>-->
++                                <!--tofile="target/test_repos/synapse/conf/trust.jks" />-->
+                                 <!--<copy file="src/test/resources/identity.jks"-->
+-                                <!--tofile="target/test_repos/synapse/conf/identity.jks"/>-->
++                                <!--tofile="target/test_repos/synapse/conf/identity.jks" />-->
+                                 <!--<copy file="../core/src/test/resources/keystore.jks"-->
+-                                <!--tofile="target/test_repos/synapse/conf/keystore.jks"/>-->
++                                <!--tofile="target/test_repos/synapse/conf/keystore.jks" />-->
+ 
+-                                <property name="temp.dir" value="target/temp"/>
+-                                <property name="classes" value="${temp.dir}/classes"/>
+-                                <property name="services" value="target/test_repos/axis2Server/services"/>
++                                <property name="temp.dir" value="target/temp" />
++                                <property name="classes" value="${temp.dir}/classes" />
++                                <property name="services" value="target/test_repos/axis2Server/services" />
+ 
+-                                <property name="src" value="../samples/services/SimpleStockQuoteService/src"/>
++                                <property name="src" value="../samples/services/SimpleStockQuoteService/src" />
+ 
+-                                <mkdir dir="${temp.dir}"/>
+-                                <mkdir dir="${classes}"/>
++                                <mkdir dir="${temp.dir}" />
++                                <mkdir dir="${classes}" />
+ 
+                                 <javac source="${java.version}" target="${java.version}" debug="on" destdir="${classes}" fork="true" includeantruntime="false">
+-                                    <src path="${src}"/>
+-                                    <classpath refid="maven.compile.classpath"/>
++                                    <src path="${src}" />
++                                    <classpath refid="maven.compile.classpath" />
+                                 </javac>
+ 
+-                                <property name="SSQ.dir" value="${temp.dir}/SimpleStockQuote"/>
+-                                <mkdir dir="${SSQ.dir}"/>
++                                <property name="SSQ.dir" value="${temp.dir}/SimpleStockQuote" />
++                                <mkdir dir="${SSQ.dir}" />
+ 
+-                                <mkdir dir="${SSQ.dir}/META-INF"/>
+-                                <copy file="${src}/../conf/services.xml" tofile="${SSQ.dir}/META-INF/services.xml"/>
++                                <mkdir dir="${SSQ.dir}/META-INF" />
++                                <copy file="${src}/../conf/services.xml" tofile="${SSQ.dir}/META-INF/services.xml" />
+                                 <!--<copy file="${src}/../wsdl/SimpleStockQuoteService.wsdl"-->
+-                                <!--tofile="${SSQ.dir}/META-INF/service.wsdl"/>-->
++                                <!--tofile="${SSQ.dir}/META-INF/service.wsdl" />-->
+                                 <copy toDir="${SSQ.dir}">
+                                     <fileset dir="${classes}">
+-                                        <include name="**/*.class"/>
++                                        <include name="**/*.class" />
+                                     </fileset>
+                                 </copy>
+ 
+                                 <jar destfile="${services}/SimpleStockQuoteService.aar">
+-                                    <fileset dir="${SSQ.dir}"/>
++                                    <fileset dir="${SSQ.dir}" />
+                                 </jar>
+ 
+-                                <property name="src2" value="../samples/services/SecureStockQuoteService/src"/>
+-                                <delete dir="${temp.dir}"/>
+-                                <mkdir dir="${temp.dir}"/>
+-                                <mkdir dir="${classes}"/>
++                                <property name="src2" value="../samples/services/SecureStockQuoteService/src" />
++                                <delete dir="${temp.dir}" />
++                                <mkdir dir="${temp.dir}" />
++                                <mkdir dir="${classes}" />
+                                 <javac source="${java.version}" target="${java.version}" debug="on" destdir="${classes}" fork="true" includeantruntime="false">
+-                                    <src path="${src2}"/>
+-                                    <classpath refid="maven.compile.classpath"/>
++                                    <src path="${src2}" />
++                                    <classpath refid="maven.compile.classpath" />
+                                 </javac>
+-                                <property name="SSQ2.dir" value="${temp.dir}/SecureStockQuoteService"/>
+-                                <mkdir dir="${SSQ2.dir}"/>
+-                                <mkdir dir="${SSQ2.dir}/META-INF"/>
+-                                <copy file="${src2}/../conf/services.xml" tofile="${SSQ2.dir}/META-INF/services.xml"/>
++                                <property name="SSQ2.dir" value="${temp.dir}/SecureStockQuoteService" />
++                                <mkdir dir="${SSQ2.dir}" />
++                                <mkdir dir="${SSQ2.dir}/META-INF" />
++                                <copy file="${src2}/../conf/services.xml" tofile="${SSQ2.dir}/META-INF/services.xml" />
+                                 <!--<copy file="${src2}/../wsdl/SimpleStockQuoteService.wsdl"-->
+-                                <!--tofile="${SSQ2.dir}/META-INF/service.wsdl"/>-->
+-                                <copy file="${src2}/../store.jks" tofile="${SSQ2.dir}/store.jks"/>
++                                <!--tofile="${SSQ2.dir}/META-INF/service.wsdl" />-->
++                                <copy file="${src2}/../store.jks" tofile="${SSQ2.dir}/store.jks" />
+                                 <copy toDir="${SSQ2.dir}">
+                                     <fileset dir="${classes}">
+-                                        <include name="**/*.class"/>
++                                        <include name="**/*.class" />
+                                     </fileset>
+                                 </copy>
+                                 <jar destfile="${services}/SecureStockQuoteService.aar">
+-                                    <fileset dir="${SSQ2.dir}"/>
++                                    <fileset dir="${SSQ2.dir}" />
+                                 </jar>
+ 
+-                                <property name="src3" value="../samples/services/MTOMSwASampleService/src"/>
+-                                <delete dir="${temp.dir}"/>
+-                                <mkdir dir="${temp.dir}"/>
+-                                <mkdir dir="${classes}"/>
++                                <property name="src3" value="../samples/services/MTOMSwASampleService/src" />
++                                <delete dir="${temp.dir}" />
++                                <mkdir dir="${temp.dir}" />
++                                <mkdir dir="${classes}" />
+                                 <javac source="${java.version}" target="${java.version}" debug="on" destdir="${classes}" fork="true" includeantruntime="false">
+-                                    <src path="${src3}"/>
+-                                    <classpath refid="maven.compile.classpath"/>
++                                    <src path="${src3}" />
++                                    <classpath refid="maven.compile.classpath" />
+                                 </javac>
+-                                <property name="SSQ3.dir" value="${temp.dir}/MTOMSwASampleService"/>
+-                                <mkdir dir="${SSQ3.dir}"/>
+-                                <mkdir dir="${SSQ3.dir}/META-INF"/>
+-                                <copy file="${src3}/../conf/services.xml" tofile="${SSQ3.dir}/META-INF/services.xml"/>
++                                <property name="SSQ3.dir" value="${temp.dir}/MTOMSwASampleService" />
++                                <mkdir dir="${SSQ3.dir}" />
++                                <mkdir dir="${SSQ3.dir}/META-INF" />
++                                <copy file="${src3}/../conf/services.xml" tofile="${SSQ3.dir}/META-INF/services.xml" />
+                                 <copy toDir="${SSQ3.dir}">
+                                     <fileset dir="${classes}">
+-                                        <include name="**/*.class"/>
++                                        <include name="**/*.class" />
+                                     </fileset>
+                                 </copy>
+                                 <jar destfile="${services}/MTOMSwASampleService.aar">
+-                                    <fileset dir="${SSQ3.dir}"/>
++                                    <fileset dir="${SSQ3.dir}" />
+                                 </jar>
+ 
+-                                <property name="src5" value="../samples/services/LoadbalanceFailoverService/src"/>
+-                                <delete dir="${temp.dir}"/>
+-                                <mkdir dir="${temp.dir}"/>
+-                                <mkdir dir="${classes}"/>
++                                <property name="src5" value="../samples/services/LoadbalanceFailoverService/src" />
++                                <delete dir="${temp.dir}" />
++                                <mkdir dir="${temp.dir}" />
++                                <mkdir dir="${classes}" />
+                                 <javac source="${java.version}" target="${java.version}" debug="on" destdir="${classes}" fork="true" includeantruntime="false">
+-                                    <src path="${src5}"/>
+-                                    <classpath refid="maven.compile.classpath"/>
++                                    <src path="${src5}" />
++                                    <classpath refid="maven.compile.classpath" />
+                                 </javac>
+ 
+-                                <property name="LBFA1.dir" value="${temp.dir}/LBService1"/>
+-                                <mkdir dir="${LBFA1.dir}"/>
++                                <property name="LBFA1.dir" value="${temp.dir}/LBService1" />
++                                <mkdir dir="${LBFA1.dir}" />
+ 
+-                                <mkdir dir="${LBFA1.dir}/META-INF"/>
+-                                <copy file="${src5}/../conf/service1/services.xml" tofile="${LBFA1.dir}/META-INF/services.xml"/>
++                                <mkdir dir="${LBFA1.dir}/META-INF" />
++                                <copy file="${src5}/../conf/service1/services.xml" tofile="${LBFA1.dir}/META-INF/services.xml" />
+                                 <copy toDir="${LBFA1.dir}">
+                                     <fileset dir="${classes}">
+-                                        <include name="**/LBService1.class"/>
++                                        <include name="**/LBService1.class" />
+                                     </fileset>
+                                 </copy>
+ 
+                                 <jar destfile="${services}/LBService1.aar">
+-                                    <fileset dir="${LBFA1.dir}"/>
++                                    <fileset dir="${LBFA1.dir}" />
+                                 </jar>
+ 
+-                                <property name="LBFA2.dir" value="${temp.dir}/LBService2"/>
+-                                <mkdir dir="${LBFA2.dir}"/>
++                                <property name="LBFA2.dir" value="${temp.dir}/LBService2" />
++                                <mkdir dir="${LBFA2.dir}" />
+ 
+-                                <mkdir dir="${LBFA2.dir}/META-INF"/>
+-                                <copy file="${src5}/../conf/service2/services.xml" tofile="${LBFA2.dir}/META-INF/services.xml"/>
++                                <mkdir dir="${LBFA2.dir}/META-INF" />
++                                <copy file="${src5}/../conf/service2/services.xml" tofile="${LBFA2.dir}/META-INF/services.xml" />
+                                 <copy toDir="${LBFA2.dir}">
+                                     <fileset dir="${classes}">
+-                                        <include name="**/LBService2.class"/>
++                                        <include name="**/LBService2.class" />
+                                     </fileset>
+                                 </copy>
+ 
+                                 <jar destfile="${services}/LBService2.aar">
+-                                    <fileset dir="${LBFA2.dir}"/>
++                                    <fileset dir="${LBFA2.dir}" />
+                                 </jar>
+ 
+                             </tasks>
+Index: java/modules/migrator/pom.xml
+===================================================================
+--- java/modules/migrator/pom.xml	(revision 1776580)
++++ java/modules/migrator/pom.xml	(revision 1776581)
+@@ -18,15 +18,13 @@
+   ~  under the License.
+   -->
+ 
+-<project xmlns="http://maven.apache.org/POM/4.0.0"
+-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+ 
+     <modelVersion>4.0.0</modelVersion>
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>3.0.0-SNAPSHOT</version>
++        <version>3.0.0</version>
+         <relativePath>../../pom.xml</relativePath>
+     </parent>
+ 
+@@ -40,9 +38,9 @@
+     </description>
+ 
+     <scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/migrator</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/migrator</developerConnection>
+-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/migrator</url>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/migrator</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/migrator</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/modules/migrator</url>
+     </scm>
+ 
+     <build>
+Index: java/modules/packaging/package-archetype/pom.xml
+===================================================================
+--- java/modules/packaging/package-archetype/pom.xml	(revision 1776580)
++++ java/modules/packaging/package-archetype/pom.xml	(revision 1776581)
+@@ -17,15 +17,12 @@
+   ~  specific language governing permissions and limitations
+   ~  under the License.
+   -->
+-<project
+-    xmlns="http://maven.apache.org/POM/4.0.0"
+-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>3.0.0-SNAPSHOT</version>
++        <version>3.0.0</version>
+         <relativePath>../../../pom.xml</relativePath>
+     </parent>
+     <artifactId>synapse-package-archetype</artifactId>
+@@ -37,9 +34,9 @@
+     </description>
+ 
+     <scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/packaging/package-archetype</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/packaging/package-archetype</developerConnection>
+-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/packaging/package-archetype</url>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/packaging/package-archetype</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/packaging/package-archetype</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/modules/packaging/package-archetype</url>
+     </scm>
+ 
+     <build>
+Index: java/modules/packaging/package-skeleton/pom.xml
+===================================================================
+--- java/modules/packaging/package-skeleton/pom.xml	(revision 1776580)
++++ java/modules/packaging/package-skeleton/pom.xml	(revision 1776581)
+@@ -17,15 +17,12 @@
+   ~  specific language governing permissions and limitations
+   ~  under the License.
+   -->
+-<project
+-    xmlns="http://maven.apache.org/POM/4.0.0"
+-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+     <parent>
+         <groupId>org.apache.synapse</groupId>
+         <artifactId>Apache-Synapse</artifactId>
+-        <version>3.0.0-SNAPSHOT</version>
++        <version>3.0.0</version>
+         <relativePath>../../../pom.xml</relativePath>
+     </parent>
+     <artifactId>synapse-package-skeleton</artifactId>
+@@ -38,9 +35,9 @@
+     </description>
+ 
+     <scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java/modules/packaging/package-skeleton</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java/modules/packaging/package-skeleton</developerConnection>
+-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/modules/packaging/package-skeleton</url>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/packaging/package-skeleton</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0/modules/packaging/package-skeleton</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0/modules/packaging/package-skeleton</url>
+     </scm>
+ 
+     <dependencies>
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1776580)
++++ java/pom.xml	(revision 1776581)
+@@ -18,10 +18,7 @@
+   ~  under the License.
+   -->
+ 
+-<project
+-        xmlns="http://maven.apache.org/POM/4.0.0"
+-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+ 
+     <parent>
+@@ -32,7 +29,7 @@
+ 
+     <groupId>org.apache.synapse</groupId>
+     <artifactId>Apache-Synapse</artifactId>
+-    <version>3.0.0-SNAPSHOT</version>
++    <version>3.0.0</version>
+ 
+     <name>Apache Synapse</name>
+     <description>Apache Synapse</description>
+@@ -79,9 +76,9 @@
+     </licenses>
+ 
+     <scm>
+-        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/trunk/java</connection>
+-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/trunk/java</developerConnection>
+-        <url>http://svn.apache.org/viewvc/synapse/trunk/java/</url>
++        <connection>scm:svn:http://svn.apache.org/repos/asf/synapse/tags/3.0.0</connection>
++        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/synapse/tags/3.0.0</developerConnection>
++        <url>http://svn.apache.org/viewvc/synapse/tags/3.0.0</url>
+     </scm>
+ 
+     <organization>
+@@ -1174,7 +1171,7 @@
+             <name>Davanum Srinivas</name>
+             <id>dims</id>
+             <email>davanum@gmail.com</email>
+-            <organization></organization>
++            <organization />
+         </developer>
+         <developer>
+             <name>Sanjiva Weerawarana</name>
+-*-*-*-
+Message: [maven-release-plugin] prepare release 3.0.0
+-*-*-*-
+When: 2016-12-30 09:56:30 -0500 
+-*-*-*-
+Who: ravi

@@ -1,0 +1,29 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            "     private static void produce(String message, Channel channel, String queueName)\n",
+            "             throws IOException {\n",
+            "-        for (int i = 0; i < 1000000; i++) {\n",
+            "-            channel.basicPublish(\"\", queueName, null, message.getBytes());\n",
+            "-        }\n",
+            "+        channel.basicPublish(\"\", queueName, null, message.getBytes());\n",
+            "     }\n",
+            " \n",
+            "     private static void publish(String message, Channel channel, String exchangeName)\n"
+          ],
+          "locn": "-90,9 +90,7"
+        }
+      ],
+      "from": "java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPProducerClient.java",
+      "to": "java/modules/transports/optional/amqp/src/test/java/org/apache/synapse/tranport/amqp/AMQPProducerClient.java"
+    }
+  ],
+  "id": "1510091",
+  "message": "reverted the invalid commit.",
+  "when": "2013-08-03T22:40:04-04:00",
+  "who": "rajikak"
+}

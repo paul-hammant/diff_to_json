@@ -1,0 +1,31 @@
+Index: java/modules/documentation
+===================================================================
+--- java/modules/documentation	(revision 1746951)
++++ java/modules/documentation	(revision 1746952)
+
+Property changes on: java/modules/documentation
+___________________________________________________________________
+Modified: svn:ignore
+## -1 +1,3 ##
++.project
++.settings
+ target
+Index: java/modules/transports/optional/amqp
+===================================================================
+--- java/modules/transports/optional/amqp	(revision 1746951)
++++ java/modules/transports/optional/amqp	(revision 1746952)
+
+Property changes on: java/modules/transports/optional/amqp
+___________________________________________________________________
+Added: svn:ignore
+## -0,0 +1,4 ##
++.classpath
++.project
++.settings
++target
+-*-*-*-
+Message: Set svn:ignore.
+-*-*-*-
+When: 2016-06-05 16:59:12 -0400 
+-*-*-*-
+Who: veithen

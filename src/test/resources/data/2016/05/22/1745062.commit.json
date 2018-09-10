@@ -1,0 +1,71 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             try {\n",
+            "                 if (!hasData(buffer, inBufferInputMode)) {\n",
+            "                     waitForData();\n",
+            "+                    if (producerError) {\n",
+            "+                        return -1;\n",
+            "+                    }\n",
+            "                 }\n",
+            "                 if (isEndOfStream()) {\n",
+            "                     return -1;\n"
+          ],
+          "locn": "-322,6 +322,9"
+        },
+        {
+          "lines": [
+            "             try {\n",
+            "                 try {\n",
+            "                     while (!hasData(buffer, inBufferInputMode) && !producerCompleted) {\n",
+            "+                        if (producerError) {\n",
+            "+                            break;\n",
+            "+                        }\n",
+            "                         producerIoControl.requestInput();\n",
+            "                         readCondition.await();\n",
+            "                     }\n"
+          ],
+          "locn": "-362,6 +365,9"
+        },
+        {
+          "lines": [
+            "                 while (remaining > 0) {\n",
+            "                     if (!outputBuffer.hasRemaining()) {\n",
+            "                         flushContent();\n",
+            "+                        if (consumerError) {\n",
+            "+                            buffer.clear();\n",
+            "+                            break;\n",
+            "+                        }\n",
+            "                         setInputMode(outputBuffer, outBufferInputMode);\n",
+            "                     }\n",
+            "                     int chunk = Math.min(remaining, outputBuffer.remaining());\n"
+          ],
+          "locn": "-406,6 +412,10"
+        },
+        {
+          "lines": [
+            "             try {\n",
+            "                 try {\n",
+            " \t\t\t\t\twhile (hasData(outputBuffer, outBufferInputMode)) {\n",
+            "+                        if(consumerError) {\n",
+            "+                            break;\n",
+            "+                        }\n",
+            " \t\t\t\t\t\tif (consumerIoControl != null && writeCondition != null) {\n",
+            " \t\t\t\t\t\t\tconsumerIoControl.requestOutput();\n",
+            " \t\t\t\t\t\t\twriteCondition.await();\n"
+          ],
+          "locn": "-428,6 +438,9"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/Pipe.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/Pipe.java"
+    }
+  ],
+  "id": "1745062",
+  "message": "fix for SYNAPSE-1004 by Ravi",
+  "when": "2016-05-22T10:49:13-04:00",
+  "who": "isudana"
+}

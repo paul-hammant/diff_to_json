@@ -1,0 +1,70 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     </formats>\n",
+            "     <fileSets>\n",
+            "         <fileSet>\n",
+            "-            <directory>jars</directory>\n",
+            "+            <directory>target/jars</directory>\n",
+            "             <outputDirectory>/</outputDirectory>\n",
+            "             <includes>\n",
+            "                 <include>*.jar</include>\n"
+          ],
+          "locn": "-25,7 +25,7"
+        },
+        {
+          "lines": [
+            "             </includes>\n",
+            "         </fileSet>\n",
+            "     </fileSets>\n",
+            "-</assembly>\n",
+            "\\ No newline at end of file\n",
+            "+</assembly>\n"
+          ],
+          "locn": "-32,4 +32,4"
+        }
+      ],
+      "from": "java/modules/patches/src/main/assembly/jars.xml",
+      "to": "java/modules/patches/src/main/assembly/jars.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                             <goal>jar</goal>\n",
+            "                         </goals>\n",
+            "                         <configuration>\n",
+            "-                            <outputDirectory>./jars</outputDirectory>\n",
+            "+                            <outputDirectory>./target/jars</outputDirectory>\n",
+            "                         </configuration>\n",
+            "                     </execution>\n",
+            "                 </executions>\n"
+          ],
+          "locn": "-52,7 +52,7"
+        },
+        {
+          "lines": [
+            "                         <configuration>\n",
+            "                             <target>\n",
+            "                                 <unjar dest=\"${project.build.outputDirectory}\">\n",
+            "-                                    <fileset dir=\"${basedir}/jars\">\n",
+            "+                                    <fileset dir=\"${basedir}/target/jars\">\n",
+            "                                         <include name=\"**/*.jar\" />\n",
+            "                                     </fileset>\n",
+            "                                 </unjar>\n"
+          ],
+          "locn": "-68,7 +68,7"
+        }
+      ],
+      "from": "java/modules/patches/pom.xml",
+      "to": "java/modules/patches/pom.xml"
+    }
+  ],
+  "id": "1776731",
+  "message": "Moving patch jar creation into target. This causes mvn release:prepare to fail the second time after a dryRun",
+  "when": "2016-12-31T07:32:53-05:00",
+  "who": "ravi"
+}

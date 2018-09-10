@@ -1,0 +1,934 @@
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples.xml	(revision 1215073)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples.xml	(revision 1215074)
+@@ -50,8 +50,9 @@
+                         <li><a href="samples/sample10.html">Sample 10: Introduction to dynamic endpoints with registry</a></li>
+                         <li><a href="samples/sample11.html">Sample 11: A full registry based configuration, and sharing a configuration between multiple instances</a></li>
+                         <li><a href="samples/sample12.html">Sample 12: One-way messaging / fire-and-forget through Synapse</a></li>
+-                        <li><a href="samples/sample13.html">Sample 13: Dual channel invocation through Synapse</a></li>
+-                    </ul>
++                        <li><a href="samples/sample13.html">Sample 13: Dual channel invocation through Synapse</a></li> 
++                        <li><a href="samples/sample14.html">Sample 14: Sequences and Endpoints as local registry items</a></li>
++                     </ul>
+                 </p>
+             </subsection>
+             <subsection name="Endpoints">
+@@ -73,7 +74,8 @@
+                 <p>
+                     <ul>
+                         <li><a href="samples/sample100.html">Sample 100: Using WS-Security for outgoing messages</a></li>
+-                        <li><a href="samples/sample101.html">Sample 101: Using WS-ReliableMessaging for outgoing messages</a></li>
++                        <li><a href="samples/sample101.html">Sample 101: Using WS-ReliableMessaging for outgoing messages 1.0</a></li>
++                        <li><a href="samples/sample102.html">Sample 102: Using WS-ReliableMessaging for outgoing messages 1.1</a></li>
+                     </ul>
+                 </p>
+             </subsection>
+@@ -110,10 +112,10 @@
+                         <li><a href="samples/sample257.html">Sample 257: Proxy services with the FIX transport</a></li>
+                         <li><a href="samples/sample258.html">Sample 258: Switching from HTTP to FIX </a></li>
+                         <li><a href="samples/sample259.html">Sample 259: Switching from FIX to HTTP </a></li>
+-                        <li><a href="">Sample 260: Switching from FIX to AMQP </a></li>
++                        <li><a href="samples/sample260.html">Sample 260: Switching from FIX to AMQP </a></li>
+                         <li><a href="samples/sample261.html">Sample 261: Switch between different FIX versions </a></li>
+                         <li><a href="samples/sample262.html">Sample 262: Content Based Routing of FIX messages </a></li>
+-                        <li><a href="">Sample 263: Transport switching - JMS to http/s using JBoss Messaging (JBM)</a></li>
++                        <li><a href="samples/sample263.html">Sample 263: Transport switching - JMS to http/s using JBoss Messaging (JBM)</a></li>
+                         <li><a href="samples/sample264.html">Sample 264: Request-response invocations with the JMS transport</a></li>
+                         <li><a href="samples/sample265.html">Sample 265: Switching from TCP to HTTP/S</a></li>
+                         <li><a href="samples/sample266.html">Sample 266: Switching from UDP to HTTP/S</a></li>
+@@ -123,7 +125,7 @@
+             <subsection name="Scheduled Tasks">
+                 <p>
+                     <ul>
+-                        <li><a href="#Sample300">Sample 300: Introduction to tasks with simple trigger</a></li>
++                        <li><a href="samples/sample300.html">Sample 300: Introduction to tasks with simple trigger</a></li>
+                     </ul>
+                 </p>
+             </subsection>
+@@ -226,7 +228,7 @@
+                     </ul>
+                 </p>
+             </subsection>
+-            <subsection name="Priority Based Mediation">
++             <subsection name="Priority Based Mediation">
+                 <p>
+                     <ul>
+                         <li><a href="samples/sample650.html">Sample 650: Introduction to priority based mediation</a></li>
+@@ -245,7 +247,7 @@
+                 <p>
+                     <ul>
+                         <!-- This sample should be renamed -->
+-                        <li><a href="#Sample440">Sample 440: Exposing a SOAP service over JSON</a></li>
++                        <li><a href="samples/sample440.html">Sample 440: Exposing a SOAP service over JSON</a></li>
+                     </ul>
+                 </p>
+             </subsection>
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample440.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples/sample440.xml	(revision 1215073)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples/sample440.xml	(revision 1215074)
+@@ -23,7 +23,7 @@
+         <title>Apache Synapse - Sample 440</title>
+     </properties>
+     <body>
+-        <section name="Sample 440: ">
++        <section name="Sample 440: Exposing a SOAP service over JSON">
+             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+ 
+     &lt;proxy name="JSONProxy" transports="http https"&gt;
+@@ -73,7 +73,7 @@
+ &lt;/definitions&gt;</div>
+             <subsection name="Objective">
+                 <p>
+-
++ 					Demonstrate the ability to switch between JSON and XML/SOAP content interchange formats
+                 </p>
+             </subsection>
+             <subsection name="Pre-requisites">
+@@ -80,6 +80,9 @@
+                 <p>
+                     <ul>
+                         <li>
++                            Setup Synapse and the sample Axis2 client for JSON  (Refer  Synapse <a href="setup/script.html#json">Samples Setup Guide</a> for details) 
++                        </li>
++                        <li>
+                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                         </li>
+                         <li>
+@@ -86,7 +89,7 @@
+                             Start Synapse using the configuration numbered 440 (repository/conf/sample/synapse_sample_440.xml)
+                             <div class="command">
+                                 Unix/Linux: sh synapse.sh -sample 440<br/>
+-                                Windows: synapse.bat -sample 440
++                                Windows: synapse.bat -sample 710
+                             </div>
+                         </li>
+                     </ul>
+@@ -93,11 +96,18 @@
+                 </p>
+             </subsection>
+             <subsection name="Executing the Client">
+-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
++                <div class="command">ant jsonclient -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/services/JSONProxy</div>
++ 				<p>JSON client will send a stockquote request to Synapse using the
++					JSON content interchange format. Synapse will trnasform it into a SOAP
++					request and forward to the Axis2 server. The SOAP response from the
++					Axis2 server will be converted into a JSON message and sent back to the
++					JSON client.</p>
++				<p>You may use a tool like TCPMon to monitor the JSON requests sent
++						over the wire. A sample JSON request and response is shown below:</p>
++				
++                <div class="consoleOutput">{"getQuote":{"request":{"symbol":"IBM"}}}</div>
+ 
+-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
+-
+-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
++                <div class="consoleOutput">{"getQuoteResponse":{"return":{"change":3.853593376681722,"earnings":12.802850763714854,"high":67.92488310190126,"last":66.14619264746406,"lastTradeTimestamp":"Mon Aug 23 16:48:40 IST 2010","low":-66.04000424423522,"marketCap":-9334516.42324327,"name":"IBM Company","open":-64.61950137150009,"peRatio":-19.78600441437058,"percentageChange":5.411779328273005,"prevClose":71.2075112994578,"symbol":"IBM","volume":16842}}}</div>
+             </subsection>
+         </section>
+         <p><a href="../samples.html">Back to Catalog</a></p>        
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample255.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples/sample255.xml	(revision 1215073)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples/sample255.xml	(revision 1215074)
+@@ -79,8 +79,7 @@
+                             more details).
+                         </li>
+                         <li>
+-                            Enable the mail transport sender for Synapse (refer Mail transport setup
+-                            guide for more details).
++                            Enable the mail transport sender for Synapse (refer <a href="setup/mail.html#mailTransportSender"> Mail transport setup</a> guide for more details).
+                         </li>
+                         <li>
+                             Create a new test directory in the FTP site.
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample256.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples/sample256.xml	(revision 1215073)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples/sample256.xml	(revision 1215074)
+@@ -85,7 +85,7 @@
+                         </li>
+                         <li>
+                             Enable the mail transport listener and mail transport sender for Synapse
+-                            (refer mail transport setup guide for more details)
++                            (refer  <a href="setup/mail.html#mailTransportSender"> Mail transport setup</a> guide for more details)
+                         </li>
+                         <li>
+                             Start Synapse using the configuration numbered 256 (repository/conf/sample/synapse_sample_256.xml)
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample652.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples/sample652.xml	(revision 1215073)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples/sample652.xml	(revision 1215074)
+@@ -23,7 +23,7 @@
+         <title>Apache Synapse - Sample 652</title>
+     </properties>
+     <body>
+-        <section name="Sample 652: ">
++        <section name="Sample 652: Distributed transaction management">
+             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+ 
+ &lt;sequence name="myFaultHandler"&gt;
+@@ -91,7 +91,7 @@
+ &lt;/definitions&gt;</div>
+             <subsection name="Objective">
+                 <p>
+-
++					Demonstrate the use of the transaction mediator in a distributed transaction
+                 </p>
+             </subsection>
+             <subsection name="Pre-requisites">
+@@ -98,7 +98,20 @@
+                 <p>
+                     <ul>
+                         <li>
+-                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
++                              Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
++                              <p>To run this sample it is required to deploy synpase on JBoss application server(This is only tested with JBoss application sever), you 
++                              can use the war distribution to deploy synapse on JBoss application server. Use the synpase_sample_652.xml as the synapse confiuration 
++                              file and start JBoss with that synpase configuration file. Also you need to define two XA datasources for above two datasources. 
++                              You'll need to refer JBoss documentation to see how to do this.</p>
++                              <p>
++                                It also required to have two database instances, this will be used by the two XA datasources. 
++                                Refer the <a href="setup/db.html#derby">Sample Setup Guide </a> to see how you can set up the derby database server.
++                              </p>
++                              <p>
++                                In this sample a record is delete from one database and it is added into the second database. 
++                                If either of the operations(deleting from the 1st database and adding into the second database)
++                                fails everything will be roll backed. The records will be untoched.
++                              </p>
+                         </li>
+                         <li>
+                             Start Synapse using the configuration numbered 652 (repository/conf/sample/synapse_sample_652.xml)
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample14.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples/sample14.xml	(nonexistent)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples/sample14.xml	(revision 1215074)
+@@ -0,0 +1,89 @@
++<?xml version="1.0" encoding="ISO-8859-1" ?>
++<!-- ~ Licensed to the Apache Software Foundation (ASF) under one ~ or more 
++	contributor license agreements. See the NOTICE file ~ distributed with this 
++	work for additional information ~ regarding copyright ownership. The ASF 
++	licenses this file ~ to you under the Apache License, Version 2.0 (the ~ 
++	"License"); you may not use this file except in compliance ~ with the License. 
++	You may obtain a copy of the License at ~ ~ http://www.apache.org/licenses/LICENSE-2.0 
++	~ ~ Unless required by applicable law or agreed to in writing, ~ software 
++	distributed under the License is distributed on an ~ * "AS IS" BASIS, WITHOUT 
++	WARRANTIES OR CONDITIONS OF ANY ~ KIND, either express or implied. See the 
++	License for the ~ specific language governing permissions and limitations 
++	~ under the License. -->
++
++<document>
++	<properties>
++		<title>Apache Synapse - Sample 14</title>
++	</properties>
++	<body>
++		<section name="Sample 14: Sequences and Endpoints as local registry items">
++			<div class="xmlConf"><pre xml:space="preserve">&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;
++             xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
++             xsi:schemaLocation=&quot;http://ws.apache.org/ns/synapse http://synapse.apache.org/ns/2010/04/configuration/synapse_config.xsd&quot;&gt;
++
++    &lt;localEntry key=&quot;local-enrty-ep-key&quot;
++                src=&quot;file:repository/conf/sample/resources/endpoint/dynamic_endpt_1.xml&quot;/&gt;
++
++    &lt;localEntry key=&quot;local-enrty-sequence-key&quot;&gt;
++        &lt;sequence name=&quot;dynamic_sequence&quot;&gt;
++            &lt;log level=&quot;custom&quot;&gt;
++                &lt;property name=&quot;message&quot; value=&quot;*** Test Message 1 ***&quot;/&gt;
++            &lt;/log&gt;
++        &lt;/sequence&gt;
++    &lt;/localEntry&gt;
++
++    &lt;sequence name=&quot;main&quot;&gt;
++        &lt;in&gt;
++            &lt;sequence key=&quot;local-enrty-sequence-key&quot;/&gt;
++            &lt;send&gt;
++                &lt;endpoint key=&quot;local-enrty-ep-key&quot;/&gt;
++            &lt;/send&gt;
++        &lt;/in&gt;
++        &lt;out&gt;
++            &lt;send/&gt;
++        &lt;/out&gt;
++    &lt;/sequence&gt;
++
++&lt;/definitions&gt;</pre></div>
++			<subsection name="Objective">
++				<p>
++					Objective: Sequence and Endpoints as local registry entries
++				</p>
++			</subsection>
++
++			<subsection name="Pre-requisites">
++				<p>
++					<ul>
++						<li>
++							Start the Synapse configuration numbered 14: i.e. synapse
++							-sample 14
++						</li>
++						<li>
++							Start the Axis2 server and deploy the SimpleStockQuoteService if
++							not already done
++						</li>
++					</ul>
++				</p>
++			</subsection>
++			<subsection name="Executing the Client">
++				<p>
++                    Execute the client as follows.
++                </p>
++                <div class="command">ant stockquote -Dtrpurl=http://localhost:8280/</div>
++             	<p>This example shows sequences and endpoints fetched from local
++				   registry. Thus it is possible to have endpoints sequences as
++				   local registry entries including file entries.Execute the
++				   following command to see the sample working, where you will be
++				   able to see the log statement from the fetched sequence from the
++				   local entry and the endpoint will be fetched from the specified
++				   file at runtime and be cached in the system
++				</p>
++                
++            </subsection>
++
++		</section>
++		<p>
++			<a href="../samples.html">Back to Catalog</a>
++		</p>
++	</body>
++</document>
+\ No newline at end of file
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/mail.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/mail.xml	(nonexistent)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/mail.xml	(revision 1215074)
+@@ -0,0 +1,60 @@
++<?xml version="1.0" encoding="ISO-8859-1" ?>
++<!-- ~ Licensed to the Apache Software Foundation (ASF) under one ~ or more 
++	contributor license agreements. See the NOTICE file ~ distributed with this 
++	work for additional information ~ regarding copyright ownership. The ASF 
++	licenses this file ~ to you under the Apache License, Version 2.0 (the ~ 
++	"License"); you may not use this file except in compliance ~ with the License. 
++	You may obtain a copy of the License at ~ ~ http://www.apache.org/licenses/LICENSE-2.0 
++	~ ~ Unless required by applicable law or agreed to in writing, ~ software 
++	distributed under the License is distributed on an ~ * "AS IS" BASIS, WITHOUT 
++	WARRANTIES OR CONDITIONS OF ANY ~ KIND, either express or implied. See the 
++	License for the ~ specific language governing permissions and limitations 
++	~ under the License. -->
++
++<document>
++	<properties>
++		<title>Apache Synapse - Script Setup Guide</title>
++	</properties>
++	<body>
++
++		<section name="Contents">
++			<ul>
++				<li>
++					<a href="#mailTransportSender">Setting up Mail Transport Sender</a>
++				</li>
++				<li>
++					<a href="#mailTransportReceiver">Setting up Mail Transport Receiver</a>
++				</li>
++			</ul>
++		</section>
++		<section name="Setting up Mail Transport Sender"
++			id="mailTransportSender">
++			<p>
++			  To enable the mail transport sender for samples, you need to uncomment
++			  the mail transport sender configuration in the
++			  repository/conf/axis2.xml. Uncomment the mail transport sender sample
++			  configuration and make sure it points to a valid SMTP configuration for
++			  any actual scenarios. 
++			  <div class="xmlConf">&lt;transportSender name=&quot;mailto&quot; class=&quot;org.apache.synapse.transport.mail.MailTransportSender&quot;&gt;
++        &lt;parameter name=&quot;mail.smtp.host&quot;&gt;smtp.gmail.com&lt;/parameter&gt;
++        &lt;parameter name=&quot;mail.smtp.port&quot;&gt;587&lt;/parameter&gt;
++        &lt;parameter name=&quot;mail.smtp.starttls.enable&quot;&gt;true&lt;/parameter&gt;
++        &lt;parameter name=&quot;mail.smtp.auth&quot;&gt;true&lt;/parameter&gt;
++        &lt;parameter name=&quot;mail.smtp.user&quot;&gt;synapse.demo.0&lt;/parameter&gt;
++        &lt;parameter name=&quot;mail.smtp.password&quot;&gt;mailpassword&lt;/parameter&gt;
++        &lt;parameter name=&quot;mail.smtp.from&quot;&gt;synapse.demo.0@gmail.com&lt;/parameter&gt;
++&lt;/transportSender&gt;</div>
++			</p>
++		</section>
++		<section name="Setting up Mail Transport Receiver"
++			id="mailTransportReceiver">
++			<p>
++		     To enable the mail transport receiver for samples, you need to
++		     uncomment the mail transport receiver configuration in the
++			 configuration. Note: you need to provide correct parameters for a valid
++			 mail account at service level.
++			</p>
++			<div class="xmlConf">&lt;transportReceiver name=&quot;mailto&quot; class=&quot;org.apache.axis2.transport.mail.MailTransportListener&quot;&gt;&lt;/transportReceiver&gt;</div>
++		</section>
++	</body>
++</document>
+\ No newline at end of file
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/script.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/script.xml	(nonexistent)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/script.xml	(revision 1215074)
+@@ -0,0 +1,101 @@
++<?xml version="1.0" encoding="ISO-8859-1" ?>
++<!-- ~ Licensed to the Apache Software Foundation (ASF) under one ~ or more 
++	contributor license agreements. See the NOTICE file ~ distributed with this 
++	work for additional information ~ regarding copyright ownership. The ASF 
++	licenses this file ~ to you under the Apache License, Version 2.0 (the ~ 
++	"License"); you may not use this file except in compliance ~ with the License. 
++	You may obtain a copy of the License at ~ ~ http://www.apache.org/licenses/LICENSE-2.0 
++	~ ~ Unless required by applicable law or agreed to in writing, ~ software 
++	distributed under the License is distributed on an ~ * "AS IS" BASIS, WITHOUT 
++	WARRANTIES OR CONDITIONS OF ANY ~ KIND, either express or implied. See the 
++	License for the ~ specific language governing permissions and limitations 
++	~ under the License. -->
++
++<document>
++	<properties>
++		<title>Apache Synapse - Script Setup Guide</title>
++	</properties>
++	<body>
++
++		<section name="Contents">
++			<ul>
++				<li>
++					<a href="#intro">Introduction</a>
++				</li>
++				<li>
++					<a href="#javaScript">JavaScripts Support</a>
++				</li>
++				<li>
++					<a href="#ruby">Ruby Support</a>
++				</li>
++				<li>
++					<a href="#json">JSON Support</a>
++				</li>
++			</ul>
++		</section>
++		<section name="Configuring Synapse for Script Mediator Support"
++			id="intro">
++			<p>
++				The Synapse Script Mediator is a Synapse extension, and thus all
++				prerequisites are not bundled by default with the Synapse
++				distribution.Before you use some script mediators you may need to
++				manually add the required jar files to the Synapse lib directory, and
++				optionally 	perform other installation tasks as may be required by the
++				individual scripting language. This is explained in the following
++				sections.
++			</p>
++			<subsection name="JavaScript Support" id="javaScript">
++
++				<p>
++					The JavaScript/E4X support is enabled by default and comes
++					ready-to-use with the Synapse distribution.
++				</p>
++			</subsection>
++			<subsection name="Ruby Support" id="ruby">
++				<p>
++					For Ruby support you need to download the 'jruby-complete.jar'
++					from the Maven repository for JRuby, and copy it into the 'lib'
++					folder of Synapse . The JRuby JAR can be downloaded from
++					<a class="externalLink"
++						href="http://repo2.maven.org/maven2/org/jruby/jruby-complete/1.3.0/jruby-complete-1.3.0.jar">
++						here
++					</a>
++				</p>
++			</subsection>
++			<subsection name="JSON Support" id="json">
++				<p>
++					<a class="externalLink" href="http://json.org">JSON</a>
++					is a lightweight data-interchange format.
++					It can be used as an alternative to XML or SOAP. To enable the JSON
++					support in Synapse, following two jar files should be deployed into the 'lib'
++					directory of Synapse.
++				</p>
++				<ul>
++					<li>
++						<a class="externalLink" href="http://repo1.maven.org/maven2/org/apache/axis2/axis2-json">axis2-json.jar</a>
++					</li>
++					<li>
++						<a class="externalLink" href="http://jettison.codehaus.org/Download">jettison.jar</a>
++					</li>
++				</ul>
++				<p>
++      			Having deployed the necessary libraries you should now register the JSON message
++      			builder and formatter with Synapse. Open up 'repository/conf/axis2.xml' file
++      			of Synapse and add the following two entries under the 'messageBuilders' and
++      			'messageFormatters' sections respectively.
++    			</p>
++    			<div class="xmlConf">
++    &lt;messageBuilder contentType=&quot;application/json&quot;
++                         class=&quot;org.apache.axis2.json.JSONOMBuilder&quot;/&gt;
++
++     &lt;messageFormatter contentType=&quot;application/json&quot;
++                         class=&quot;org.apache.axis2.json.JSONMessageFormatter&quot;/&gt;
++    			</div>
++    			<p>
++     If you are planning to run sample 440, you should also add the above two entries to the 'samples/axis2Client/client_repo/conf/axis2.xml' file.
++    			</p>
++			</subsection>
++
++		</section>
++	</body>
++</document>
+\ No newline at end of file
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/db.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/db.xml	(revision 1215073)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/db.xml	(revision 1215074)
+@@ -20,7 +20,7 @@
+ 
+ <document>
+     <properties>
+-        <title>Apache Synapse - Database Setup Guide</title>
++        <title>Configuring Synapse for Script Mediator Support</title>
+     </properties>
+     <body>
+         <section name="Contents">
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/index.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/index.xml	(revision 1215073)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/index.xml	(revision 1215074)
+@@ -382,6 +382,7 @@
+                 <li><a href="fix.html">FIX Setup Guide</a></li>
+                 <li><a href="tcp_udp.html">TCP/UDP Setup Guide</a></li>
+                 <li><a href="db.html">Database Setup Guide</a></li>
++                <li><a href="script.html">Script Setup Guide</a></li>
+             </ul>
+         </section>
+     </body>
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/jms.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/jms.xml	(revision 1215073)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples/setup/jms.xml	(revision 1215074)
+@@ -36,6 +36,7 @@
+                 </li>
+                 <li><a href="#server">Enabling JMS Support in Axis2 Server</a></li>
+                 <li><a href="#client">Enabling JMS Support in Axis2 Client</a></li>
++                <li><a href="#amqp">Configure Synapse for AMQP Transport</a></li>
+             </ul>
+         </section>
+         <section name="Introduction" id="intro">
+@@ -186,5 +187,58 @@
+                 default and so you only need to meet the prerequisites described above.
+             </p>
+         </section>
+-    </body>
++        <section name="Configure Synapse for AMQP Transport" id="amqp">
++	<p>
++		The samples used in this guide assumes the existence of a local QPid
++		(1.0-M2 or higher) installation properly installed and started up. You
++		also
++		need to copy the following client JAR files into the Synapse 'lib' folder
++		to support AMQP. These files are found in the 'lib' directory of the
++		QPid installation.
++	</p>
++	<ul>
++		<li>qpid-client-1.0-incubating-M2.jar</li>
++		<li>qpid-common-1.0-incubating-M2.jar</li>
++		<li>geronimo-jms_1.1_spec-1.0.jar</li>
++		<li>slf4j-api-1.4.0.jar **</li>
++		<li>slf4j-log4j12-1.4.0.jar **</li>
++	</ul>
++	<p>
++		** To configure FIX (Quickfix/J 1.3) with AMQP (QPid-1.0-M2) copy the
++		sl4j-* libraries comes with QPid and ignore the sl4j-* libraries with
++		Quickfix/J.
++	</p>
++	<p>
++		To enable the AMQP over JMS transport, you need to uncomment the JMS
++		transport
++		listener configuration. To enable AMQP over JMS for synapse, the
++		repository/conf/axis2.xml must be updated,
++		while to enable JMS support for the sample Axis2 server the
++		samples/axis2Server/repository/conf/axis2.xml file must be updated.
++	</p>
++	<div class="xmlConf">&lt;!--Uncomment this and configure as appropriate for JMS transport support, after setting up your JMS environment --&gt;
++        &lt;transportReceiver name=&quot;jms&quot; class=&quot;org.apache.synapse.transport.jms.JMSListener&quot;&gt;
++        &lt;/transportReceiver&gt;
++        &lt;transportSender name=&quot;jms&quot; class=&quot;org.apache.synapse.transport.jms.JMSSender&quot;&gt;
++        &lt;/transportReceiver&gt;</div>
++      <p>Locate and edit the AMQP connection settings file for the message consumer, this fle is usually named direct.properties.</p>
++      <div class="xmlConf">java.naming.factory.initial = org.apache.qpid.jndi.PropertiesFileInitialContextFactory
++# register some connection factories
++# connectionfactory.[jndiname] = [ConnectionURL]
++connectionfactory.qpidConnectionfactory = amqp://guest:guest@clientid/test?brokerlist='tcp://localhost:5672'
++# Register an AMQP destination in JNDI
++# destination.[jniName] = [BindingURL]
++destination.directQueue = direct://amq.direct//QpidStockQuoteService?routingkey='QpidStockQuoteService'
++destination.replyQueue = direct://amq.direct//replyQueue?routingkey='replyQueue'</div>
++	  <p>Locate and edit the AMQP connection settings file for Synapse, this fle is usually named con.properties.</p>
++	   <div class="xmlConf">#initial context factory
++#java.naming.factory.initial =org.apache.qpid.jndi.PropertiesFileInitialContextFactory
++# register some connection factories
++# connectionfactory.[jndiname] = [ConnectionURL]
++connectionfactory.qpidConnectionfactory=amqp://guest:guest@clientid/test?brokerlist='tcp://localhost:5672'
++# Register an AMQP destination in JNDI
++# destination.[jndiName] = [BindingURL]
++destination.directQueue=direct://amq.direct//QpidStockQuoteService</div>
++</section>
++     </body>
+ </document>
+\ No newline at end of file
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample101.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples/sample101.xml	(revision 1215073)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples/sample101.xml	(revision 1215074)
+@@ -23,7 +23,7 @@
+         <title>Apache Synapse - Sample 101</title>
+     </properties>
+     <body>
+-        <section name="Sample 101: Using WS-ReliableMessaging for Outgoing Messages">
++        <section name="Sample 101: Using WS-ReliableMessaging for Outgoing Messages 1.0">
+             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+ 
+     &lt;sequence name="main"&gt;
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample102.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples/sample102.xml	(revision 1215073)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples/sample102.xml	(revision 1215074)
+@@ -23,7 +23,7 @@
+         <title>Apache Synapse - Sample 102</title>
+     </properties>
+     <body>
+-        <section name="Sample 102: ">
++        <section name="Sample 102:Reliable message exchange between Synapse and the back-end server using WS-ReliableMessaging 1.1 ">
+             <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+ 
+     &lt;sequence name="main"&gt;
+@@ -46,8 +46,8 @@
+ &lt;/definitions&gt;</div>
+             <subsection name="Objective">
+                 <p>
+-
+-                </p>
++               	 	Demonstrate the message exchange between Synapse and the server using WS-ReliableMessaging (WS-RM) - 1.1
++			    </p>
+             </subsection>
+             <subsection name="Pre-requisites">
+                 <p>
+@@ -66,12 +66,8 @@
+                 </p>
+             </subsection>
+             <subsection name="Executing the Client">
+-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
+-
+-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
+-
+-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
+-            </subsection>
++             	<p>This sample is as same as the previous one except it uses WS-RM 1.1 version where as the previous sample is using the RM version 1.0</p>
++             </subsection>
+         </section>
+         <p><a href="../samples.html">Back to Catalog</a></p>        
+     </body>
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample260.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples/sample260.xml	(revision 1215073)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples/sample260.xml	(revision 1215074)
+@@ -23,9 +23,8 @@
+         <title>Apache Synapse - Sample 260</title>
+     </properties>
+     <body>
+-        <section name="Sample 260: ">
+-            <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+-
++        <section name="Sample 260:Switch from FIX to AMQP">
++    <div class="xmlConf">&lt;definitions xmlns="http://ws.apache.org/ns/synapse"&gt;
+     &lt;proxy name="FIXProxy" transports="fix"&gt;
+         &lt;target&gt;
+             &lt;endpoint&gt;
+@@ -48,11 +47,10 @@
+             file
+         &lt;/parameter&gt;
+     &lt;/proxy&gt;
+-
+ &lt;/definitions&gt;</div>
+             <subsection name="Objective">
+                 <p>
+-
++					Demonstrate the capability of switching between FIX and AMQP protocols
+                 </p>
+             </subsection>
+             <subsection name="Pre-requisites">
+@@ -59,24 +57,36 @@
+                 <p>
+                     <ul>
+                         <li>
+-                            Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
++                           You will need the sample FIX blotter that comes with Quickfix/J (Banzai). Configure the blotter to establish sessions with Synapse. (refer
++                            <a href="setup/fix.html#synapse">FIX setup guide</a> for details)
+                         </li>
+-                        <li>
+-                            Start Synapse using the configuration numbered 260 (repository/conf/sample/synapse_sample_260.xml)
+-                            <div class="command">
+-                                Unix/Linux: sh synapse.sh -sample 260<br/>
+-                                Windows: synapse.bat -sample 260
+-                            </div>
++                         <li>
++                           Configure the AMQP transport for Synapse. See Configure Synapse for  <a href="setup/jms.html#amqp"> AMQP Transport setup</a> for detail
+                         </li>
++                        <li> 
++                           To get an idea about the various transport parameters being used in this sample see FIX Transport Parameters .
++                        </li>
+                     </ul>
+                 </p>
+             </subsection>
+             <subsection name="Executing the Client">
+-                <div class="command">ant stockquote -Daddurl=http://localhost:9000/services/SimpleStockQuoteService -Dtrpurl=http://localhost:8280/</div>
+-
+-                <div class="consoleOutput">Sat Nov 18 21:01:23 IST 2006 SimpleStockQuoteService :: Generating quote for : IBM</div>
+-
+-                <div class="consoleOutput">Standard :: Stock price = $95.26454380258552</div>
++            	<p>
++            	   Start the AMQP consumer, by switching to samples/axis2Client directory and running the consumer using the following command. Consumer will listen to the queue 'QpidStockQuoteService', accept the orders and reply to the queue 'replyQueue'.
++            	</p>
++                <div class="command">ant amqpconsumer -Dpropfile=$SYNAPSE_HOME/repository/conf/sample/resources/fix/direct.properties</div>
++				<p>
++				  Open up the SYNAPSE_HOME/repository/conf/sample/synapse_sample_260.xml file
++				  and make sure that the transport.fix.AcceptorConfigURL property points
++				  to the fix-synapse.cfg file you created. Once done you can start the
++				  Synapse configuration numbered 260: i.e. synapse -sample 260. Note that
++				  Synapse creates a new FIX session with Banzai at this point.
++				</p>
++				<p>
++				  Send an order request from Banzai to Synapse. e.g. Buy DELL 1000 @ MKT.
++				</p>
++				<p>
++				  Synapse will forward the order request by binding it to a JMS message payload and sending it to the AMQP consumer. AMQP consumer will send a execution back to Banzai.
++				</p>
+             </subsection>
+         </section>
+         <p><a href="../samples.html">Back to Catalog</a></p>        
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample263.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples/sample263.xml	(nonexistent)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples/sample263.xml	(revision 1215074)
+@@ -0,0 +1,180 @@
++<?xml version="1.0" encoding="ISO-8859-1" ?>
++<!-- ~ Licensed to the Apache Software Foundation (ASF) under one ~ or more 
++	contributor license agreements. See the NOTICE file ~ distributed with this 
++	work for additional information ~ regarding copyright ownership. The ASF 
++	licenses this file ~ to you under the Apache License, Version 2.0 (the ~ 
++	"License"); you may not use this file except in compliance ~ with the License. 
++	You may obtain a copy of the License at ~ ~ http://www.apache.org/licenses/LICENSE-2.0 
++	~ ~ Unless required by applicable law or agreed to in writing, ~ software 
++	distributed under the License is distributed on an ~ * "AS IS" BASIS, WITHOUT 
++	WARRANTIES OR CONDITIONS OF ANY ~ KIND, either express or implied. See the 
++	License for the ~ specific language governing permissions and limitations 
++	~ under the License. -->
++
++<document>
++	<properties>
++		<title>Apache Synapse - Sample 262</title>
++	</properties>
++	<body>
++		<section
++			name="Sample 263: Transport switching - JMS to http/s using JBoss Messaging(JBM)">
++			<div class="xmlConf">
++&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;
++             xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
++             xsi:schemaLocation=&quot;http://ws.apache.org/ns/synapse http://synapse.apache.org/ns/2010/04/configuration/synapse_config.xsd&quot;&gt;
++
++    &lt;proxy name=&quot;StockQuoteProxy&quot; transports=&quot;jms&quot;&gt;
++        &lt;target&gt;
++            &lt;inSequence&gt;
++                &lt;property action=&quot;set&quot; name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
++            &lt;/inSequence&gt;
++            &lt;endpoint&gt;
++                &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
++            &lt;/endpoint&gt;
++            &lt;outSequence&gt;
++                &lt;send/&gt;
++            &lt;/outSequence&gt;
++        &lt;/target&gt;
++        &lt;publishWSDL uri=&quot;file:repository/conf/sample/resources/proxy/sample_proxy_1.wsdl&quot;/&gt;
++        &lt;parameter name=&quot;transport.jms.ContentType&quot;&gt;
++            &lt;rules&gt;
++                &lt;jmsProperty&gt;contentType&lt;/jmsProperty&gt;
++                &lt;default&gt;application/xml&lt;/default&gt;
++            &lt;/rules&gt;
++        &lt;/parameter&gt;
++    &lt;/proxy&gt;
++&lt;/definitions&gt;
++			</div>
++			<subsection name="Objective">
++				<p>
++					Objective: Introduction to switching transports with proxy
++					services.
++					The JMS provider will be								
++					<a class="externalLink" href="http://jboss.org/jbossmessaging/">JBoss Messaging(JBM).</a>
++				</p>
++			</subsection>
++			<subsection name="Pre-requisites">
++				<p>
++					<ul>
++						<li>
++							Start the Axis2 server and deploy the SimpleStockQuoteService
++							(Refer
++							steps above)
++						</li>
++						<li>
++							<a class="externalLink" href="http://jboss.org/jbossmessaging/">Download</a>
++							, install and start JBM server, and configure Synapse to listen
++							on JBM (refer notes below)
++							<br />
++						</li>
++						<li>
++							Start the Synapse configuration numbered 263
++							<div class="command">
++								Unix/Linux: sh synapse.sh -sample 263
++								<br />
++								Windows: synapse.bat -sample 23
++							</div>
++						</li>
++						<li>
++							We need to configure the required queues in JBM. Add the
++							following entry to JBM jms configuration inside
++							file-config/stand-alone/non-clustered/jbm-jms.xml.
++							Once JBM is
++							installed and started you should get a message as
++							follows:
++							<div class="xmlConf">
++&lt;queue name=&quot;StockQuoteProxy&quot;&gt;
++    &lt;entry name=&quot;StockQuoteProxy&quot;/&gt;
++&lt;/queue&gt;
++							</div>
++						</li>
++						<li>
++							Once you started the JBM server with the above changes you'll be
++							able to see the following on STDOUT
++							<div class="consoleOutput">
++10:18:02,673 INFO [org.jboss.messaging.core.server.impl.MessagingServerImpl] JBoss Messaging Server version 2.0.0.BETA3 (maggot, 104) started
++							</div>
++						</li>
++						<li>
++							<p>You will now need to configure the Axis2 instance used by
++								Synapse
++								(not the sample Axis2 server) to enable JMS support using
++								the
++								above provider. Refer Axis2 documentation on setting up JMS
++								in
++								detail (http://ws.apache.org/axis2/1_1/jms-transport.html).
++								You
++								will also need to copy the jbm-core-client.jar,
++								jbm-jms-client.jar, jnp-client.jar(these jars are inside client
++								folder ) and jbm-transports.jar, netty.jar(these jars are from
++								lib folder) jars from JBM into the lib directory to allow
++								Synapse
++								to connect to the JBM JMS provider. This was tested with
++								JBM
++								2.0.0.BETA3
++							</p>
++						</li>
++						<li>
++							<p>You need to add the following configuration for Axis2 JMS transport listener in axis2.xml found at repository/conf/axis2.xml.
++							</p>
++							<div class="consoleOutput">
++&lt;transportReceiver name=&quot;jms&quot; class=&quot;org.apache.axis2.transport.jms.JMSListener&quot;&gt;
++   &lt;parameter name=&quot;java.naming.factory.initial&quot;&gt;org.jnp.interfaces.NamingContextFactory&lt;/parameter&gt;
++   &lt;parameter name=&quot;java.naming.provider.url&quot;&gt;jnp://localhost:1099&lt;/parameter&gt;
++   &lt;parameter name=&quot;java.naming.factory.url.pkgs&quot;&gt;org.jboss.naming:org.jnp.interfaces&lt;/parameter&gt;
++&lt;parameter name=&quot;transport.jms.ConnectionFactoryJNDIName&quot;&gt;ConnectionFactory&lt;/parameter&gt;
++							</div>
++						</li>
++						<li>
++							On the Synapse debug log you will notice that the JMS listener
++							received the request message as:
++							<div class="consoleOutput">
++[JMSWorker-1] DEBUG ProxyServiceMessageReceiver -Proxy Service StockQuoteProxy received a new message...
++							</div>
++						</li>
++						
++						<li>
++							<p>In this sample, the client sends the request message to the
++								proxy service exposed over JMS in Synsape. Synapse forwards this
++								message to the HTTP EPR of the simple stock quote service hosted
++								on the sample Axis2 server. Note that the operation is out-only
++								and no response is sent back to the client. The
++								transport.jms.ContentType property is necessary to allow the JMS
++								transport to determine the content type of incoming messages.
++								With the given configuration it will first try to read the
++								content type from the 'contentType' message property and fall
++								back to 'application/xml' (i.e. POX) if this property is not
++								set.
++								Note that the JMS client used in this example doesn't send any
++								content type information.
++							</p>
++						</li>
++
++					</ul>
++				</p>
++			</subsection>
++			  <subsection name="Executing the Client">
++                <p>
++                    Once you start the Synapse configuration 250 and request for the WSDL of the 
++                    proxy service (http://localhost:8280/services/StockQuoteProxy?wsdl) you will 
++                    notice that its exposed only on the JMS transport. This is because the configuration specified this 
++                    requirement in the proxy service definition.
++                </p>         
++                <div class="command">
++ant jmsclient -Djms_type=pox -Djms_dest=StockQuoteProxy -Djms_payload=MSFT -Djava.naming.provider.url=jnp://localhost:1099 -Djava.naming.factory.initial=org.jnp.interfaces.NamingContextFactory -D=java.naming.factory.url.pkgs=org.jboss.naming:org.jnp.interfaces
++				</div>     
++				   
++				   <p>Now if you examine the console running the sample Axis2 server,
++							you will see a message indicating that the server has accepted an
++							order as follows: </p>
++							<div class="consoleOutput">
++Accepted order for : 16517 stocks of MSFT at $169.14622538721846
++							</div> 
++            </subsection>
++
++		</section>
++		<p>
++			<a href="../samples.html">Back to Catalog</a>
++		</p>
++	</body>
++</document>
+\ No newline at end of file
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample381.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples/sample381.xml	(revision 1215073)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples/sample381.xml	(revision 1215074)
+@@ -76,7 +76,7 @@
+                     <ul>                
+                         <li>
+                             Setup and start a JMS broker (Apache ActiveMQ can be used as the
+-                            JMS broker for this scenario. Refer JMS setup guide for information on
++                            JMS broker for this scenario.Refer <a href="setup/jms.html#intro">JMS setup guide</a> for information on
+                             how to run ActiveMQ.)
+                         </li>
+                         <li>
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample353.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples/sample353.xml	(revision 1215073)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples/sample353.xml	(revision 1215074)
+@@ -83,6 +83,11 @@
+             <subsection name="Pre-requisites">
+                 <p>
+                     <ul>
++                         <li>
++                           This sample uses Ruby so first setup support for this in Synapse as described at
++							<a href="setup/script.html#ruby">Configuring JRuby</a>
++							<br />
++                        </li>
+                         <li>
+                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                         </li>
+Index: scratch/hiranya/website/src/site/xdoc/userguide/samples/sample354.xml
+===================================================================
+--- scratch/hiranya/website/src/site/xdoc/userguide/samples/sample354.xml	(revision 1215073)
++++ scratch/hiranya/website/src/site/xdoc/userguide/samples/sample354.xml	(revision 1215074)
+@@ -71,6 +71,11 @@
+             <subsection name="Pre-requisites">
+                 <p>
+                     <ul>
++                     	<li>
++                           This sample uses Ruby so first setup support for this in Synapse as described at
++							<a href="setup/script.html#ruby">Configuring JRuby</a>
++							<br />
++                        </li>
+                         <li>
+                             Deploy the SimpleStockQuoteService in the sample Axis2 server and start Axis2
+                         </li>
+-*-*-*-
+Message: Updating new documentation - Thanks Dushan for helping me out with these edits
+-*-*-*-
+When: 2011-12-16 04:43:06 -0500 
+-*-*-*-
+Who: hiranya

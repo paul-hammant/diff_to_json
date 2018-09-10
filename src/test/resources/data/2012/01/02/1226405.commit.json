@@ -1,0 +1,60 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                 <groupId>org.apache.commons</groupId>\n",
+            "                 <artifactId>commons-vfs2</artifactId>\n",
+            "                 <version>${commons.vfs.version}</version>\n",
+            "+                <exclusions>\n",
+            "+                    <exclusion>\n",
+            "+                        <groupId>org.apache.maven.scm</groupId>\n",
+            "+                        <artifactId>maven-scm-api</artifactId>\n",
+            "+                    </exclusion>\n",
+            "+                    <exclusion>\n",
+            "+                        <groupId>org.apache.maven.scm</groupId>\n",
+            "+                        <artifactId>maven-scm-provider-svnexe</artifactId>\n",
+            "+                    </exclusion>\n",
+            "+                </exclusions>\n",
+            "             </dependency>\n",
+            "             <dependency>\n",
+            "                 <!-- For VFS (FTP) Transport -->\n"
+          ],
+          "locn": "-649,6 +649,16"
+        },
+        {
+          "lines": [
+            "                 <groupId>wsdl4j</groupId>\n",
+            "                 <artifactId>wsdl4j</artifactId>\n",
+            "                 <version>${wsdl4j.version}</version>\n",
+            "+                <exclusions>\n",
+            "+                    <exclusion>\n",
+            "+                        <groupId>org.apache.maven</groupId>\n",
+            "+                        <artifactId>maven-plugin-api</artifactId>\n",
+            "+                    </exclusion>\n",
+            "+                    <exclusion>\n",
+            "+                        <groupId>org.apache.maven</groupId>\n",
+            "+                        <artifactId>maven-artifact</artifactId>\n",
+            "+                    </exclusion>\n",
+            "+                    <exclusion>\n",
+            "+                        <groupId>org.apache.maven</groupId>\n",
+            "+                        <artifactId>maven-project</artifactId>\n",
+            "+                    </exclusion>\n",
+            "+                </exclusions>\n",
+            "             </dependency>\n",
+            "             <dependency>\n",
+            "                 <groupId>xerces</groupId>\n"
+          ],
+          "locn": "-949,6 +959,20"
+        }
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    }
+  ],
+  "id": "1226405",
+  "message": "Excluding some transitive dependencies",
+  "when": "2012-01-02T08:10:43-05:00",
+  "who": "hiranya"
+}

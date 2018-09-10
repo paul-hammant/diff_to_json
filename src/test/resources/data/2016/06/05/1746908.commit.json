@@ -1,0 +1,274 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.synapse.Mediator;\n",
+            " import org.apache.synapse.config.xml.eventing.EventPublisherMediatorSerializer;\n",
+            " import org.apache.synapse.mediators.builtin.RespondMediator;\n",
+            "-import sun.misc.Service;\n",
+            " \n",
+            " import java.util.HashMap;\n",
+            " import java.util.Iterator;\n",
+            " import java.util.Map;\n",
+            "+import java.util.ServiceLoader;\n",
+            " \n",
+            " public class MediatorSerializerFinder {\n",
+            " \n"
+          ],
+          "locn": "-25,11 +25,11"
+        },
+        {
+          "lines": [
+            "      * Register pluggable mediator serializers from the classpath\n",
+            "      *\n",
+            "      * This looks for JAR files containing a META-INF/services that adheres to the following\n",
+            "-     * http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider\n",
+            "+     * https://docs.oracle.com/javase/tutorial/ext/basics/spi.html\n",
+            "      */\n",
+            "     private void registerExtensions() {\n",
+            "         if (log.isDebugEnabled()) {\n"
+          ],
+          "locn": "-108,7 +108,7"
+        },
+        {
+          "lines": [
+            "             log.debug(\"Registering mediator extensions found in the classpath.. \");\n",
+            "         }\n",
+            "         // register MediatorSerializer extensions\n",
+            "-        Iterator it = Service.providers(MediatorSerializer.class);\n",
+            "-        while (it.hasNext()) {\n",
+            "-            MediatorSerializer ms = (MediatorSerializer) it.next();\n",
+            "-            String name = ms.getMediatorClassName();\n",
+            "+        Iterator<MediatorSerializer> serializers = ServiceLoader.load(MediatorSerializer.class).iterator();\n",
+            "+\n",
+            "+        while (serializers.hasNext()) {\n",
+            "+            MediatorSerializer serializer = serializers.next();\n",
+            "+            String name = serializer.getMediatorClassName();\n",
+            "             try {\n",
+            "-                serializerMap.put(name, ms.getClass().newInstance());\n",
+            "+                serializerMap.put(name, serializer.getClass().newInstance());\n",
+            "             } catch (InstantiationException e) {\n",
+            "-                handleException(\"Error instantiating mediator serializer : \" + ms);\n",
+            "+                handleException(\"Error instantiating mediator serializer : \" + serializer);\n",
+            "             } catch (IllegalAccessException e) {\n",
+            "-                handleException(\"Error instantiating mediator serializer : \" + ms);\n",
+            "+                handleException(\"Error instantiating mediator serializer : \" + serializer);\n",
+            "             }\n",
+            "             if (log.isDebugEnabled()) {\n",
+            "-                log.debug(\"Added MediatorSerializer \" + ms.getClass().getName() + \" to handle \" + name);\n",
+            "+                log.debug(\"Added MediatorSerializer \" + serializer.getClass().getName() + \" to handle \" + name);\n",
+            "             }\n",
+            "         }\n",
+            "     }\n"
+          ],
+          "locn": "-115,19 +115,20"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import java.util.Iterator;\r\n",
+            " import java.util.Map;\r\n",
+            " import java.util.Properties;\r\n",
+            "+import java.util.ServiceLoader;\r\n",
+            " \r\n",
+            " import javax.xml.namespace.QName;\r\n",
+            " \r\n"
+          ],
+          "locn": "-23,6 +23,7"
+        },
+        {
+          "lines": [
+            " import org.apache.synapse.config.XMLToObjectMapper;\r\n",
+            " import org.apache.synapse.startup.quartz.SimpleQuartzFactory;\r\n",
+            " \r\n",
+            "-import sun.misc.Service;\r\n",
+            "-\r\n",
+            " public class StartupFinder implements XMLToObjectMapper {\r\n",
+            " \r\n",
+            "     private static final Log log = LogFactory\r\n"
+          ],
+          "locn": "-34,8 +35,6"
+        },
+        {
+          "lines": [
+            "     }\r\n",
+            " \r\n",
+            "     /**\r\n",
+            "-     * Register pluggable mediator factories from the classpath\r\n",
+            "+     * Register pluggable startup factories from the classpath\r\n",
+            "      * <p/>\r\n",
+            "-     * This looks for JAR files containing a META-INF/services that adheres to\r\n",
+            "-     * the following\r\n",
+            "-     * http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider\r\n",
+            "+     * This looks for JAR files containing a META-INF/services that adheres to the following\r\n",
+            "+     * https://docs.oracle.com/javase/tutorial/ext/basics/spi.html\r\n",
+            "      */\r\n",
+            "     private static void registerExtensions() {\r\n",
+            " \r\n",
+            "-        // log.debug(\"Registering mediator extensions found in the classpath : \"\r\n",
+            "-        // + System.getResource(\"java.class.path\"));\r\n",
+            "-\r\n",
+            "         // register MediatorFactory extensions\r\n",
+            "-        Iterator<?> it = Service.providers(StartupFactory.class);\r\n",
+            "-        while (it.hasNext()) {\r\n",
+            "-            StartupFactory sf = (StartupFactory) it.next();\r\n",
+            "-            QName tag = sf.getTagQName();\r\n",
+            "-            factoryMap.put(tag, sf.getClass());\r\n",
+            "-            serializerMap.put(tag, sf.getSerializerClass());\r\n",
+            "+        Iterator<StartupFactory> factories = ServiceLoader.load(StartupFactory.class).iterator();\r\n",
+            "+        while (factories.hasNext()) {\r\n",
+            "+            StartupFactory factory = factories.next();\r\n",
+            "+            QName tag = factory.getTagQName();\r\n",
+            "+            factoryMap.put(tag, factory.getClass());\r\n",
+            "+            serializerMap.put(tag, factory.getSerializerClass());\r\n",
+            "             if (log.isDebugEnabled()) {\r\n",
+            "-                log.debug(\"Added StartupFactory \" + sf.getClass()\r\n",
+            "-                        + \" to handle \" + tag);\r\n",
+            "+                log.debug(\"Added StartupFactory \" + factory.getClass() + \" to handle \" + tag);\r\n",
+            "             }\r\n",
+            "         }\r\n",
+            "     }\r\n"
+          ],
+          "locn": "-100,27 +99,22"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/StartupFinder.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/StartupFinder.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.synapse.Mediator;\n",
+            " import org.apache.synapse.config.XMLToObjectMapper;\n",
+            " import org.apache.synapse.config.xml.eventing.EventPublisherMediatorFactory;\n",
+            "-import sun.misc.Service;\n",
+            " \n",
+            " import javax.xml.namespace.QName;\n",
+            " import java.util.HashMap;\n"
+          ],
+          "locn": "-28,7 +28,6"
+        },
+        {
+          "lines": [
+            " import java.util.Iterator;\n",
+            " import java.util.Map;\n",
+            " import java.util.Properties;\n",
+            "+import java.util.ServiceLoader;\n",
+            " \n",
+            " /**\n",
+            "  *\n"
+          ],
+          "locn": "-35,6 +34,7"
+        },
+        {
+          "lines": [
+            "      * Register pluggable mediator factories from the classpath\n",
+            "      *\n",
+            "      * This looks for JAR files containing a META-INF/services that adheres to the following\n",
+            "-     * http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider\n",
+            "+     * https://docs.oracle.com/javase/tutorial/ext/basics/spi.html\n",
+            "      */\n",
+            "     private static void registerExtensions() {\n",
+            " \n",
+            "         // register MediatorFactory extensions\n",
+            "-        Iterator it = Service.providers(MediatorFactory.class);\n",
+            "-        while (it.hasNext()) {\n",
+            "-            MediatorFactory mf = (MediatorFactory) it.next();\n",
+            "-            QName tag = mf.getTagQName();\n",
+            "-            factoryMap.put(tag, mf.getClass());\n",
+            "+        Iterator<MediatorFactory> factories = ServiceLoader.load(MediatorFactory.class).iterator();\n",
+            "+        while (factories.hasNext()) {\n",
+            "+            MediatorFactory factory = factories.next();\n",
+            "+            QName tag = factory.getTagQName();\n",
+            "+            factoryMap.put(tag, factory.getClass());\n",
+            "             if (log.isDebugEnabled()) {\n",
+            "-                log.debug(\"Added MediatorFactory \" + mf.getClass() + \" to handle \" + tag);\n",
+            "+                log.debug(\"Added MediatorFactory \" + factory.getClass() + \" to handle \" + tag);\n",
+            "             }\n",
+            "         }\n",
+            "     }\n"
+          ],
+          "locn": "-133,18 +133,18"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.synapse.SynapseException;\r\n",
+            " import org.apache.synapse.config.SynapseConfiguration;\r\n",
+            " import org.apache.synapse.config.XMLToObjectMapper;\r\n",
+            "-import sun.misc.Service;\r\n",
+            " \r\n",
+            " import javax.xml.namespace.QName;\r\n",
+            " import javax.xml.stream.XMLStreamException;\r\n",
+            " \r\n",
+            "-import java.io.OutputStream;\r\n",
+            " import java.util.HashMap;\r\n",
+            " import java.util.Iterator;\r\n",
+            " import java.util.Map;\r\n",
+            " import java.util.Properties;\r\n",
+            "+import java.util.ServiceLoader;\r\n",
+            " \r\n",
+            " /**\r\n",
+            "  * This class is based on J2SE Service Provider model\r\n"
+          ],
+          "locn": "-26,16 +26,15"
+        },
+        {
+          "lines": [
+            "         initialized = true;\r\n",
+            "     }\r\n",
+            "     /**\r\n",
+            "-     * Register plugable mediator factories from the classpath\r\n",
+            "+     * Register pluggable mediator factories from the classpath\r\n",
+            "      * <p/>\r\n",
+            "      * This looks for JAR files containing a META-INF/services that adheres to the following\r\n",
+            "-     * http://java.sun.com/j2se/1.3/docs/guide/jar/jar.html#Service%20Provider\r\n",
+            "+     * https://docs.oracle.com/javase/tutorial/ext/basics/spi.html\r\n",
+            "      */\r\n",
+            "     private static void registerExtensions() {\r\n",
+            " \r\n",
+            "+        Iterator<ConfigurationFactory> factories = ServiceLoader.load(ConfigurationFactory.class).iterator();\r\n",
+            "         // register MediatorFactory extensions\r\n",
+            "-        Iterator it = Service.providers(ConfigurationFactory.class);\r\n",
+            "-        while (it.hasNext()) {\r\n",
+            "-            ConfigurationFactory cf = (ConfigurationFactory) it.next();\r\n",
+            "-            QName tag = cf.getTagQName();\r\n",
+            "-            factoryMap.put(tag, cf.getClass());\r\n",
+            "-            serializerMap.put(tag, cf.getSerializerClass());\r\n",
+            "+        while (factories.hasNext()) {\r\n",
+            "+            ConfigurationFactory factory = factories.next();\r\n",
+            "+            QName tag = factory.getTagQName();\r\n",
+            "+            factoryMap.put(tag, factory.getClass());\r\n",
+            "+            serializerMap.put(tag, factory.getSerializerClass());\r\n",
+            "             if (log.isDebugEnabled()) {\r\n",
+            "-                log.debug(\"Added MediatorFactory \" + cf.getClass() + \" to handle \" + tag);\r\n",
+            "+                log.debug(\"Added MediatorFactory \" + factory.getClass() + \" to handle \" + tag);\r\n",
+            "             }\r\n",
+            "         }\r\n",
+            "     }\r\n"
+          ],
+          "locn": "-106,22 +105,22"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/ConfigurationFactoryAndSerializerFinder.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/ConfigurationFactoryAndSerializerFinder.java"
+    }
+  ],
+  "id": "1746908",
+  "message": "SYNAPSE-485: Replace the use of sun.misc.Service with java.util.ServiceLoader. Patch provided by Auke Schrijnen.",
+  "when": "2016-06-05T09:09:12-04:00",
+  "who": "veithen"
+}

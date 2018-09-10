@@ -1,0 +1,41 @@
+Index: java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/FileObjectDataSource.java
+===================================================================
+--- java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/FileObjectDataSource.java	(revision 1328744)
++++ java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/FileObjectDataSource.java	(revision 1328745)
+@@ -18,7 +18,7 @@
+ */
+ package org.apache.synapse.transport.vfs;
+ 
+-import org.apache.axiom.attachments.SizeAwareDataSource;
++import org.apache.axiom.ext.activation.SizeAwareDataSource;
+ import org.apache.commons.vfs2.FileObject;
+ import org.apache.commons.vfs2.FileSystemException;
+ 
+Index: java/modules/core/src/main/java/org/apache/synapse/eventing/managers/DefaultInMemorySubscriptionManager.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/eventing/managers/DefaultInMemorySubscriptionManager.java	(revision 1328744)
++++ java/modules/core/src/main/java/org/apache/synapse/eventing/managers/DefaultInMemorySubscriptionManager.java	(revision 1328745)
+@@ -21,6 +21,7 @@
+ 
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
++import org.apache.axiom.util.UIDGenerator;
+ import org.apache.axis2.context.MessageContext;
+ import org.apache.synapse.SynapseException;
+ import org.apache.synapse.eventing.SynapseEventingConstants;
+@@ -58,7 +59,7 @@
+ 
+     public String subscribe(Subscription subscription) throws EventException {
+         if (subscription.getId() == null) {
+-            subscription.setId(org.apache.axiom.om.util.UUIDGenerator.getUUID());
++            subscription.setId(UIDGenerator.generateURNString());
+         }
+         store.put(subscription.getId(), subscription);
+         return subscription.getId();
+-*-*-*-
+Message: Eliminated a couple of references to deprecated classes so that we don't need to add a dependency to axiom-compat.
+
+-*-*-*-
+When: 2012-04-21 18:50:22 -0400 
+-*-*-*-
+Who: veithen

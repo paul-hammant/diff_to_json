@@ -1,0 +1,103 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            " import junit.framework.TestCase;\n",
+            " import org.apache.synapse.MessageContext;\n",
+            "-import org.apache.synapse.SynapseException;\n",
+            " import org.apache.synapse.core.axis2.Axis2MessageContext;\n",
+            " import org.apache.synapse.config.xml.XMLConfigConstants;\n",
+            " import org.apache.synapse.mediators.MediatorProperty;\n"
+          ],
+          "locn": "-21,7 +21,6"
+        },
+        {
+          "lines": [
+            " import org.apache.axiom.om.OMElement;\n",
+            " \n",
+            " import java.util.Map;\n",
+            "+import java.util.regex.Pattern;\n",
+            " \n",
+            " public class PropertyMediatorTest extends TestCase {\n",
+            " \n"
+          ],
+          "locn": "-30,6 +29,7"
+        },
+        {
+          "lines": [
+            "         Object prop = synCtx.getProperty(\"nameOne\");\n",
+            "         assertEquals(valueOne, prop);\n",
+            " \n",
+            "-        // Test XML property retreival\n",
+            "+        // Test XML property retrieval\n",
+            "         String exprValue = new SynapseXPath(\"synapse:get-property('nameOne')\").stringValueOf(synCtx);\n",
+            "         assertEquals(xml, exprValue);\n",
+            " \n"
+          ],
+          "locn": "-142,7 +142,7"
+        },
+        {
+          "lines": [
+            "             \"value\".equals(medProp.getEvaluatedExpression(synCtx)));\n",
+            "     }\n",
+            " \n",
+            "+    public void testPropertyRegexTest() throws Exception {\n",
+            "+        String outputProperty = \"regexProperty\";\n",
+            "+\n",
+            "+        PropertyMediator propMediator = new PropertyMediator();\n",
+            "+        propMediator.setName(outputProperty);\n",
+            "+        propMediator.setExpression(new SynapseXPath(\"get-property('testProperty')\"));\n",
+            "+        propMediator.setPattern(Pattern.compile(\"([A-Z]+)([0-9]+)\"));\n",
+            "+\n",
+            "+        MessageContext synCtx = TestUtils.getTestContext(\"<empty/>\");\n",
+            "+        synCtx.setProperty(\"testProperty\", \"HELLOWORLD123\");\n",
+            "+        propMediator.mediate(synCtx);\n",
+            "+        assertEquals(\"HELLOWORLD123\", synCtx.getProperty(outputProperty));\n",
+            "+\n",
+            "+        propMediator.setGroup(1);\n",
+            "+        propMediator.mediate(synCtx);\n",
+            "+        assertEquals(\"HELLOWORLD\", synCtx.getProperty(outputProperty));\n",
+            "+\n",
+            "+        //testing the fix for SYNAPSE-890\n",
+            "+        synCtx.setProperty(\"testProperty\", \"HELLOWORLD\");\n",
+            "+        propMediator.mediate(synCtx);\n",
+            "+        assertEquals(\"\", synCtx.getProperty(outputProperty));\n",
+            "+    }\n",
+            "+\n",
+            " }\n",
+            " \n",
+            " \n"
+          ],
+          "locn": "-209,6 +209,29"
+        }
+      ],
+      "from": "java/modules/core/src/test/java/org/apache/synapse/mediators/builtin/PropertyMediatorTest.java",
+      "to": "java/modules/core/src/test/java/org/apache/synapse/mediators/builtin/PropertyMediatorTest.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                         pattern.toString() + \" with the property value :\" + value;\n",
+            "                 synLog.traceOrDebug(msg);\n",
+            "             }\n",
+            "+            matchedValue = \"\"; //if not matched ideally should return empty string\n",
+            "         }\n",
+            "         \n",
+            "         return matchedValue;\n"
+          ],
+          "locn": "-353,6 +353,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/PropertyMediator.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/PropertyMediator.java"
+    }
+  ],
+  "id": "1504337",
+  "message": "Applying the patch to SYNAPSE-890. Added a test case to verify the fix.",
+  "when": "2013-07-17T20:59:43-04:00",
+  "who": "hiranya"
+}

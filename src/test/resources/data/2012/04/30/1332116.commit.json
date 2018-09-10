@@ -1,0 +1,103 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            " package org.apache.synapse.config.xml;\n",
+            " \n",
+            " import org.apache.axiom.om.OMElement;\n",
+            "-import org.apache.axiom.om.impl.exception.XMLComparisonException;\n",
+            " import org.apache.synapse.registry.Registry;\n",
+            " \n",
+            " import java.util.Properties;\n"
+          ],
+          "locn": "-20,7 +20,6"
+        }
+      ],
+      "from": "java/modules/core/src/test/java/org/apache/synapse/config/xml/RegistrySerializationTest.java",
+      "to": "java/modules/core/src/test/java/org/apache/synapse/config/xml/RegistrySerializationTest.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            " package org.apache.synapse.config.xml;\n",
+            " \n",
+            "-import org.apache.axiom.om.impl.exception.XMLComparisonException;\n",
+            "-\n",
+            " public class SwitchMediatorSerializationTest extends AbstractTestCase {\n",
+            " \n",
+            "     private SwitchMediatorFactory switchMediatorFactory = null;\n"
+          ],
+          "locn": "-19,8 +19,6"
+        }
+      ],
+      "from": "java/modules/core/src/test/java/org/apache/synapse/config/xml/SwitchMediatorSerializationTest.java",
+      "to": "java/modules/core/src/test/java/org/apache/synapse/config/xml/SwitchMediatorSerializationTest.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "  */\n",
+            " package org.apache.synapse.mediators.bsf;\n",
+            " \n",
+            "-import org.apache.axiom.om.impl.exception.XMLComparisonException;\n",
+            " import org.apache.synapse.mediators.AbstractTestCase;\n",
+            " \n",
+            " public class ScriptMediatorSerializationTest extends AbstractTestCase {\n"
+          ],
+          "locn": "-18,7 +18,6"
+        },
+        {
+          "lines": [
+            "         scriptMediatorSerializer = new ScriptMediatorSerializer();\n",
+            "     }\n",
+            " \n",
+            "-    public void testScriptMediatorSerializationScenarioOne() throws XMLComparisonException {\n",
+            "+    public void testScriptMediatorSerializationScenarioOne() {\n",
+            "         String inputXml = \"<script xmlns=\\\"http://ws.apache.org/ns/synapse\\\" key=\\\"script-key\\\" function=\\\"funOne\\\" language=\\\"js\\\"></script> \";\n",
+            "         assertTrue(serialization(inputXml, mediatorFactory, scriptMediatorSerializer));\n",
+            "         assertTrue(serialization(inputXml, scriptMediatorSerializer));\n",
+            "     }\n",
+            " \n",
+            "-    public void testScriptMediatorSerializationScenarioTwo() throws XMLComparisonException {\n",
+            "+    public void testScriptMediatorSerializationScenarioTwo() {\n",
+            "         String inputXml = \"<script xmlns=\\\"http://ws.apache.org/ns/synapse\\\" language=\\\"js\\\" key=\\\"script-key\\\" ></script> \";\n",
+            "         assertTrue(serialization(inputXml, mediatorFactory, scriptMediatorSerializer));\n",
+            "         assertTrue(serialization(inputXml, scriptMediatorSerializer));\n",
+            "     }\n",
+            " \n",
+            "-    public void testInlineScriptMediatorSerializationScenarioOne() throws XMLComparisonException {\n",
+            "+    public void testInlineScriptMediatorSerializationScenarioOne() {\n",
+            "         String inputXml = \"<syn:script xmlns:syn=\\\"http://ws.apache.org/ns/synapse\\\" language='js'>\" +\n",
+            "                 \"<![CDATA[var symbol = mc.getPayloadXML()..*::Code.toString();mc.setPayloadXML(<m:getQuote xmlns:m=\\\"http://services.samples/xsd\\\">\\n\" +\n",
+            "                 \"<m:request><m:symbol>{symbol}</m:symbol></m:request></m:getQuote>);]]></syn:script> \";\n"
+          ],
+          "locn": "-31,19 +30,19"
+        },
+        {
+          "lines": [
+            "         assertTrue(serialization(inputXml, scriptMediatorSerializer));\n",
+            "     }\n",
+            " \n",
+            "-    public void testInlineScriptMediatorSerializationScenarioTwo() throws XMLComparisonException {\n",
+            "+    public void testInlineScriptMediatorSerializationScenarioTwo() {\n",
+            "         String inputXml = \"<syn:script xmlns:syn=\\\"http://ws.apache.org/ns/synapse\\\" language='rb'>\" +\n",
+            "                 \"<![CDATA[\" +\n",
+            "                 \"require 'rexml/document'\\n\" +\n"
+          ],
+          "locn": "-51,7 +50,7"
+        }
+      ],
+      "from": "java/modules/extensions/src/test/java/org/apache/synapse/mediators/bsf/ScriptMediatorSerializationTest.java",
+      "to": "java/modules/extensions/src/test/java/org/apache/synapse/mediators/bsf/ScriptMediatorSerializationTest.java"
+    }
+  ],
+  "id": "1332116",
+  "message": "Removed references to deprecated Axiom classes.\n",
+  "when": "2012-04-30T04:41:41-04:00",
+  "who": "veithen"
+}

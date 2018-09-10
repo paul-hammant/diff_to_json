@@ -1,0 +1,121 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             <post>user@synapse.apache.org</post>\n",
+            "             <archive>http://mail-archives.apache.org/mod_mbox/synapse-user/</archive>\n",
+            "         </mailingList>\n",
+            "-\t    <mailingList>\n",
+            "+        <mailingList>\n",
+            "             <name>Apache Synapse Commits List</name>\n",
+            "             <subscribe>commits-subscribe@synapse.apache.org</subscribe>\n",
+            "             <unsubscribe>commits-unsubscribe@synapse.apache.org</unsubscribe>\n"
+          ],
+          "locn": "-59,7 +59,7"
+        },
+        {
+          "lines": [
+            "                 <artifactId>synapse-core</artifactId>\n",
+            "                 <version>${project.version}</version>\n",
+            "             </dependency>\n",
+            "-\t    <dependency>\n",
+            "+            <dependency>\n",
+            "                 <groupId>org.apache.synapse</groupId>\n",
+            "                 <artifactId>synapse-documentation</artifactId>\n",
+            "                 <version>${project.version}</version>\n",
+            "-\t\t<type>zip</type>\n",
+            "-\t\t<classifier>docs</classifier>\n",
+            "+                <type>zip</type>\n",
+            "+                <classifier>docs</classifier>\n",
+            "             </dependency>\n",
+            "             <dependency>\n",
+            "                 <groupId>org.apache.synapse</groupId>\n"
+          ],
+          "locn": "-325,12 +325,12"
+        },
+        {
+          "lines": [
+            "         <module>modules/packaging/package-skeleton</module>\n",
+            "         <module>modules/packaging/package-archetype</module>\n",
+            "         <module>modules/integration</module>\n",
+            "-\t    <module>modules/documentation</module>\n",
+            "+        <module>modules/documentation</module>\n",
+            "     </modules>\n",
+            " \n",
+            "     <properties>\n"
+          ],
+          "locn": "-1043,7 +1043,7"
+        },
+        {
+          "lines": [
+            "             <email>saminda AT wso2.com</email>\n",
+            "             <organization>WSO2</organization>\n",
+            "         </developer>\n",
+            "-\t    <developer>\n",
+            "+        <developer>\n",
+            "             <name>Afkham Azeez</name>\n",
+            "             <id>azeez</id>\n",
+            "             <email>azeez AT wso2.com</email>\n",
+            "             <organization>WSO2</organization>\n",
+            "-\t        <url>http://afkham.org/</url>\n",
+            "+            <url>http://afkham.org/</url>\n",
+            "         </developer>\n",
+            "         <developer>\n",
+            "             <name>Paul Fremantle</name>\n"
+          ],
+          "locn": "-1135,12 +1135,12"
+        },
+        {
+          "lines": [
+            "             <email>hiranya AT apache.org</email>\n",
+            "             <organization>UC Santa Barbara</organization>\n",
+            "         </developer>\n",
+            "-\t    <developer>\n",
+            "+        <developer>\n",
+            "             <name>Charith Wickramarachchi</name>\n",
+            "             <id>charith</id>\n",
+            "             <email>charith AT apache.org</email>\n",
+            "             <organization>WSO2</organization>\n",
+            "         </developer>\n",
+            "-\t    <developer>\n",
+            "+        <developer>\n",
+            "             <name>Heshan Suriyaarachchi</name>\n",
+            "             <id>heshan</id>\n",
+            "             <email>heshan AT apache.org</email>\n",
+            "             <organization>WSO2</organization>\n",
+            "-\t        <url>http://heshans.blogspot.com/</url>\n",
+            "+            <url>http://heshans.blogspot.com/</url>\n",
+            "         </developer>\n",
+            "         <developer>\n",
+            "             <name>Rajika Kumarasiri</name>\n"
+          ],
+          "locn": "-1265,18 +1265,18"
+        },
+        {
+          "lines": [
+            "             <name>Kasun Indrasiri</name>\n",
+            "             <id>kasun</id>\n",
+            "             <email>kasun AT apache.org</email>\n",
+            "-\t    <organization>WSO2</organization>\n",
+            "+            <organization>WSO2</organization>\n",
+            "         </developer> \n",
+            "-\t    <developer>\n",
+            "+        <developer>\n",
+            "             <name>Udayanga Wickramasinghe</name>\n",
+            "             <id>uswick</id>\n",
+            "             <email>uswick AT apache.org</email>\n"
+          ],
+          "locn": "-1287,9 +1287,9"
+        }
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    }
+  ],
+  "id": "1544884",
+  "message": "Fixed formatting: use spaces instead of tabs.",
+  "when": "2013-11-23T16:51:54-05:00",
+  "who": "veithen"
+}

@@ -1,0 +1,77 @@
+Index: java/modules/integration/src/test/resources/sample300.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample300.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample300.xml	(revision 1507749)
+@@ -0,0 +1,20 @@
++<synapseSample>
++    <sampleID>300</sampleID>
++    <sampleName>Introduction to Synapse Tasks</sampleName>
++    <synapseConfig>
++        <!--if we don't specify the optional values, framework will use defaults-->
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>repository/conf/sample/synapse_sample_300.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++            <counterEnabled>true</counterEnabled>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++        <clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+\ No newline at end of file
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1507748)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1507749)
+@@ -22,6 +22,7 @@
+ import junit.framework.TestSuite;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.samples.framework.tests.tasks.Sample300;
+ import org.apache.synapse.samples.framework.tests.transport.Sample250;
+ import org.apache.synapse.samples.framework.tests.advanced.*;
+ import org.apache.synapse.samples.framework.tests.endpoint.*;
+@@ -209,6 +210,9 @@
+         sampleClassRepo.put("250", Sample250.class);
+         sampleClassRepo.put("251", Sample251.class);
+ 
++        //Tasks
++        sampleClassRepo.put("300", Sample300.class);
++
+         //Advanced
+         sampleClassRepo.put("350", Sample350.class);
+         sampleClassRepo.put("351", Sample351.class);
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/tasks/Sample300.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/tasks/Sample300.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/tasks/Sample300.java	(revision 1507749)
+@@ -0,0 +1,18 @@
++package org.apache.synapse.samples.framework.tests.tasks;
++
++import org.apache.synapse.samples.framework.SynapseTestCase;
++
++public class Sample300 extends SynapseTestCase {
++
++    public Sample300() {
++        super(300);
++    }
++
++    public void testRestToPox() throws Exception {
++        log.info("Waiting 10 seconds for the task to run...");
++        Thread.sleep(10000);
++        int messageCount = getAxis2Server().getMessageCount("SimpleStockQuoteService", "getQuote");
++        log.info("Task sent " + messageCount + " messages.");
++        assertTrue(messageCount >= 2);
++    }
++}
+-*-*-*-
+Message: Adding sample300 (scheduled tasks) to the integration test suite.
+-*-*-*-
+When: 2013-07-27 20:20:25 -0400 
+-*-*-*-
+Who: hiranya

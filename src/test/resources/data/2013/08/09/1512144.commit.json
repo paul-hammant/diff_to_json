@@ -1,0 +1,363 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     private long reconnectTimeout = 30000;\n",
+            "     private boolean append;\n",
+            "     private boolean fileLocking;\n",
+            "+    private boolean isUseTempFile = false;\n",
+            " \n",
+            "     /**\n",
+            "      * Constructs the VFSOutTransportInfo containing the information about the file to which the\n",
+            "      * response has to be submitted to.\n",
+            "-     * \n",
+            "+     *\n",
+            "      * @param outFileURI URI of the file to which the message is delivered\n",
+            "      */\n",
+            "     VFSOutTransportInfo(String outFileURI, boolean fileLocking) {\n",
+            "-        \n",
+            "+\n",
+            "         if (outFileURI.startsWith(VFSConstants.VFS_PREFIX)) {\n",
+            "             this.outFileURI = outFileURI.substring(VFSConstants.VFS_PREFIX.length());\n",
+            "         } else {\n"
+          ],
+          "locn": "-43,15 +43,16"
+        },
+        {
+          "lines": [
+            "             this.outFileURI = outFileURI;\n",
+            "         }\n",
+            " \n",
+            "-        Map<String,String> properties = BaseUtils.getEPRProperties(outFileURI);\n",
+            "+        Map<String, String> properties = BaseUtils.getEPRProperties(outFileURI);\n",
+            "         if (properties.containsKey(VFSConstants.MAX_RETRY_COUNT)) {\n",
+            "             String strMaxRetryCount = properties.get(VFSConstants.MAX_RETRY_COUNT);\n",
+            "             maxRetryCount = Integer.parseInt(strMaxRetryCount);\n"
+          ],
+          "locn": "-58,7 +59,7"
+        },
+        {
+          "lines": [
+            "             maxRetryCount = VFSConstants.DEFAULT_MAX_RETRY_COUNT;\n",
+            "         }\n",
+            " \n",
+            "+        if (properties.containsKey(VFSConstants.TRANSPORT_FILE_USE_TEMP_FILE)) {\n",
+            "+            String useTempFile = properties.get(VFSConstants.TRANSPORT_FILE_USE_TEMP_FILE);\n",
+            "+            isUseTempFile = Boolean.valueOf(useTempFile).booleanValue();\n",
+            "+        }\n",
+            "+\n",
+            "         if (properties.containsKey(VFSConstants.RECONNECT_TIMEOUT)) {\n",
+            "             String strReconnectTimeout = properties.get(VFSConstants.RECONNECT_TIMEOUT);\n",
+            "             reconnectTimeout = Long.parseLong(strReconnectTimeout) * 1000;\n"
+          ],
+          "locn": "-66,6 +67,11"
+        },
+        {
+          "lines": [
+            "         return reconnectTimeout;\n",
+            "     }\n",
+            " \n",
+            "+    public boolean isUseTempFile() {\n",
+            "+        return isUseTempFile;\n",
+            "+    }\n",
+            "+\n",
+            "     public void setReconnectTimeout(long reconnectTimeout) {\n",
+            "         this.reconnectTimeout = reconnectTimeout;\n",
+            "     }\n",
+            "-    \n",
+            "+\n",
+            "     public boolean isAppend() {\n",
+            "         return append;\n",
+            "     }\n"
+          ],
+          "locn": "-122,10 +128,14"
+        }
+      ],
+      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSOutTransportInfo.java",
+      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSOutTransportInfo.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import java.io.InputStream;\n",
+            " import java.io.OutputStream;\n",
+            " import java.text.SimpleDateFormat;\n",
+            "-import java.util.Arrays;\n",
+            "-import java.util.Date;\n",
+            "-import java.util.Map;\n",
+            "-import java.util.Random;\n",
+            "+import java.util.*;\n",
+            " import java.util.regex.Pattern;\n",
+            " import java.util.regex.Matcher;\n",
+            " \n"
+          ],
+          "locn": "-33,10 +33,7"
+        },
+        {
+          "lines": [
+            "      * @return boolean true if the lock has been acquired or false if not\n",
+            "      */\n",
+            "     public synchronized static boolean acquireLock(FileSystemManager fsManager, FileObject fo) {\n",
+            "-        \n",
+            "+\n",
+            "         // generate a random lock value to ensure that there are no two parties\n",
+            "         // processing the same file\n",
+            "         Random random = new Random();\n",
+            "         byte[] lockValue = String.valueOf(random.nextLong()).getBytes();\n",
+            "-        \n",
+            "+\n",
+            "         try {\n",
+            "             // check whether there is an existing lock for this item, if so it is assumed\n",
+            "             // to be processed by an another listener (downloading) or a sender (uploading)\n"
+          ],
+          "locn": "-114,12 +111,12"
+        },
+        {
+          "lines": [
+            "         return url;\n",
+            "     }\n",
+            " \n",
+            "+    /**\n",
+            "+     * Generate a unique file name to be used as a temp file\n",
+            "+     * @return the temp file name\n",
+            "+     */\n",
+            "+    public static String generateTempFileName() {\n",
+            "+        return \"file\".concat(UUID.randomUUID().toString());\n",
+            "+    }\n",
+            " \n",
+            "     private static boolean verifyLock(byte[] lockValue, FileObject lockObject) {\n",
+            "         try {\n"
+          ],
+          "locn": "-214,6 +211,13"
+        }
+      ],
+      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSUtils.java",
+      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSUtils.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " package org.apache.synapse.transport.vfs;\n",
+            " \n",
+            " public final class VFSConstants {\n",
+            "-    \n",
+            "+\n",
+            "     // vfs transport prefix (e.g. used in an out EPR etc)\n",
+            "     public static final String VFS_PREFIX = \"vfs:\";\n",
+            " \n"
+          ],
+          "locn": "-20,7 +20,7"
+        },
+        {
+          "lines": [
+            "     public static final String TRANSPORT_FILE_FILE_URI = \"transport.vfs.FileURI\";\n",
+            "     public static final String TRANSPORT_FILE_FILE_NAME_PATTERN = \"transport.vfs.FileNamePattern\";\n",
+            "     public static final String TRANSPORT_FILE_CONTENT_TYPE = \"transport.vfs.ContentType\";\n",
+            "-    public static final String TRANSPORT_FILE_LOCKING = \"transport.vfs.Locking\";    \n",
+            "-    public static final String TRANSPORT_FILE_LOCKING_ENABLED = \"enable\";    \n",
+            "+    public static final String TRANSPORT_FILE_LOCKING = \"transport.vfs.Locking\";\n",
+            "+    public static final String TRANSPORT_FILE_LOCKING_ENABLED = \"enable\";\n",
+            "     public static final String TRANSPORT_FILE_LOCKING_DISABLED = \"disable\";\n",
+            " \n",
+            "     public static final String REPLY_FILE_URI = \"transport.vfs.ReplyFileURI\";\n"
+          ],
+          "locn": "-41,8 +41,8"
+        },
+        {
+          "lines": [
+            " \n",
+            "     public static final String DEFAULT_XML_RESPONSE_FILE = \"response.xml\";\n",
+            "     public static final String DEFAULT_NON_XML_RESPONSE_FILE = \"response.dat\";\n",
+            "-    \n",
+            "+\n",
+            "     public static final String STREAMING = \"transport.vfs.Streaming\";\n",
+            "-    \n",
+            "+\n",
+            "     public static final String MAX_RETRY_COUNT = \"transport.vfs.MaxRetryCount\";\n",
+            "     public static final String RECONNECT_TIMEOUT = \"transport.vfs.ReconnectTimeout\";\n",
+            "     public static final String APPEND = \"transport.vfs.Append\";\n",
+            "     public static final int DEFAULT_MAX_RETRY_COUNT = 3;\n",
+            "     public static final long DEFAULT_RECONNECT_TIMEOUT = 30000;\n",
+            "-    \n",
+            "+\n",
+            "     // transport header property names used by the VFS transport\n",
+            "     public static final String FILE_PATH = \"FILE_PATH\";\n",
+            "     public static final String FILE_NAME = \"FILE_NAME\";\n"
+          ],
+          "locn": "-53,15 +53,15"
+        },
+        {
+          "lines": [
+            "       public static final String TRANSPORT_FAILED_RECORD_NEXT_RETRY_DURATION =\n",
+            "               \"transport.vfs.FailedRecordNextRetryDuration\";\n",
+            " \n",
+            "+      /**\n",
+            "+       * Should use a temp file when uploading ?\n",
+            "+       */\n",
+            "+      public static final String TRANSPORT_FILE_USE_TEMP_FILE = \"transport.vfs.UseTempFile\";\n",
+            "+\n",
+            "       public static final int DEFAULT_NEXT_RETRY_DURATION = 3000; // 3 seconds\n",
+            " \n",
+            "       /**\n"
+          ],
+          "locn": "-99,6 +99,11"
+        }
+      ],
+      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSConstants.java",
+      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSConstants.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.commons.vfs2.FileType;\n",
+            " import org.apache.commons.vfs2.impl.StandardFileSystemManager;\n",
+            " \n",
+            "+import java.io.File;\n",
+            " import java.io.IOException;\n",
+            " \n",
+            " /**\n"
+          ],
+          "locn": "-38,6 +38,7"
+        },
+        {
+          "lines": [
+            "                 int maxRetryCount = vfsOutInfo.getMaxRetryCount();\n",
+            "                 long reconnectionTimeout = vfsOutInfo.getReconnectTimeout();\n",
+            "                 boolean append = vfsOutInfo.isAppend();\n",
+            "-                \n",
+            "+                boolean isUseTempFile = vfsOutInfo.isUseTempFile();\n",
+            "+                String tempTargetFileName, actualTargetFileName = null;\n",
+            "+\n",
+            "                 while (wasError) {\n",
+            "                     \n",
+            "                     try {\n"
+          ],
+          "locn": "-127,7 +128,9"
+        },
+        {
+          "lines": [
+            "                         try {\n",
+            "                             Thread.sleep(reconnectionTimeout);\n",
+            "                         } catch (InterruptedException e2) {\n",
+            "-                            e2.printStackTrace();\n",
+            "+                            Thread.currentThread().interrupt();\n",
+            "                         }\n",
+            "                     }\n",
+            "                 }\n"
+          ],
+          "locn": "-152,7 +155,7"
+        },
+        {
+          "lines": [
+            "                 if (replyFile.exists()) {\n",
+            " \n",
+            "                     if (replyFile.getType() == FileType.FOLDER) {\n",
+            "+                        if (isUseTempFile) {\n",
+            "+                            tempTargetFileName = VFSUtils.generateTempFileName();\n",
+            "+                            actualTargetFileName = VFSUtils.getFileName(msgCtx, vfsOutInfo);\n",
+            "+                        } else {\n",
+            "+                            tempTargetFileName = VFSUtils.getFileName(msgCtx, vfsOutInfo);\n",
+            "+                        }\n",
+            "                         // we need to write a file containing the message to this folder\n",
+            "-                        FileObject responseFile = fsManager.resolveFile(replyFile,\n",
+            "-                                VFSUtils.getFileName(msgCtx, vfsOutInfo));\n",
+            "+                        FileObject responseFile = fsManager.resolveFile(replyFile, tempTargetFileName);\n",
+            " \n",
+            "                         // if file locking is not disabled acquire the lock\n",
+            "                         // before uploading the file\n"
+          ],
+          "locn": "-160,9 +163,14"
+        },
+        {
+          "lines": [
+            "                             populateResponseFile(responseFile, msgCtx,append, false);\n",
+            "                         }\n",
+            " \n",
+            "+                        if (isUseTempFile) {\n",
+            "+                            responseFile.moveTo(fsManager.resolveFile(replyFile, actualTargetFileName));\n",
+            "+                        }\n",
+            "+\n",
+            "                     } else if (replyFile.getType() == FileType.FILE) {\n",
+            "+                        if (isUseTempFile) {\n",
+            "+                            tempTargetFileName = VFSUtils.generateTempFileName();\n",
+            "+                            actualTargetFileName = replyFile.getURL().toString();\n",
+            "+                            replyFile = getTempFileObject(fsManager, replyFile, tempTargetFileName);\n",
+            "+                        }\n",
+            " \n",
+            "                         // if file locking is not disabled acquire the lock\n",
+            "                         // before uploading the file\n"
+          ],
+          "locn": "-180,7 +188,16"
+        },
+        {
+          "lines": [
+            "                             populateResponseFile(replyFile, msgCtx, append, false);\n",
+            "                         }\n",
+            " \n",
+            "+                        if (isUseTempFile) {\n",
+            "+                            replyFile.moveTo(fsManager.resolveFile(actualTargetFileName));\n",
+            "+                        }\n",
+            "                     } else {\n",
+            "                         handleException(\"Unsupported reply file type : \" + replyFile.getType() +\n",
+            "                                 \" for file : \" + vfsOutInfo.getOutFileURI());\n",
+            "                     }\n",
+            "                 } else {\n",
+            "+                    if (isUseTempFile) {\n",
+            "+                        tempTargetFileName = VFSUtils.generateTempFileName();\n",
+            "+                        actualTargetFileName = replyFile.getURL().toString();\n",
+            "+                        replyFile = getTempFileObject(fsManager, replyFile, tempTargetFileName);\n",
+            "+                    }\n",
+            "+\n",
+            "                     // if file locking is not disabled acquire the lock before uploading the file\n",
+            "                     if (vfsOutInfo.isFileLockingEnabled()) {\n",
+            "                         acquireLockForSending(replyFile, vfsOutInfo);\n"
+          ],
+          "locn": "-192,11 +209,20"
+        },
+        {
+          "lines": [
+            "                         replyFile.createFile();\n",
+            "                         populateResponseFile(replyFile, msgCtx, append, false);\n",
+            "                     }\n",
+            "+\n",
+            "+                    if (isUseTempFile) {\n",
+            "+                        replyFile.moveTo(fsManager.resolveFile(actualTargetFileName));\n",
+            "+                    }\n",
+            "                 }\n",
+            "             } catch (FileSystemException e) {\n",
+            "                 handleException(\"Error resolving reply file : \" +\n"
+          ],
+          "locn": "-207,6 +233,10"
+        },
+        {
+          "lines": [
+            "             }\n",
+            "         }\n",
+            "     }\n",
+            "+\n",
+            "+    private FileObject getTempFileObject(FileSystemManager fsManager,\n",
+            "+                                         FileObject originalFileObj,\n",
+            "+                                         String fileName) throws FileSystemException {\n",
+            "+        FileObject pareFileObject = originalFileObj.getParent();\n",
+            "+        String parentURL = pareFileObject.getURL().toString();\n",
+            "+        return fsManager.resolveFile(parentURL.concat(File.separator).concat(fileName));\n",
+            "+    }\n",
+            " }\n"
+          ],
+          "locn": "-278,4 +308,12"
+        }
+      ],
+      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java",
+      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/VFSTransportSender.java"
+    }
+  ],
+  "id": "1512144",
+  "message": "fixed SYNAPSE-502.",
+  "when": "2013-08-09T01:58:20-04:00",
+  "who": "rajikak"
+}

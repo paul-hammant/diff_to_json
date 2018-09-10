@@ -1,0 +1,24 @@
+Index: java/modules/commons/src/main/java/org/apache/synapse/commons/datasource/DataSourceFinder.java
+===================================================================
+--- java/modules/commons/src/main/java/org/apache/synapse/commons/datasource/DataSourceFinder.java	(revision 1505841)
++++ java/modules/commons/src/main/java/org/apache/synapse/commons/datasource/DataSourceFinder.java	(revision 1505842)
+@@ -45,7 +45,12 @@
+     public static DataSource find(String dsName, Properties jndiEnv) {
+ 
+         try {
+-            Context context = new InitialContext(jndiEnv);
++            Context context;
++            if (jndiEnv == null) {
++                context = new InitialContext();
++            } else {
++                context = new InitialContext(jndiEnv);
++            }
+             return find(dsName, context);
+ 
+         } catch (NamingException e) {
+-*-*-*-
+Message: Applying the patch for SYNAPSE-880
+-*-*-*-
+When: 2013-07-22 18:56:54 -0400 
+-*-*-*-
+Who: hiranya

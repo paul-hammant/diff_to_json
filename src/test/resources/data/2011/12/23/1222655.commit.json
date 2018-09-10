@@ -1,0 +1,150 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         <p>\n",
+            "         Condition II : Matching HTTP Header AND Url<br/>\n",
+            "         </p>\n",
+            "-        <pre xml:space=\"preserve\">curl -d @stockQuoteReq.xml -H \"Content-Type: application/soap+xml;charset=UTF-8\" -H \"my_custom_header1:foo1\" \"http://localhost:8280/services/StockQuoteProxy\"</pre>\n",
+            "+            <pre xml:space=\"preserve\">curl -d @stockQuoteReq.xml -H \"Content-Type: application/soap+xml;charset=UTF-8\" -H \"my_custom_header1:foo1\" \"http://localhost:8280/services/StockQuoteProxy\"</pre>\n",
+            " \n",
+            "         <p>\n",
+            "         Condition III : Complex conditions with AND, OR and NOT<br/>\n"
+          ],
+          "locn": "-2837,7 +2837,7"
+        }
+      ],
+      "from": "java/src/site/xdoc/Synapse_Samples.xml",
+      "to": "java/src/site/xdoc/Synapse_Samples.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             server = new NetworkServerControl\n",
+            "                     (InetAddress.getByName(\"localhost\"), 1527);\n",
+            "             server.start(null);\n",
+            "+            while (true) {\n",
+            "+                try {\n",
+            "+                    server.ping();\n",
+            "+                    break;\n",
+            "+                } catch (Exception ignored) {\n",
+            "+                    log.info(\"Waiting for Derby server to start...\");\n",
+            "+                    Thread.sleep(2000);\n",
+            "+                }\n",
+            "+            }\n",
+            "             log.info(\"Derby is successfully started.\");\n",
+            " \n",
+            "         } catch (Exception e) {\n"
+          ],
+          "locn": "-42,6 +42,15"
+        }
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/DerbyServerController.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/DerbyServerController.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         if (seqAtt != null && !\"\".equals(seqAtt.getAttributeValue())) {\n",
+            "             mediator.setSequenceName(seqAtt.getAttributeValue());\n",
+            "         } else {\n",
+            "-            handleException(\"sequence is a required attribue\");\n",
+            "+            handleException(\"sequence is a required attribute\");\n",
+            "         }\n",
+            " \n",
+            "         OMAttribute priorityAtt = elem.getAttribute(PRIORITY_ATT);\n"
+          ],
+          "locn": "-43,7 +43,7"
+        },
+        {
+          "lines": [
+            "         if (queueAtt != null && !\"\".equals(queueAtt.getAttributeValue())) {\n",
+            "             mediator.setExecutorName(queueAtt.getAttributeValue());\n",
+            "         } else {\n",
+            "-            handleException(\"Queue is a required attribue\");\n",
+            "+            handleException(\"Queue is a required attribute\");\n",
+            "         }\n",
+            " \n",
+            "         return mediator;\n"
+          ],
+          "locn": "-55,7 +55,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/EnqueueMediatorFactory.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/EnqueueMediatorFactory.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            "             // Throttle only will be created ,if the massage flow is IN\n",
+            "             if (!isResponse) {\n",
+            "-                //check the availability of the ConcurrentAccessControler\n",
+            "+                //check the availability of the ConcurrentAccessController\n",
+            "                 //if this is a clustered environment\n",
+            "                 if (isClusteringEnable) {\n",
+            "                     concurrentAccessController =\n"
+          ],
+          "locn": "-132,7 +132,7"
+        },
+        {
+          "lines": [
+            "                         }\n",
+            "                         try {\n",
+            "                             // process the policy\n",
+            "-                            throttle = ThrottleFactory.createMediatorThrottle(\n",
+            "-                                    PolicyEngine.getPolicy(inLinePolicy));\n",
+            "+                            throttle = ThrottleFactory.createMediatorThrottle(inLinePolicy);\n",
+            " \n",
+            "                             //At this point concurrent access controller definitely 'null'\n",
+            "                             // f the clustering is disable.\n"
+          ],
+          "locn": "-149,8 +149,7"
+        },
+        {
+          "lines": [
+            "                                     try {\n",
+            "                                         // Creates the throttle from the policy\n",
+            "                                         throttle = ThrottleFactory.createMediatorThrottle(\n",
+            "-                                                PolicyEngine.getPolicy((OMElement) entryValue));\n",
+            "+                                                (OMElement) entryValue);\n",
+            " \n",
+            "                                         //For non-clustered  environment , must re-initiates\n",
+            "                                         //For  clustered  environment,\n"
+          ],
+          "locn": "-214,7 +213,7"
+        }
+      ],
+      "from": "java/modules/extensions/src/main/java/org/apache/synapse/mediators/throttle/ThrottleMediator.java",
+      "to": "java/modules/extensions/src/main/java/org/apache/synapse/mediators/throttle/ThrottleMediator.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         <!-- dependencies of Synapse extensions module -->\n",
+            "         <wso2commons.version>1.2</wso2commons.version>\n",
+            "         <wso2caching.version>3.5.0</wso2caching.version>\n",
+            "-        <wso2throttle.version>SNAPSHOT</wso2throttle.version>\n",
+            "+        <wso2throttle.version>3.2.1</wso2throttle.version>\n",
+            "         <wso2eventing-api.version>SNAPSHOT</wso2eventing-api.version>\n",
+            "         <xbean.version>2.2.0</xbean.version>\n",
+            "         <bsf.version>3.0</bsf.version>\n"
+          ],
+          "locn": "-872,7 +872,7"
+        }
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    }
+  ],
+  "id": "1222655",
+  "message": "Upgrading throttle version used - SYNAPSE-788",
+  "when": "2011-12-23T07:18:52-05:00",
+  "who": "hiranya"
+}

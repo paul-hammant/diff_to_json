@@ -1,0 +1,53 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.axis2.description.ParameterInclude;\n",
+            " import org.apache.axis2.transport.base.AbstractPollTableEntry;\n",
+            " import org.apache.axis2.transport.base.ParamUtils;\n",
+            "+import org.apache.commons.logging.Log;\n",
+            "+import org.apache.commons.logging.LogFactory;\n",
+            " \n",
+            " import java.text.DateFormat;\n",
+            " import java.text.SimpleDateFormat;\n"
+          ],
+          "locn": "-24,6 +24,8"
+        },
+        {
+          "lines": [
+            "  */\n",
+            " public class PollTableEntry extends AbstractPollTableEntry {\n",
+            " \n",
+            "+    private static final Log log = LogFactory.getLog(PollTableEntry.class);\n",
+            "+\n",
+            "     // operation after scan\n",
+            "     public static final int DELETE = 0;\n",
+            "     public static final int MOVE   = 1;\n"
+          ],
+          "locn": "-34,6 +36,8"
+        },
+        {
+          "lines": [
+            "         \n",
+            "         fileURI = ParamUtils.getOptionalParam(params, VFSConstants.TRANSPORT_FILE_FILE_URI);\n",
+            "         if (fileURI == null) {\n",
+            "+            log.warn(\"required parameter \" + VFSConstants.TRANSPORT_FILE_FILE_URI +\n",
+            "+                    \" is missing in the proxy service configuration\");\n",
+            "             return false;\n",
+            "         } else {\n",
+            "             \n"
+          ],
+          "locn": "-205,6 +209,8"
+        }
+      ],
+      "from": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/PollTableEntry.java",
+      "to": "java/modules/transports/core/vfs/src/main/java/org/apache/synapse/transport/vfs/PollTableEntry.java"
+    }
+  ],
+  "id": "1504958",
+  "message": "Applying the patch for SYNAPSE-895; Logging a warning when a VFS proxy is configured without the file URI parameter.",
+  "when": "2013-07-19T14:29:42-04:00",
+  "who": "hiranya"
+}

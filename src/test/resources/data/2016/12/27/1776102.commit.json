@@ -1,0 +1,33 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         <contributor>\n",
+            "             <name>Senduran Balasubramaniyam</name>\n",
+            "         </contributor>\n",
+            "+        <contributor>\n",
+            "+            <name>Chanaka Fernando</name>\n",
+            "+        </contributor>\n",
+            "+        <contributor>\n",
+            "+            <name>Isuru Ranawaka</name>\n",
+            "+        </contributor>\n",
+            "+        <contributor>\n",
+            "+            <name>Buddhima Wijeweera</name>\n",
+            "+        </contributor>\n",
+            "     </contributors>\n",
+            " </project>\n"
+          ],
+          "locn": "-1316,5 +1316,14"
+        }
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    }
+  ],
+  "id": "1776102",
+  "message": "Add more contributors",
+  "when": "2016-12-27T05:31:49-05:00",
+  "who": "isudana"
+}

@@ -1,0 +1,28 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                              class=\"org.apache.axis2.receivers.RawXMLINOutMessageReceiver\" />\n",
+            "         </messageReceivers>\n",
+            "         <parameter locked=\"false\" name=\"ServiceClass\">samples.services.MTOMSwASampleService</parameter>\n",
+            "+        <operation name=\"oneWayUploadUsingMTOM\">\n",
+            "+            <messageReceiver class=\"org.apache.axis2.receivers.RawXMLINOnlyMessageReceiver\" />\n",
+            "+        </operation>\n",
+            "     </service>\n",
+            " </serviceGroup>\n",
+            "\\ No newline at end of file\n"
+          ],
+          "locn": "-26,5 +26,8"
+        }
+      ],
+      "from": "java/modules/samples/services/MTOMSwASampleService/conf/services.xml",
+      "to": "java/modules/samples/services/MTOMSwASampleService/conf/services.xml"
+    }
+  ],
+  "id": "1386772",
+  "message": "Ensure that the correct message receiver is used for oneWayUploadUsingMTOM.",
+  "when": "2012-09-17T15:03:07-04:00",
+  "who": "veithen"
+}

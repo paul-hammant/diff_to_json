@@ -1,0 +1,42 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ScheduledMessageForwardingProcessor.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ScheduledMessageForwardingProcessor.java	(revision 1230902)
++++ java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ScheduledMessageForwardingProcessor.java	(revision 1230903)
+@@ -33,7 +33,7 @@
+  * Redelivery processor is the Message processor which implements the Dead letter channel EIP
+  * It will Time to time Redeliver the Messages to a given target.
+  */
+-public class ScheduledMessageForwardingProcessor extends ScheduledMessageProcessor{
++public class ScheduledMessageForwardingProcessor extends ScheduledMessageProcessor {
+ 
+     public static final String BLOCKING_SENDER = "blocking.sender";
+ 
+@@ -131,8 +131,9 @@
+     @Override
+     public void destroy() {
+          try {
+-            scheduler.deleteJob(name + "-forward job",
++             scheduler.deleteJob(name + "-forward job",
+                     ScheduledMessageProcessor.SCHEDULED_MESSAGE_PROCESSOR_GROUP);
++             scheduler.shutdown(true);
+         } catch (SchedulerException e) {
+             log.error("Error while destroying the task " + e);
+         }
+Index: java/modules/core/src/main/java/org/apache/synapse/message/processors/ScheduledMessageProcessor.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/message/processors/ScheduledMessageProcessor.java	(revision 1230902)
++++ java/modules/core/src/main/java/org/apache/synapse/message/processors/ScheduledMessageProcessor.java	(revision 1230903)
+@@ -186,6 +186,7 @@
+     public void destroy() {
+         try {
+             scheduler.deleteJob(name + "-trigger",SCHEDULED_MESSAGE_PROCESSOR_GROUP);
++            scheduler.shutdown(true);
+         } catch (SchedulerException e) {
+             log.error("Error while destroying the task " + e);
+         }
+-*-*-*-
+Message: Shutting down the schedulers initiated by the scheduled processors
+-*-*-*-
+When: 2012-01-13 00:25:15 -0500 
+-*-*-*-
+Who: hiranya

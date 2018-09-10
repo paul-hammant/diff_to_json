@@ -1,0 +1,47 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            "     }\n",
+            " \n",
+            "-   \n",
+            "+    /**\n",
+            "+     * Test case for InMemory Message Store configuration Factory and serializer with parameters\n",
+            "+     */\n",
+            "+    public void testMessageStoreSerializationWithParameters() {\n",
+            "+        String messageStoreConfiguration = \"<syn:messageStore xmlns:syn=\\\"\" +\n",
+            "+                \"http://ws.apache.org/ns/synapse\\\"\" +\n",
+            "+                \" name=\\\"foo\\\" >\" +\n",
+            "+                \"<syn:parameter name=\\\"testName1\\\">testValue1</syn:parameter>\" +\n",
+            "+                \"<syn:parameter name=\\\"testName2\\\">testValue2</syn:parameter>\" +\n",
+            "+                \"</syn:messageStore>\";\n",
+            " \n",
+            "+        OMElement messageStoreElement = createOMElement(messageStoreConfiguration);\n",
+            "+        MessageStore messageStore = MessageStoreFactory.createMessageStore(messageStoreElement,\n",
+            "+                new Properties());\n",
+            "+        OMElement serializedElement = MessageStoreSerializer.serializeMessageStore(null,\n",
+            "+                messageStore);\n",
+            "+\n",
+            "+        assertTrue(compare(messageStoreElement, serializedElement));\n",
+            "+\n",
+            "+    }\n",
+            "+\n",
+            "+\n",
+            "+\n",
+            " }\n"
+          ],
+          "locn": "-53,6 +53,27"
+        }
+      ],
+      "from": "java/modules/core/src/test/java/org/apache/synapse/config/xml/MessageStoreSerializationTest.java",
+      "to": "java/modules/core/src/test/java/org/apache/synapse/config/xml/MessageStoreSerializationTest.java"
+    }
+  ],
+  "id": "1369599",
+  "message": "adding Test case for MessageStore serialization test to test test the config with params",
+  "when": "2012-08-05T10:16:36-04:00",
+  "who": "charith"
+}

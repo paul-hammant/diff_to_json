@@ -1,0 +1,19 @@
+Index: java/modules/core/src/test/java/org/apache/synapse/registry/url/SimpleURLRegistryTest.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/registry/url/SimpleURLRegistryTest.java	(revision 1778749)
++++ java/modules/core/src/test/java/org/apache/synapse/registry/url/SimpleURLRegistryTest.java	(revision 1778750)
+@@ -110,7 +110,7 @@
+         props.put("cachableDuration", "1500");
+         reg.init(props);
+         
+-        OMNode node = reg.lookup(FILE2);
++        OMContainer node = (OMContainer)reg.lookup(FILE2);
+         node.serialize(new NullOutputStream());
+     }
+ 
+-*-*-*-
+Message: Eliminate usage of deprecated Axiom API.
+-*-*-*-
+When: 2017-01-14 05:21:40 -0500 
+-*-*-*-
+Who: veithen

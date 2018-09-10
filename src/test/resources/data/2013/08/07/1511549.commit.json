@@ -1,0 +1,129 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            " package org.apache.synapse.transport.fix;\n",
+            " \n",
+            " import org.apache.axiom.attachments.ByteArrayDataSource;\n",
+            "+import org.apache.axiom.om.OMAbstractFactory;\n",
+            " import org.apache.axiom.om.OMElement;\n",
+            " import org.apache.axiom.om.OMNamespace;\n",
+            " import org.apache.axiom.soap.SOAPBody;\n",
+            " import org.apache.axiom.soap.SOAPEnvelope;\n",
+            " import org.apache.axiom.soap.SOAPFactory;\n",
+            "-import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;\n",
+            " import org.apache.axis2.AxisFault;\n",
+            " import org.apache.axis2.context.MessageContext;\n",
+            " import org.apache.axis2.transport.base.BaseUtils;\n"
+          ],
+          "locn": "-20,12 +20,12"
+        },
+        {
+          "lines": [
+            "             log.debug(\"Creating SOAP envelope for FIX message...\");\n",
+            "         }\n",
+            " \n",
+            "-        SOAPFactory soapFactory = new SOAP11Factory();\n",
+            "+        SOAPFactory soapFactory = OMAbstractFactory.getSOAP11Factory();\n",
+            "         OMElement msg = soapFactory.createOMElement(FIXConstants.FIX_MESSAGE, null);\n",
+            "         msg.addAttribute(soapFactory.createOMAttribute(FIXConstants.FIX_MESSAGE_INCOMING_SESSION,\n",
+            "                 null, sessionID));\n"
+          ],
+          "locn": "-80,7 +80,7"
+        },
+        {
+          "lines": [
+            "                     binaryData.addAttribute(FIXConstants.FIX_MESSAGE_REFERENCE, binaryCID, null);\n",
+            "                     msgField.addChild(binaryData);\n",
+            "                 } else {\n",
+            "-                    soapFactory.createOMText(msgField, value.toString(),\n",
+            "-                            OMElement.CDATA_SECTION_NODE);\n",
+            "+                    createOMText(soapFactory, msgField, value.toString());\n",
+            "                 }\n",
+            "                 header.addChild(msgField);\n",
+            "             }\n"
+          ],
+          "locn": "-111,8 +111,7"
+        },
+        {
+          "lines": [
+            "                     binaryData.addAttribute(FIXConstants.FIX_MESSAGE_REFERENCE, binaryCID, null);\n",
+            "                     msgField.addChild(binaryData);\n",
+            "                 } else {\n",
+            "-                    soapFactory.createOMText(msgField, value.toString(),\n",
+            "-                            OMElement.CDATA_SECTION_NODE);\n",
+            "+                    createOMText(soapFactory, msgField, value.toString());\n",
+            "                 }\n",
+            "                 trailer.addChild(msgField);\n",
+            "             }\n"
+          ],
+          "locn": "-141,8 +140,7"
+        },
+        {
+          "lines": [
+            "                      binaryData.addAttribute(FIXConstants.FIX_MESSAGE_REFERENCE, binaryCID, null);\n",
+            "                      msgField.addChild(binaryData);\n",
+            "                  } else {\n",
+            "-                     soapFactory.createOMText(msgField, value.toString(),\n",
+            "-                             OMElement.CDATA_SECTION_NODE);\n",
+            "+                     createOMText(soapFactory, msgField, value.toString());\n",
+            "                  }\n",
+            " \n",
+            "                  body.addChild(msgField);\n"
+          ],
+          "locn": "-193,8 +191,7"
+        },
+        {
+          "lines": [
+            "     }\n",
+            " \n",
+            "     /**\n",
+            "-     * Reads the SOAP body of a message and attempts to retreive the session identifier string\n",
+            "+     * Reads the SOAP body of a message and attempts to retrieve the session identifier string\n",
+            "      * with a namesapce\n",
+            "      *\n",
+            "      * @param body Body of the SOAP message\n"
+          ],
+          "locn": "-779,7 +776,7"
+        },
+        {
+          "lines": [
+            "     }\n",
+            " \n",
+            "     /**\n",
+            "+     * Creates a text node within a CDATA section selectively by looking at the enclosing text.\n",
+            "+     *\n",
+            "+     * @param soapFactory SOAPFactory instance used to create the OMText object\n",
+            "+     * @param field Parent OMElement (field element)\n",
+            "+     * @param text String text to be added to the field element\n",
+            "+     */\n",
+            "+    private static void createOMText(SOAPFactory soapFactory, OMElement field, String text) {\n",
+            "+        if (text == null) {\n",
+            "+            return;\n",
+            "+        }\n",
+            "+        if (text.indexOf('<') == -1 && text.indexOf('&') == -1 && text.indexOf('>') == -1) {\n",
+            "+            soapFactory.createOMText(field, text);\n",
+            "+        } else {\n",
+            "+            soapFactory.createOMText(field, text, OMElement.CDATA_SECTION_NODE);\n",
+            "+        }\n",
+            "+    }\n",
+            "+\n",
+            "+    /**\n",
+            "      * Read the FIX message payload and identify the namespace if exists\n",
+            "      *\n",
+            "      * @param fixBody FIX message payload\n"
+          ],
+          "locn": "-794,6 +791,24"
+        }
+      ],
+      "from": "java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/FIXUtils.java",
+      "to": "java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/FIXUtils.java"
+    }
+  ],
+  "id": "1511549",
+  "message": "Using CDATA selectively when parsing FIX messages. Patch applied from SYNAPSE-650 with some modifications",
+  "when": "2013-08-07T20:39:37-04:00",
+  "who": "hiranya"
+}

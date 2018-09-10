@@ -1,0 +1,550 @@
+Index: java/modules/integration/src/test/resources/extras/synapse_sample_10002.xml
+===================================================================
+--- java/modules/integration/src/test/resources/extras/synapse_sample_10002.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/extras/synapse_sample_10002.xml	(revision 1533847)
+@@ -0,0 +1,113 @@
++<syn:definitions xmlns:syn="http://ws.apache.org/ns/synapse">
++    <syn:proxy name="DirectMediationProxy">
++        <syn:target>
++            <syn:endpoint>
++                <syn:address uri="http://localhost:9000/services/EchoService"/>
++            </syn:endpoint>
++            <syn:outSequence>
++                <syn:send/>
++            </syn:outSequence>
++        </syn:target>
++    </syn:proxy>
++
++    <syn:proxy name="ContentBasedRoutingProxy">
++        <syn:target>
++            <syn:inSequence>
++                <syn:filter source="//bar[1]" regex="^uuid.*">
++                    <syn:then>
++                        <syn:send>
++                            <syn:endpoint>
++                                <syn:address uri="http://localhost:9000/services/EchoService"/>
++                            </syn:endpoint>
++                        </syn:send>
++                    </syn:then>
++                    <syn:else>
++                        <syn:makefault version="soap11">
++                            <syn:code xmlns:sf11="http://schemas.xmlsoap.org/soap/envelope/" value="sf11:Server"/>
++                            <syn:reason value="First order must be for the symbol IBM"/>
++                        </syn:makefault>
++                        <syn:header name="To" action="remove"/>
++                        <syn:property name="RESPONSE" value="true"/>
++                        <syn:send/>
++                    </syn:else>
++                </syn:filter>
++            </syn:inSequence>
++        </syn:target>
++    </syn:proxy>
++
++    <syn:proxy name="HeaderBasedRoutingProxy">
++        <syn:target>
++            <syn:inSequence>
++                <syn:filter source="$trp:CustomHeader" regex="TestValue">
++                    <syn:then>
++                        <syn:send>
++                            <syn:endpoint>
++                                <syn:address uri="http://localhost:9000/services/EchoService"/>
++                            </syn:endpoint>
++                        </syn:send>
++                    </syn:then>
++                    <syn:else>
++                        <syn:makefault version="soap11">
++                            <syn:code xmlns:sf11="http://schemas.xmlsoap.org/soap/envelope/" value="sf11:Server"/>
++                            <syn:reason value="First order must be for the symbol IBM"/>
++                        </syn:makefault>
++                        <syn:header name="To" action="remove"/>
++                        <syn:property name="RESPONSE" value="true"/>
++                        <syn:send/>
++                    </syn:else>
++                </syn:filter>
++            </syn:inSequence>
++        </syn:target>
++    </syn:proxy>
++
++    <syn:proxy name="XSLTProxy">
++        <syn:target>
++            <syn:endpoint>
++                <syn:address uri="http://localhost:9000/services/EchoService"/>
++            </syn:endpoint>
++            <syn:inSequence>
++                <syn:xslt key="xslt_transform_reverse"/>
++            </syn:inSequence>
++            <syn:outSequence>
++                <syn:xslt key="xslt_transform"/>
++                <syn:send/>
++            </syn:outSequence>
++        </syn:target>
++    </syn:proxy>
++
++    <syn:localEntry key="xslt_transform_reverse">
++        <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
++                        version="2.0">
++            <xsl:output method="xml"
++                        omit-xml-declaration="yes"
++                        indent="no"/>
++            <xsl:template match="foo">
++                <oof>
++                    <xsl:for-each select="bar">
++                        <rab>
++                            <xsl:value-of select="bar"/>
++                        </rab>
++                    </xsl:for-each>
++                </oof>
++            </xsl:template>
++        </xsl:stylesheet>
++    </syn:localEntry>
++
++    <syn:localEntry key="xslt_transform">
++        <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
++                        version="2.0">
++            <xsl:output method="xml"
++                        omit-xml-declaration="yes"
++                        indent="no"/>
++            <xsl:template match="oof">
++                <foo>
++                    <xsl:for-each select="rab">
++                        <bar>
++                            <xsl:value-of select="rab"/>
++                        </bar>
++                    </xsl:for-each>
++                </foo>
++            </xsl:template>
++        </xsl:stylesheet>
++    </syn:localEntry>
++</syn:definitions>
+\ No newline at end of file
+Index: java/modules/integration/src/test/resources/sample10002.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample10002.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample10002.xml	(revision 1533847)
+@@ -0,0 +1,18 @@
++<synapseSample>
++    <sampleID>10002</sampleID>
++    <sampleName>Pass Through Transport and Deferred Building Sanity Checks</sampleName>
++    <synapseConfig>
++        <!--if we don't specify the optional values, framework will use defaults-->
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>modules/integration/src/test/resources/extras/synapse_sample_10002.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <echoServer id="0">
++            <httpPort>9000</httpPort>
++        </echoServer>
++    </backEndServerConfig>
++    <clientConfig>
++        <clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestUtils.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestUtils.java	(revision 1533846)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestUtils.java	(revision 1533847)
+@@ -118,6 +118,8 @@
+             return new DerbyServerController(root);
+         } else if (SampleConfigConstants.TAG_BE_SERVER_CONF_JMS_BROKER.equals(root.getLocalName())) {
+             return new ActiveMQController(root);
++        } else if (SampleConfigConstants.TAG_BE_SERVER_CONF_ECHO_SERVER.equals(root.getLocalName())) {
++            return new EchoHttpServerController(root);
+         }
+         return null;
+     }
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/SampleConfigConstants.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/SampleConfigConstants.java	(revision 1533846)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/SampleConfigConstants.java	(revision 1533847)
+@@ -39,6 +39,7 @@
+     public static final String TAG_BE_SERVER_CONF_AXIS2_SERVER = "axis2Server";
+     public static final String TAG_BE_SERVER_CONF_JMS_BROKER = "jmsBroker";
+     public static final String TAG_BE_SERVER_CONF_DERBY_SERVER = "derbyServer";
++    public static final String TAG_BE_SERVER_CONF_ECHO_SERVER = "echoServer";
+     public static final String TAG_BE_SERVER_CONF_QFIX_EXECUTOR = "fixExecutor";
+ 
+     public static final String TAG_BE_SERVER_CONF_AXIS2_REPO = "axis2Repo";
+@@ -47,6 +48,8 @@
+     public static final String TAG_BE_SERVER_CONF_AXIS2_HTTPS_PORT = "httpsPort";
+     public static final String TAG_BE_SERVER_CONF_AXIS2_COUNTER_ENABLED = "counterEnabled";
+ 
++    public static final String TAG_BE_SERVER_CONF_ECHO_HTTP_PORT = "port";
++
+     public static final String TAG_BE_SERVER_CONF_DERBY_PORT = "dbPort";
+ 
+     public static final String TAG_BE_SERVER_CONF_JMS_PROVIDER_URL = "providerURL";
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/EchoHttpServerController.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/EchoHttpServerController.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/EchoHttpServerController.java	(revision 1533847)
+@@ -0,0 +1,188 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.samples.framework;
++
++import org.apache.axiom.om.OMElement;
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.http.*;
++import org.apache.http.entity.ByteArrayEntity;
++import org.apache.http.entity.ContentType;
++import org.apache.http.impl.DefaultBHttpServerConnection;
++import org.apache.http.impl.DefaultBHttpServerConnectionFactory;
++import org.apache.http.protocol.*;
++import org.apache.http.util.EntityUtils;
++import org.apache.synapse.samples.framework.config.SampleConfigConstants;
++
++import java.io.IOException;
++import java.io.InterruptedIOException;
++import java.net.ServerSocket;
++import java.net.Socket;
++import java.util.concurrent.atomic.AtomicInteger;
++
++public class EchoHttpServerController extends AbstractBackEndServerController {
++
++    private static final Log log = LogFactory.getLog(EchoHttpServerController.class);
++
++    private int port;
++    private RequestListenerThread requestListener;
++
++    public EchoHttpServerController(OMElement element) {
++        super(element);
++        port = Integer.parseInt(SynapseTestUtils.getParameter(element,
++                SampleConfigConstants.TAG_BE_SERVER_CONF_AXIS2_HTTP_PORT, "9000"));
++    }
++
++    public boolean startProcess() {
++        try {
++            requestListener = new RequestListenerThread(port);
++            requestListener.start();
++            return true;
++        } catch (IOException e) {
++            log.error("Error while initializing echo server", e);
++            return false;
++        }
++    }
++
++    public boolean stopProcess() {
++        requestListener.halt();
++        requestListener = null;
++        return true;
++    }
++
++    static class EchoHttpHandler implements HttpRequestHandler {
++
++        public void handle(HttpRequest request, HttpResponse response,
++                           HttpContext context) throws HttpException, IOException {
++
++            if (log.isDebugEnabled()) {
++                log.debug(request.getRequestLine().toString());
++            }
++            if (request instanceof HttpEntityEnclosingRequest) {
++                HttpEntity entity = ((HttpEntityEnclosingRequest) request).getEntity();
++                byte[] entityContent = EntityUtils.toByteArray(entity);
++                response.setStatusCode(HttpStatus.SC_OK);
++                response.setEntity(new ByteArrayEntity(entityContent,
++                        ContentType.create(entity.getContentType().getValue())));
++            } else {
++                response.setStatusCode(HttpStatus.SC_NO_CONTENT);
++            }
++        }
++    }
++
++    static class RequestListenerThread extends Thread {
++
++        private final HttpConnectionFactory<DefaultBHttpServerConnection> connFactory;
++        private final ServerSocket serversocket;
++        private final HttpService httpService;
++
++        public RequestListenerThread(final int port) throws IOException {
++            this.connFactory = DefaultBHttpServerConnectionFactory.INSTANCE;
++            this.serversocket = new ServerSocket(port);
++
++            // Set up the HTTP protocol processor
++            HttpProcessor httpProcessor = HttpProcessorBuilder.create()
++                    .add(new ResponseDate())
++                    .add(new ResponseServer("EchoServer"))
++                    .add(new ResponseContent())
++                    .add(new ResponseConnControl()).build();
++
++            // Set up request handlers
++            UriHttpRequestHandlerMapper registry = new UriHttpRequestHandlerMapper();
++            registry.register("*", new EchoHttpHandler());
++
++            // Set up the HTTP service
++            this.httpService = new HttpService(httpProcessor, registry);
++            this.setName("echo-http-server");
++        }
++
++        @Override
++        public void run() {
++            log.info("Listening on port " + this.serversocket.getLocalPort());
++            AtomicInteger counter = new AtomicInteger(0);
++            while (!Thread.interrupted()) {
++                try {
++                    // Set up HTTP connection
++                    Socket socket = this.serversocket.accept();
++                    HttpServerConnection conn = this.connFactory.createConnection(socket);
++
++                    // Start worker thread
++                    Thread t = new WorkerThread(this.httpService, conn, counter.incrementAndGet());
++                    t.start();
++                } catch (InterruptedIOException ex) {
++                    break;
++                } catch (IOException e) {
++                    if (Thread.interrupted()) {
++                        break;
++                    }
++                    log.error("I/O error initializing connection thread", e);
++                    break;
++                }
++            }
++        }
++
++        public void halt() {
++            log.info("Shutting down echo server");
++            try {
++                this.interrupt();
++                this.serversocket.close();
++            } catch (IOException e) {
++                log.warn("Error while shutting down echo server", e);
++            }
++        }
++    }
++
++    static class WorkerThread extends Thread {
++
++        private final HttpService httpservice;
++        private final HttpServerConnection conn;
++
++        public WorkerThread(
++                final HttpService httpservice,
++                final HttpServerConnection conn,
++                final int counter) {
++            super();
++            this.httpservice = httpservice;
++            this.conn = conn;
++            this.setName("echo-http-worker-" + counter);
++        }
++
++        @Override
++        public void run() {
++            HttpContext context = new BasicHttpContext(null);
++            try {
++                while (!Thread.interrupted() && this.conn.isOpen()) {
++                    this.httpservice.handleRequest(this.conn, context);
++                }
++            } catch (ConnectionClosedException ex) {
++                log.debug("Client closed the connection", ex);
++            } catch (IOException ex) {
++                log.error("I/O error: " + ex.getMessage(), ex);
++            } catch (HttpException ex) {
++                log.error("Unrecoverable HTTP protocol violation: " + ex.getMessage(), ex);
++            } finally {
++                try {
++                    this.conn.shutdown();
++                } catch (IOException ignore) {}
++            }
++        }
++
++    }
++}
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1533846)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1533847)
+@@ -22,6 +22,7 @@
+ import junit.framework.TestSuite;
+ import org.apache.commons.logging.Log;
+ import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.samples.framework.tests.rest.Sample10002;
+ import org.apache.synapse.samples.framework.tests.tasks.*;
+ import org.apache.synapse.samples.framework.tests.transport.Sample250;
+ import org.apache.synapse.samples.framework.tests.advanced.*;
+@@ -242,5 +243,6 @@
+ 
+         sampleClassRepo.put("800", Sample800.class);
+         sampleClassRepo.put("10001", Sample10001.class);
++        sampleClassRepo.put("10002", Sample10002.class);
+     }
+ }
+\ No newline at end of file
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/rest/Sample10002.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/rest/Sample10002.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/rest/Sample10002.java	(revision 1533847)
+@@ -0,0 +1,150 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.samples.framework.tests.rest;
++
++import org.apache.axiom.om.OMElement;
++import org.apache.http.HttpStatus;
++import org.apache.synapse.samples.framework.SynapseTestCase;
++import org.apache.synapse.samples.framework.clients.BasicHttpClient;
++import org.apache.synapse.samples.framework.clients.HttpResponse;
++
++import java.util.HashMap;
++import java.util.Iterator;
++import java.util.Map;
++import java.util.UUID;
++
++public class Sample10002 extends SynapseTestCase {
++
++    private static final int[] SIZES = new int[] {
++            500, 1024, 10240, 102400, 1024 * 1024
++    };
++
++    private static final String[] SIZE_STRINGS = new String[] {
++            "500B", "1K", "10K", "100K", "1M"
++    };
++
++    public Sample10002() {
++        super(10002);
++    }
++
++    public void testDirectMediation() throws Exception {
++        BasicHttpClient client = new BasicHttpClient();
++        int children = 0;
++        StringBuilder xml = new StringBuilder("<foo>");
++
++        for (int i = 0; i < SIZES.length; i++) {
++            while (xml.length() < SIZES[i]) {
++                xml.append("<bar>").append(UUID.randomUUID().toString()).append("</bar>");
++                children++;
++            }
++            verifyMediationResult("DirectMediation", client, xml, children, SIZE_STRINGS[i]);
++        }
++    }
++
++    public void testCBRMediation() throws Exception {
++        BasicHttpClient client = new BasicHttpClient();
++        int children = 1;
++        StringBuilder xml = new StringBuilder("<foo><bar>uuid:1234567890</bar>");
++
++        for (int i = 0; i < SIZES.length; i++) {
++            while (xml.length() < SIZES[i]) {
++                xml.append("<bar>").append(UUID.randomUUID().toString()).append("</bar>");
++                children++;
++            }
++            verifyMediationResult("ContentBasedRouting", client, xml, children, SIZE_STRINGS[i]);
++        }
++    }
++
++    public void testHeaderBasedRoutingMediation() throws Exception {
++        BasicHttpClient client = new BasicHttpClient();
++        int children = 0;
++        StringBuilder xml = new StringBuilder("<foo>");
++
++        Map<String,String> headers = new HashMap<String, String>();
++        headers.put("CustomHeader", "TestValue");
++
++        for (int i = 0; i < SIZES.length; i++) {
++            while (xml.length() < SIZES[i]) {
++                xml.append("<bar>").append(UUID.randomUUID().toString()).append("</bar>");
++                children++;
++            }
++            verifyMediationResult("HeaderBasedRouting", client, xml, children,
++                    SIZE_STRINGS[i], headers);
++        }
++    }
++
++    public void testXSLTMediation() throws Exception {
++        BasicHttpClient client = new BasicHttpClient();
++        int children = 0;
++        StringBuilder xml = new StringBuilder("<foo>");
++
++        for (int i = 0; i < SIZES.length; i++) {
++            while (xml.length() < SIZES[i]) {
++                xml.append("<bar>").append(UUID.randomUUID().toString()).append("</bar>");
++                children++;
++            }
++            verifyMediationResult("XSLT", client, xml, children, SIZE_STRINGS[i]);
++        }
++    }
++
++    private void verifyMediationResult(String scenario, BasicHttpClient client,
++                                       StringBuilder message, int childrenCount,
++                                       String sizeStr) throws Exception {
++
++        verifyMediationResult(scenario, client, message, childrenCount, sizeStr, null);
++    }
++
++    private void verifyMediationResult(String scenario, BasicHttpClient client,
++                                       StringBuilder message, int childrenCount,
++                                       String sizeStr, Map<String,String> headers) throws Exception {
++
++        log.info(">>>>>>>>>>>>>>>> Testing " + scenario + "; Payload size: " + sizeStr);
++
++        HttpResponse response;
++        if (headers != null) {
++            response = client.doPost("http://127.0.0.1:8280/services/" + scenario + "Proxy",
++                    message.append("</foo>").toString().getBytes(), "application/xml", headers);
++        } else {
++            response = client.doPost("http://127.0.0.1:8280/services/" + scenario + "Proxy",
++                    message.append("</foo>").toString().getBytes(), "application/xml");
++        }
++
++        // remove the closing tag added in the previous step
++        message.setLength(message.length() - 6);
++
++        // We must get a 200 OK
++        assertEquals(HttpStatus.SC_OK, response.getStatus());
++
++        OMElement body = response.getBodyAsXML();
++        // First element must be 'foo'
++        assertEquals("foo", body.getLocalName());
++
++        Iterator childElements = body.getChildrenWithLocalName("bar");
++        int returnedChildren = 0;
++        while (childElements.hasNext()) {
++            returnedChildren++;
++            childElements.next();
++        }
++        // Must return all the child 'bar' elements we sent
++        assertEquals(childrenCount, returnedChildren);
++
++        log.info(">>>>>>>>>>>>>>>> " + scenario + " (" + sizeStr + "): SUCCESS");
++    }
++}
+-*-*-*-
+Message: Adding a new test case to sanity check PTT + deferred building scenarios
+-*-*-*-
+When: 2013-10-19 20:51:00 -0400 
+-*-*-*-
+Who: hiranya

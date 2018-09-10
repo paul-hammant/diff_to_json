@@ -1,0 +1,386 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         if (conn != null) {\n",
+            "             errorMessage = \"[\" + conn + \"] \" + msg;\n",
+            "         } else {\n",
+            "-            errorMessage = \"[\" + conn + \"] \" + msg;\n",
+            "+            errorMessage = msg;\n",
+            "         }\n",
+            "         log.error(errorMessage, e);\n",
+            "     }\n"
+          ],
+          "locn": "-459,7 +459,7"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/SourceHandler.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                 if (soapVersion == 1) {\n",
+            "                     SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();\n",
+            "                     envelope = fac.getDefaultEnvelope();\n",
+            "-                } else if (soapVersion == 2) {\n",
+            "-                    SOAPFactory fac = OMAbstractFactory.getSOAP12Factory();\n",
+            "-                    envelope = fac.getDefaultEnvelope();\n",
+            "                 } else {\n",
+            "                     SOAPFactory fac = OMAbstractFactory.getSOAP12Factory();\n",
+            "                     envelope = fac.getDefaultEnvelope();\n"
+          ],
+          "locn": "-404,9 +404,6"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ServerWorker.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/ServerWorker.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     }\n",
+            " \n",
+            "     public void setCompleted(boolean completed) {\n",
+            "-        this.completed = completed;\n",
+            "         synchronized (this) {\n",
+            "+            this.completed = completed;\n",
+            "             this.notifyAll();\n",
+            "         }\n",
+            "     }\n"
+          ],
+          "locn": "-387,8 +387,8"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Axis2HttpRequest.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Axis2HttpRequest.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "  * org.apache.catalina.valves.AccessLogValve with thanks.\n",
+            "  */\n",
+            " public class Access {\n",
+            "+\n",
+            "     private static Log log = LogFactory.getLog(Access.class);\n",
+            " \n",
+            "     /**\n"
+          ],
+          "locn": "-40,6 +40,7"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Access.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/Access.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                                     responseMsgCtx.getProperty(\"synapse.send\") == null) {\n",
+            "                                 return;\n",
+            "                             }\n",
+            "-                        } else if (responseMsgCtx == null ||\n",
+            "-                                outMsgCtx.getOptions().isUseSeparateListener()) {\n",
+            "+                        } else if (outMsgCtx.getOptions().isUseSeparateListener()) {\n",
+            "                             // Since we need to notify the SynapseCallback receiver to remove the\n",
+            "                             // call backs registered  we set a custom property\n",
+            "                             setHeaders(context, response, outMsgCtx, responseMsgCtx);\n"
+          ],
+          "locn": "-740,8 +740,7"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/nhttp/ClientHandler.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         if (o != null && o instanceof Mediator) {\n",
+            "             return (Mediator) o;\n",
+            "         } else {\n",
+            "-            Mediator m = getConfiguration().getSequenceTemplate(key);\n",
+            "-            if (m instanceof TemplateMediator) {\n",
+            "-                TemplateMediator templateMediator = (TemplateMediator) m;\n",
+            "-                synchronized (m) {\n",
+            "-                    if (!templateMediator.isInitialized()) {\n",
+            "-                        templateMediator.init(synEnv);\n",
+            "-                    }\n",
+            "+            TemplateMediator m = getConfiguration().getSequenceTemplate(key);\n",
+            "+            synchronized (m) {\n",
+            "+                if (!m.isInitialized()) {\n",
+            "+                    m.init(synEnv);\n",
+            "                 }\n",
+            "             }\n",
+            "             localEntries.put(key, m);\n"
+          ],
+          "locn": "-152,13 +152,10"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2MessageContext.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2MessageContext.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "  *  specific language governing permissions and limitations\n",
+            "  *  under the License.\n",
+            "  */\n",
+            "+\n",
+            " package org.apache.synapse.libraries.model;\n",
+            " \n",
+            " import org.apache.axiom.om.OMElement;\n"
+          ],
+          "locn": "-16,6 +16,7"
+        },
+        {
+          "lines": [
+            " \n",
+            "     private static final Log log = LogFactory.getLog(ArtifactFile.class);\n",
+            " \n",
+            "-    protected static String fileName;\n",
+            "+    protected String fileName;\n",
+            " \n",
+            "     protected OMElement configurationElement;\n",
+            " \n"
+          ],
+          "locn": "-33,7 +34,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/libraries/model/ArtifactFile.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/libraries/model/ArtifactFile.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             LibraryArtifact artifact = subArtifacts.get(artifactName);\n",
+            "             if (artifact.isLeafArtifact()) {\n",
+            "                 delegateClassLoading(artifact, library);\n",
+            "-                //this is where actual artifact is constructed to it's ture form\n",
+            "+                //this is where actual artifact is constructed to its true form\n",
+            "                 Object template = artifact.file.build();\n",
+            "                 if (artifact.file instanceof TemplateArtifactFile) {\n",
+            " \n"
+          ],
+          "locn": "-96,7 +96,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/libraries/model/LibraryArtifact.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/libraries/model/LibraryArtifact.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             }\r\n",
+            " \r\n",
+            "             // continue stopping the axis2 environment if we created it\r\n",
+            "-            if (serverConfigurationInformation.isCreateNewInstance() && configurationContext != null\r\n",
+            "-                    && configurationContext.getAxisConfiguration() != null) {\r\n",
+            "+            if (serverConfigurationInformation.isCreateNewInstance() &&\r\n",
+            "+                    configurationContext.getAxisConfiguration() != null) {\r\n",
+            "                 Map<String, AxisService> serviceMap =\r\n",
+            "                         configurationContext.getAxisConfiguration().getServices();\r\n",
+            "                 for (AxisService svc : serviceMap.values()) {\r\n"
+          ],
+          "locn": "-442,8 +442,8"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/Axis2SynapseController.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         }\n",
+            " \n",
+            "         /** Extract the SynapseXpath object from parameters to identify the sequence number of the message */\n",
+            "-        if (parameters != null && parameters.get(ResequencingProcessor.SEQUENCE_NUMBER_XPATH) != null) {\n",
+            "+        if (parameters.get(ResequencingProcessor.SEQUENCE_NUMBER_XPATH) != null) {\n",
+            "             seqNoxPath = (SynapseXPath) parameters.get(ResequencingProcessor.SEQUENCE_NUMBER_XPATH);\n",
+            "         }\n",
+            " \n"
+          ],
+          "locn": "-73,7 +73,7"
+        },
+        {
+          "lines": [
+            "         try {\n",
+            "             Thread.sleep(timePeriod);\n",
+            "         } catch (InterruptedException e) {\n",
+            "-            log.error(new String(\"Interrupted while thread sleeping in resequencer\"));\n",
+            "+            log.error(\"Interrupted while thread sleeping in resequencer\", e);\n",
+            "         }\n",
+            "     }\n",
+            " \n"
+          ],
+          "locn": "-236,7 +236,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/message/processors/resequence/ResequencingJob.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/message/processors/resequence/ResequencingJob.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                                 errorStop = true;\n",
+            "                                 continue;\n",
+            " \n",
+            "-                            } else if(outCtx == null) {\n",
+            "+                            } else if (outCtx == null) {\n",
+            "                                 // This Means we have invoked an out only operation\n",
+            "                                 // remove the message and reset the count\n",
+            "                                 messageStore.poll();\n"
+          ],
+          "locn": "-161,7 +161,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ForwardingJob.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/message/processors/forward/ForwardingJob.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             }\n",
+            "             return expression;\n",
+            "         } catch (Exception e) {\n",
+            "-            handleException(\"Can not evaluate escaped expression : \" + expr.toString());\n",
+            "+            handleException(\"Can not evaluate escaped expression : \" + expr);\n",
+            "         }\n",
+            "         return this.expression;\n",
+            " \n"
+          ],
+          "locn": "-208,7 +208,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/mediators/Value.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/mediators/Value.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     /**\n",
+            "      * This method will implements the serialization of SynapseImport object to its configuration\n",
+            "      *\n",
+            "-     * @param s the type SynapseImport which is subjected to the serialization\n",
+            "+     * @param synapseImport the type SynapseImport which is subjected to the serialization\n",
+            "      * @return OMElement serialized in to xml from the given parameters\n",
+            "      */\n",
+            "-    public OMElement serializeImport(SynapseImport s) {\n",
+            "-\n",
+            "-\n",
+            "-        if (!(s instanceof SynapseImport)) {\n",
+            "-            handleException(\"Unsupported Synapse Import passed in for serialization\");\n",
+            "-        }\n",
+            "-\n",
+            "-        SynapseImport synapseImport = (SynapseImport) s;\n",
+            "-\n",
+            "+    public OMElement serializeImport(SynapseImport synapseImport) {\n",
+            "         OMElement importElem = fac.createOMElement(\"import\", synNS);\n",
+            " \n",
+            "         if (synapseImport.getLibName() != null) {\n",
+            "             importElem.addAttribute(fac.createOMAttribute(\n",
+            "-                    \"name\", nullNS, s.getLibName()));\n",
+            "+                    \"name\", nullNS, synapseImport.getLibName()));\n",
+            "         } else {\n",
+            "             handleException(\"Invalid Synapse Import. Target Library name is required\");\n",
+            "         }\n"
+          ],
+          "locn": "-47,23 +47,15"
+        },
+        {
+          "lines": [
+            " \n",
+            "         if (synapseImport.getLibPackage() != null) {\n",
+            "             importElem.addAttribute(fac.createOMAttribute(\n",
+            "-                    \"package\", nullNS, s.getLibPackage()));\n",
+            "+                    \"package\", nullNS, synapseImport.getLibPackage()));\n",
+            "         } else {\n",
+            "             handleException(\"Invalid Synapse Import. Target Library package is required\");\n",
+            "         }\n"
+          ],
+          "locn": "-70,7 +62,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseImportSerializer.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseImportSerializer.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            "         Matcher matcher = regex.matcher(value);\n",
+            "         if (matcher == null) {\n",
+            "-\n",
+            "             log.warn(\"Matcher for the provided character sequence and the pattern ' \"\n",
+            "                     + regex + \" '\" + \" cannot be found. Switch case will not be executed.\");\n",
+            "-\n",
+            "             return false;\n",
+            "         }\n",
+            " \n"
+          ],
+          "locn": "-120,10 +120,8"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/SwitchCase.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/SwitchCase.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         throw new SynapseException(msg);\n",
+            "     }\n",
+            " \n",
+            "-    private static void handleException(String msg, Exception e) {\n",
+            "-        log.error(msg, e);\n",
+            "-        throw new SynapseException(msg, e);\n",
+            "-    }\n",
+            "-\n",
+            " }\n"
+          ],
+          "locn": "-70,9 +70,4"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseImportFactory.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/SynapseImportFactory.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                     //this is a important step -> we need to unload what ever the components loaded previously\n",
+            "                     synLib.unLoadLibrary();\n",
+            "                     //then reload\n",
+            "-                    if (synLib != null) {\n",
+            "-                        LibDeployerUtils.loadLibArtifacts(synImport, synLib);\n",
+            "-                    }\n",
+            "+                    LibDeployerUtils.loadLibArtifacts(synImport, synLib);\n",
+            "                     log.info(\"Synapse Library Import named '\" + synImportQualfiedName +\n",
+            "                              \" has been deployed from file : \"\n",
+            "                              + fileName);\n"
+          ],
+          "locn": "-148,9 +148,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/deployers/ImportDeployer.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/deployers/ImportDeployer.java"
+    }
+  ],
+  "id": "1509848",
+  "message": "Some refactoring and minor improvements - Removing redundant null checks etc.",
+  "when": "2013-08-02T16:42:30-04:00",
+  "who": "hiranya"
+}

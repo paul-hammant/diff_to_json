@@ -1,0 +1,33 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                     </ul>\n",
+            "                 </p>\n",
+            "             </subsection>\n",
+            "+            <subsection name=\"REST API\">\n",
+            "+                <p>\n",
+            "+                    <ul>\n",
+            "+                        <li><a href=\"samples/sample800.html\">Sample 800: Introduction to REST API</a></li>\n",
+            "+                    </ul>\n",
+            "+                </p>\n",
+            "+            </subsection>\n",
+            "         </section>\n",
+            "     </body>\n",
+            " </document>\n",
+            "\\ No newline at end of file\n"
+          ],
+          "locn": "-249,6 +249,13"
+        }
+      ],
+      "from": "scratch/hiranya/website/src/site/xdoc/userguide/samples.xml",
+      "to": "scratch/hiranya/website/src/site/xdoc/userguide/samples.xml"
+    }
+  ],
+  "id": "1222277",
+  "message": "Updating samples",
+  "when": "2011-12-22T10:26:19-05:00",
+  "who": "kasun"
+}

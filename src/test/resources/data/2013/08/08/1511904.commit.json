@@ -1,0 +1,157 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "+/*\n",
+            "+ *  Licensed to the Apache Software Foundation (ASF) under one\n",
+            "+ *  or more contributor license agreements.  See the NOTICE file\n",
+            "+ *  distributed with this work for additional information\n",
+            "+ *  regarding copyright ownership.  The ASF licenses this file\n",
+            "+ *  to you under the Apache License, Version 2.0 (the\n",
+            "+ *  \"License\"); you may not use this file except in compliance\n",
+            "+ *  with the License.  You may obtain a copy of the License at\n",
+            "+ *\n",
+            "+ *   http://www.apache.org/licenses/LICENSE-2.0\n",
+            "+ *\n",
+            "+ *  Unless required by applicable law or agreed to in writing,\n",
+            "+ *  software distributed under the License is distributed on an\n",
+            "+ *   * \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n",
+            "+ *  KIND, either express or implied.  See the License for the\n",
+            "+ *  specific language governing permissions and limitations\n",
+            "+ *  under the License.\n",
+            "+ */\n",
+            "+\n",
+            "+package org.apache.synapse.config.xml.endpoints;\n",
+            "+\n",
+            "+import org.apache.axiom.om.OMElement;\n",
+            "+import org.apache.synapse.config.xml.AbstractTestCase;\n",
+            "+import org.apache.synapse.endpoints.DynamicLoadbalanceEndpoint;\n",
+            "+\n",
+            "+public class DynamicLoadbalanceEndpointSerializationTest extends AbstractTestCase {\n",
+            "+\n",
+            "+    public void testDLBEndpointScenarioOne() throws Exception {\n",
+            "+        String inputXML = \"<endpoint name=\\\"ep\\\" xmlns=\\\"http://ws.apache.org/ns/synapse\\\">\" +\n",
+            "+                \"<dynamicLoadbalance algorithm=\\\"org.apache.synapse.endpoints.algorithms.RoundRobin\\\">\" +\n",
+            "+                \"<membershipHandler class=\\\"org.apache.synapse.core.axis2.Axis2LoadBalanceMembershipHandler\\\">\" +\n",
+            "+                \"<property name=\\\"applicationDomain\\\" value=\\\"foo\\\"/></membershipHandler></dynamicLoadbalance>\" +\n",
+            "+                \"</endpoint>\" ;\n",
+            "+\n",
+            "+        OMElement inputElement = createOMElement(inputXML);\n",
+            "+        DynamicLoadbalanceEndpoint endpoint =\n",
+            "+                (DynamicLoadbalanceEndpoint) DynamicLoadbalanceEndpointFactory.\n",
+            "+                        getEndpointFromElement(inputElement, true, null);\n",
+            "+\n",
+            "+        OMElement serializedOut = DynamicLoadbalanceEndpointSerializer.getElementFromEndpoint(endpoint);\n",
+            "+        assertTrue(compare(serializedOut,inputElement));\n",
+            "+    }\n",
+            "+\n",
+            "+    public void testDLBEndpointScenarioTwo() throws Exception {\n",
+            "+        String inputXML = \"<endpoint name=\\\"ep\\\" xmlns=\\\"http://ws.apache.org/ns/synapse\\\">\" +\n",
+            "+                \"<session type=\\\"soap\\\"/>\" +\n",
+            "+                \"<dynamicLoadbalance algorithm=\\\"org.apache.synapse.endpoints.algorithms.RoundRobin\\\">\" +\n",
+            "+                \"<membershipHandler class=\\\"org.apache.synapse.core.axis2.Axis2LoadBalanceMembershipHandler\\\">\" +\n",
+            "+                \"<property name=\\\"applicationDomain\\\" value=\\\"foo\\\"/></membershipHandler></dynamicLoadbalance>\" +\n",
+            "+                \"</endpoint>\" ;\n",
+            "+\n",
+            "+        OMElement inputElement = createOMElement(inputXML);\n",
+            "+        DynamicLoadbalanceEndpoint endpoint =\n",
+            "+                (DynamicLoadbalanceEndpoint) DynamicLoadbalanceEndpointFactory.\n",
+            "+                        getEndpointFromElement(inputElement, true, null);\n",
+            "+\n",
+            "+        OMElement serializedOut = DynamicLoadbalanceEndpointSerializer.getElementFromEndpoint(endpoint);\n",
+            "+        assertTrue(compare(serializedOut,inputElement));\n",
+            "+    }\n",
+            "+\n",
+            "+    public void testDLBEndpointScenarioThree() throws Exception {\n",
+            "+        String inputXML = \"<endpoint name=\\\"ep\\\" xmlns=\\\"http://ws.apache.org/ns/synapse\\\">\" +\n",
+            "+                \"<dynamicLoadbalance failover=\\\"false\\\" algorithm=\\\"org.apache.synapse.endpoints.algorithms.RoundRobin\\\">\" +\n",
+            "+                \"<membershipHandler class=\\\"org.apache.synapse.core.axis2.Axis2LoadBalanceMembershipHandler\\\">\" +\n",
+            "+                \"<property name=\\\"applicationDomain\\\" value=\\\"foo\\\"/></membershipHandler></dynamicLoadbalance>\" +\n",
+            "+                \"</endpoint>\" ;\n",
+            "+\n",
+            "+        OMElement inputElement = createOMElement(inputXML);\n",
+            "+        DynamicLoadbalanceEndpoint endpoint =\n",
+            "+                (DynamicLoadbalanceEndpoint) DynamicLoadbalanceEndpointFactory.\n",
+            "+                        getEndpointFromElement(inputElement, true, null);\n",
+            "+\n",
+            "+        OMElement serializedOut = DynamicLoadbalanceEndpointSerializer.getElementFromEndpoint(endpoint);\n",
+            "+        assertTrue(compare(serializedOut,inputElement));\n",
+            "+    }\n",
+            "+}\n"
+          ],
+          "locn": "-0,0 +1,76"
+        }
+      ],
+      "from": "java/modules/core/src/test/java/org/apache/synapse/config/xml/endpoints/DynamicLoadbalanceEndpointSerializationTest.java",
+      "to": "java/modules/core/src/test/java/org/apache/synapse/config/xml/endpoints/DynamicLoadbalanceEndpointSerializationTest.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "  *  specific language governing permissions and limitations\n",
+            "  *  under the License.\n",
+            "  */\n",
+            "+\n",
+            " package org.apache.synapse.core.axis2;\n",
+            " \n",
+            " import org.apache.axis2.clustering.ClusteringAgent;\n"
+          ],
+          "locn": "-16,6 +16,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2LoadBalanceMembershipHandler.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2LoadBalanceMembershipHandler.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                             getFirstChildWithName(new QName(SynapseConstants.SYNAPSE_NAMESPACE,\n",
+            "                                                             \"membershipHandler\"));\n",
+            "             if (eventHandler != null) {\n",
+            "-                String clazz =\n",
+            "-                        eventHandler.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE,\n",
+            "-                                                                 \"class\")).trim();\n",
+            "+                String clazz = eventHandler.getAttributeValue(new QName(\n",
+            "+                        XMLConfigConstants.NULL_NAMESPACE, \"class\"));\n",
+            "+                if (clazz == null) {\n",
+            "+                    handleException(\"class attribute is required on the membershipHandler element\");\n",
+            "+                } else {\n",
+            "+                    clazz = clazz.trim();\n",
+            "+                }\n",
+            "                 try {\n",
+            "                     LoadBalanceMembershipHandler lbMembershipHandler =\n",
+            "                             (LoadBalanceMembershipHandler) Class.forName(clazz).newInstance();\n"
+          ],
+          "locn": "-129,9 +129,13"
+        },
+        {
+          "lines": [
+            "                 } catch (Exception e) {\n",
+            "                     String msg = \"Could not instantiate \" +\n",
+            "                             \"LoadBalanceMembershipHandler implementation \" + clazz;\n",
+            "-                    log.error(msg, e);\n",
+            "-                    throw new SynapseException(msg, e);\n",
+            "+                    handleException(msg, e);\n",
+            "                 }\n",
+            "+            } else {\n",
+            "+                handleException(\"membershipHandler element is required\");\n",
+            "             }\n",
+            " \n",
+            "             processProperties(loadbalanceEndpoint, epConfig);\n"
+          ],
+          "locn": "-157,9 +161,10"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/DynamicLoadbalanceEndpointFactory.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/DynamicLoadbalanceEndpointFactory.java"
+    }
+  ],
+  "id": "1511904",
+  "message": "Adding a serialization test case for dynamic load balance endpoint",
+  "when": "2013-08-08T14:02:16-04:00",
+  "who": "hiranya"
+}

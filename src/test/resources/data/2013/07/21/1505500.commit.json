@@ -1,0 +1,453 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import junit.framework.TestSuite;\n",
+            " import org.apache.commons.logging.Log;\n",
+            " import org.apache.commons.logging.LogFactory;\n",
+            "+import org.apache.synapse.samples.framework.tests.Sample250;\n",
+            " import org.apache.synapse.samples.framework.tests.advanced.*;\n",
+            " import org.apache.synapse.samples.framework.tests.endpoint.*;\n",
+            " import org.apache.synapse.samples.framework.tests.message.*;\n"
+          ],
+          "locn": "-22,6 +22,7"
+        },
+        {
+          "lines": [
+            "         sampleClassRepo.put(\"156\", Sample156.class);\n",
+            "         sampleClassRepo.put(\"157\", Sample157.class);\n",
+            " \n",
+            "+        //Transport switching\n",
+            "+        sampleClassRepo.put(\"250\", Sample250.class);\n",
+            "+\n",
+            "         //Advanced\n",
+            "         sampleClassRepo.put(\"350\", Sample350.class);\n",
+            "         sampleClassRepo.put(\"351\", Sample351.class);\n"
+          ],
+          "locn": "-203,6 +204,9"
+        }
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                     SampleConfigConstants.TAG_BE_SERVER_CONF_AXIS2_HTTP_PORT);\n",
+            "             String axis2HttpsPort = axis2Properties.getProperty(\n",
+            "                     SampleConfigConstants.TAG_BE_SERVER_CONF_AXIS2_HTTPS_PORT);\n",
+            "+            String counterEnabled = axis2Properties.getProperty(\n",
+            "+                    SampleConfigConstants.TAG_BE_SERVER_CONF_AXIS2_COUNTER_ENABLED);\n",
+            " \n",
+            "             configuration.getAxis2Config(serverName).setServerName(serverName);\n",
+            " \n"
+          ],
+          "locn": "-356,6 +356,8"
+        },
+        {
+          "lines": [
+            " \n",
+            "             configuration.getAxis2Config(serverName).setHttpPort(axis2HttpPort);\n",
+            "             configuration.getAxis2Config(serverName).setHttpsPort(axis2HttpsPort);\n",
+            "+            if (Boolean.parseBoolean(counterEnabled)) {\n",
+            "+                configuration.getAxis2Config(serverName).setCounterEnabled(true);\n",
+            "+            }\n",
+            " \n",
+            "             backendServerControllers.add(new Axis2BackEndServerController(serverName,\n",
+            "                     configuration.getAxis2Config(serverName)));\n"
+          ],
+          "locn": "-377,6 +379,9"
+        }
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SynapseTestCase.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     private QueueSession session;\n",
+            "     private QueueSender sender;\n",
+            " \n",
+            "-    public void connect(String destName) throws Exception {\n",
+            "+    public void connect(String destination) throws Exception {\n",
+            " \n",
+            "         Properties env = new Properties();\n",
+            "-        //String factoryURL = System.getProperty(\"java.naming.factory.url.pkgs\");\n",
+            "         String connectionFactoryName = \"ConnectionFactory\";\n",
+            " \n",
+            "         if (System.getProperty(\"java.naming.provider.url\") == null) {\n"
+          ],
+          "locn": "-33,10 +33,9"
+        },
+        {
+          "lines": [
+            "             env.put(\"java.naming.factory.initial\",\n",
+            "                 \"org.apache.activemq.jndi.ActiveMQInitialContextFactory\");\n",
+            "         }\n",
+            "-        if (connectionFactoryName != null) {\n",
+            "-            env.put(\"transport.jms.ConnectionFactoryJNDIName\", connectionFactoryName);\n",
+            "-        }\n",
+            "-        \n",
+            "+        env.put(\"transport.jms.ConnectionFactoryJNDIName\", connectionFactoryName);\n",
+            "+\n",
+            "         InitialContext ic = new InitialContext(env);\n",
+            "-        QueueConnectionFactory confac = (QueueConnectionFactory) ic.lookup(\"ConnectionFactory\");\n",
+            "+        QueueConnectionFactory confac = (QueueConnectionFactory) ic.lookup(connectionFactoryName);\n",
+            "         connection = confac.createQueueConnection();\n",
+            "         session = connection.createQueueSession(false, QueueSession.AUTO_ACKNOWLEDGE);\n",
+            "-        sender = session.createSender((Queue)ic.lookup(destName));\n",
+            "+        sender = session.createSender((Queue)ic.lookup(destination));\n",
+            "     }\n",
+            " \n",
+            "     public void shutdown() throws Exception {\n"
+          ],
+          "locn": "-46,15 +45,13"
+        },
+        {
+          "lines": [
+            "         return bytes;\n",
+            "     }\n",
+            " \n",
+            "-    public static double getRandom(double base, double variance, boolean positiveOnly) {\n",
+            "+    private double getRandom(double base, double variance, boolean positiveOnly) {\n",
+            "         double rand = Math.random();\n",
+            "         return (base + ((rand > 0.5 ? 1 : -1) * variance * base * rand))\n",
+            "             * (positiveOnly ? 1 : (rand > 0.5 ? 1 : -1));\n",
+            "     }\n",
+            " \n",
+            "-    public void sendAsPox(String param) throws Exception{\n",
+            "-                 sendTextMessage(\n",
+            "-                    \"<m:placeOrder xmlns:m=\\\"http://services.samples\\\">\\n\" +\n",
+            "-                    \"    <m:order>\\n\" +\n",
+            "-                    \"        <m:price>\" + getRandom(100, 0.9, true) + \"</m:price>\\n\" +\n",
+            "-                    \"        <m:quantity>\" + (int) getRandom(10000, 1.0, true) + \"</m:quantity>\\n\" +\n",
+            "-                    \"        <m:symbol>\" + param + \"</m:symbol>\\n\" +\n",
+            "-                    \"    </m:order>\\n\" +\n",
+            "-                    \"</m:placeOrder>\");\n",
+            "+    public void sendAsPox(String symbol) throws Exception {\n",
+            "+        sendTextMessage(\n",
+            "+                \"<m:placeOrder xmlns:m=\\\"http://services.samples\\\">\\n\" +\n",
+            "+                \"    <m:order>\\n\" +\n",
+            "+                \"        <m:price>\" + getRandom(100, 0.9, true) + \"</m:price>\\n\" +\n",
+            "+                \"        <m:quantity>\" + (int) getRandom(10000, 1.0, true) + \"</m:quantity>\\n\" +\n",
+            "+                \"        <m:symbol>\" + symbol + \"</m:symbol>\\n\" +\n",
+            "+                \"    </m:order>\\n\" +\n",
+            "+                \"</m:placeOrder>\");\n",
+            "     }\n",
+            " \n",
+            " }\n"
+          ],
+          "locn": "-98,21 +95,21"
+        }
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/JMSSampleClient.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/clients/JMSSampleClient.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "+package org.apache.synapse.samples.framework.tests;\n",
+            "+\n",
+            "+import org.apache.synapse.samples.framework.Axis2BackEndServerController;\n",
+            "+import org.apache.synapse.samples.framework.BackEndServerController;\n",
+            "+import org.apache.synapse.samples.framework.SynapseTestCase;\n",
+            "+import org.apache.synapse.samples.framework.clients.JMSSampleClient;\n",
+            "+\n",
+            "+import java.util.List;\n",
+            "+\n",
+            "+public class Sample250 extends SynapseTestCase {\n",
+            "+\n",
+            "+    public Sample250() {\n",
+            "+        super(250);\n",
+            "+    }\n",
+            "+\n",
+            "+    public void testPlaceOrder() throws Exception {\n",
+            "+        List<BackEndServerController> servers = getBackendServerControllers();\n",
+            "+        Axis2BackEndServerController axis2Server = null;\n",
+            "+        for (BackEndServerController server : servers) {\n",
+            "+            if (server instanceof Axis2BackEndServerController) {\n",
+            "+                axis2Server = (Axis2BackEndServerController) server;\n",
+            "+                break;\n",
+            "+            }\n",
+            "+        }\n",
+            "+        if (axis2Server == null) {\n",
+            "+            fail(\"Failed to load the Axis2BackEndServerController\");\n",
+            "+        }\n",
+            "+\n",
+            "+        assertEquals(0, axis2Server.getMessageCount(\"SimpleStockQuoteService\", \"placeOrder\"));\n",
+            "+        JMSSampleClient client = new JMSSampleClient();\n",
+            "+        client.connect(\"dynamicQueues/StockQuoteProxy\");\n",
+            "+        client.sendAsPox(\"IBM\");\n",
+            "+        Thread.sleep(2000);\n",
+            "+        assertEquals(1, axis2Server.getMessageCount(\"SimpleStockQuoteService\", \"placeOrder\"));\n",
+            "+        client.shutdown();\n",
+            "+    }\n",
+            "+}\n"
+          ],
+          "locn": "-0,0 +1,37"
+        }
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/Sample250.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/Sample250.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "+package org.apache.synapse.samples.framework;\n",
+            "+\n",
+            "+import org.apache.axis2.AxisFault;\n",
+            "+import org.apache.axis2.context.MessageContext;\n",
+            "+import org.apache.axis2.handlers.AbstractHandler;\n",
+            "+\n",
+            "+import java.util.HashMap;\n",
+            "+import java.util.Map;\n",
+            "+import java.util.concurrent.atomic.AtomicInteger;\n",
+            "+\n",
+            "+public class MessageCounter extends AbstractHandler {\n",
+            "+\n",
+            "+    private Map<String,AtomicInteger> counter = new HashMap<String, AtomicInteger>();\n",
+            "+\n",
+            "+    public InvocationResponse invoke(MessageContext msgContext) throws AxisFault {\n",
+            "+        String service = \"_anon_\";\n",
+            "+        String operation = \"_anon_\";\n",
+            "+        if (msgContext.getAxisService() != null) {\n",
+            "+            service = msgContext.getAxisService().getName();\n",
+            "+        }\n",
+            "+        if (msgContext.getAxisOperation() != null) {\n",
+            "+            operation = msgContext.getAxisOperation().getName().getLocalPart();\n",
+            "+        }\n",
+            "+        String key = getKey(service, operation);\n",
+            "+        synchronized (this) {\n",
+            "+            if (counter.containsKey(key)) {\n",
+            "+                counter.get(key).incrementAndGet();\n",
+            "+            } else {\n",
+            "+                counter.put(key, new AtomicInteger(1));\n",
+            "+            }\n",
+            "+        }\n",
+            "+\n",
+            "+        return InvocationResponse.CONTINUE;\n",
+            "+    }\n",
+            "+\n",
+            "+    public int getCount(String service, String operation) {\n",
+            "+        String key = getKey(service, operation);\n",
+            "+        synchronized (this) {\n",
+            "+            if (counter.containsKey(key)) {\n",
+            "+                return counter.get(key).get();\n",
+            "+            }\n",
+            "+        }\n",
+            "+        return 0;\n",
+            "+    }\n",
+            "+\n",
+            "+    private String getKey(String service, String operation) {\n",
+            "+        return service + \":\" + operation;\n",
+            "+    }\n",
+            "+\n",
+            "+}\n"
+          ],
+          "locn": "-0,0 +1,50"
+        }
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/MessageCounter.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/MessageCounter.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     public static final String TAG_BE_SERVER_CONF_AXIS2_XML = \"axis2Xml\";\n",
+            "     public static final String TAG_BE_SERVER_CONF_AXIS2_HTTP_PORT = \"httpPort\";\n",
+            "     public static final String TAG_BE_SERVER_CONF_AXIS2_HTTPS_PORT = \"httpsPort\";\n",
+            "+    public static final String TAG_BE_SERVER_CONF_AXIS2_COUNTER_ENABLED = \"counterEnabled\";\n",
+            " \n",
+            "     public static final String TAG_BE_SERVER_CONF_JMS_PROVIDER_URL = \"providerURL\";\n",
+            "     public static final String TAG_BE_SERVER_CONF_JMS_INITIAL_NAMING_FACTORY = \"initialNamingFactory\";\n"
+          ],
+          "locn": "-42,6 +42,7"
+        }
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SampleConfigConstants.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/SampleConfigConstants.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     private String httpPort;\n",
+            "     private String httpsPort;\n",
+            "     private boolean clusteringEnabled;\n",
+            "+    private boolean counterEnabled;\n",
+            " \n",
+            "     public String getServerName() {\n",
+            "         return serverName;\n"
+          ],
+          "locn": "-27,6 +27,7"
+        },
+        {
+          "lines": [
+            "     public void setClusteringEnabled(boolean clusteringEnabled) {\n",
+            "         this.clusteringEnabled = clusteringEnabled;\n",
+            "     }\n",
+            "+\n",
+            "+    public boolean isCounterEnabled() {\n",
+            "+        return counterEnabled;\n",
+            "+    }\n",
+            "+\n",
+            "+    public void setCounterEnabled(boolean counterEnabled) {\n",
+            "+        this.counterEnabled = counterEnabled;\n",
+            "+    }\n",
+            " }\n"
+          ],
+          "locn": "-75,4 +76,12"
+        }
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/Axis2ServerConfiguration.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/config/Axis2ServerConfiguration.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.axis2.context.ConfigurationContextFactory;\n",
+            " import org.apache.axis2.description.TransportInDescription;\n",
+            " import org.apache.axis2.engine.ListenerManager;\n",
+            "+import org.apache.axis2.engine.Phase;\n",
+            "+import org.apache.axis2.phaseresolver.PhaseMetadata;\n",
+            " import org.apache.commons.logging.Log;\n",
+            " import org.apache.commons.logging.LogFactory;\n",
+            " import org.apache.synapse.samples.framework.config.Axis2ServerConfiguration;\n",
+            " \n",
+            "+import java.util.List;\n",
+            " import java.util.concurrent.CountDownLatch;\n",
+            " \n",
+            " /**\n"
+          ],
+          "locn": "-6,10 +6,13"
+        },
+        {
+          "lines": [
+            "     private Axis2ServerConfiguration configuration;\n",
+            "     private CountDownLatch cdLatch;\n",
+            "     private Exception processException;\n",
+            "+    private MessageCounter counter;\n",
+            " \n",
+            "     public Axis2BackEndServerController(String serverName,\n",
+            "                                         Axis2ServerConfiguration configuration) {\n"
+          ],
+          "locn": "-27,6 +30,7"
+        },
+        {
+          "lines": [
+            " \n",
+            "     public boolean stop() {\n",
+            "         if (serverThread.isRunning) {\n",
+            "+            counter = null;\n",
+            "             serverThread.isRunning = false;\n",
+            "             try {\n",
+            "                 cdLatch = new CountDownLatch(1);\n"
+          ],
+          "locn": "-61,6 +65,7"
+        },
+        {
+          "lines": [
+            "         return true;\n",
+            "     }\n",
+            " \n",
+            "+    public int getMessageCount(String service, String operation) {\n",
+            "+        if (counter != null) {\n",
+            "+            return counter.getCount(service, operation);\n",
+            "+        }\n",
+            "+        return -1;\n",
+            "+    }\n",
+            "+\n",
+            "     class BackEndServerThread extends Thread {\n",
+            " \n",
+            "         public boolean isRunning = false;\n"
+          ],
+          "locn": "-72,6 +77,13"
+        },
+        {
+          "lines": [
+            "                     clusteringAgent.init();\n",
+            "                 }\n",
+            " \n",
+            "+                if (configuration.isCounterEnabled()) {\n",
+            "+                    log.info(\"Engaging server side message counter\");\n",
+            "+                    List<Phase> phases = configContext.getAxisConfiguration().getInFlowPhases();\n",
+            "+                    for (Phase phase : phases) {\n",
+            "+                        if (PhaseMetadata.PHASE_DISPATCH.equals(phase.getName())) {\n",
+            "+                            counter = new MessageCounter();\n",
+            "+                            phase.addHandler(counter);\n",
+            "+                            break;\n",
+            "+                        }\n",
+            "+                    }\n",
+            "+                }\n",
+            " \n",
+            "                 listenerManager.startSystem(configContext);\n",
+            "                 isRunning = true;\n"
+          ],
+          "locn": "-126,6 +138,17"
+        },
+        {
+          "lines": [
+            "             }\n",
+            "             cdLatch.countDown();\n",
+            " \n",
+            "-            log.info(\"ServerThread: Wait until test are finished\");\n",
+            "+            log.info(\"ServerThread: Wait until tests are finished\");\n",
+            "             while (isRunning) {\n",
+            "                 //wait\n",
+            "                 try {\n"
+          ],
+          "locn": "-135,7 +158,7"
+        }
+      ],
+      "from": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/Axis2BackEndServerController.java",
+      "to": "java/modules/integration/src/test/java/org/apache/synapse/samples/framework/Axis2BackEndServerController.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "+<synapseSample>\n",
+            "+    <sampleID>250</sampleID>\n",
+            "+    <sampleName>JMS to HTTP</sampleName>\n",
+            "+    <synapseConfig>\n",
+            "+        <!--if we don't specify the optional values, framework will use defaults-->\n",
+            "+        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>\n",
+            "+        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_jms.xml</axis2Xml>\n",
+            "+        <synapseXml>repository/conf/sample/synapse_sample_250.xml</synapseXml>\n",
+            "+    </synapseConfig>\n",
+            "+    <backEndServerConfig>\n",
+            "+        <jmsBroker id='0'>\n",
+            "+            <providerURL>tcp://localhost:61616</providerURL>\n",
+            "+            <initialNamingFactory>org.apache.activemq.jndi.ActiveMQInitialContextFactory</initialNamingFactory>\n",
+            "+        </jmsBroker>\n",
+            "+        <axis2Server id='1'>\n",
+            "+            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>\n",
+            "+            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>\n",
+            "+            <counterEnabled>true</counterEnabled>\n",
+            "+        </axis2Server>\n",
+            "+    </backEndServerConfig>\n",
+            "+    <clientConfig>\n",
+            "+        <clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>\n",
+            "+    </clientConfig>\n",
+            "+</synapseSample>\n"
+          ],
+          "locn": "-0,0 +1,24"
+        }
+      ],
+      "from": "java/modules/integration/src/test/resources/sample250.xml",
+      "to": "java/modules/integration/src/test/resources/sample250.xml"
+    }
+  ],
+  "id": "1505500",
+  "message": "Adding sample250 (JMS to HTTP switching) to the integration test suite.",
+  "when": "2013-07-21T19:05:04-04:00",
+  "who": "hiranya"
+}

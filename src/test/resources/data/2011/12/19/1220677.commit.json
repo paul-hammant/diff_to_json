@@ -1,0 +1,45 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                 warn(traceOn, \"Exception encountered but no fault handler found - \" +\n",
+            "                     \"message dropped\", synCtx);\n",
+            "             }\n",
+            "+            throw syne;\n",
+            "         } finally {\n",
+            "             StatisticsReporter.endReportForAllOnRequestProcessed(synCtx);\n",
+            "         }\n"
+          ],
+          "locn": "-189,6 +189,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/ProxyServiceMessageReceiver.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/ProxyServiceMessageReceiver.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "      * Returns the EndpointSerializer implementation for the given endpoint. Throws a SynapseException,\n",
+            "      * if there is no serializer for the given endpoint type.\n",
+            "      *\n",
+            "-     * @param endpoint Endpoint implementaion.\n",
+            "+     * @param endpoint Endpoint implementation.\n",
+            "      * @return EndpointSerializer implementation.\n",
+            "      */\n",
+            "     public static EndpointSerializer getEndpointSerializer(Endpoint endpoint) {\n"
+          ],
+          "locn": "-121,7 +121,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/EndpointSerializer.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/config/xml/endpoints/EndpointSerializer.java"
+    }
+  ],
+  "id": "1220677",
+  "message": "Fixing SYNAPSE-721",
+  "when": "2011-12-19T05:12:43-05:00",
+  "who": "hiranya"
+}

@@ -1,0 +1,41 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                 APIs provide a flexible and powerful approach for defining full fledged REST APIs\n",
+            "                 in Synapse. An API definition starts with the &lt;api&gt; element.\n",
+            "             </p>\n",
+            "-            <div class=\"xmlConf\">&lt;api name=\"string\" context=\"string\" [hostname=\"string\"][port=\"int\"]&gt;\n",
+            "+            <div class=\"xmlConf\">&lt;api name=\"string\" context=\"string\" [transport=\"http|https\"][hostname=\"string\"][port=\"int\"]&gt;\n",
+            "     &lt;resource [methods=\"http-method-list\"][inSequence=\"string\"][outSequence=\"string\"]\n",
+            "                 [faultSequence=\"string\"][url-mapping=\"string\"][uri-template=\"string\"]\n",
+            "                 [content-type=\"string\"][user-agent=\"str\"]&gt;\n"
+          ],
+          "locn": "-1470,7 +1470,7"
+        },
+        {
+          "lines": [
+            "                 attribute is used to define the URL context at which the REST API will be anchored\n",
+            "                 (eg: /ws, /foo/bar, /soap). The API will only receive requests that fall in the\n",
+            "                 specified URL context. In addition to that an API could be bound to a particular\n",
+            "-                host and a port using the 'hostname' and 'port' attributes.\n",
+            "+                host and a port using the 'hostname' and 'port' attributes. The 'transport' attribute\n",
+            "+                can be used to restrict the API to process either HTTP messages or HTTPS messages only.\n",
+            "             </p>\n",
+            "             <p>\n",
+            "                 An API must also contain one or more resources. Resources define how messages\n"
+          ],
+          "locn": "-1488,7 +1488,8"
+        }
+      ],
+      "from": "java/modules/documentation/src/site/xdoc/userguide/config.xml",
+      "to": "java/modules/documentation/src/site/xdoc/userguide/config.xml"
+    }
+  ],
+  "id": "1511548",
+  "message": "Updated the documentation regarding the new transport attribute in APIs",
+  "when": "2013-08-07T20:25:44-04:00",
+  "who": "hiranya"
+}

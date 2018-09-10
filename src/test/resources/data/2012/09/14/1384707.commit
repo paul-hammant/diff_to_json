@@ -1,0 +1,33 @@
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1384706)
++++ java/pom.xml	(revision 1384707)
+@@ -554,10 +554,6 @@
+                         <groupId>org.apache.woden</groupId>
+                         <artifactId>woden-api</artifactId>
+                     </exclusion>
+-                    <exclusion>
+-                        <groupId>xalan</groupId>
+-                        <artifactId>xalan</artifactId>
+-                    </exclusion>
+                 </exclusions>
+                 <type>mar</type>
+             </dependency>
+Index: java/modules/distribution/src/main/assembly/bin.xml
+===================================================================
+--- java/modules/distribution/src/main/assembly/bin.xml	(revision 1384706)
++++ java/modules/distribution/src/main/assembly/bin.xml	(revision 1384707)
+@@ -188,7 +188,6 @@
+                 <exclude>xerces:xercesImpl:jar</exclude>
+                 <exclude>org.apache.xerces:xercesImpl</exclude> <!-- Find the source of this -->
+                 <exclude>org.apache.xerces:xml-apis</exclude>
+-                <exclude>xalan:xalan:jar</exclude>
+                 <exclude>quickfixj:quickfixj-all:jar</exclude>
+                 <exclude>org.snmp4j:snmp4j</exclude>
+                 <exclude>org.snmp4j:snmp4j-agent</exclude>
+-*-*-*-
+Message: Fixed sample 156: WSS4J seems to require Xalan, so include it in the distribution.
+-*-*-*-
+When: 2012-09-14 06:07:09 -0400 
+-*-*-*-
+Who: veithen

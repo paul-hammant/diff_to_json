@@ -1,0 +1,431 @@
+Index: java/modules/core/src/test/resources/synapse-libraries/SynapseTestLibrary.zip
+===================================================================
+Cannot display: file marked as a binary type.
+svn:mime-type = application/octet-stream
+Index: java/modules/core/src/test/resources/synapse-libraries/SynapseTestLibrary.zip
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/SynapseTestLibrary.zip	(revision 1329741)
++++ java/modules/core/src/test/resources/synapse-libraries/SynapseTestLibrary.zip	(nonexistent)
+
+Property changes on: java/modules/core/src/test/resources/synapse-libraries/SynapseTestLibrary.zip
+___________________________________________________________________
+Deleted: svn:executable
+## -1 +0,0 ##
+-*
+\ No newline at end of property
+Deleted: svn:mime-type
+## -1 +0,0 ##
+-application/octet-stream
+\ No newline at end of property
+Index: java/modules/core/src/test/resources/synapse-libraries/assembly/assemble-lib.xml
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/assembly/assemble-lib.xml	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/assembly/assemble-lib.xml	(revision 1329742)
+@@ -0,0 +1,23 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<assembly>
++    <formats>
++        <format>zip</format>
++    </formats>
++    <includeBaseDirectory>false</includeBaseDirectory>
++    <fileSets>
++        <fileSet>
++            <directory>src/test/resources/synapse-libraries/skeleton</directory>
++            <outputDirectory></outputDirectory>
++        </fileSet>
++        <fileSet>
++            <directory>target/classes</directory>
++            <outputDirectory></outputDirectory>
++            <excludes>
++                <exclude>**/metrics_module.xml</exclude>
++                <exclude>**/META-INF/*</exclude>
++            </excludes>
++        </fileSet>
++    </fileSets>
++    
++    
++</assembly>
+
+Property changes on: java/modules/core/src/test/resources/synapse-libraries/assembly/assemble-lib.xml
+___________________________________________________________________
+Added: svn:executable
+## -0,0 +1 ##
++*
+\ No newline at end of property
+Index: java/modules/core/src/test/resources/synapse-libraries/assembly/filter.properties
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/assembly/filter.properties	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/assembly/filter.properties	(revision 1329742)
+@@ -0,0 +1,3 @@
++product.name=Apache Synapse
++product.version=2.2.0-SNAPSHOT
++
+Index: java/modules/core/src/test/resources/synapse-libraries/skeleton/artifacts.xml
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/skeleton/artifacts.xml	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/skeleton/artifacts.xml	(revision 1329742)
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<artifacts>
++    <artifact name="SynapseLinkedinLib" package="org.apache.synapse.linkedin" >
++        <dependency artifact="linkedin_core" />
++        <description>synapse library for Linkedin</description>
++    </artifact>
++</artifacts>
+
+Property changes on: java/modules/core/src/test/resources/synapse-libraries/skeleton/artifacts.xml
+___________________________________________________________________
+Added: svn:executable
+## -0,0 +1 ##
++*
+\ No newline at end of property
+Index: java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/register_user.xml
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/register_user.xml	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/register_user.xml	(revision 1329742)
+@@ -0,0 +1,14 @@
++<template xmlns="http://ws.apache.org/ns/synapse" name="register_user">
++        <parameter name="oauth.consumerKey"/>
++        <parameter name="oauth.consumerSecret"/>
++        <parameter name="oauth.accessToken"/>
++        <parameter name="oauth.accessTokenSecret"/>
++        <parameter name="profile.id"/>
++        <sequence>
++            	<log level="full">
++			<property name="Linkedin sample operation" expression="$func:profile.id" />
++		</log>
++		<!--use a Log mediator just for testing for the Test Lib -->
++		<class name="org.apache.synapse.mediators.builtin.LogMediator" />
++        </sequence>
++    </template>	
+
+Property changes on: java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/register_user.xml
+___________________________________________________________________
+Added: svn:executable
+## -0,0 +1 ##
++*
+\ No newline at end of property
+Index: java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/post_status.xml
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/post_status.xml	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/post_status.xml	(revision 1329742)
+@@ -0,0 +1,10 @@
++<template xmlns="http://ws.apache.org/ns/synapse" name="post_status">
++        <parameter name="status"/>
++        <sequence>
++            	<log level="full">
++			<property name="Linkedin sample operation" expression="$func:status" />
++		</log>
++		<!--use a Log mediator just for testing for the Test Lib -->
++		<class name="org.apache.synapse.mediators.builtin.LogMediator" />
++        </sequence>
++    </template>	
+
+Property changes on: java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/post_status.xml
+___________________________________________________________________
+Added: svn:executable
+## -0,0 +1 ##
++*
+\ No newline at end of property
+Index: java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/show_headline.xml
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/show_headline.xml	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/show_headline.xml	(revision 1329742)
+@@ -0,0 +1,10 @@
++<template xmlns="http://ws.apache.org/ns/synapse" name="show_headline">
++        <parameter name="id"/>
++        <sequence>
++            	<log level="full">
++			<property name="Linkedin sample operation" expression="$func:id" />
++		</log>
++		<!--use a Log mediator just for testing for the Test Lib -->
++		<class name="org.apache.synapse.mediators.builtin.LogMediator" />
++        </sequence>
++    </template>	
+
+Property changes on: java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/show_headline.xml
+___________________________________________________________________
+Added: svn:executable
+## -0,0 +1 ##
++*
+\ No newline at end of property
+Index: java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/artifact.xml
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/artifact.xml	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/artifact.xml	(revision 1329742)
+@@ -0,0 +1,23 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<artifact name="linkedin_core" type="synapse/template" >
++
++    <subArtifacts> 
++	<artifact name="post_status">
++    		<file>post_status.xml</file>
++    		<description>sample synapse library</description>
++	</artifact>
++	<artifact name="show_headline">
++    		<file>show_headline.xml</file>
++    		<description>sample synapse library</description>
++	</artifact>
++	<artifact name="send_message">
++    		<file>send_message.xml</file>
++    		<description>sample synapse library</description>
++	</artifact>
++	<artifact name="register_user">
++    		<file>register_user.xml</file>
++    		<description>sample synapse library</description>
++	</artifact>
++    </subArtifacts>
++    
++</artifact>
+
+Property changes on: java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/artifact.xml
+___________________________________________________________________
+Added: svn:executable
+## -0,0 +1 ##
++*
+\ No newline at end of property
+Index: java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/send_message.xml
+===================================================================
+--- java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/send_message.xml	(nonexistent)
++++ java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/send_message.xml	(revision 1329742)
+@@ -0,0 +1,12 @@
++<template xmlns="http://ws.apache.org/ns/synapse" name="send_message">
++        <parameter name="idList"/>
++        <parameter name="subject"/>
++        <parameter name="message"/>
++        <sequence>
++            	<log level="full">
++			<property name="Linkedin sample operation" expression="$func:idList" />
++		</log>
++		<!--use a Log mediator just for testing for the Test Lib -->
++		<class name="org.apache.synapse.mediators.builtin.LogMediator" />
++        </sequence>
++    </template>	
+
+Property changes on: java/modules/core/src/test/resources/synapse-libraries/skeleton/linkedin_core/send_message.xml
+___________________________________________________________________
+Added: svn:executable
+## -0,0 +1 ##
++*
+\ No newline at end of property
+Index: java/modules/core/src/test/java/org/apache/synapse/libraries/LibImportTest.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/libraries/LibImportTest.java	(revision 1329741)
++++ java/modules/core/src/test/java/org/apache/synapse/libraries/LibImportTest.java	(revision 1329742)
+@@ -24,6 +24,9 @@
+ import org.apache.synapse.libraries.util.LibDeployerUtils;
+ import org.apache.synapse.libraries.util.LibDeployerUtilsTest;
+ 
++import java.io.File;
++import java.net.URISyntaxException;
++
+ /**
+  * Created by IntelliJ IDEA.
+  * User: charitha
+@@ -31,12 +34,11 @@
+  * Time: 4:38 PM
+  * To change this template use File | Settings | File Templates.
+  */
+-public abstract class LibImportTest extends TestCase {
++public class LibImportTest extends AbstractLibTestCase {
+ 
+ 
+-/*
+-    public void testValidImports() {
+-        Library library = LibDeployerUtils.createSynapseLibrary(LibDeployerUtilsTest.class.getResource("/synapse-libraries/SynapseTestLibrary.zip").getPath());
++    public void testValidImports() throws URISyntaxException {
++        Library library = LibDeployerUtils.createSynapseLibrary(getResourcePath());
+         SynapseImport validSynImport = new SynapseImport();
+         validSynImport.setLibName("SynapseLinkedinLib");
+         validSynImport.setLibPackage("org.apache.synapse.linkedin");
+@@ -61,7 +63,7 @@
+     }
+ 
+     public void testInValidImportsCaseOne() {
+-        Library library = LibDeployerUtils.createSynapseLibrary(LibDeployerUtilsTest.class.getResource("/synapse-libraries/SynapseTestLibrary.zip").getPath());
++        Library library = LibDeployerUtils.createSynapseLibrary(getResourcePath());
+         SynapseImport invalidSynImport = new SynapseImport();
+         invalidSynImport.setLibName("testSynapseLinkedinLib");
+         invalidSynImport.setLibPackage("org.apache.synapse.linkedin");
+@@ -74,7 +76,7 @@
+     }
+ 
+     public void testInValidImportsCaseTwo() {
+-        Library library = LibDeployerUtils.createSynapseLibrary(LibDeployerUtilsTest.class.getResource("/synapse-libraries/SynapseTestLibrary.zip").getPath());
++        Library library = LibDeployerUtils.createSynapseLibrary(getResourcePath());
+         SynapseImport invalidSynImport = new SynapseImport();
+         invalidSynImport.setLibName("SynapseLinkedinLib");
+         invalidSynImport.setLibPackage("test.org.apache.synapse.linkedin");
+@@ -87,7 +89,7 @@
+     }
+ 
+     public void testInValidImportsCaseThree() {
+-        Library library = LibDeployerUtils.createSynapseLibrary(LibDeployerUtilsTest.class.getResource("/synapse-libraries/SynapseTestLibrary.zip").getPath());
++        Library library = LibDeployerUtils.createSynapseLibrary(getResourcePath());
+         SynapseImport invalidSynImport = new SynapseImport();
+         invalidSynImport.setLibName("testSynapseLinkedinLib");
+         invalidSynImport.setLibPackage("test.org.apache.synapse.linkedin");
+@@ -98,6 +100,5 @@
+         assertEquals("org.apache.synapse.linkedin", library.getPackage());
+         assertNull(library.getArtifact("org.apache.synapse.linkedin.post_status"));
+     }
+-*/
+ 
+ }
+Index: java/modules/core/src/test/java/org/apache/synapse/libraries/AbstractLibTestCase.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/libraries/AbstractLibTestCase.java	(nonexistent)
++++ java/modules/core/src/test/java/org/apache/synapse/libraries/AbstractLibTestCase.java	(revision 1329742)
+@@ -0,0 +1,40 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++package org.apache.synapse.libraries;
++
++import junit.framework.TestCase;
++import org.apache.synapse.libraries.util.LibDeployerUtilsTest;
++
++import java.io.File;
++import java.net.URISyntaxException;
++
++public abstract class AbstractLibTestCase extends TestCase {
++    public String path = null;
++
++    protected String getResourcePath() {
++        try {
++            if (path == null) {
++                path = new File("./target/test_repos/synapse/synapse-libraries/synapse-test-lib.zip").getAbsolutePath();
++            }
++        } catch (Exception e) {
++            return null;
++        }
++        return path;
++    }
++}
+Index: java/modules/core/src/test/java/org/apache/synapse/libraries/util/LibDeployerUtilsTest.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/libraries/util/LibDeployerUtilsTest.java	(revision 1329741)
++++ java/modules/core/src/test/java/org/apache/synapse/libraries/util/LibDeployerUtilsTest.java	(revision 1329742)
+@@ -18,11 +18,10 @@
+  */
+ package org.apache.synapse.libraries.util;
+ 
+-import junit.framework.TestCase;
++import org.apache.synapse.libraries.AbstractLibTestCase;
+ import org.apache.synapse.libraries.model.Library;
+ 
+ import javax.xml.namespace.QName;
+-import java.net.URL;
+ 
+ /**
+  * Created by IntelliJ IDEA.
+@@ -31,14 +30,12 @@
+  * Time: 4:54 PM
+  * To change this template use File | Settings | File Templates.
+  */
+-public abstract class LibDeployerUtilsTest extends TestCase {
++public class LibDeployerUtilsTest extends AbstractLibTestCase {
+ 
+-/*
+     String path;
+ 
+     public void setUp() {
+-        URL resource = LibDeployerUtilsTest.class.getResource("/synapse-libraries/SynapseTestLibrary.zip");
+-        path = resource.getPath();
++        path = getResourcePath();
+     }
+ 
+     public void testCreateSynapseLibrary() {
+@@ -49,6 +46,5 @@
+         assertEquals("org.apache.synapse.linkedin", library.getPackage());
+         assertEquals("synapse library for Linkedin", library.getDescription());
+     }
+-*/
+ 
+ }
+Index: java/modules/core/pom.xml
+===================================================================
+--- java/modules/core/pom.xml	(revision 1329741)
++++ java/modules/core/pom.xml	(revision 1329742)
+@@ -75,6 +75,32 @@
+ 
+             <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
++                <artifactId>maven-assembly-plugin</artifactId>
++                <executions>
++                    <execution>
++                        <id>test-library-assembly</id>
++                        <phase>generate-test-resources</phase>
++                        <goals>
++                            <goal>attached</goal>
++                        </goals>
++                        <configuration>
++                            <finalName>synapse-test-lib</finalName>	
++                            <filters>
++                                <filter>
++                                    ${basedir}/src/test/resources/synapse-libraries/assembly/filter.properties
++                                </filter>
++                            </filters>
++                            <descriptors>
++                                <descriptor>src/test/resources/synapse-libraries/assembly/assemble-lib.xml
++                                </descriptor>
++                            </descriptors>
++                        </configuration>
++                    </execution>
++                </executions>
++            </plugin>
++
++            <plugin>
++                <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-antrun-plugin</artifactId>
+                 <executions>
+                     <execution>
+@@ -87,6 +113,8 @@
+                                 <mkdir dir="target/test_repos/synapse/modules"/>
+                                 <mkdir dir="target/test_repos/synapse/services"/>
+                                 <mkdir dir="target/test_repos/client/modules"/>
++                                <mkdir dir="target/test_repos/synapse/synapse-libraries"/>
++                                <copy file="target/synapse-test-lib.zip" todir="target/test_repos/synapse/synapse-libraries"/>
+                             </tasks>
+                         </configuration>
+                         <goals>
+@@ -93,6 +121,18 @@
+                             <goal>run</goal>
+                         </goals>
+                     </execution>
++                    <execution>
++                        <id>remove_test_lib</id>
++                        <phase>install</phase>
++                        <configuration>
++                            <tasks>
++                                <delete file="target/synapse-test-lib.zip"/>
++                            </tasks>
++                        </configuration>
++                        <goals>
++                            <goal>run</goal>
++                        </goals>
++                    </execution>
+                 </executions>
+             </plugin>
+             <plugin>
+-*-*-*-
+Message: fixing synapse tests cases for Synapse libraries
+-*-*-*-
+When: 2012-04-24 10:35:29 -0400 
+-*-*-*-
+Who: uswick

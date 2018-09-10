@@ -1,0 +1,187 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                 <exclude>javax.servlet:servlet-api:jar</exclude>\r\n",
+            "                 <exclude>xml-apis:xml-apis:jar</exclude>\r\n",
+            "                 <exclude>xerces:xercesImpl:jar</exclude>\r\n",
+            "-                <exclude>org.apache.xerces:xercesImpl</exclude> <!-- Find the source of this -->\r\n",
+            "-                <exclude>org.apache.xerces:xml-apis</exclude>\r\n",
+            "-                <exclude>quickfixj:quickfixj-all:jar</exclude>\r\n",
+            "+                <exclude>org.quickfixj:quickfixj-*:jar</exclude>\r\n",
+            "                 <exclude>org.snmp4j:snmp4j</exclude>\r\n",
+            "                 <exclude>org.snmp4j:snmp4j-agent</exclude>\r\n",
+            "                 <exclude>com.rabbitmq:amqp-client:jar</exclude>\r\n"
+          ],
+          "locn": "-185,9 +185,7"
+        }
+      ],
+      "from": "java/modules/distribution/src/main/assembly/bin.xml",
+      "to": "java/modules/distribution/src/main/assembly/bin.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " <?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+            " <assembly>\n",
+            "+    <id>eiptest-lib</id>\n",
+            "     <formats>\n",
+            "         <format>zip</format>\n",
+            "     </formats>\n"
+          ],
+          "locn": "-1,5 +1,6"
+        }
+      ],
+      "from": "java/modules/core/src/test/resources/synapse-libraries/assembly/assemble-eiptest-lib.xml",
+      "to": "java/modules/core/src/test/resources/synapse-libraries/assembly/assemble-eiptest-lib.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " <?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+            " <assembly>\n",
+            "+    <id>test-lib</id>\n",
+            "     <formats>\n",
+            "         <format>zip</format>\n",
+            "     </formats>\n"
+          ],
+          "locn": "-1,5 +1,6"
+        }
+      ],
+      "from": "java/modules/core/src/test/resources/synapse-libraries/assembly/assemble-lib.xml",
+      "to": "java/modules/core/src/test/resources/synapse-libraries/assembly/assemble-lib.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " <?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+            " <assembly>\n",
+            "+    <id>eipcore-lib</id>\n",
+            "     <formats>\n",
+            "         <format>zip</format>\n",
+            "     </formats>\n"
+          ],
+          "locn": "-1,5 +1,6"
+        }
+      ],
+      "from": "java/modules/core/src/test/resources/synapse-libraries/assembly/assemble-eipcore-lib.xml",
+      "to": "java/modules/core/src/test/resources/synapse-libraries/assembly/assemble-eipcore-lib.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             if (entry.getName().startsWith(\"META-INF/\")) {\n",
+            "                 continue;\n",
+            "             }\n",
+            "-            // if the entry is a directory, create a new dir\n",
+            "+            // Skip directories\n",
+            "             if (entry.isDirectory()) {\n",
+            "-                createDir(destPath + entry.getName());\n",
+            "                 continue;\n",
+            "             }\n",
+            "-            // if the entry is a file, write the file\n",
+            "+            File dest = new File(destPath, entry.getName());\n",
+            "+            dest.getParentFile().mkdirs();\n",
+            "             copyInputStream(zipFile.getInputStream(entry),\n",
+            "-                            new BufferedOutputStream(new FileOutputStream(destPath + entry.getName())));\n",
+            "+                            new BufferedOutputStream(new FileOutputStream(dest)));\n",
+            "         }\n",
+            "         zipFile.close();\n",
+            "     }\n"
+          ],
+          "locn": "-434,14 +434,14"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/libraries/util/LibDeployerUtils.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/libraries/util/LibDeployerUtils.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                             <goal>attached</goal>\n",
+            "                         </goals>\n",
+            "                         <configuration>\n",
+            "-                            <finalName>synapse-test-lib</finalName>\t\n",
+            "+                            <finalName>synapse</finalName>\t\n",
+            "                             <filters>\n",
+            "                                 <filter>\n",
+            "                                     ${basedir}/src/test/resources/synapse-libraries/assembly/filter.properties\n"
+          ],
+          "locn": "-84,7 +84,7"
+        },
+        {
+          "lines": [
+            "                             <goal>attached</goal>\n",
+            "                         </goals>\n",
+            "                         <configuration>\n",
+            "-                            <finalName>synapse-eiptest-lib</finalName>\n",
+            "+                            <finalName>synapse</finalName>\n",
+            "                             <filters>\n",
+            "                                 <filter>\n",
+            "                                     ${basedir}/src/test/resources/synapse-libraries/assembly/filter.properties\n"
+          ],
+          "locn": "-103,7 +103,7"
+        },
+        {
+          "lines": [
+            "                             <goal>attached</goal>\n",
+            "                         </goals>\n",
+            "                         <configuration>\n",
+            "-                            <finalName>synapse-eipcore-lib</finalName>\n",
+            "+                            <finalName>synapse</finalName>\n",
+            "                             <filters>\n",
+            "                                 <filter>\n",
+            "                                     ${basedir}/src/test/resources/synapse-libraries/assembly/filter.properties\n"
+          ],
+          "locn": "-122,7 +122,7"
+        }
+      ],
+      "from": "java/modules/core/pom.xml",
+      "to": "java/modules/core/pom.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                 <plugin>\n",
+            "                     <groupId>org.apache.maven.plugins</groupId>\n",
+            "                     <artifactId>maven-compiler-plugin</artifactId>\n",
+            "-                    <version>2.3.2</version>\n",
+            "+                    <version>3.5.1</version>\n",
+            "                     <configuration>\n",
+            "                         <source>${java.version}</source>\n",
+            "                         <target>${java.version}</target>\n"
+          ],
+          "locn": "-196,7 +196,7"
+        },
+        {
+          "lines": [
+            "                 <plugin>\n",
+            "                     <groupId>org.apache.maven.plugins</groupId>\n",
+            "                     <artifactId>maven-assembly-plugin</artifactId>\n",
+            "-                    <!-- The latest version (2.2.2) has a problem with file permissions -->\n",
+            "-                    <version>2.2-beta-2</version>\n",
+            "+                    <version>2.6</version>\n",
+            "                 </plugin>\n",
+            "                 <plugin>\n",
+            "                     <groupId>org.apache.maven.plugins</groupId>\n"
+          ],
+          "locn": "-252,8 +252,7"
+        }
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    }
+  ],
+  "id": "1746919",
+  "message": "* Fix the binary distribution descriptor:\n  * Remove unused exclusions for Xerces.\n  * Fix the exclusion for quickfix.\n* Upgrade maven-assembly-plugin to fix issues with wildcards in exclusions.\n* Fix a flaw in the library extraction logic exposed by the upgrade of maven-assembly-plugin.\n* Upgrade maven-compiler-plugin to get meaningful compiler errors.\n",
+  "when": "2016-06-05T09:49:40-04:00",
+  "who": "veithen"
+}

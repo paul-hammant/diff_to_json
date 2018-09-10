@@ -1,0 +1,23 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/transform/PayloadFactoryMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/transform/PayloadFactoryMediator.java	(revision 1382064)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/transform/PayloadFactoryMediator.java	(revision 1382065)
+@@ -81,10 +81,7 @@
+         }
+ 
+         // replace the existing payload with the new payload
+-        for (Iterator itr = soapBody.getChildElements(); itr.hasNext();) {
+-            itr.next();
+-            itr.remove();
+-        }
++        soapBody.removeChildren();
+ 
+         for (Iterator itr = resultElement.getChildElements(); itr.hasNext();) {
+             OMElement child = (OMElement) itr.next();
+-*-*-*-
+Message: Code refractoring to use new API.
+
+-*-*-*-
+When: 2012-09-07 11:23:59 -0400 
+-*-*-*-
+Who: sadeep

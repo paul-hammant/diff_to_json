@@ -1,0 +1,30 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "           <artifactId>axis2-transport-base</artifactId>\n",
+            "         </dependency>\n",
+            "         <dependency>\n",
+            "+            <groupId>org.apache.ws.commons.axiom</groupId>\n",
+            "+            <artifactId>axiom-compat</artifactId>\n",
+            "+            <version>${axiom.version}</version>\n",
+            "+        </dependency>\n",
+            "+        <dependency>\n",
+            "           <groupId>org.apache.synapse</groupId>\n",
+            "           <artifactId>synapse-securevault</artifactId>\n",
+            "         </dependency>\n"
+          ],
+          "locn": "-80,6 +80,11"
+        }
+      ],
+      "from": "java/modules/commons/pom.xml",
+      "to": "java/modules/commons/pom.xml"
+    }
+  ],
+  "id": "1678577",
+  "message": "Quick fix to prevent build failure caused by the deprecation of an Axiom API.",
+  "when": "2015-05-10T12:45:30-04:00",
+  "who": "veithen"
+}

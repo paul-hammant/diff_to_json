@@ -1,0 +1,27 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                     for Synapse.\n",
+            "                 </li>\n",
+            "                 <li>\n",
+            "-                    The maximum number of characters in a single line should not exceed 100. Please\n",
+            "+                    The maximum number of characters in a single line should not exceed 120. Please\n",
+            "                     configure your IDE to properly enforce this restriction on all source files.\n",
+            "                 </li>\n",
+            "                 <li>\n"
+          ],
+          "locn": "-57,7 +57,7"
+        }
+      ],
+      "from": "java/modules/documentation/src/site/xdoc/dev/best-practices.xml",
+      "to": "java/modules/documentation/src/site/xdoc/dev/best-practices.xml"
+    }
+  ],
+  "id": "1746935",
+  "message": "Documentation update -  Increasing Line Wrapping to 120",
+  "when": "2016-06-05T13:10:21-04:00",
+  "who": "isudana"
+}

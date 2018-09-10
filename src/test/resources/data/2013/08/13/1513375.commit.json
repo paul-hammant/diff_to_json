@@ -1,0 +1,95 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                 new RequestContent(),\n",
+            "                 new RequestTargetHost(),\n",
+            "                 new RequestConnControl(),\n",
+            "-                new RequestUserAgent(),\n",
+            "+                new RequestUserAgent(\"Synapse-PT-HttpComponents-NIO\"),\n",
+            "                 new RequestExpectContinue(false));\n",
+            "     }\n",
+            " \n"
+          ],
+          "locn": "-59,7 +59,7"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/TargetConfiguration.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/config/TargetConfiguration.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                         if (!HTTPConstants.HEADER_HOST.equalsIgnoreCase((String) entry.getKey())) {\n",
+            "                             request.addHeader((String) entry.getKey(), (String) entry.getValue());\n",
+            "                         } else {\n",
+            "-                            if( msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER) != null) {\n",
+            "+                            if (msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER) != null) {\n",
+            "                             \trequest.addHeader((String) entry.getKey(),\n",
+            "                                         (String) msgContext.getProperty(\n",
+            "                                                 NhttpConstants.REQUEST_HOST_HEADER));\n"
+          ],
+          "locn": "-82,7 +82,7"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/TargetRequestFactory.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/util/TargetRequestFactory.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             \trequestMsgCtx.getAxisOperation().getInputAction();\n",
+            "             }\n",
+            " \n",
+            "-            if (requestMsgCtx.isSOAP11() && soapAction != null &&\n",
+            "-                    soapAction.length() > 0) {\n",
+            "-                Header existingHeader =\n",
+            "-                \trequest.getFirstHeader(HTTPConstants.HEADER_SOAP_ACTION);\n",
+            "+            if (requestMsgCtx.isSOAP11() && soapAction != null && soapAction.length() > 0) {\n",
+            "+                Header existingHeader = request.getFirstHeader(HTTPConstants.HEADER_SOAP_ACTION);\n",
+            "                 if (existingHeader != null) {\n",
+            "                 \trequest.removeHeader(existingHeader);\n",
+            "                 }\n"
+          ],
+          "locn": "-192,10 +192,8"
+        },
+        {
+          "lines": [
+            "                     MessageFormatterDecoratorFactory.createMessageFormatterDecorator(requestMsgCtx);\n",
+            "                 request.setHeader(HTTPConstants.HEADER_SOAP_ACTION,\n",
+            "                         messageFormatter.formatSOAPAction(requestMsgCtx, null, soapAction));\n",
+            "-                request.setHeader(HttpHeaders.USER_AGENT, \"Synapse-PT-HttpComponents-NIO\");\n",
+            "             }\n",
+            "     \t}\n",
+            " \n"
+          ],
+          "locn": "-203,7 +201,6"
+        },
+        {
+          "lines": [
+            "         // Pre-process HTTP request\n",
+            "         HttpContext context = conn.getContext();\n",
+            "         context.setAttribute(HttpCoreContext.HTTP_CONNECTION, conn);\n",
+            "-        context.setAttribute(HttpCoreContext.HTTP_TARGET_HOST,\n",
+            "-                new HttpHost(url.getHost(), port));\n",
+            "+        context.setAttribute(HttpCoreContext.HTTP_TARGET_HOST, new HttpHost(url.getHost(), port));\n",
+            "         context.setAttribute(HttpCoreContext.HTTP_REQUEST, request);\n",
+            " \n",
+            "         // start the request\n"
+          ],
+          "locn": "-216,8 +213,7"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetRequest.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetRequest.java"
+    }
+  ],
+  "id": "1513375",
+  "message": "Using the RequestUserAgent API to set the User-Agent header on outgoing messages.",
+  "when": "2013-08-13T03:12:47-04:00",
+  "who": "hiranya"
+}

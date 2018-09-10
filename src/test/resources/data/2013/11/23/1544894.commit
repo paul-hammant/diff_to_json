@@ -1,0 +1,20 @@
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/EchoHttpServerController.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/EchoHttpServerController.java	(revision 1544893)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/EchoHttpServerController.java	(revision 1544894)
+@@ -78,6 +78,9 @@
+             if (request instanceof HttpEntityEnclosingRequest) {
+                 HttpEntity entity = ((HttpEntityEnclosingRequest) request).getEntity();
+                 byte[] entityContent = EntityUtils.toByteArray(entity);
++                if (log.isDebugEnabled()) {
++                	log.debug("Request entity read; size=" + entityContent.length);
++                }
+                 response.setStatusCode(HttpStatus.SC_OK);
+                 response.setEntity(new ByteArrayEntity(entityContent,
+                         ContentType.create(entity.getContentType().getValue())));
+-*-*-*-
+Message: Added some debug logging.
+-*-*-*-
+When: 2013-11-23 18:52:19 -0500 
+-*-*-*-
+Who: veithen

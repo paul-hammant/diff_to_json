@@ -1,0 +1,28 @@
+Index: java/modules/extensions/src/test/java/org/apache/synapse/format/syslog/SyslogMessageBuilderTest.java
+===================================================================
+--- java/modules/extensions/src/test/java/org/apache/synapse/format/syslog/SyslogMessageBuilderTest.java	(revision 1481308)
++++ java/modules/extensions/src/test/java/org/apache/synapse/format/syslog/SyslogMessageBuilderTest.java	(revision 1481309)
+@@ -30,7 +30,6 @@
+ import junit.framework.TestCase;
+ 
+ import org.apache.axiom.om.OMElement;
+-import org.apache.axiom.om.impl.jaxp.OMSource;
+ import org.apache.axis2.context.MessageContext;
+ import org.apache.commons.lang.ObjectUtils;
+ import org.xml.sax.ErrorHandler;
+@@ -94,7 +93,7 @@
+                 throw exception;
+             }
+         });
+-        validator.validate(new OMSource(element));
++        validator.validate(element.getSAXSource(true));
+         String pidString = element.getAttributeValue(new QName(SyslogConstants.PID));
+         return new SyslogMessage(element.getAttributeValue(new QName(SyslogConstants.FACILITY)),
+                                  element.getAttributeValue(new QName(SyslogConstants.SEVERITY)),
+-*-*-*-
+Message: Avoid usage of deprecated API.
+
+-*-*-*-
+When: 2013-05-11 08:15:41 -0400 
+-*-*-*-
+Who: veithen

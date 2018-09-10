@@ -1,0 +1,64 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             <artifactId>axis2-codegen</artifactId>\n",
+            "         </dependency>\n",
+            " \n",
+            "-\t<!-- JSON Support --> \n",
+            "-\t<dependency>\n",
+            "-\t\t<groupId>org.apache.axis2</groupId>\n",
+            "-\t\t<artifactId>axis2-json</artifactId>\n",
+            "-\t</dependency>\n",
+            "+\t    <!-- JSON Support -->\n",
+            "+        <dependency>\n",
+            "+            <groupId>org.apache.axis2</groupId>\n",
+            "+            <artifactId>axis2-json</artifactId>\n",
+            "+            <exclusions>\n",
+            "+                <exclusion>\n",
+            "+                    <groupId>org.codehaus.jettison</groupId>\n",
+            "+                    <artifactId>jettison</artifactId>\n",
+            "+                </exclusion>\n",
+            "+            </exclusions>\n",
+            "+        </dependency>\n",
+            "+        <dependency>\n",
+            "+            <groupId>org.codehaus.jettison</groupId>\n",
+            "+            <artifactId>jettison</artifactId>\n",
+            "+            <version>${jettison.version}</version>\n",
+            "+        </dependency>\n",
+            " \n",
+            "         <!-- Additional transports -->\n",
+            "         <dependency>\n"
+          ],
+          "locn": "-110,11 +110,22"
+        }
+      ],
+      "from": "java/modules/distribution/pom.xml",
+      "to": "java/modules/distribution/pom.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         <axis2.version>1.7.3</axis2.version>\n",
+            "         <axiom.version>1.2.19</axiom.version>\n",
+            "         <wsdl4j.version>1.6.2</wsdl4j.version>\n",
+            "+        <jettison.version>1.3.8</jettison.version>\n",
+            " \n",
+            "         <!-- addressing, rampart, neethi -->\n",
+            "         <addressing.version>${axis2.version}</addressing.version>\n"
+          ],
+          "locn": "-1042,6 +1042,7"
+        }
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    }
+  ],
+  "id": "1776241",
+  "message": "Fix for SYNAPSE-1077",
+  "when": "2016-12-28T03:35:14-05:00",
+  "who": "ravi"
+}

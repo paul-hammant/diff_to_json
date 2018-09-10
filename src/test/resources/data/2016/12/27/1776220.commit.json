@@ -1,0 +1,122 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                     <a href=\"#Installing\">Installing Synapse</a>\n",
+            "                     <ul>\n",
+            "                         <li>\n",
+            "-                            <a href=\"#InstallingLinux\">Installing on Linux/Unix</a>\n",
+            "+\t\t\t    <a href=\"#InstallingLinux\">Installing on *nix (Linux/macOS/Solaris)</a>\n",
+            "                         </li>\n",
+            "                         <li>\n",
+            "                             <a href=\"#InstallingWin\">Installing on MS Windows</a>\n"
+          ],
+          "locn": "-37,7 +37,7"
+        },
+        {
+          "lines": [
+            "                             </a>\n",
+            "                         </td>\n",
+            "                         <td>\n",
+            "-                            1.6.0_23 or higher (For instructions on setting up the JDK on different\n",
+            "+                            1.7.0_55 or higher (For instructions on setting up the JDK on different\n",
+            "                             operating systems, visit<a\n",
+            "                                 href=\"http://www.oracle.com/technetwork/java/index.html\">\n",
+            "                             Java homepage.\n"
+          ],
+          "locn": "-64,7 +64,7"
+        },
+        {
+          "lines": [
+            "                         </td>\n",
+            "                         <td>\n",
+            "                             To build Apache Synapse from its source distribution, you will need\n",
+            "-                            Maven 2.2.0 or later.\n",
+            "+                            Maven 3.2.x or later.\n",
+            "                         </td>\n",
+            "                     </tr>\n",
+            "                     <tr>\n"
+          ],
+          "locn": "-91,7 +91,7"
+        },
+        {
+          "lines": [
+            "                             Operating System\n",
+            "                         </td>\n",
+            "                         <td>\n",
+            "-                            Linux, Solaris, MS Windows - XP/2003/2008 (Not fully tested on Windows\n",
+            "-                            Vista or Windows 7). Since Apache Synapse is a Java application, it will\n",
+            "+                            Linux, Solaris, macOS, MS Windows - XP/2003/2008 (Not fully tested on Windows\n",
+            "+\t\t\t    Vista/7/8/10). Since Apache Synapse is a Java application, it will\n",
+            "                             generally be possible to run it on other operating systems with a\n",
+            "-                            JDK 1.6.x runtime. Linux/Solaris is recommended for production\n",
+            "+                            JDK 1.7.x runtime. Linux is recommended for production\n",
+            "                             deployments.\n",
+            "                         </td>\n",
+            "                     </tr>\n"
+          ],
+          "locn": "-119,10 +119,10"
+        },
+        {
+          "lines": [
+            "             </p>\n",
+            "             <ol>\n",
+            "                 <li>\n",
+            "-                    Binary Distribution: Includes binary files for both Linux and\n",
+            "+                    Binary Distribution: Includes binary files for Linux, macOS and\n",
+            "                     MS Windows operating systems, compressed into a single a zip file. Recommended\n",
+            "                     for normal users.\n",
+            "                 </li>\n",
+            "                 <p/>\n",
+            "                 <li>\n",
+            "-                    Source Distribution: Includes the source code for both Linux and MS Windows\n",
+            "+                    Source Distribution: Includes the source code for Linux, macOS and MS Windows\n",
+            "                     operating systems, compressed into a single zip file which can be used to build\n",
+            "                     the binaries. Recommended for advanced users.\n",
+            "                 </li>\n"
+          ],
+          "locn": "-137,13 +137,13"
+        },
+        {
+          "lines": [
+            "                 The following guide will take you through the binary distribution installation\n",
+            "                 on different platforms.\n",
+            "             </p>\n",
+            "-            <subsection name=\"Installing on Linux/Unix\" id=\"InstallingLinux\">\n",
+            "+\t    <subsection name=\"Installing on *nix (Linux/macOS/Solaris)\" id=\"InstallingLinux\">\n",
+            "                 <ol>\n",
+            "                     <li>\n",
+            "                         <a href=\"http://synapse.apache.org/download.html\">Download</a> Apache\n"
+          ],
+          "locn": "-155,7 +155,7"
+        },
+        {
+          "lines": [
+            "         <section name=\"Building Synapse Using the Source Distribution\" id=\"Building\">\n",
+            "             <p>\n",
+            "                 Apache Synapse build is based on <a href=\"http://maven.apache.org/\"> Apache\n",
+            "-                Maven 2</a>. Hence, it is a prerequisite to have Maven (version 2.2.0 or later)\n",
+            "+                Maven 3</a>. Hence, it is a prerequisite to have Maven (version 3.2.0 or later)\n",
+            "                 installed in order to build Synapse from the source distribution. Instructions on\n",
+            "-                installing Maven 2 are available on the <a href=\"http://maven.apache.org/\"> Maven\n",
+            "-                website</a>. Follow these steps to build Synapse after setting up Maven 2.\n",
+            "+                installing Maven 3 are available on the <a href=\"http://maven.apache.org/\"> Maven\n",
+            "+                website</a>. Follow these steps to build Synapse after setting up Maven 3.\n",
+            "             </p>\n",
+            "             <ol>\n",
+            "                 <li>\n"
+          ],
+          "locn": "-214,10 +214,10"
+        }
+      ],
+      "from": "java/modules/documentation/src/site/xdoc/userguide/installation.xml",
+      "to": "java/modules/documentation/src/site/xdoc/userguide/installation.xml"
+    }
+  ],
+  "id": "1776220",
+  "message": "Updates to installation page to reflect changes in Synapse 3.0",
+  "when": "2016-12-27T21:28:26-05:00",
+  "who": "ravi"
+}

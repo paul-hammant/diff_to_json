@@ -1,0 +1,19 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/SynapseConstants.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/SynapseConstants.java	(revision 1766243)
++++ java/modules/core/src/main/java/org/apache/synapse/SynapseConstants.java	(revision 1766244)
+@@ -234,7 +234,7 @@
+          * this is the timeout for otherwise non-expiring callbacks
+          * to ensure system stability over time
+          */
+-        public static final long DEFAULT_GLOBAL_TIMEOUT = 24 * 60 * 60 * 1000;
++        public static final long DEFAULT_GLOBAL_TIMEOUT = 3 * 60 * 1000;
+ 
+         /**
+          * don't do anything for response timeouts. this means infinite timeout. this is the default
+-*-*-*-
+Message: reducing global timeout interval to 3mins, it is pointless to keep the call backs after socket timeout of 3mins
+-*-*-*-
+When: 2016-10-23 00:12:48 -0400 
+-*-*-*-
+Who: isudana

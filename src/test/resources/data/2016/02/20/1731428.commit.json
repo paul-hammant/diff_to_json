@@ -1,0 +1,40 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                 <plugin>\n",
+            "                     <groupId>org.apache.maven.plugins</groupId>\n",
+            "                     <artifactId>maven-site-plugin</artifactId>\n",
+            "-                    <version>3.0</version>\n",
+            "+                    <version>3.3</version>\n",
+            "                 </plugin>\n",
+            "                 <plugin>\n",
+            "                     <groupId>org.apache.maven.plugins</groupId>\n"
+          ],
+          "locn": "-191,7 +191,7"
+        },
+        {
+          "lines": [
+            "         <plugins>\n",
+            "             <plugin>\n",
+            "                 <artifactId>maven-site-plugin</artifactId>\n",
+            "-                <version>3.0</version>\n",
+            "+                <version>3.3</version>\n",
+            "                 <inherited>false</inherited>\n",
+            "             </plugin>\n",
+            "             <plugin>\n"
+          ],
+          "locn": "-966,7 +966,7"
+        }
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    }
+  ],
+  "id": "1731428",
+  "message": "updating site plugin version to fix a build failure",
+  "when": "2016-02-20T12:15:55-05:00",
+  "who": "isudana"
+}

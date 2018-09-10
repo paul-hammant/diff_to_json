@@ -1,0 +1,195 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         }\n",
+            "         lock.lock();\n",
+            "         try {\n",
+            "-            freeConnections.add(conn);\n",
+            "+            // Adding to busyConnections to make sure the first requester get it.\n",
+            "+            // Otherwise someone else might acquire it.\n",
+            "+            busyConnections.add(conn);\n",
+            "         } finally {\n",
+            "             lock.unlock();\n",
+            "         }\n"
+          ],
+          "locn": "-118,7 +118,9"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/connections/HostConnections.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/connections/HostConnections.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "     }\n",
+            " \n",
+            "     /**\n",
+            "+     * Return an existing connection to the host:port pair from connection pool.\n",
+            "+     * If a connection is not available, return <code>null</code>\n",
+            "+     *\n",
+            "+     * @param host host\n",
+            "+     * @param port port\n",
+            "+     * @return returns a connection if already available in the pool\n",
+            "+     */\n",
+            "+    public NHttpClientConnection getExistingConnection(String host, int port) {\n",
+            "+        if (log.isDebugEnabled()) {\n",
+            "+            log.debug(\"Trying to get an existing connection to the \" + host + \":\" + port);\n",
+            "+        }\n",
+            "+\n",
+            "+        HostConnections pool = getConnectionPool(host, port);\n",
+            "+        return pool.getConnection();\n",
+            "+    }\n",
+            "+\n",
+            "+    /**\n",
+            "      * This connection is no longer needed. So we need to close connection.\n",
+            "      *\n",
+            "      * @param conn connection to shutdownConnection\n"
+          ],
+          "locn": "-104,6 +104,23"
+        },
+        {
+          "lines": [
+            " \n",
+            "     private HostConnections getConnectionPool(String host, int port) {\n",
+            "         String key = host + \":\" + port;\n",
+            "-        // see weather a pool already exists for this host:port\n",
+            "-        HostConnections pool = poolMap.get(key);\n",
+            "+        HostConnections pool;\n",
+            "         synchronized (poolMap) {\n",
+            "+            // see weather a pool already exists for this host:port\n",
+            "+            pool = poolMap.get(key);\n",
+            "             if (pool == null) {\n",
+            "                 pool = new HostConnections(host, port, maxConnections);\n",
+            "                 poolMap.put(key, pool);\n",
+            "             }\n",
+            "         }\n",
+            "-\n",
+            "         return pool;\n",
+            "     }\n",
+            " \n",
+            "-\n",
+            " }\n"
+          ],
+          "locn": "-188,17 +205,16"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/connections/TargetConnections.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/connections/TargetConnections.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "      *\n",
+            "      * @param host name of the remote host\n",
+            "      * @param port remote port number\n",
+            "+     * @param conn connection made available to process the request\n",
+            "      */\n",
+            "-    public void connected(String host, int port) {\n",
+            "+    public void connected(String host, int port, NHttpClientConnection conn) {\n",
+            "         Queue<MessageContext> queue = null;\n",
+            "         lock.lock();\n",
+            "         try {\n"
+          ],
+          "locn": "-157,8 +157,9"
+        },
+        {
+          "lines": [
+            "         }\n",
+            " \n",
+            "         while (queue.size() > 0) {\n",
+            "-            NHttpClientConnection conn = targetConnections.getConnection(host, port);\n",
+            "+            if (conn == null) {\n",
+            "+                // Try to get an existing connection from pool. Here we should not ask to create\n",
+            "+                // new connections as it may ended up with extra connections. New connections are\n",
+            "+                // created upon request submission.\n",
+            "+                conn = targetConnections.getExistingConnection(host, port);\n",
+            "+            }\n",
+            "             if (conn != null) {\n",
+            "                 MessageContext messageContext = queue.poll();\n",
+            " \n"
+          ],
+          "locn": "-168,7 +169,12"
+        },
+        {
+          "lines": [
+            "                 if (messageContext != null) {\n",
+            "                     tryNextMessage(messageContext, conn);\n",
+            "                 }\n",
+            "+                conn = null;\n",
+            "             } else {\n",
+            "                 break;\n",
+            "             }\n"
+          ],
+          "locn": "-175,6 +181,7"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/DeliveryAgent.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/DeliveryAgent.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \n",
+            " package org.apache.synapse.transport.passthru;\n",
+            " \n",
+            "-import java.io.IOException;\n",
+            "-\n",
+            " import org.apache.axis2.AxisFault;\n",
+            " import org.apache.axis2.context.MessageContext;\n",
+            " import org.apache.axis2.description.WSDL2Constants;\n"
+          ],
+          "locn": "-19,8 +19,6"
+        },
+        {
+          "lines": [
+            " import org.apache.http.HttpResponse;\n",
+            " import org.apache.http.HttpStatus;\n",
+            " import org.apache.http.impl.nio.DefaultNHttpClientConnection;\n",
+            "-import org.apache.http.nio.*;\n",
+            "+import org.apache.http.nio.ContentDecoder;\n",
+            "+import org.apache.http.nio.ContentEncoder;\n",
+            "+import org.apache.http.nio.NHttpClientConnection;\n",
+            "+import org.apache.http.nio.NHttpClientEventHandler;\n",
+            "+import org.apache.http.nio.NHttpServerConnection;\n",
+            " import org.apache.synapse.transport.nhttp.NhttpConstants;\n",
+            " import org.apache.synapse.transport.passthru.config.TargetConfiguration;\n",
+            " import org.apache.synapse.transport.passthru.connections.HostConnections;\n",
+            " import org.apache.synapse.transport.passthru.jmx.PassThroughTransportMetricsCollector;\n",
+            " \n",
+            "+import java.io.IOException;\n",
+            "+\n",
+            " /**\n",
+            "  * This class is handling events from the transport -- > client.\n",
+            "  */\n"
+          ],
+          "locn": "-32,12 +30,18"
+        },
+        {
+          "lines": [
+            "         targetConfiguration.getConnections().addConnection(conn);\n",
+            " \n",
+            "         // notify about the new connection\n",
+            "-        deliveryAgent.connected(pool.getHost(), pool.getPort());\n",
+            "+        deliveryAgent.connected(pool.getHost(), pool.getPort(), conn);\n",
+            "         \n",
+            "         conn.getContext().setAttribute(PassThroughConstants.REQ_DEPARTURE_TIME,\n",
+            "                 System.currentTimeMillis());\n"
+          ],
+          "locn": "-77,7 +81,7"
+        }
+      ],
+      "from": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetHandler.java",
+      "to": "java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/TargetHandler.java"
+    }
+  ],
+  "id": "1610131",
+  "message": "fix for SYNAPSE-989",
+  "when": "2014-07-13T03:35:52-04:00",
+  "who": "isudana"
+}

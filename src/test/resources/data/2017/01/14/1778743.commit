@@ -1,0 +1,93 @@
+Index: java/modules/core/pom.xml
+===================================================================
+--- java/modules/core/pom.xml	(revision 1778742)
++++ java/modules/core/pom.xml	(revision 1778743)
+@@ -225,6 +225,10 @@
+     
+     <dependencies>
+         <dependency>
++            <groupId>org.apache.axis2</groupId>
++            <artifactId>axis2-clustering</artifactId>
++        </dependency>
++        <dependency>
+             <groupId>org.apache.synapse</groupId>
+             <artifactId>synapse-securevault</artifactId>
+         </dependency>
+Index: java/pom.xml
+===================================================================
+--- java/pom.xml	(revision 1778742)
++++ java/pom.xml	(revision 1778743)
+@@ -647,11 +647,38 @@
+                 <version>${wso2caching.version}</version>
+                 <type>jar</type>
+                 <exclusions>
++                    <!-- Don't let wso2caching impose a logging implementation -->
+                     <exclusion>
+                         <groupId>log4j</groupId>
+                         <artifactId>log4j</artifactId>
+                     </exclusion>
++                    <!-- The wso2caching POM declares a snapshot repository that is now dead
++                         (snapshots.maven.codehaus.org). If we use snapshot versions of
++                         Axis2/Axiom/Neethi, then Maven will start attempting to download them
++                         from the dead repository, causing the build to get stuck. To work
++                         around this, exclude dependencies that we might want to switch to
++                         snapshot versions. -->
+                     <exclusion>
++                        <groupId>org.apache.axis2</groupId>
++                        <artifactId>axis2-kernel</artifactId>
++                    </exclusion>
++                    <exclusion>
++                        <groupId>org.apache.axis2</groupId>
++                        <artifactId>axis2-saaj</artifactId>
++                    </exclusion>
++                    <exclusion>
++                        <groupId>org.apache.axis2</groupId>
++                        <artifactId>axis2-clustering</artifactId>
++                    </exclusion>
++                    <exclusion>
++                        <groupId>org.apache.ws.commons.axiom</groupId>
++                        <artifactId>axiom-api</artifactId>
++                    </exclusion>
++                    <exclusion>
++                        <groupId>org.apache.ws.commons.axiom</groupId>
++                        <artifactId>axiom-impl</artifactId>
++                    </exclusion>
++                    <exclusion>
+                         <groupId>org.apache.neethi</groupId>
+                         <artifactId>neethi</artifactId>
+                     </exclusion>
+@@ -688,6 +715,28 @@
+                         <groupId>org.apache.ant</groupId>
+                         <artifactId>ant-nodeps</artifactId>
+                     </exclusion>
++                    <!-- Work around issues with snapshot dependencies
++                         (see the entry for wso2caching for more details). -->
++                    <exclusion>
++                        <groupId>org.apache.axis2</groupId>
++                        <artifactId>axis2-kernel</artifactId>
++                    </exclusion>
++                    <exclusion>
++                        <groupId>org.apache.axis2</groupId>
++                        <artifactId>axis2-clustering</artifactId>
++                    </exclusion>
++                    <exclusion>
++                        <groupId>org.apache.ws.commons.axiom</groupId>
++                        <artifactId>axiom-api</artifactId>
++                    </exclusion>
++                    <exclusion>
++                        <groupId>org.apache.ws.commons.axiom</groupId>
++                        <artifactId>axiom-impl</artifactId>
++                    </exclusion>
++                    <exclusion>
++                        <groupId>org.apache.neethi</groupId>
++                        <artifactId>neethi</artifactId>
++                    </exclusion>
+                 </exclusions>
+             </dependency>
+ 
+-*-*-*-
+Message: Prevent the build from attempting to access the dead Codehaus snapshot repository.
+-*-*-*-
+When: 2017-01-14 04:34:30 -0500 
+-*-*-*-
+Who: veithen

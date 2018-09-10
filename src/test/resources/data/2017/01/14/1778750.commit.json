@@ -1,0 +1,27 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "         props.put(\"cachableDuration\", \"1500\");\n",
+            "         reg.init(props);\n",
+            "         \n",
+            "-        OMNode node = reg.lookup(FILE2);\n",
+            "+        OMContainer node = (OMContainer)reg.lookup(FILE2);\n",
+            "         node.serialize(new NullOutputStream());\n",
+            "     }\n",
+            " \n"
+          ],
+          "locn": "-110,7 +110,7"
+        }
+      ],
+      "from": "java/modules/core/src/test/java/org/apache/synapse/registry/url/SimpleURLRegistryTest.java",
+      "to": "java/modules/core/src/test/java/org/apache/synapse/registry/url/SimpleURLRegistryTest.java"
+    }
+  ],
+  "id": "1778750",
+  "message": "Eliminate usage of deprecated Axiom API.",
+  "when": "2017-01-14T05:21:40-05:00",
+  "who": "veithen"
+}

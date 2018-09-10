@@ -1,0 +1,394 @@
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample161.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample161.java	(nonexistent)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/tests/proxy/Sample161.java	(revision 1746312)
+@@ -0,0 +1,44 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.samples.framework.tests.proxy;
++
++import org.apache.http.HttpStatus;
++import org.apache.synapse.samples.framework.SynapseTestCase;
++import org.apache.synapse.samples.framework.clients.BasicHttpClient;
++import org.apache.synapse.samples.framework.clients.HttpResponse;
++
++public class Sample161 extends SynapseTestCase {
++    private String requestXml = "<test>foo</test>";
++
++    public Sample161() {
++        super(161);
++    }
++
++    public void testRespondMediator() throws Exception {
++
++        String url = "http://localhost:8280/services/EchoService";
++        BasicHttpClient client = new BasicHttpClient();
++        HttpResponse response = client.doPost(url, requestXml.getBytes(), "application/xml");
++        assertEquals(HttpStatus.SC_OK, response.getStatus());
++        assertEquals("Request and Echo Service Response is not equal", requestXml, response.getBodyAsString());
++
++    }
++
++}
+Index: java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java
+===================================================================
+--- java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1746311)
++++ java/modules/integration/src/test/java/org/apache/synapse/samples/framework/TestSamplesHandlerSuite.java	(revision 1746312)
+@@ -207,7 +207,7 @@
+         sampleClassRepo.put("155", Sample155.class);
+         sampleClassRepo.put("156", Sample156.class);
+         sampleClassRepo.put("157", Sample157.class);
+-
++        sampleClassRepo.put("161", Sample161.class);
+         //Transport switching
+         sampleClassRepo.put("250", Sample250.class);
+         sampleClassRepo.put("251", Sample251.class);
+@@ -250,4 +250,4 @@
+ 
+         sampleClassRepo.put("10101", Sample10101.class);
+     }
+-}
+\ No newline at end of file
++}
+Index: java/modules/integration/src/test/resources/sample161.xml
+===================================================================
+--- java/modules/integration/src/test/resources/sample161.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/sample161.xml	(revision 1746312)
+@@ -0,0 +1,18 @@
++<synapseSample>
++    <sampleID>161</sampleID>
++    <sampleName>Proxy with respond mediator</sampleName>
++    <synapseConfig>
++        <axis2Repo>modules/integration/target/test_repos/synapse</axis2Repo>
++        <axis2Xml>modules/integration/target/test_repos/synapse/conf/axis2_def.xml</axis2Xml>
++        <synapseXml>modules/integration/src/test/resources/extras/synapse_sample_161.xml</synapseXml>
++    </synapseConfig>
++    <backEndServerConfig>
++        <axis2Server id='0'>
++            <axis2Repo>modules/integration/target/test_repos/axis2Server</axis2Repo>
++            <axis2Xml>modules/integration/target/test_repos/axis2Server/conf/axis2_def.xml</axis2Xml>
++        </axis2Server>
++    </backEndServerConfig>
++    <clientConfig>
++	<clientRepo>modules/integration/target/test_repos/axis2Client</clientRepo>
++    </clientConfig>
++</synapseSample>
+Index: java/modules/integration/src/test/resources/extras/synapse_sample_161.xml
+===================================================================
+--- java/modules/integration/src/test/resources/extras/synapse_sample_161.xml	(nonexistent)
++++ java/modules/integration/src/test/resources/extras/synapse_sample_161.xml	(revision 1746312)
+@@ -0,0 +1,30 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!--
++  ~  Licensed to the Apache Software Foundation (ASF) under one
++  ~  or more contributor license agreements.  See the NOTICE file
++  ~  distributed with this work for additional information
++  ~  regarding copyright ownership.  The ASF licenses this file
++  ~  to you under the Apache License, Version 2.0 (the
++  ~  "License"); you may not use this file except in compliance
++  ~  with the License.  You may obtain a copy of the License at
++  ~
++  ~   http://www.apache.org/licenses/LICENSE-2.0
++  ~
++  ~  Unless required by applicable law or agreed to in writing,
++  ~  software distributed under the License is distributed on an
++  ~   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++  ~  KIND, either express or implied.  See the License for the
++  ~  specific language governing permissions and limitations
++  ~  under the License.
++  -->
++
++<!-- Repond Mediator with proxy services -->
++<definitions xmlns="http://ws.apache.org/ns/synapse">
++    <proxy name="EchoService">
++        <target>
++            <inSequence>
++                <respond/>
++            </inSequence>
++        </target>
++    </proxy>
++</definitions>
+Index: java/modules/core/src/test/java/org/apache/synapse/config/xml/RespondMediatorSerializationTest.java
+===================================================================
+--- java/modules/core/src/test/java/org/apache/synapse/config/xml/RespondMediatorSerializationTest.java	(nonexistent)
++++ java/modules/core/src/test/java/org/apache/synapse/config/xml/RespondMediatorSerializationTest.java	(revision 1746312)
+@@ -0,0 +1,38 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.config.xml;
++
++public class RespondMediatorSerializationTest extends AbstractTestCase {
++
++    RespondMediatorFactory respondMediatorFactory;
++    RespondMediatorSerializer respondMediatorSerializer;
++
++    public RespondMediatorSerializationTest() {
++        super(RespondMediatorSerializationTest.class.getName());
++        respondMediatorFactory = new RespondMediatorFactory();
++        respondMediatorSerializer = new RespondMediatorSerializer();
++    }
++
++    public void testRespondMediatorSerializationSenarioOne() throws Exception {
++        String inputXml = "<respond xmlns=\"http://ws.apache.org/ns/synapse\" />";
++        assertTrue(serialization(inputXml, respondMediatorFactory, respondMediatorSerializer));
++        assertTrue(serialization(inputXml, respondMediatorSerializer));
++    }
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java	(revision 1746311)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorSerializerFinder.java	(revision 1746312)
+@@ -24,6 +24,7 @@
+ import org.apache.synapse.SynapseException;
+ import org.apache.synapse.Mediator;
+ import org.apache.synapse.config.xml.eventing.EventPublisherMediatorSerializer;
++import org.apache.synapse.mediators.builtin.RespondMediator;
+ import sun.misc.Service;
+ 
+ import java.util.HashMap;
+@@ -70,7 +71,8 @@
+         URLRewriteMediatorSerializer.class,
+         PayloadFactoryMediatorSerializer.class,
+         BeanMediatorSerializer.class,
+-        EJBMediatorSerializer.class
++        EJBMediatorSerializer.class,
++        RespondMediatorSerializer.class
+     };
+ 
+     private final static MediatorSerializerFinder instance = new MediatorSerializerFinder();
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/RespondMediatorSerializer.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/RespondMediatorSerializer.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/RespondMediatorSerializer.java	(revision 1746312)
+@@ -0,0 +1,46 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.config.xml;
++
++import org.apache.axiom.om.OMElement;
++import org.apache.synapse.Mediator;
++import org.apache.synapse.mediators.builtin.RespondMediator;
++
++/**
++ * Serializer for {@link RespondMediator} instances.
++ *
++ * @see RespondMediator
++ */
++public class RespondMediatorSerializer extends AbstractMediatorSerializer{
++
++    public OMElement serializeSpecificMediator(Mediator m) {
++        if (!(m instanceof RespondMediator)) {
++            handleException("Unsupported mediator passed in for serialization : " + m.getType());
++        }
++        RespondMediator mediator = (RespondMediator) m;
++        OMElement respond = fac.createOMElement("respond", synNS);
++        saveTracingState(respond, mediator);
++        return respond;
++    }
++
++    public String getMediatorClassName() {
++        return RespondMediator.class.getName();
++    }
++}
+\ No newline at end of file
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java	(revision 1746311)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/MediatorFactoryFinder.java	(revision 1746312)
+@@ -84,7 +84,8 @@
+         InvokeMediatorFactory.class,
+         PayloadFactoryMediatorFactory.class,
+         BeanMediatorFactory.class,
+-        EJBMediatorFactory.class
++        EJBMediatorFactory.class,
++        RespondMediatorFactory.class
+     };
+ 
+     private final static MediatorFactoryFinder instance  = new MediatorFactoryFinder();
+Index: java/modules/core/src/main/java/org/apache/synapse/config/xml/RespondMediatorFactory.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/config/xml/RespondMediatorFactory.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/config/xml/RespondMediatorFactory.java	(revision 1746312)
+@@ -0,0 +1,50 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.config.xml;
++
++import org.apache.axiom.om.OMElement;
++import org.apache.synapse.Mediator;
++import org.apache.synapse.mediators.builtin.RespondMediator;
++
++import javax.xml.namespace.QName;
++import java.util.Properties;
++
++/**
++ * Factory for {@link RespondMediator} instances.
++ * <p/>
++ * Configuration syntax:
++ * <pre>
++ * &lt;respond/&gt;
++ * </pre>
++ */
++public class RespondMediatorFactory extends AbstractMediatorFactory {
++    private static final QName Respond_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "respond");
++
++    @Override
++    protected Mediator createSpecificMediator(OMElement omElement, Properties properties) {
++        Mediator responseMediator = new RespondMediator();
++        processAuditStatus(responseMediator, omElement);
++        return responseMediator;
++    }
++
++    public QName getTagQName() {
++        return Respond_Q;
++    }
++}
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/RespondMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/RespondMediator.java	(nonexistent)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/builtin/RespondMediator.java	(revision 1746312)
+@@ -0,0 +1,70 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.mediators.builtin;
++
++import org.apache.synapse.MessageContext;
++import org.apache.synapse.SynapseLog;
++import org.apache.synapse.core.axis2.Axis2Sender;
++import org.apache.synapse.mediators.AbstractMediator;
++
++/**
++ * Halts further processing/mediation of the current message and return the current message back to client
++ * This Mediator reduce the number of configuration element need to build an echo service from ESB.
++ */
++public class RespondMediator extends AbstractMediator {
++
++    /**
++     * Halts further processing/mediation of the current message and return the current message back to client.
++     *
++     * @param synCtx the current message for mediation
++     * @return false
++     */
++    public boolean mediate(MessageContext synCtx) {
++        SynapseLog synapseLog = getLog(synCtx);
++
++        boolean isTraceOrDebugEnabled = synapseLog.isTraceOrDebugEnabled();
++        if (isTraceOrDebugEnabled) {
++            synapseLog.traceOrDebug("Start : Respond mediator");
++
++            if (synapseLog.isTraceTraceEnabled()) {
++                synapseLog.traceOrDebug("Message : " + synCtx.getEnvelope());
++            }
++        }
++
++        synCtx.setTo(null);
++        synCtx.setResponse(true);
++        Axis2Sender.sendBack(synCtx);
++
++        if (isTraceOrDebugEnabled) {
++            synapseLog.traceOrDebug("End : Respond Mediator");
++        }
++        return false;
++    }
++
++    /**
++     * Since this Mediator does not touch the content of the message Content Aware property is set into False.
++     *
++     * @return false
++     */
++    @Override
++    public boolean isContentAware() {
++        return false;
++    }
++}
+-*-*-*-
+Message: applying patch to include Respond Mediator improvement SYNAPSE-997 together with integration test provided through SYNAPSE-1031
+-*-*-*-
+When: 2016-05-31 14:27:38 -0400 
+-*-*-*-
+Who: isudana

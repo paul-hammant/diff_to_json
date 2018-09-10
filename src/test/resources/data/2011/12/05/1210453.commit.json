@@ -1,0 +1,440 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                     proxyServiceGroup.addService(proxyService);\n",
+            "                     axisCfg.addServiceGroup(proxyServiceGroup);\n",
+            "                 } else {\n",
+            "-                    // First set the parent of the service - Otherwise there's an issue\n",
+            "-                    // generating endpoints\n",
+            "+                    // Simply add the service to the existing group\n",
+            "                     proxyService.setParent(axisCfg.getServiceGroup(serviceGroup));\n",
+            "-                    // Simply add the service to the existing group\n",
+            "                     axisCfg.addServiceToExistingServiceGroup(proxyService, serviceGroup);\n",
+            "                 }\n",
+            "             }\n"
+          ],
+          "locn": "-575,10 +575,8"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/ProxyService.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/ProxyService.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.synapse.util.MessageHelper;\n",
+            " \n",
+            " import javax.xml.namespace.QName;\n",
+            "+import java.util.Map;\n",
+            " \n",
+            " /**\n",
+            "  * This is a simple client that handles both in only and in out\n"
+          ],
+          "locn": "-52,6 +52,7"
+        },
+        {
+          "lines": [
+            "         EndpointDefinition endpoint,\n",
+            "         org.apache.synapse.MessageContext synapseOutMessageContext) throws AxisFault {\n",
+            " \n",
+            "-        boolean separateListener      = false;\n",
+            "-        boolean wsSecurityEnabled     = false;\n",
+            "-        String wsSecPolicyKey         = null;\n",
+            "-        String inboundWsSecPolicyKey  = null;\n",
+            "+        boolean separateListener = false;\n",
+            "+        boolean wsSecurityEnabled = false;\n",
+            "+        String wsSecPolicyKey = null;\n",
+            "+        String inboundWsSecPolicyKey = null;\n",
+            "         String outboundWsSecPolicyKey = null;\n",
+            "-        boolean wsRMEnabled           = false;\n",
+            "-        String wsRMPolicyKey          = null;\n",
+            "-        boolean wsAddressingEnabled   = false;\n",
+            "-        String wsAddressingVersion    = null;\n",
+            "+        boolean wsRMEnabled = false;\n",
+            "+        String wsRMPolicyKey = null;\n",
+            "+        boolean wsAddressingEnabled = false;\n",
+            "+        String wsAddressingVersion = null;\n",
+            " \n",
+            "         if (endpoint != null) {\n",
+            "-            separateListener       = endpoint.isUseSeparateListener();\n",
+            "-            wsSecurityEnabled      = endpoint.isSecurityOn();\n",
+            "-            wsSecPolicyKey         = endpoint.getWsSecPolicyKey();\n",
+            "-            inboundWsSecPolicyKey  = endpoint.getInboundWsSecPolicyKey();\n",
+            "+            separateListener = endpoint.isUseSeparateListener();\n",
+            "+            wsSecurityEnabled = endpoint.isSecurityOn();\n",
+            "+            wsSecPolicyKey = endpoint.getWsSecPolicyKey();\n",
+            "+            inboundWsSecPolicyKey = endpoint.getInboundWsSecPolicyKey();\n",
+            "             outboundWsSecPolicyKey = endpoint.getOutboundWsSecPolicyKey();\n",
+            "-            wsRMEnabled            = endpoint.isReliableMessagingOn();\n",
+            "-            wsRMPolicyKey          = endpoint.getWsRMPolicyKey();\n",
+            "-            wsAddressingEnabled    = endpoint.isAddressingOn() || wsRMEnabled;\n",
+            "-            wsAddressingVersion    = endpoint.getAddressingVersion();\n",
+            "+            wsRMEnabled = endpoint.isReliableMessagingOn();\n",
+            "+            wsRMPolicyKey = endpoint.getWsRMPolicyKey();\n",
+            "+            wsAddressingEnabled = endpoint.isAddressingOn() || wsRMEnabled;\n",
+            "+            wsAddressingVersion = endpoint.getAddressingVersion();\n",
+            "         }\n",
+            " \n",
+            "         if (log.isDebugEnabled()) {\n"
+          ],
+          "locn": "-76,26 +77,26"
+        },
+        {
+          "lines": [
+            "                 \"] [to=\" + to + \"]\");\n",
+            "         }\n",
+            " \n",
+            "-        // save the original message context wihout altering it, so we can tie the response\n",
+            "+        // save the original message context without altering it, so we can tie the response\n",
+            "         MessageContext originalInMsgCtx\n",
+            "             = ((Axis2MessageContext) synapseOutMessageContext).getAxis2MessageContext();\n",
+            " \n",
+            "+        String session = (String) synapseOutMessageContext.getProperty(\"LB_COOKIE_HEADER\");\n",
+            "+        if (session != null) {\n",
+            "+            Map headers = (Map) originalInMsgCtx.getProperty(MessageContext.TRANSPORT_HEADERS);\n",
+            "+            headers.put(\"Cookie\", session);\n",
+            "+        }\n",
+            "+\n",
+            "         // create a new MessageContext to be sent out as this should not corrupt the original\n",
+            "         // we need to create the response to the original message later on\n",
+            "         String preserveAddressingProperty = (String) synapseOutMessageContext.getProperty(\n"
+          ],
+          "locn": "-122,10 +123,16"
+        },
+        {
+          "lines": [
+            "             } else if (SynapseConstants.FORMAT_GET.equals(endpoint.getFormat())) {\n",
+            "                 axisOutMsgCtx.setDoingREST(true);\n",
+            "                 axisOutMsgCtx.setProperty(Constants.Configuration.HTTP_METHOD,\n",
+            "-                    Constants.Configuration.HTTP_METHOD_GET);\n",
+            "+                        Constants.Configuration.HTTP_METHOD_GET);\n",
+            "                 axisOutMsgCtx.setProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE,\n",
+            "                         org.apache.axis2.transport.http.HTTPConstants.MEDIA_TYPE_X_WWW_FORM);\n",
+            "                 \n"
+          ],
+          "locn": "-150,7 +157,7"
+        },
+        {
+          "lines": [
+            "             } else if (SynapseConstants.FORMAT_SOAP11.equals(endpoint.getFormat())) {\n",
+            "                 axisOutMsgCtx.setDoingREST(false);\n",
+            "                 axisOutMsgCtx.removeProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE);\n",
+            "-                // We need to set this ezplicitly here in case the requset was not a POST\n",
+            "+                // We need to set this explicitly here in case the request was not a POST\n",
+            "                 axisOutMsgCtx.setProperty(Constants.Configuration.HTTP_METHOD,\n",
+            "-                    Constants.Configuration.HTTP_METHOD_POST);\n",
+            "+                        Constants.Configuration.HTTP_METHOD_POST);\n",
+            "                 if (axisOutMsgCtx.getSoapAction() == null && axisOutMsgCtx.getWSAAction() != null) {\n",
+            "                     axisOutMsgCtx.setSoapAction(axisOutMsgCtx.getWSAAction());\n",
+            "                 }\n",
+            "-                if(!axisOutMsgCtx.isSOAP11()) {\n",
+            "+                if (!axisOutMsgCtx.isSOAP11()) {\n",
+            "                     SOAPUtils.convertSOAP12toSOAP11(axisOutMsgCtx);\n",
+            "                 }\n",
+            "                 \n"
+          ],
+          "locn": "-157,13 +164,13"
+        },
+        {
+          "lines": [
+            "             } else if (SynapseConstants.FORMAT_SOAP12.equals(endpoint.getFormat())) {\n",
+            "                 axisOutMsgCtx.setDoingREST(false);\n",
+            "                 axisOutMsgCtx.removeProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE);\n",
+            "-                // We need to set this ezplicitly here in case the requset was not a POST\n",
+            "+                // We need to set this explicitly here in case the request was not a POST\n",
+            "                 axisOutMsgCtx.setProperty(Constants.Configuration.HTTP_METHOD,\n",
+            "-                    Constants.Configuration.HTTP_METHOD_POST);\n",
+            "+                        Constants.Configuration.HTTP_METHOD_POST);\n",
+            "                 if (axisOutMsgCtx.getSoapAction() == null && axisOutMsgCtx.getWSAAction() != null) {\n",
+            "                     axisOutMsgCtx.setSoapAction(axisOutMsgCtx.getWSAAction());\n",
+            "                 }\n",
+            "-                if(axisOutMsgCtx.isSOAP11()) {\n",
+            "+                if (axisOutMsgCtx.isSOAP11()) {\n",
+            "                     SOAPUtils.convertSOAP11toSOAP12(axisOutMsgCtx);\n",
+            "                 }                \n",
+            " \n",
+            "             } else if (SynapseConstants.FORMAT_REST.equals(endpoint.getFormat())) {\n",
+            "+                // format=rest is kept only backwards compatibility. We no longer needed that.\n",
+            "+                // Remove Message Type  for GET and DELETE Request\n",
+            "                 if (originalInMsgCtx.getProperty(Constants.Configuration.HTTP_METHOD) != null) {\n",
+            "-                    if (originalInMsgCtx.getProperty(Constants.Configuration.HTTP_METHOD).\n",
+            "-                            toString().equals(Constants.Configuration.HTTP_METHOD_GET)\n",
+            "-                            || originalInMsgCtx.getProperty(Constants.Configuration.HTTP_METHOD).\n",
+            "-                            toString().equals(Constants.Configuration.HTTP_METHOD_DELETE)) {\n",
+            "-                        // Removing message type for GET and DELETE requests\n",
+            "-                        axisOutMsgCtx.removeProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE);\n",
+            "+                    Object method = originalInMsgCtx.getProperty(Constants.Configuration.HTTP_METHOD);\n",
+            "+                    if (method.equals(Constants.Configuration.HTTP_METHOD_GET) ||\n",
+            "+                           method.equals(Constants.Configuration.HTTP_METHOD_DELETE)) {\n",
+            "+                        axisOutMsgCtx.removeProperty(\n",
+            "+                                org.apache.axis2.Constants.Configuration.MESSAGE_TYPE);\n",
+            "                     }\n",
+            "                 }\n",
+            "                 axisOutMsgCtx.setDoingREST(true);\n"
+          ],
+          "locn": "-170,24 +177,25"
+        },
+        {
+          "lines": [
+            "                         endpoint.getCharSetEncoding());\n",
+            "             }\n",
+            " \n",
+            "-            // add rest request' suffix URI\n",
+            "-            Object restSuffix =\n",
+            "-                    axisOutMsgCtx.getProperty(NhttpConstants.REST_URL_POSTFIX);\n",
+            "+            // add rest request suffix URI\n",
+            "+            String restSuffix = (String) axisOutMsgCtx.getProperty(NhttpConstants.REST_URL_POSTFIX);\n",
+            "             boolean isRest = SynapseConstants.FORMAT_REST.equals(endpoint.getFormat());\n",
+            " \n",
+            "-            if (!isRest) {\n",
+            "+            if (!isRest && !endpoint.isForceSOAP11() && !endpoint.isForceSOAP12()) {\n",
+            "                 isRest = isRequestRest(originalInMsgCtx);\n",
+            "             }\n",
+            " \n",
+            "             if (endpoint.getAddress() != null) {\n",
+            "                 if (isRest && restSuffix != null && !\"\".equals(restSuffix)) {\n",
+            "-                    axisOutMsgCtx.setTo(\n",
+            "-                            new EndpointReference(\n",
+            "-                                    endpoint.getAddress(synapseOutMessageContext) + restSuffix));\n",
+            "+                    String address = endpoint.getAddress(synapseOutMessageContext);\n",
+            "+                    String url;\n",
+            "+                    if (!address.endsWith(\"/\") && !restSuffix.startsWith(\"/\") &&\n",
+            "+                            !restSuffix.startsWith(\"?\")) {\n",
+            "+                        url = address + \"/\" + restSuffix;\n",
+            "+                    } else {\n",
+            "+                        url = address + restSuffix;\n",
+            "+                    }\n",
+            "+                    axisOutMsgCtx.setTo(new EndpointReference(url));\n",
+            " \n",
+            "                 } else {\n",
+            "                     axisOutMsgCtx.setTo(\n"
+          ],
+          "locn": "-217,20 +225,25"
+        },
+        {
+          "lines": [
+            "                 if (isRest && restSuffix != null && !\"\".equals(restSuffix)) {\n",
+            "                     EndpointReference epr = axisOutMsgCtx.getTo();\n",
+            "                     if (epr != null) {\n",
+            "-                        axisOutMsgCtx.setTo(new EndpointReference(epr.getAddress() + restSuffix));\n",
+            "+                        String address = epr.getAddress();\n",
+            "+                        String url;\n",
+            "+                        if (!address.endsWith(\"/\") && !restSuffix.startsWith(\"/\") &&\n",
+            "+                                !restSuffix.startsWith(\"?\")) {\n",
+            "+                            url = address + \"/\" + restSuffix;\n",
+            "+                        } else {\n",
+            "+                            url = address + restSuffix;\n",
+            "+                        }\n",
+            "+                        axisOutMsgCtx.setTo(new EndpointReference(url));\n",
+            "                     }\n",
+            "                 }\n",
+            "             }\n"
+          ],
+          "locn": "-244,7 +257,15"
+        },
+        {
+          "lines": [
+            " \n",
+            "         AxisService anoymousService =\n",
+            "             AnonymousServiceFactory.getAnonymousService(synapseOutMessageContext.getConfiguration(),\n",
+            "-            axisCfg, wsAddressingEnabled, wsRMEnabled, wsSecurityEnabled);\n",
+            "+                    axisCfg, wsAddressingEnabled, wsRMEnabled, wsSecurityEnabled);\n",
+            "         // mark the anon services created to be used in the client side of synapse as hidden\n",
+            "         // from the server side of synapse point of view\n",
+            "         anoymousService.getParent().addParameter(SynapseConstants.HIDDEN_SERVICE_PARAM, \"true\");\n",
+            "         ServiceGroupContext sgc = new ServiceGroupContext(\n",
+            "-            axisCfgCtx, (AxisServiceGroup) anoymousService.getParent());\n",
+            "+                        axisCfgCtx, (AxisServiceGroup) anoymousService.getParent());\n",
+            "         ServiceContext serviceCtx = sgc.getServiceContext(anoymousService);\n",
+            " \n",
+            "         boolean outOnlyMessage = \"true\".equals(synapseOutMessageContext.getProperty(\n",
+            "-                SynapseConstants.OUT_ONLY)) || WSDL2Constants.MEP_URI_IN_ONLY.equals(\n",
+            "-                originalInMsgCtx.getOperationContext()\n",
+            "-                        .getAxisOperation().getMessageExchangePattern());\n",
+            "+                SynapseConstants.OUT_ONLY));\n",
+            " \n",
+            "         // get a reference to the DYNAMIC operation of the Anonymous Axis2 service\n",
+            "         AxisOperation axisAnonymousOperation = anoymousService.getOperation(\n",
+            "-            outOnlyMessage ?\n",
+            "-                new QName(AnonymousServiceFactory.OUT_ONLY_OPERATION) :\n",
+            "-                new QName(AnonymousServiceFactory.OUT_IN_OPERATION));\n",
+            "+                outOnlyMessage ?\n",
+            "+                        new QName(AnonymousServiceFactory.OUT_ONLY_OPERATION) :\n",
+            "+                        new QName(AnonymousServiceFactory.OUT_IN_OPERATION));\n",
+            " \n",
+            "+\n",
+            "         Options clientOptions = MessageHelper.cloneOptions(originalInMsgCtx.getOptions());\n",
+            "         clientOptions.setUseSeparateListener(separateListener);\n",
+            "         // if RM is requested,\n"
+          ],
+          "locn": "-307,25 +328,24"
+        },
+        {
+          "lines": [
+            "         OperationClient mepClient = axisAnonymousOperation.createClient(serviceCtx, clientOptions);\n",
+            "         mepClient.addMessageContext(axisOutMsgCtx);\n",
+            "         axisOutMsgCtx.setAxisMessage(\n",
+            "-            axisAnonymousOperation.getMessage(WSDLConstants.MESSAGE_LABEL_OUT_VALUE));\n",
+            "+                axisAnonymousOperation.getMessage(WSDLConstants.MESSAGE_LABEL_OUT_VALUE));\n",
+            " \n",
+            "         // set the SEND_TIMEOUT for transport sender\n",
+            "         if (endpoint != null && endpoint.getTimeoutDuration() > 0) {\n"
+          ],
+          "locn": "-373,7 +393,7"
+        },
+        {
+          "lines": [
+            "         // Accepted response, as this implies that Synapse does not yet know if\n",
+            "         // a 202 or 200 response would be written back.\n",
+            "         originalInMsgCtx.getOperationContext().setProperty(\n",
+            "-            org.apache.axis2.Constants.RESPONSE_WRITTEN, \"SKIP\");\n",
+            "+                org.apache.axis2.Constants.RESPONSE_WRITTEN, \"SKIP\");\n",
+            " \n",
+            "         // if the transport out is explicitly set use it\n",
+            "         Object o = originalInMsgCtx.getProperty(\"TRANSPORT_OUT_DESCRIPTION\");\n"
+          ],
+          "locn": "-408,7 +428,7"
+        },
+        {
+          "lines": [
+            "         mepClient.execute(true);\n",
+            "         if (wsRMEnabled) {\n",
+            "             Object rm11 = clientOptions.getProperty(SandeshaClientConstants.RM_SPEC_VERSION);\n",
+            "-            if ( (rm11 != null) && rm11.equals(Sandesha2Constants.SPEC_VERSIONS.v1_1)){\n",
+            "+            if ((rm11 != null) && rm11.equals(Sandesha2Constants.SPEC_VERSIONS.v1_1)){\n",
+            "                 ServiceClient serviceClient = new ServiceClient(\n",
+            "                         axisOutMsgCtx.getConfigurationContext(), axisOutMsgCtx.getAxisService());\n",
+            "                 serviceClient.setTargetEPR(\n"
+          ],
+          "locn": "-421,7 +441,7"
+        },
+        {
+          "lines": [
+            " \n",
+            "         Options current = options;\n",
+            "         while (current != null && current.getProperty(SynapseConstants.RAMPART_POLICY) != null) {\n",
+            "-             current.setProperty(SynapseConstants.RAMPART_POLICY, null);\n",
+            "-             current = current.getParent();\n",
+            "+            current.setProperty(SynapseConstants.RAMPART_POLICY, null);\n",
+            "+            current = current.getParent();\n",
+            "         }\n",
+            "     }\n",
+            " \n"
+          ],
+          "locn": "-456,8 +476,8"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/Axis2FlexibleMEPClient.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " import org.apache.axis2.AxisFault;\n",
+            " import org.apache.axis2.Constants;\n",
+            " import org.apache.axis2.addressing.EndpointReference;\n",
+            "+import org.apache.axis2.addressing.RelatesTo;\n",
+            " import org.apache.axis2.client.OperationClient;\n",
+            " import org.apache.axis2.client.Options;\n",
+            " import org.apache.axis2.client.async.Callback;\n"
+          ],
+          "locn": "-23,6 +23,7"
+        },
+        {
+          "lines": [
+            "             responseMessageContext.setOptions(options);\n",
+            "             responseMessageContext.setServerSide(true);\n",
+            " \t\t\taddMessageContext(responseMessageContext);\n",
+            "+            responseMessageContext.setProperty(\"synapse.send\", \"true\");\n",
+            " \n",
+            "             AxisEngine.send(msgctx);\n",
+            " \n",
+            "             // did the engine receive a immediate synchronous response?\n",
+            "-            // e.g. sometimes the transport sender may listen for a syncronous reply\n",
+            "+            // e.g. sometimes the transport sender may listen for a synchronous reply\n",
+            " \t\t\tif (msgctx.getProperty(MessageContext.TRANSPORT_IN) != null) {\n",
+            " \n",
+            "                 responseMessageContext.setOperationContext(msgctx.getOperationContext());                \n"
+          ],
+          "locn": "-187,11 +188,12"
+        },
+        {
+          "lines": [
+            "                     // If request is REST we assume the responseMessageContext is\n",
+            "                     // REST, so set the variable\n",
+            " \n",
+            "+                    Options options = responseMessageContext.getOptions();\n",
+            "+                    if (options != null) {\n",
+            "+                        RelatesTo relatesTo = options.getRelatesTo();\n",
+            "+                        if (relatesTo != null) {\n",
+            "+                            relatesTo.setValue(msgctx.getMessageID());\n",
+            "+                        } else {\n",
+            "+                            options.addRelatesTo(new RelatesTo(msgctx.getMessageID()));\n",
+            "+                        }\n",
+            "+                    }\n",
+            "+\n",
+            "                     SOAPEnvelope resenvelope =\n",
+            "                         TransportUtils.createSOAPMessage(responseMessageContext);\n",
+            " \n"
+          ],
+          "locn": "-226,6 +228,16"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/DynamicAxisOperation.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/DynamicAxisOperation.java"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            " package org.apache.synapse.core.axis2;\n",
+            " \n",
+            " import org.apache.axis2.AxisFault;\n",
+            "-import org.apache.axis2.description.WSDL2Constants;\n",
+            " import org.apache.commons.logging.Log;\n",
+            " import org.apache.commons.logging.LogFactory;\n",
+            " import org.apache.synapse.*;\n"
+          ],
+          "locn": "-20,7 +20,6"
+        },
+        {
+          "lines": [
+            " import org.apache.synapse.aspects.statistics.StatisticsReporter;\n",
+            " import org.apache.synapse.endpoints.Endpoint;\n",
+            " import org.apache.synapse.mediators.MediatorFaultHandler;\n",
+            "-import org.apache.synapse.transport.nhttp.NhttpConstants;\n",
+            " \n",
+            " /**\n",
+            "  * This is the MessageReceiver set to act on behalf of Proxy services.\n"
+          ],
+          "locn": "-28,7 +27,6"
+        },
+        {
+          "lines": [
+            " \n",
+            "             if (!synCtx.getFaultStack().isEmpty()) {\n",
+            "                 warn(traceOn, \"Executing fault handler due to exception encountered\", synCtx);\n",
+            "-                ((FaultHandler) synCtx.getFaultStack().pop()).handleFault(synCtx, syne);\n",
+            "-\n",
+            "+                (synCtx.getFaultStack().pop()).handleFault(synCtx, syne);\n",
+            "             } else {\n",
+            "                 warn(traceOn, \"Exception encountered but no fault handler found - \" +\n",
+            "                     \"message dropped\", synCtx);\n"
+          ],
+          "locn": "-186,8 +184,7"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/ProxyServiceMessageReceiver.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/ProxyServiceMessageReceiver.java"
+    }
+  ],
+  "id": "1210453",
+  "message": "Fixing some issues with REST mediation",
+  "when": "2011-12-05T08:18:45-05:00",
+  "who": "hiranya"
+}

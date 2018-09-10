@@ -1,0 +1,79 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/mediators/transform/FaultMediator.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/mediators/transform/FaultMediator.java	(revision 1349133)
++++ java/modules/core/src/main/java/org/apache/synapse/mediators/transform/FaultMediator.java	(revision 1349134)
+@@ -110,26 +110,23 @@
+             default : {
+                 // if this is a POX or REST message then make a POX fault
+                 if (synCtx.isDoingPOX() || synCtx.isDoingGET()) {
+-                    
++
+                     makePOXFault(synCtx, synLog);
+ 
+                 } else {
+-                    
++
+                     // determine from current message's SOAP envelope namespace
+                     SOAPEnvelope envelop = synCtx.getEnvelope();
+                     if (envelop != null) {
+-                        
++
+                         if (SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(
+                             envelop.getNamespace().getNamespaceURI())) {
+-
+-                            soapVersion = SOAP12;
+                             makeSOAPFault(synCtx, SOAP12, synLog);
+ 
+                         } else {
+-                            soapVersion = SOAP11;
+                             makeSOAPFault(synCtx, SOAP11, synLog);
+                         }
+-                        
++
+                     } else {
+                         // default to SOAP 11
+                         makeSOAPFault(synCtx, SOAP11, synLog);
+@@ -245,8 +242,8 @@
+         }
+ 
+         // populate it
+-        setFaultCode(synCtx, factory, fault);
+-        setFaultResaon(synCtx, factory, fault);
++        setFaultCode(synCtx, factory, fault, soapVersion);
++        setFaultReason(synCtx, factory, fault, soapVersion);
+         setFaultNode(factory, fault);
+         setFaultRole(factory, fault);
+         setFaultDetail(synCtx, factory, fault);
+@@ -305,7 +302,7 @@
+         synLog.traceOrDebug("End : Fault mediator");
+     }
+ 
+-    private void setFaultCode(MessageContext synCtx, SOAPFactory factory, SOAPFault fault) {
++    private void setFaultCode(MessageContext synCtx, SOAPFactory factory, SOAPFault fault, int soapVersion) {
+ 
+         QName fault_code = null;
+ 
+@@ -319,7 +316,7 @@
+         }
+ 
+         SOAPFaultCode code = factory.createSOAPFaultCode();
+-        switch(soapVersion) {
++        switch (soapVersion) {
+             case SOAP11:
+                 code.setText(fault_code);
+                 break;
+@@ -331,7 +328,7 @@
+         fault.setCode(code);
+     }
+ 
+-    private void setFaultResaon(MessageContext synCtx, SOAPFactory factory, SOAPFault fault) {
++    private void setFaultReason(MessageContext synCtx, SOAPFactory factory, SOAPFault fault, int soapVersion) {
+         String reasonString = null;
+ 
+         if (faultReasonValue == null && faultReasonExpr == null) {
+-*-*-*-
+Message: Preventing the fault mediator from changing its status at runtime
+-*-*-*-
+When: 2012-06-12 02:23:38 -0400 
+-*-*-*-
+Who: hiranya

@@ -1,0 +1,46 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            " \t    <organization>WSO2</organization>\n",
+            " \t    <url>https://linkedin.com/in/rundupitiya</url>\n",
+            "         </developer>\n",
+            "+        <developer>\n",
+            "+            <name>Vanjikumaran Sivajothy</name>\n",
+            "+            <id>vanji</id>\n",
+            "+            <email>vanji AT apache.org</email>\n",
+            "+            <organization>WSO2</organization>\n",
+            "+            <url>https://www.linkedin.com/in/vanjikumaran</url>\n",
+            "+        </developer>\n",
+            "     </developers>\n",
+            " \n",
+            "     <contributors>\n"
+          ],
+          "locn": "-1361,6 +1361,13"
+        },
+        {
+          "lines": [
+            "             <name>Dave Irving</name>\n",
+            "         </contributor>\n",
+            "         <contributor>\n",
+            "-            <name>Vanjikumaran Sivajothy</name>\n",
+            "-        </contributor>\n",
+            "-        <contributor>\n",
+            "             <name>Prabath Ariyarathna</name>\n",
+            "         </contributor>\n",
+            "         <contributor>\n"
+          ],
+          "locn": "-1377,9 +1384,6"
+        }
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    }
+  ],
+  "id": "1791072",
+  "message": "Added new developer detail",
+  "when": "2017-04-12T01:38:11-04:00",
+  "who": "vanji"
+}

@@ -1,0 +1,117 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "             <artifactId>synapse-vfs-transport</artifactId>\n",
+            "             <scope>test</scope>\n",
+            "         </dependency>\n",
+            "-\t<dependency>\n",
+            "-\t    <!-- Required for validate mediator tests on JDK 5 -->\n",
+            "+\t    <dependency>\n",
+            "+\t        <!-- Required for validate mediator tests on JDK 5 -->\n",
+            "             <groupId>xerces</groupId>\n",
+            "             <artifactId>xercesImpl</artifactId>\n",
+            "-\t    <scope>test</scope>\n",
+            "+\t        <scope>test</scope>\n",
+            "         </dependency>\n",
+            "     </dependencies>\n",
+            " </project>\n"
+          ],
+          "locn": "-231,11 +231,11"
+        }
+      ],
+      "from": "java/modules/core/pom.xml",
+      "to": "java/modules/core/pom.xml"
+    },
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                     <artifactId>maven-javadoc-plugin</artifactId>\n",
+            "                     <version>2.8</version>\n",
+            "                 </plugin>\n",
+            "-\t\t<plugin>\n",
+            "-\t\t    <groupId>org.apache.maven.plugins</groupId>\n",
+            "-\t\t    <artifactId>maven-project-info-reports-plugin</artifactId>\n",
+            "-\t\t    <version>2.2</version>\n",
+            "-      \t\t</plugin>\n",
+            "+                <plugin>\n",
+            "+                    <groupId>org.apache.maven.plugins</groupId>\n",
+            "+                    <artifactId>maven-project-info-reports-plugin</artifactId>\n",
+            "+                    <version>2.2</version>\n",
+            "+                </plugin>\n",
+            "             </plugins>\n",
+            "         </pluginManagement>\n",
+            "+        <plugins>\n",
+            "+            <plugin>\n",
+            "+                <inherited>false</inherited>\n",
+            "+                <artifactId>maven-javadoc-plugin</artifactId>\n",
+            "+                <executions>\n",
+            "+                    <execution>\n",
+            "+                        <id>javadoc-aggregate</id>\n",
+            "+                        <configuration>\n",
+            "+                            <links>\n",
+            "+                                <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>\n",
+            "+                                <link>http://java.sun.com/j2ee/1.4/docs/api/</link>\n",
+            "+                                <link>http://jaxen.codehaus.org/apidocs/</link>\n",
+            "+                                <link>http://ws.apache.org/commons/axiom/apidocs/</link>\n",
+            "+                                <link>http://ws.apache.org/axis2/1_5_1/api/</link>\n",
+            "+                            </links>\n",
+            "+                        </configuration>\n",
+            "+                        <goals>\n",
+            "+                            <goal>aggregate</goal>\n",
+            "+                        </goals>\n",
+            "+                    </execution>\n",
+            "+                </executions>\n",
+            "+            </plugin>\n",
+            "+        </plugins>\n",
+            "     </build>\n",
+            " \n",
+            "     <dependencyManagement>\n"
+          ],
+          "locn": "-277,13 +277,36"
+        },
+        {
+          "lines": [
+            "     <reporting>\n",
+            "         <plugins>\n",
+            "             <plugin>\n",
+            "-                <inherited>false</inherited>\n",
+            "-                <artifactId>maven-javadoc-plugin</artifactId>\n",
+            "-                <configuration>\n",
+            "-                    <links>\n",
+            "-                        <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>\n",
+            "-                        <link>http://java.sun.com/j2ee/1.4/docs/api/</link>\n",
+            "-                        <link>http://jaxen.codehaus.org/apidocs/</link>\n",
+            "-                        <link>http://ws.apache.org/commons/axiom/apidocs/</link>\n",
+            "-                        <link>http://ws.apache.org/axis2/1_5_1/api/</link>\n",
+            "-                    </links>\n",
+            "-                    <aggregate>true</aggregate>\n",
+            "-                </configuration>\n",
+            "-            </plugin>\n",
+            "-            <plugin>\n",
+            "                 <artifactId>maven-site-plugin</artifactId>\n",
+            "                 <inherited>false</inherited>\n",
+            "             </plugin>\n",
+            "             <plugin>\n",
+            "                 <artifactId>maven-project-info-reports-plugin</artifactId>\n",
+            "-\t\t<version>2.2</version>\n",
+            "+                <version>2.2</version>\n",
+            "                 <configuration>\n",
+            "                     <!-- These features are disabled since they cause \"mvn site\" to hang -->\n",
+            "                     <dependencyLocationsEnabled>false</dependencyLocationsEnabled>\n"
+          ],
+          "locn": "-920,26 +943,12"
+        }
+      ],
+      "from": "java/pom.xml",
+      "to": "java/pom.xml"
+    }
+  ],
+  "id": "1224922",
+  "message": "Modifying javadoc plugin configuration to prevent the effects of http://jira.codehaus.org/browse/MJAVADOC-276",
+  "when": "2011-12-27T10:03:22-05:00",
+  "who": "hiranya"
+}

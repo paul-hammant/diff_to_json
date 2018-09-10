@@ -1,0 +1,42 @@
+{
+  "changes": [
+    {
+      "chunks": [
+        {
+          "lines": [
+            "                 targetInLineFaultSequence.destroy();\n",
+            "             }\n",
+            " \n",
+            "-            try {\n",
+            "-                AxisService as = axisConfig.getService(this.getName());\n",
+            "-                if (as != null) {\n",
+            "-                    as.setActive(false);\n",
+            "-                    axisConfig.notifyObservers(new AxisEvent(AxisEvent.SERVICE_STOP, as), as);\n",
+            "-                }\n",
+            "-                this.setRunning(false);\n",
+            "-                auditInfo(\"Stopped the proxy service : \" + name);\n",
+            "-            } catch (AxisFault axisFault) {\n",
+            "-                handleException(\"Error stopping the proxy service : \" + name, axisFault);\n",
+            "+            AxisService as = axisConfig.getServiceForActivation(this.getName());\n",
+            "+            if (as != null && as.isActive()) {\n",
+            "+                as.setActive(false);\n",
+            "+                axisConfig.notifyObservers(new AxisEvent(AxisEvent.SERVICE_STOP, as), as);\n",
+            "             }\n",
+            "+            this.setRunning(false);\n",
+            "+            auditInfo(\"Stopped the proxy service : \" + name);\n",
+            "         } else {\n",
+            "             auditWarn(\"Unable to stop proxy service : \" + name +\n",
+            "                 \". Couldn't access Axis configuration\");\n"
+          ],
+          "locn": "-741,17 +741,13"
+        }
+      ],
+      "from": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/ProxyService.java",
+      "to": "java/modules/core/src/main/java/org/apache/synapse/core/axis2/ProxyService.java"
+    }
+  ],
+  "id": "1509809",
+  "message": "Applying patch for SYNAPSE-874",
+  "when": "2013-08-02T14:58:49-04:00",
+  "who": "hiranya"
+}

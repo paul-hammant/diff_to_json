@@ -1,0 +1,58 @@
+Index: java/modules/packaging/package-archetype/src/main/resources/archetype-resources/repository/conf/axis2.xml
+===================================================================
+--- java/modules/packaging/package-archetype/src/main/resources/archetype-resources/repository/conf/axis2.xml	(revision 1210880)
++++ java/modules/packaging/package-archetype/src/main/resources/archetype-resources/repository/conf/axis2.xml	(revision 1210881)
+@@ -302,7 +302,7 @@
+     <!--                  Clustering                       -->
+     <!-- ================================================= -->
+     <!-- Configure the following for preparing Synapse to a clustered environment -->
+-    <clustering class="org.apache.axis2.clustering.tribes.TribesClusterManager" enable="false">
++    <clustering class="org.apache.axis2.clustering.tribes.TribesClusteringAgent" enable="false">
+ 
+         <!--
+            This parameter indicates whther the cluster has to be automatically initalized
+Index: java/repository/conf/sample/resources/misc/client/axis2.xml
+===================================================================
+--- java/repository/conf/sample/resources/misc/client/axis2.xml	(revision 1210880)
++++ java/repository/conf/sample/resources/misc/client/axis2.xml	(revision 1210881)
+@@ -258,7 +258,7 @@
+     <!-- ================================================= -->
+     <!-- Configure and uncomment following for preparing Axis2 to a clustered environment -->
+     <!--
+-    <clustering class="org.apache.axis2.cluster.tribes.TribesClusterManager">
++    <clustering class="org.apache.axis2.cluster.tribes.TribesClusteringAgent">
+         <parameter name="param1">value1</parameter>
+         <parameter name="domain">apache.axis2.domain</parameter>
+     	<configurationManager class="org.apache.axis2.cluster.configuration.TribesConfigurationManager">
+Index: java/repository/conf/sample/resources/misc/server/axis2.xml
+===================================================================
+--- java/repository/conf/sample/resources/misc/server/axis2.xml	(revision 1210880)
++++ java/repository/conf/sample/resources/misc/server/axis2.xml	(revision 1210881)
+@@ -256,7 +256,7 @@
+     <!-- Clustering  -->
+     <!-- ================================================= -->
+     <!-- Configure the following for preparing Axis2 to a clustered environment -->
+-    <clustering class="org.apache.axis2.clustering.tribes.TribesClusterManager" enable="false">
++    <clustering class="org.apache.axis2.clustering.tribes.TribesClusteringAgent" enable="false">
+         <parameter name="AvoidInitiation">true</parameter>
+         <parameter name="membershipScheme">multicast</parameter>
+         <parameter name="domain">apache.axis2.app.domain</parameter>
+Index: java/repository/conf/axis2.xml
+===================================================================
+--- java/repository/conf/axis2.xml	(revision 1210880)
++++ java/repository/conf/axis2.xml	(revision 1210881)
+@@ -343,7 +343,7 @@
+     <!--                  Clustering                       -->
+     <!-- ================================================= -->
+     <!-- Configure the following for preparing Synapse to a clustered environment -->
+-    <clustering class="org.apache.axis2.clustering.tribes.TribesClusterManager" enable="false">
++    <clustering class="org.apache.axis2.clustering.tribes.TribesClusteringAgent" enable="false">
+ 
+         <!--
+            This parameter indicates whther the cluster has to be automatically initalized
+-*-*-*-
+Message: s/TribesClusterManager/TribesClusteringAgent since this class has been renamed in the Axis2 trunk
+-*-*-*-
+When: 2011-12-06 07:07:10 -0500 
+-*-*-*-
+Who: azeez

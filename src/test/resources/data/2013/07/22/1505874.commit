@@ -1,0 +1,309 @@
+Index: java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/message/FIXMessageFormatter.java
+===================================================================
+--- java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/message/FIXMessageFormatter.java	(nonexistent)
++++ java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/message/FIXMessageFormatter.java	(revision 1505874)
+@@ -0,0 +1,81 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.transport.fix.message;
++
++import java.io.IOException;
++import java.io.OutputStream;
++import java.net.URL;
++
++import org.apache.axiom.om.OMOutputFormat;
++import org.apache.axis2.AxisFault;
++import org.apache.axis2.Constants;
++import org.apache.axis2.context.MessageContext;
++import org.apache.axis2.transport.MessageFormatter;
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++import org.apache.synapse.transport.fix.FIXUtils;
++
++/**
++ * Reads the incoming message context and convert them back to the fix raw
++ * message
++ * 
++ */
++public class FIXMessageFormatter implements MessageFormatter {
++
++	private static final Log log = LogFactory.getLog(FIXMessageFormatter.class);
++
++	public String formatSOAPAction(MessageContext arg0, OMOutputFormat arg1, String arg2) {
++		return null;
++	}
++
++	public byte[] getBytes(MessageContext arg0, OMOutputFormat arg1) throws AxisFault {
++	
++		return null;
++	}
++
++	public String getContentType(MessageContext msgCtx, OMOutputFormat format, String soapActionString) {
++		String contentType = (String) msgCtx.getProperty(Constants.Configuration.CONTENT_TYPE);
++		String encoding = format.getCharSetEncoding();
++		if (contentType == null) {
++			contentType = (String) msgCtx.getProperty(Constants.Configuration.MESSAGE_TYPE);
++		}
++		if (encoding != null) {
++			contentType += "; charset=" + encoding;
++		}
++		return contentType;
++	}
++
++	public URL getTargetAddress(MessageContext arg0, OMOutputFormat arg1, URL arg2) throws AxisFault {
++		return null;
++	}
++
++	public void writeTo(MessageContext msgCtx, OMOutputFormat format, OutputStream out,
++                        boolean preserve) throws AxisFault {
++
++		try {
++            quickfix.Message message = FIXUtils.getInstance().createFIXMessage(msgCtx);
++            out.write(message.toString().getBytes());
++		} catch (IOException e) {
++			log.error("Error while formatting FIX SOAP message", e);
++			throw new AxisFault(e.getMessage());
++		}
++	}
++
++}
+Index: java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/message/FIXMessageBuilder.java
+===================================================================
+--- java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/message/FIXMessageBuilder.java	(nonexistent)
++++ java/modules/transports/optional/fix/src/main/java/org/apache/synapse/transport/fix/message/FIXMessageBuilder.java	(revision 1505874)
+@@ -0,0 +1,95 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.transport.fix.message;
++
++import java.io.InputStream;
++import java.io.InputStreamReader;
++import java.io.Reader;
++
++import org.apache.axiom.om.OMElement;
++import org.apache.axis2.AxisFault;
++import org.apache.axis2.Constants;
++import org.apache.axis2.builder.Builder;
++import org.apache.axis2.context.MessageContext;
++import org.apache.commons.logging.Log;
++import org.apache.commons.logging.LogFactory;
++
++import org.apache.synapse.transport.fix.FIXUtils;
++import quickfix.InvalidMessage;
++
++/**
++ * Fix message builder prepares a payload based on the incoming raw fix message
++ * read from the destination. This implementation only focuses on building the message
++ * context. There will be limitations such as when building message there won't be
++ * fix session attribute involved and the assumption is that the fix client and executor
++ * has the responsibility of managing fix session accordingly.
++ */
++public class FIXMessageBuilder implements Builder {
++
++	private static final Log log = LogFactory.getLog(FIXMessageBuilder.class);
++
++	public OMElement processDocument(InputStream inputStream, String contentType,
++                                     MessageContext messageContext) throws AxisFault {
++		Reader reader;
++        quickfix.Message message;
++        StringBuilder messageString = new StringBuilder();
++		try {
++			String charSetEncoding = (String) messageContext.getProperty(
++                    Constants.Configuration.CHARACTER_SET_ENCODING);
++			if (charSetEncoding == null) {
++				charSetEncoding = MessageContext.DEFAULT_CHAR_SET_ENCODING;
++			}
++			reader = new InputStreamReader(inputStream, charSetEncoding);
++			try {
++				int data = reader.read();
++				while (data != -1) {
++					char dataChar = (char) data;
++					data = reader.read();
++					messageString.append(dataChar);
++				}
++			} catch (Exception e) {
++                handleException("Error while creating FIX SOAP envelope", e);
++			}
++
++		} catch (Exception e) {
++            handleException("Error while creating FIX SOAP envelope", e);
++		}
++
++		try {
++			message = new quickfix.Message(messageString.toString(), null, false);
++		} catch (InvalidMessage e) {
++			handleException("Error while creating FIX SOAP envelope", e);
++            return null;
++		}
++
++		if (log.isDebugEnabled()) {
++			log.debug("Creating SOAP envelope for FIX message...");
++		}
++
++        FIXUtils.getInstance().setSOAPEnvelope(message, -1, "", messageContext);
++		return messageContext.getEnvelope().getBody().getFirstElement();
++	}
++
++    private void handleException(String msg, Exception e) throws AxisFault {
++        log.error(msg, e);
++        throw new AxisFault(msg, e);
++    }
++
++}
+Index: java/modules/transports/optional/fix/src/test/java/org/apache/synapse/transport/fix/message/FIXMessageFormatterTest.java
+===================================================================
+--- java/modules/transports/optional/fix/src/test/java/org/apache/synapse/transport/fix/message/FIXMessageFormatterTest.java	(nonexistent)
++++ java/modules/transports/optional/fix/src/test/java/org/apache/synapse/transport/fix/message/FIXMessageFormatterTest.java	(revision 1505874)
+@@ -0,0 +1,60 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.transport.fix.message;
++
++import java.io.ByteArrayInputStream;
++import java.io.ByteArrayOutputStream;
++
++import junit.framework.TestCase;
++
++import org.apache.axiom.om.OMAbstractFactory;
++import org.apache.axiom.om.OMElement;
++import org.apache.axiom.om.OMOutputFormat;
++import org.apache.axiom.soap.SOAPEnvelope;
++import org.apache.axiom.soap.SOAPFactory;
++import org.apache.axis2.context.MessageContext;
++
++public class FIXMessageFormatterTest extends TestCase {
++
++	public void testWriteTo() throws Exception {
++
++		String input = "8=FIX.4.0\u00019=105\u000135=D\u000134=2\u000149=BANZAI\u0001" +
++                "52=20080711-06:42:26\u000156=SYNAPSE\u000111=1215758546278\u000121=1\u0001" +
++                "38=90000000\u000140=1\u000154=1\u000155=DEL\u000159=0\u000110=121\u0001";
++
++		MessageContext msgCtx = new MessageContext();
++		FIXMessageBuilder builder = new FIXMessageBuilder();
++		OMElement element = builder.processDocument(new ByteArrayInputStream(input.getBytes()),
++                "fix/j", msgCtx);
++        assertNotNull(element);
++
++        FIXMessageFormatter fixMessageFormatter = new FIXMessageFormatter();
++		ByteArrayOutputStream output = new ByteArrayOutputStream();
++		SOAPFactory factory = OMAbstractFactory.getSOAP12Factory();
++		SOAPEnvelope env = factory.getDefaultEnvelope();
++		env.getBody().addChild(element);
++        msgCtx.setEnvelope(env);
++
++		OMOutputFormat myOutputFormat = new OMOutputFormat();
++        fixMessageFormatter.writeTo(msgCtx, myOutputFormat, output, false);
++        assertTrue(output.toByteArray().length > 0);
++	}
++
++}
+Index: java/modules/transports/optional/fix/src/test/java/org/apache/synapse/transport/fix/message/FIXMessageBuilderTest.java
+===================================================================
+--- java/modules/transports/optional/fix/src/test/java/org/apache/synapse/transport/fix/message/FIXMessageBuilderTest.java	(nonexistent)
++++ java/modules/transports/optional/fix/src/test/java/org/apache/synapse/transport/fix/message/FIXMessageBuilderTest.java	(revision 1505874)
+@@ -0,0 +1,47 @@
++/*
++ *  Licensed to the Apache Software Foundation (ASF) under one
++ *  or more contributor license agreements.  See the NOTICE file
++ *  distributed with this work for additional information
++ *  regarding copyright ownership.  The ASF licenses this file
++ *  to you under the Apache License, Version 2.0 (the
++ *  "License"); you may not use this file except in compliance
++ *  with the License.  You may obtain a copy of the License at
++ *
++ *   http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing,
++ *  software distributed under the License is distributed on an
++ *   * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *  KIND, either express or implied.  See the License for the
++ *  specific language governing permissions and limitations
++ *  under the License.
++ */
++
++package org.apache.synapse.transport.fix.message;
++
++import java.io.ByteArrayInputStream;
++import junit.framework.TestCase;
++
++import org.apache.axiom.om.OMElement;
++import org.apache.axis2.context.MessageContext;
++
++import javax.xml.namespace.QName;
++
++public class FIXMessageBuilderTest extends TestCase {
++
++	public void testProcessDocument() throws Exception {
++		String input = "8=FIX.4.0\u00019=105\u000135=D\u000134=2\u000149=BANZAI\u0001" +
++                "52=20080711-06:42:26\u000156=SYNAPSE\u000111=1215758546278\u000121=1\u0001" +
++                "38=90000000\u000140=1\u000154=1\u000155=DEL\u000159=0\u000110=121\u0001";
++
++		MessageContext msgCtx = new MessageContext();
++		FIXMessageBuilder builder = new FIXMessageBuilder();
++        OMElement element = builder.processDocument(new ByteArrayInputStream(input.getBytes()),
++                "fix/j", msgCtx);
++        assertNotNull(element);
++        assertNotNull(element.getFirstChildWithName(new QName("header")));
++        assertNotNull(element.getFirstChildWithName(new QName("body")));
++        assertNotNull(element.getFirstChildWithName(new QName("trailer")));
++	}
++
++}
+-*-*-*-
+Message: Adding the FIX message builder and formatter. Inspired by the patch for SYNAPSE-891.
+-*-*-*-
+When: 2013-07-22 21:25:37 -0400 
+-*-*-*-
+Who: hiranya

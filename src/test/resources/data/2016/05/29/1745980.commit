@@ -1,0 +1,24 @@
+Index: java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java
+===================================================================
+--- java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java	(revision 1745979)
++++ java/modules/transports/core/nhttp/src/main/java/org/apache/synapse/transport/passthru/PassThroughHttpSender.java	(revision 1745980)
+@@ -385,11 +385,11 @@
+ 				}
+ 			}
+ 
+-			if (Boolean.TRUE.equals(msgContext.getProperty("PASSTHRU_CONNECT_ERROR"))) {
++			if (Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.PASSTHRU_CONNECT_ERROR))) {
+ 				return;
+ 			}
+ 
+-			OutputStream out = (OutputStream) msgContext.getProperty("GET_ME_OUT");
++			OutputStream out = (OutputStream) msgContext.getProperty(PassThroughConstants.BUILDER_OUTPUT_STREAM);
+ 			if (out != null) {
+ 				String disableChunking = (String) msgContext.getProperty(
+                         PassThroughConstants.DISABLE_CHUNKING);
+-*-*-*-
+Message: Completing the fix done for SYNAPSE-1024
+-*-*-*-
+When: 2016-05-29 05:08:59 -0400 
+-*-*-*-
+Who: hiranya

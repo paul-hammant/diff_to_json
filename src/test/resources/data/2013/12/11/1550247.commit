@@ -1,0 +1,42 @@
+Index: java/modules/core/src/main/java/org/apache/synapse/util/jaxp/AXIOMResultBuilder.java
+===================================================================
+--- java/modules/core/src/main/java/org/apache/synapse/util/jaxp/AXIOMResultBuilder.java	(revision 1550246)
++++ java/modules/core/src/main/java/org/apache/synapse/util/jaxp/AXIOMResultBuilder.java	(revision 1550247)
+@@ -21,21 +21,25 @@
+ 
+ import java.nio.charset.Charset;
+ 
++import javax.xml.transform.sax.SAXResult;
++
++import org.apache.axiom.om.OMAbstractFactory;
++import org.apache.axiom.om.OMContainer;
++import org.apache.axiom.om.OMDocument;
+ import org.apache.axiom.om.OMElement;
+-import org.apache.axiom.om.impl.jaxp.OMResult;
+ 
+ /**
+- * {@link ResultBuilder} implementation that relies on {@link OMResult}.
++ * {@link ResultBuilder} implementation that relies on {@link OMContainer#getSAXResult()}.
+  */
+ public class AXIOMResultBuilder implements ResultBuilder {
+-    private final OMResult result = new OMResult();
++	private final OMDocument document = OMAbstractFactory.getOMFactory().createOMDocument();
+     
+-    public OMResult getResult() {
+-        return result;
++    public SAXResult getResult() {
++        return document.getSAXResult();
+     }
+ 
+     public OMElement getNode(Charset charset) {
+-        return result.getRootElement();
++        return document.getOMDocumentElement();
+     }
+ 
+     public void release() {
+-*-*-*-
+Message: Use the new getSAXResult API instead of the old OMResult API.
+-*-*-*-
+When: 2013-12-11 15:17:58 -0500 
+-*-*-*-
+Who: veithen
