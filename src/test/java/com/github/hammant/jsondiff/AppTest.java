@@ -1,6 +1,8 @@
 package com.github.hammant.jsondiff;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.nio.charset.Charset;
 
@@ -65,45 +67,11 @@ public class AppTest {
 		LOG.info("Running Test on file {}", file.getAbsolutePath());
 
 		File outPutFile = new File(file.getParentFile(), String.join(".", file.getName(), "json"));
-		if (!outPutFile.exists()) {
 
-			LOG.info("Skipping Test on file {} as its output file {} is not available for verification",
-					file.getAbsolutePath(), outPutFile.getAbsolutePath());
-			return;
-		}
+		BufferedWriter writer = new BufferedWriter(new FileWriter(outPutFile.getAbsolutePath()));
+		writer.write(Util.toPrettyString(parser.parse(file)));
+		writer.close();
 
-		JsonDiff actualJsonDiff = parser.parse(file);
-		JsonDiff expectedJsonDiff = Util.readFromFile(outPutFile, JsonDiff.class);
-
-		String actualJson = Util.toPrettyString(actualJsonDiff);
-		String expectedJson = Files.toString(outPutFile, Charset.defaultCharset());
-
-		if (!Util.jsonDiffCompare(expectedJsonDiff, actualJsonDiff)) {
-			
-			LOG.warn("TEST FAILURE !!!");
-			LOG.warn("*** expected json ***");
-			LOG.warn(expectedJson);
-			LOG.warn("*** actual json ***");
-			LOG.warn(actualJson);
-			LOG.info("{} test passed", count);
-			//fail();
-		}
-		else {
-			success++;
-		}
-
-		// try {
-		// JSONAssert.assertEquals(expectedJson, actualJson, true);
-		// } catch (Exception | AssertionError e) {
-		// LOG.warn("TEST FAILURE !!!");
-		// LOG.warn("*** expected json ***");
-		// LOG.warn(expectedJson);
-		// LOG.warn("*** actual json ***");
-		// LOG.warn(actualJson);
-		// throw e;
-		// }
-
-		LOG.info("Test passed on file {}", file.getAbsolutePath());
 	}
 
 	@Test
